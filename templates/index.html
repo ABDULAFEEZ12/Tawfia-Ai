@@ -135,7 +135,6 @@
             from {opacity: 0; transform: translateY(20px);}
             to {opacity: 1; transform: translateY(0);}
         }
-
         /* Light Mode */
         body.light-mode {
             background: linear-gradient(135deg, #e0f7fa, #b2ebf2, #80deea);
@@ -151,7 +150,6 @@
         body.light-mode .results div {
             background: rgba(0, 0, 0, 0.05);
         }
-
         /* Dark Mode */
         body.dark-mode {
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
@@ -179,13 +177,21 @@
 </header>
 
 <div class="tabs">
-    <div class="tab active" onclick="switchTab('aiSection')">🤖 AI</div>
-    <div class="tab" onclick="switchTab('quranSection')">📖 Quran</div>
-    <div class="tab" onclick="switchTab('hadithSection')">📜 Hadith</div>
+    <div class="tab active" onclick="switchTab('aiSection', event)">🤖 AI</div>
+    <div class="tab" onclick="switchTab('quranSection', event)">📖 Quran</div>
+    <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
 <!-- AI Section -->
 <div class="section active" id="aiSection">
+    <select id="aiCategory" style="width: 80%; padding: 12px; margin: 15px 0; font-size: 16px;">
+        <option value="">Select Topic</option>
+        <option value="Islamic guidance">Islamic Guidance</option>
+        <option value="fiqh">Fiqh</option>
+        <option value="history">Islamic History</option>
+        <option value="duas">Duas</option>
+        <option value="general">General Questions</option>
+    </select>
     <input type="text" id="userInput" placeholder="Type your question here...">
     <button onclick="sendQuestion()">Ask</button>
     <div class="messages" id="messages"></div>
@@ -194,7 +200,9 @@
 <!-- Quran Section -->
 <div class="section" id="quranSection">
     <input type="text" id="quranInput" placeholder="Enter Surah name or keyword...">
-    <select id="surahList"><option value="">-- Select Surah --</option></select>
+    <select id="surahList">
+        <option value="">-- Select Surah --</option>
+    </select>
     <button onclick="searchQuran()">Search Surah</button>
     <div class="results" id="quranResult"></div>
 </div>
@@ -207,15 +215,21 @@
 </div>
 
 <script>
-function switchTab(sectionId) {
+function switchTab(sectionId, event) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(sectionId).classList.add('active');
     event.target.classList.add('active');
 }
 
+function toggleMode() {
+    document.body.classList.toggle('light-mode');
+    document.body.classList.toggle('dark-mode');
+}
+
 function sendQuestion() {
     const input = document.getElementById("userInput").value.trim();
+    const category = document.getElementById("aiCategory").value;
     if (!input) return;
     const messagesDiv = document.getElementById("messages");
     const userMsg = document.createElement("p");
@@ -226,7 +240,7 @@ function sendQuestion() {
     fetch('/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: input })
+        body: JSON.stringify({ question: input, category })
     }).then(res => res.json()).then(data => {
         const aiMsg = document.createElement("p");
         aiMsg.textContent = "Tawfiq AI: " + (data.answer || "Sorry, couldn't answer.");
@@ -239,13 +253,13 @@ function searchQuran() {
     const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
     if (!query) return;
     const resultDiv = document.getElementById("quranResult");
-    resultDiv.innerHTML = <div class="user-message">Searching: ${query}</div>;
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
     fetch('/quran-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
-        resultDiv.innerHTML += <div>${data.result || "No result found."}</div>;
+        resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
     });
 }
 
@@ -253,34 +267,16 @@ function searchHadith() {
     const query = document.getElementById("hadithInput").value.trim();
     if (!query) return;
     const resultDiv = document.getElementById("hadithResult");
-    resultDiv.innerHTML = <div class="user-message">Searching: ${query}</div>;
+    resultDiv.innerHTML = `<div class="user-message">Searching Hadith: ${query}</div>`;
     fetch('/hadith-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
-        resultDiv.innerHTML += <div>${data.result || "No result found."}</div>;
+        resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
     });
-}
-
-function loadSurahList() {
-    fetch('/get-surah-list').then(res => res.json()).then(data => {
-        const list = document.getElementById("surahList");
-        data.surahs.forEach(surah => {
-            const opt = document.createElement("option");
-            opt.value = surah;
-            opt.textContent = surah;
-            list.appendChild(opt);
-        });
-    });
-}
-document.addEventListener("DOMContentLoaded", loadSurahList);
-
-function toggleMode() {
-    const body = document.body;
-    body.classList.toggle('dark-mode');
-    body.classList.toggle('light-mode');
 }
 </script>
+
 </body>
 </html>
