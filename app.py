@@ -1,64 +1,22 @@
 from flask import Flask, request, jsonify, render_template
-import json
 import requests
+import json
 from difflib import get_close_matches
-import openai
-from openai import APIError
-from dotenv import load_dotenv  # type: ignore
+from openai import OpenAI, APIError
+from dotenv import load_dotenv # type: ignore
 import os
 
 # ✅ Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(_name_)
 
 # ✅ Set up the OpenAI client securely
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ✅ Load the Hadith file ONCE when the app starts
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-hadith_path = os.path.join(BASE_DIR, 'DATA', 'sahih_bukhari_coded.json')
-
-try:
-    with open(hadith_path, 'r', encoding='utf-8') as f:
-        hadith_data = json.load(f)
-except FileNotFoundError:
-    print(f"[ERROR] Hadith file not found at: {hadith_path}")
-    hadith_data = {}  # fallback so app doesn’t crash
-
-# ✅ Load basic Islamic knowledge from the JSON file
-def load_basic_knowledge():
-    knowledge_path = os.path.join(BASE_DIR, 'DATA', 'basic_islamic_knowledge.json')
-    try:
-        with open(knowledge_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        print(f"[ERROR] Basic knowledge file not found at: {knowledge_path}")
-        return {}
-
-# ✅ Function to get answer from local knowledge or fallback to OpenAI
-def get_answer(user_question):
-    basic_knowledge = load_basic_knowledge()
-
-    # Check if the question is in the local knowledge
-    if user_question in basic_knowledge:
-        return basic_knowledge[user_question]
-
-    # If not found, fallback to OpenAI
-    return query_openai(user_question)
-
-# ✅ Function to query OpenAI
-def query_openai(user_question):
-    try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=user_question,
-            max_tokens=150
-        )
-        return response.choices[0].text.strip()
-    except Exception as e:
-        print(f"Error querying OpenAI: {e}")
-        return "Error querying OpenAI. Please try again later."
+with open(r"C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\sahih_bukhari_coded.json", 'r', encoding='utf-8') as f:
+    hadith_data = json.load(f)
 
 @app.route('/')
 def index():
@@ -73,11 +31,27 @@ def ask():
         return jsonify({'answer': 'Please type a question.'})
 
     try:
-        # Get the answer (either from local knowledge or OpenAI)
-        answer = get_answer(question)
+        system_prompt = (
+            "You are Tawfiq AI, an Islamic assistant. Answer strictly based on Quran and authentic Hadith."
+            " If unrelated to Islam, politely decline."
+        )
 
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": question}
+            ],
+            temperature=0.2,
+            max_tokens=500,
+        )
+
+        answer = response.choices[0].message.content.strip()
         return jsonify({'answer': answer})
 
+    except APIError as e:
+        print(f"AI Error: {e}")
+        return jsonify({'answer': 'Tawfiq AI is facing an issue. Please try later.'})
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'Unexpected error. Try later.'})
@@ -103,7 +77,7 @@ def quran_search():
 
         if close_matches:
             surah_number = surah_names[close_matches[0]]
-            # ✅ Fetch verses WITH translation
+            # ✅ Fetch verses WITH translation & audio
             verses_response = requests.get(
                 f'https://api.quran.gading.dev/surah/{surah_number}'
             )
@@ -117,10 +91,12 @@ def quran_search():
                 ayah_num = v['number']['inSurah']
                 translation = v['translation']['en']
                 arabic_text = v['text']['arab']
+                audio_url = v['audio']['primary']  # audio link
 
                 formatted = (
                     f"{surah_number}:{ayah_num} {translation}\n\n"
-                    f"{arabic_text}"
+                    f"{arabic_text}\n\n"
+                    f"🎧 Audio: {audio_url}"
                 )
                 formatted_verses.append(formatted)
 
@@ -138,20 +114,12 @@ def quran_search():
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
-    query = (
-        data.get('query', '')
-        .strip()
-        .lower()
-        .replace('hadith on ', '')
-        .replace('hadith by ', '')
-        .replace('hadith talking about ', '')
-    )
+    query = data.get('query', '').strip().lower()
 
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.'})
 
-    if not hadith_data:
-        return jsonify({'result': 'Hadith data not loaded properly. Please try again later.'})
+    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     try:
         matches = []
@@ -200,5 +168,5 @@ def get_surah_list():
         print(f"Error loading Surah list: {e}")
         return jsonify({'surahs': []})
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(debug=True)
