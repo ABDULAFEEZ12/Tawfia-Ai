@@ -15,7 +15,7 @@ app = Flask(__name__)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ✅ Load the Hadith file ONCE when the app starts
-with open(r"C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\sahih_bukhari_coded.json", 'r', encoding='utf-8') as f:
+with open('DATA\sahih_bukhari_coded.json', 'r', encoding='utf-8') as f:
     hadith_data = json.load(f)
 
 @app.route('/')
