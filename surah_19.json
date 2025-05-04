@@ -1,0 +1,495 @@
+{
+  "surahName": "Maryam",
+  "verses": [
+    {
+      "number": 1,
+      "arabicText": "كهيعص",
+      "translation": "Kaf, Ha, Ya, 'Ayn, Sad."
+    },
+    {
+      "number": 2,
+      "arabicText": "ذِكْرُ رَحْمَتِ رَبِّكَ عَبْدَهُ زَكَرِيَّا",
+      "translation": "[This is] a mention of the mercy of your Lord to His servant Zechariah"
+    },
+    {
+      "number": 3,
+      "arabicText": "إِذْ نَادَىٰ رَبَّهُ نِدَاءً خَفِيًّا",
+      "translation": "When he called to his Lord a private supplication."
+    },
+    {
+      "number": 4,
+      "arabicText": "قَالَ رَبِّ إِنِّي وَهَنَ الْعَظْمُ مِنِّي وَاشْتَعَلَ الرَّأْسُ شَيْبًا وَلَمْ أَكُن بِدُعَائِكَ رَبِّ شَقِيًّا",
+      "translation": "He said, \"My Lord, indeed my bones have weakened, and my head has filled with white, and never have I been in my supplication to You, my Lord, unhappy."
+    },
+    {
+      "number": 5,
+      "arabicText": "وَإِنِّي خِفْتُ الْمَوَالِيَ مِن وَرَائِي وَكَانَتِ امْرَأَتِي عَاقِرًا فَهَبْ لِي مِن لَّدُنكَ وَلِيًّا",
+      "translation": "And indeed, I fear the successors after me, and my wife has been barren, so give me from Yourself an heir"
+    },
+    {
+      "number": 6,
+      "arabicText": "يَرِثُنِي وَيَرِثُ مِنْ آلِ يَعْقُوبَ ۖ وَاجْعَلْهُ رَبِّ رَضِيًّا",
+      "translation": "Who will inherit me and inherit from the family of Jacob. And make him, my Lord, pleasing [to You].\""
+    },
+    {
+      "number": 7,
+      "arabicText": "يَا زَكَرِيَّا إِنَّا نُبَشِّرُكَ بِغُلَامٍ اسْمُهُ يَحْيَىٰ لَمْ نَجْعَل لَّهُ مِن قَبْلُ سَمِيًّا",
+      "translation": "[He was told], \"O Zechariah, indeed We give you good tidings of a boy whose name will be John. We have not assigned to any before [this] name.\""
+    },
+    {
+      "number": 8,
+      "arabicText": "قَالَ رَبِّ أَنَّىٰ يَكُونُ لِي غُلَامٌ وَكَانَتِ امْرَأَتِي عَاقِرًا وَقَدْ بَلَغْتُ مِنَ الْكِبَرِ عِتِيًّا",
+      "translation": "He said, \"My Lord, how will I have a boy when my wife has been barren and I have reached extreme old age?\""
+    },
+    {
+      "number": 9,
+      "arabicText": "قَالَ كَذَٰلِكَ قَالَ رَبُّكَ هُوَ عَلَيَّ هَيِّنٌ وَقَدْ خَلَقْتُكَ مِن قَبْلُ وَلَمْ تَكُ شَيْئًا",
+      "translation": "[An angel] said, \"Thus [it will be]; your Lord says, 'It is easy for Me, for I created you before, while you were nothing.' \""
+    },
+    {
+      "number": 10,
+      "arabicText": "قَالَ رَبِّ اجْعَل لِّي آيَةً ۚ قَالَ آيَتُكَ أَلَّا تُكَلِّمَ النَّاسَ ثَلَاثَ لَيَالٍ سَوِيًّا",
+      "translation": "[Zechariah] said, \"My Lord, make for me a sign.\" He said, \"Your sign is that you will not speak to the people for three nights, [being] sound.\""
+    },
+    {
+      "number": 11,
+      "arabicText": "فَخَرَجَ عَلَىٰ قَوْمِهِ مِنَ الْمِحْرَابِ فَأَوْحَىٰ إِلَيْهِمْ أَن سَبِّحُوا بُكْرَةً وَعَشِيًّا",
+      "translation": "So he came out to his people from the prayer chamber and signaled to them to exalt [Allah] in the morning and afternoon."
+    },
+    {
+      "number": 12,
+      "arabicText": "يَا يَحْيَىٰ خُذِ الْكِتَابَ بِقُوَّةٍ ۖ وَآتَيْنَاهُ الْحُكْمَ صَبِيًّا",
+      "translation": "[Allah] said, \"O John, take the Scripture with determination.\" And We gave him judgement [while yet] a boy"
+    },
+    {
+      "number": 13,
+      "arabicText": "وَحَنَانًا مِّن لَّدُنَّا وَزَكَاةً ۖ وَكَانَ تَقِيًّا",
+      "translation": "And affection from Us and purity, and he was fearing of Allah"
+    },
+    {
+      "number": 14,
+      "arabicText": "وَبَرًّا بِوَالِدَيْهِ وَلَمْ يَكُن جَبَّارًا عَصِيًّا",
+      "translation": "And dutiful to his parents, and he was not a disobedient tyrant."
+    },
+    {
+      "number": 15,
+      "arabicText": "وَسَلَامٌ عَلَيْهِ يَوْمَ وُلِدَ وَيَوْمَ يَمُوتُ وَيَوْمَ يُبْعَثُ حَيًّا",
+      "translation": "And peace be upon him the day he was born and the day he dies and the day he is raised alive."
+    },
+    {
+      "number": 16,
+      "arabicText": "وَاذْكُرْ فِي الْكِتَابِ مَرْيَمَ إِذِ انتَبَذَتْ مِنْ أَهْلِهَا مَكَانًا شَرْقِيًّا",
+      "translation": "And mention, [O Muhammad], in the Book [the story of] Mary, when she withdrew from her family to a place toward the east."
+    },
+    {
+      "number": 17,
+      "arabicText": "فَاتَّخَذَتْ مِن دُونِهِمْ حِجَابًا فَأَرْسَلْنَا إِلَيْهَا رُوحَنَا فَتَمَثَّلَ لَهَا بَشَرًا سَوِيًّا",
+      "translation": "And she took, in seclusion from them, a screen. Then We sent to her Our Angel, and he represented himself to her as a well-proportioned man."
+    },
+    {
+      "number": 18,
+      "arabicText": "قَالَتْ إِنِّي أَعُوذُ بِالرَّحْمَٰنِ مِنكَ إِن كُنتَ تَقِيًّا",
+      "translation": "She said, \"Indeed, I seek refuge in the Most Merciful from you, [so leave me], if you should be fearing of Allah.\""
+    },
+    {
+      "number": 19,
+      "arabicText": "قَالَ إِنَّمَا أَنَا رَسُولُ رَبِّكِ لِأَهَبَ لَكِ غُلَامًا زَكِيًّا",
+      "translation": "He said, \"I am only the messenger of your Lord to give you [news of] a pure boy.\""
+    },
+    {
+      "number": 20,
+      "arabicText": "قَالَتْ أَنَّىٰ يَكُونُ لِي غُلَامٌ وَلَمْ يَمْسَسْنِي بَشَرٌ وَلَمْ أَكُ بَغِيًّا",
+      "translation": "She said, \"How can I have a boy while no man has touched me and I have not been unchaste?\""
+    },
+    {
+      "number": 21,
+      "arabicText": "قَالَ كَذَٰلِكِ قَالَ رَبُّكِ هُوَ عَلَيَّ هَيِّنٌ ۖ وَلِنَجْعَلَهُ آيَةً لِّلنَّاسِ وَرَحْمَةً مِّنَّا ۚ وَكَانَ أَمْرًا مَّقْضِيًّا",
+      "translation": "He said, \"Thus [it will be]; your Lord says, 'It is easy for Me, and We will make him a sign to the people and a mercy from Us. And it is a matter [already] decreed.' \""
+    },
+    {
+      "number": 22,
+      "arabicText": "۞ فَحَمَلَتْهُ فَانتَبَذَتْ بِهِ مَكَانًا قَصِيًّا",
+      "translation": "So she conceived him, and she withdrew with him to a remote place."
+    },
+    {
+      "number": 23,
+      "arabicText": "فَأَجَاءَهَا الْمَخَاضُ إِلَىٰ جِذْعِ النَّخْلَةِ قَالَتْ يَا لَيْتَنِي مِتُّ قَبْلَ هَٰذَا وَكُنتُ نَسْيًا مَّنسِيًّا",
+      "translation": "And the pains of childbirth drove her to the trunk of a palm tree. She said, \"Oh, I wish I had died before this and was in oblivion, forgotten.\""
+    },
+    {
+      "number": 24,
+      "arabicText": "فَنَادَاهَا مِن تَحْتِهَا أَلَّا تَحْزَنِي قَدْ جَعَلَ رَبُّكِ تَحْتَكِ سَرِيًّا",
+      "translation": "But he called her from below her, \"Do not grieve; your Lord has provided beneath you a stream."
+    },
+    {
+      "number": 25,
+      "arabicText": "وَهُزِّي إِلَيْكِ بِجِذْعِ النَّخْلَةِ تُسَاقِطْ عَلَيْكِ رُطَبًا جَنِيًّا",
+      "translation": "And shake toward you the trunk of the palm tree; it will drop upon you ripe, fresh dates."
+    },
+    {
+      "number": 26,
+      "arabicText": "فَكُلِي وَاشْرَبِي وَقَرِّي عَيْنًا ۖ فَإِمَّا تَرَيِنَّ مِنَ الْبَشَرِ أَحَدًا فَقُولِي إِنِّي نَذَرْتُ لِلرَّحْمَٰنِ صَوْمًا فَلَنْ أُكَلِّمَ الْيَوْمَ إِنسِيًّا",
+      "translation": "So eat and drink and be contented. And if you see from among humanity anyone, say, 'Indeed, I have vowed to the Most Merciful abstention, so I will not speak today to [any] man.' \""
+    },
+    {
+      "number": 27,
+      "arabicText": "فَأَتَتْ بِهِ قَوْمَهَا تَحْمِلُهُ ۖ قَالُوا يَا مَرْيَمُ لَقَدْ جِئْتِ شَيْئًا فَرِيًّا",
+      "translation": "Then she brought him to her people, carrying him. They said, \"O Mary, you have certainly done a thing unprecedented."
+    },
+    {
+      "number": 28,
+      "arabicText": "يَا أُخْتَ هَارُونَ مَا كَانَ أَبُوكِ امْرَأَ سَوْءٍ وَمَا كَانَتْ أُمُّكِ بَغِيًّا",
+      "translation": "O sister of Aaron, your father was not a man of evil, nor was your mother unchaste.\""
+    },
+    {
+      "number": 29,
+      "arabicText": "فَأَشَارَتْ إِلَيْهِ ۖ قَالُوا كَيْفَ نُكَلِّمُ مَن كَانَ فِي الْمَهْدِ صَبِيًّا",
+      "translation": "So she pointed to him. They said, \"How can we speak to one who is in the cradle a child?\""
+    },
+    {
+      "number": 30,
+      "arabicText": "قَالَ إِنِّي عَبْدُ اللَّهِ آتَانِيَ الْكِتَابَ وَجَعَلَنِي نَبِيًّا",
+      "translation": "[Jesus] said, \"Indeed, I am the servant of Allah. He has given me the Scripture and made me a prophet."
+    },
+    {
+      "number": 31,
+      "arabicText": "وَجَعَلَنِي مُبَارَكًا أَيْنَ مَا كُنتُ وَأَوْصَانِي بِالصَّلَاةِ وَالزَّكَاةِ مَا دُمْتُ حَيًّا",
+      "translation": "And He has made me blessed wherever I am and has enjoined upon me prayer and zakah as long as I remain alive"
+    },
+    {
+      "number": 32,
+      "arabicText": "وَبَرًّا بِوَالِدَتِي وَلَمْ يَجْعَلْنِي جَبَّارًا شَقِيًّا",
+      "translation": "And [made me] dutiful to my mother, and He has not made me a wretched tyrant."
+    },
+    {
+      "number": 33,
+      "arabicText": "وَالسَّلَامُ عَلَيَّ يَوْمَ وُلِدتُّ وَيَوْمَ أَمُوتُ وَيَوْمَ أُبْعَثُ حَيًّا",
+      "translation": "And peace is on me the day I was born and the day I will die and the day I am raised alive.\""
+    },
+    {
+      "number": 34,
+      "arabicText": "ذَٰلِكَ عِيسَى ابْنُ مَرْيَمَ ۚ قَوْلَ الْحَقِّ الَّذِي فِيهِ يَمْتَرُونَ",
+      "translation": "That is Jesus, the son of Mary - the word of truth about which they are in dispute."
+    },
+    {
+      "number": 35,
+      "arabicText": "مَا كَانَ لِلَّهِ أَن يَتَّخِذَ مِن وَلَدٍ ۖ سُبْحَانَهُ ۚ إِذَا قَضَىٰ أَمْرًا فَإِنَّمَا يَقُولُ لَهُ كُن فَيَكُونُ",
+      "translation": "It is not [befitting] for Allah to take a son; exalted is He! When He decrees an affair, He only says to it, \"Be,\" and it is."
+    },
+    {
+      "number": 36,
+      "arabicText": "وَإِنَّ اللَّهَ رَبِّي وَرَبُّكُمْ فَاعْبُدُوهُ ۚ هَٰذَا صِرَاطٌ مُّسْتَقِيمٌ",
+      "translation": "[Jesus said], \"And indeed, Allah is my Lord and your Lord, so worship Him. That is a straight path.\""
+    },
+    {
+      "number": 37,
+      "arabicText": "فَاخْتَلَفَ الْأَحْزَابُ مِن بَيْنِهِمْ ۖ فَوَيْلٌ لِّلَّذِينَ كَفَرُوا مِن مَّشْهَدِ يَوْمٍ عَظِيمٍ",
+      "translation": "Then the factions differed [concerning Jesus] from among them, so woe to those who disbelieved - from the scene of a tremendous Day."
+    },
+    {
+      "number": 38,
+      "arabicText": "أَسْمِعْ بِهِمْ وَأَبْصِرْ يَوْمَ يَأْتُونَنَا ۖ لَٰكِنِ الظَّالِمُونَ الْيَوْمَ فِي ضَلَالٍ مُّبِينٍ",
+      "translation": "How [clearly] they will hear and see the Day they come to Us, but the wrongdoers today are in clear error."
+    },
+    {
+      "number": 39,
+      "arabicText": "وَأَنذِرْهُمْ يَوْمَ الْحَسْرَةِ إِذْ قُضِيَ الْأَمْرُ وَهُمْ فِي غَفْلَةٍ وَهُمْ لَا يُؤْمِنُونَ",
+      "translation": "And warn them, [O Muhammad], of the Day of Regret, when the matter will be concluded; and [yet], they are in [a state of] heedlessness, and they do not believe."
+    },
+    {
+      "number": 40,
+      "arabicText": "إِنَّا نَحْنُ نَرِثُ الْأَرْضَ وَمَنْ عَلَيْهَا وَإِلَيْنَا يُرْجَعُونَ",
+      "translation": "Indeed, it is We who will inherit the earth and whoever is on it, and to Us they will be returned."
+    },
+    {
+      "number": 41,
+      "arabicText": "وَاذْكُرْ فِي الْكِتَابِ إِبْرَاهِيمَ ۚ إِنَّهُ كَانَ صِدِّيقًا نَّبِيًّا",
+      "translation": "And mention in the Book [the story of] Abraham. Indeed, he was a man of truth and a prophet."
+    },
+    {
+      "number": 42,
+      "arabicText": "إِذْ قَالَ لِأَبِيهِ يَا أَبَتِ لِمَ تَعْبُدُ مَا لَا يَسْمَعُ وَلَا يُبْصِرُ وَلَا يُغْنِي عَنكَ شَيْئًا",
+      "translation": "[Mention] when he said to his father, \"O my father, why do you worship that which does not hear and does not see and will not benefit you at all?"
+    },
+    {
+      "number": 43,
+      "arabicText": "يَا أَبَتِ إِنِّي قَدْ جَاءَنِي مِنَ الْعِلْمِ مَا لَمْ يَأْتِكَ فَاتَّبِعْنِي أَهْدِكَ صِرَاطًا سَوِيًّا",
+      "translation": "O my father, indeed there has come to me of knowledge that which has not come to you, so follow me; I will guide you to an even path."
+    },
+    {
+      "number": 44,
+      "arabicText": "يَا أَبَتِ لَا تَعْبُدِ الشَّيْطَانَ ۖ إِنَّ الشَّيْطَانَ كَانَ لِلرَّحْمَٰنِ عَصِيًّا",
+      "translation": "O my father, do not worship Satan. Indeed Satan has ever been, to the Most Merciful, disobedient."
+    },
+    {
+      "number": 45,
+      "arabicText": "يَا أَبَتِ إِنِّي أَخَافُ أَن يَمَسَّكَ عَذَابٌ مِّنَ الرَّحْمَٰنِ فَتَكُونَ لِلشَّيْطَانِ وَلِيًّا",
+      "translation": "O my father, indeed I fear that there will touch you a punishment from the Most Merciful so you would be to Satan a companion [in Hellfire].\""
+    },
+    {
+      "number": 46,
+      "arabicText": "قَالَ أَرَاغِبٌ أَنتَ عَنْ آلِهَتِي يَا إِبْرَاهِيمُ ۖ لَئِن لَّمْ تَنتَهِ لَأَرْجُمَنَّكَ ۖ وَاهْجُرْنِي مَلِيًّا",
+      "translation": "[His father] said, \"Have you no desire for my gods, O Abraham? If you do not desist, I will surely stone you, so avoid me a prolonged time.\""
+    },
+    {
+      "number": 47,
+      "arabicText": "قَالَ سَلَامٌ عَلَيْكَ ۖ سَأَسْتَغْفِرُ لَكَ رَبِّي ۖ إِنَّهُ كَانَ بِي حَفِيًّا",
+      "translation": "[Abraham] said, \"Peace will be upon you. I will ask forgiveness for you of my Lord. Indeed, He is ever gracious to me."
+    },
+    {
+      "number": 48,
+      "arabicText": "وَأَعْتَزِلُكُمْ وَمَا تَدْعُونَ مِن دُونِ اللَّهِ وَأَدْعُو رَبِّي عَسَىٰ أَلَّا أَكُونَ بِدُعَاءِ رَبِّي شَقِيًّا",
+      "translation": "And I will leave you and those you invoke other than Allah and will invoke my Lord. I expect that I will not be in invocation to my Lord unhappy.\""
+    },
+    {
+      "number": 49,
+      "arabicText": "فَلَمَّا اعْتَزَلَهُمْ وَمَا يَعْبُدُونَ مِن دُونِ اللَّهِ وَهَبْنَا لَهُ إِسْحَاقَ وَيَعْقُوبَ ۖ وَكُلًّا جَعَلْنَا نَبِيًّا",
+      "translation": "So when he had left them and those they worshipped other than Allah, We gave him Isaac and Jacob, and each [of them] We made a prophet."
+    },
+    {
+      "number": 50,
+      "arabicText": "وَوَهَبْنَا لَهُم مِّن رَّحْمَتِنَا وَجَعَلْنَا لَهُمْ لِسَانَ صِدْقٍ عَلِيًّا",
+      "translation": "And We gave them of Our mercy, and we made for them a reputation of high honor."
+    },
+    {
+      "number": 51,
+      "arabicText": "وَاذْكُرْ فِي الْكِتَابِ مُوسَىٰ ۚ إِنَّهُ كَانَ مُخْلَصًا وَكَانَ رَسُولًا نَّبِيًّا",
+      "translation": "And mention in the Book, Moses. Indeed, he was chosen, and he was a messenger and a prophet."
+    },
+    {
+      "number": 52,
+      "arabicText": "وَنَادَيْنَاهُ مِن جَانِبِ الطُّورِ الْأَيْمَنِ وَقَرَّبْنَاهُ نَجِيًّا",
+      "translation": "And We called him from the side of the mount at [his] right and brought him near, confiding [to him]."
+    },
+    {
+      "number": 53,
+      "arabicText": "وَوَهَبْنَا لَهُ مِن رَّحْمَتِنَا أَخَاهُ هَارُونَ نَبِيًّا",
+      "translation": "And We gave him out of Our mercy his brother Aaron as a prophet."
+    },
+    {
+      "number": 54,
+      "arabicText": "وَاذْكُرْ فِي الْكِتَابِ إِسْمَاعِيلَ ۚ إِنَّهُ كَانَ صَادِقَ الْوَعْدِ وَكَانَ رَسُولًا نَّبِيًّا",
+      "translation": "And mention in the Book, Ishmael. Indeed, he was true to his promise, and he was a messenger and a prophet."
+    },
+    {
+      "number": 55,
+      "arabicText": "وَكَانَ يَأْمُرُ أَهْلَهُ بِالصَّلَاةِ وَالزَّكَاةِ وَكَانَ عِندَ رَبِّهِ مَرْضِيًّا",
+      "translation": "And he used to enjoin on his people prayer and zakah and was to his Lord pleasing."
+    },
+    {
+      "number": 56,
+      "arabicText": "وَاذْكُرْ فِي الْكِتَابِ إِدْرِيسَ ۚ إِنَّهُ كَانَ صِدِّيقًا نَّبِيًّا",
+      "translation": "And mention in the Book, Idrees. Indeed, he was a man of truth and a prophet."
+    },
+    {
+      "number": 57,
+      "arabicText": "وَرَفَعْنَاهُ مَكَانًا عَلِيًّا",
+      "translation": "And We raised him to a high station."
+    },
+    {
+      "number": 58,
+      "arabicText": "أُولَٰئِكَ الَّذِينَ أَنْعَمَ اللَّهُ عَلَيْهِم مِّنَ النَّبِيِّينَ مِن ذُرِّيَّةِ آدَمَ وَمِمَّنْ حَمَلْنَا مَعَ نُوحٍ وَمِن ذُرِّيَّةِ إِبْرَاهِيمَ وَإِسْرَائِيلَ وَمِمَّنْ هَدَيْنَا وَاجْتَبَيْنَا ۚ إِذَا تُتْلَىٰ عَلَيْهِمْ آيَاتُ الرَّحْمَٰنِ خَرُّوا سُجَّدًا وَبُكِيًّا ۩",
+      "translation": "Those were the ones upon whom Allah bestowed favor from among the prophets of the descendants of Adam and of those We carried [in the ship] with Noah, and of the descendants of Abraham and Israel, and of those whom We guided and chose. When the verses of the Most Merciful were recited to them, they fell in prostration and weeping."
+    },
+    {
+      "number": 59,
+      "arabicText": "۞ فَخَلَفَ مِن بَعْدِهِمْ خَلْفٌ أَضَاعُوا الصَّلَاةَ وَاتَّبَعُوا الشَّهَوَاتِ ۖ فَسَوْفَ يَلْقَوْنَ غَيًّا",
+      "translation": "But there came after them successors who neglected prayer and pursued desires; so they are going to meet evil -"
+    },
+    {
+      "number": 60,
+      "arabicText": "إِلَّا مَن تَابَ وَآمَنَ وَعَمِلَ صَالِحًا فَأُولَٰئِكَ يَدْخُلُونَ الْجَنَّةَ وَلَا يُظْلَمُونَ شَيْئًا",
+      "translation": "Except those who repent, believe and do righteousness; for those will enter Paradise and will not be wronged at all."
+    },
+    {
+      "number": 61,
+      "arabicText": "جَنَّاتِ عَدْنٍ الَّتِي وَعَدَ الرَّحْمَٰنُ عِبَادَهُ بِالْغَيْبِ ۚ إِنَّهُ كَانَ وَعْدُهُ مَأْتِيًّا",
+      "translation": "[Therein are] gardens of perpetual residence which the Most Merciful has promised His servants in the unseen. Indeed, His promise has ever been coming."
+    },
+    {
+      "number": 62,
+      "arabicText": "لَّا يَسْمَعُونَ فِيهَا لَغْوًا إِلَّا سَلَامًا ۖ وَلَهُمْ رِزْقُهُمْ فِيهَا بُكْرَةً وَعَشِيًّا",
+      "translation": "They will not hear therein any ill speech - only [greetings of] peace - and they will have their provision therein, morning and afternoon."
+    },
+    {
+      "number": 63,
+      "arabicText": "تِلْكَ الْجَنَّةُ الَّتِي نُورِثُ مِنْ عِبَادِنَا مَن كَانَ تَقِيًّا",
+      "translation": "That is Paradise, which We give as inheritance to those of Our servants who were fearing of Allah."
+    },
+    {
+      "number": 64,
+      "arabicText": "وَمَا نَتَنَزَّلُ إِلَّا بِأَمْرِ رَبِّكَ ۖ لَهُ مَا بَيْنَ أَيْدِينَا وَمَا خَلْفَنَا وَمَا بَيْنَ ذَٰلِكَ ۚ وَمَا كَانَ رَبُّكَ نَسِيًّا",
+      "translation": "[Gabriel said], \"And we [angels] descend not except by the order of your Lord. To Him belongs that before us and that behind us and what is in between. And never is your Lord forgetful -"
+    },
+    {
+      "number": 65,
+      "arabicText": "رَّبُّ السَّمَاوَاتِ وَالْأَرْضِ وَمَا بَيْنَهُمَا فَاعْبُدْهُ وَاصْطَبِرْ لِعِبَادَتِهِ ۚ هَلْ تَعْلَمُ لَهُ سَمِيًّا",
+      "translation": "Lord of the heavens and the earth and whatever is between them - so worship Him and have patience for His worship. Do you know of any similarity to Him?\""
+    },
+    {
+      "number": 66,
+      "arabicText": "وَيَقُولُ الْإِنسَانُ أَإِذَا مَا مِتُّ لَسَوْفَ أُخْرَجُ حَيًّا",
+      "translation": "And the disbeliever says, \"When I have died, am I going to be brought forth alive?\""
+    },
+    {
+      "number": 67,
+      "arabicText": "أَوَلَا يَذْكُرُ الْإِنسَانُ أَنَّا خَلَقْنَاهُ مِن قَبْلُ وَلَمْ يَكُ شَيْئًا",
+      "translation": "Does man not remember that We created him before, while he was nothing?"
+    },
+    {
+      "number": 68,
+      "arabicText": "فَوَرَبِّكَ لَنَحْشُرَنَّهُمْ وَالشَّيَاطِينَ ثُمَّ لَنُحْضِرَنَّهُمْ حَوْلَ جَهَنَّمَ جِثِيًّا",
+      "translation": "So by your Lord, We will surely gather them and the devils; then We will bring them to be present around Hell upon their knees."
+    },
+    {
+      "number": 69,
+      "arabicText": "ثُمَّ لَنَنزِعَنَّ مِن كُلِّ شِيعَةٍ أَيُّهُمْ أَشَدُّ عَلَى الرَّحْمَٰنِ عِتِيًّا",
+      "translation": "Then We will surely extract from every sect those of them who were worst against the Most Merciful in insolence."
+    },
+    {
+      "number": 70,
+      "arabicText": "ثُمَّ لَنَحْنُ أَعْلَمُ بِالَّذِينَ هُمْ أَوْلَىٰ بِهَا صِلِيًّا",
+      "translation": "Then, surely it is We who are most knowing of those most worthy of burning therein."
+    },
+    {
+      "number": 71,
+      "arabicText": "وَإِن مِّنكُمْ إِلَّا وَارِدُهَا ۚ كَانَ عَلَىٰ رَبِّكَ حَتْمًا مَّقْضِيًّا",
+      "translation": "And there is none of you except he will come to it. This is upon your Lord an inevitability decreed."
+    },
+    {
+      "number": 72,
+      "arabicText": "ثُمَّ نُنَجِّي الَّذِينَ اتَّقَوا وَّنَذَرُ الظَّالِمِينَ فِيهَا جِثِيًّا",
+      "translation": "Then We will save those who feared Allah and leave the wrongdoers within it, on their knees."
+    },
+    {
+      "number": 73,
+      "arabicText": "وَإِذَا تُتْلَىٰ عَلَيْهِمْ آيَاتُنَا بَيِّنَاتٍ قَالَ الَّذِينَ كَفَرُوا لِلَّذِينَ آمَنُوا أَيُّ الْفَرِيقَيْنِ خَيْرٌ مَّقَامًا وَأَحْسَنُ نَدِيًّا",
+      "translation": "And when Our verses are recited to them as clear evidences, those who disbelieve say to those who believe, \"Which of [our] two parties is best in position and best in association?\""
+    },
+    {
+      "number": 74,
+      "arabicText": "وَكَمْ أَهْلَكْنَا قَبْلَهُم مِّن قَرْنٍ هُمْ أَحْسَنُ أَثَاثًا وَرِئْيًا",
+      "translation": "And how many a generation have We destroyed before them who were better in possessions and [outward] appearance?"
+    },
+    {
+      "number": 75,
+      "arabicText": "قُلْ مَن كَانَ فِي الضَّلَالَةِ فَلْيَمْدُدْ لَهُ الرَّحْمَٰنُ مَدًّا ۚ حَتَّىٰ إِذَا رَأَوْا مَا يُوعَدُونَ إِمَّا الْعَذَابَ وَإِمَّا السَّاعَةَ فَسَيَعْلَمُونَ مَنْ هُوَ شَرٌّ مَّكَانًا وَأَضْعَفُ جُندًا",
+      "translation": "Say, \"Whoever is in error - let the Most Merciful extend for him an extension [in wealth and time] until, when they see that which they were promised - either punishment [in this world] or the Hour [of resurrection] - they will come to know who is worst in position and weaker in soldiers.\""
+    },
+    {
+      "number": 76,
+      "arabicText": "وَيَزِيدُ اللَّهُ الَّذِينَ اهْتَدَوْا هُدًى ۗ وَالْبَاقِيَاتُ الصَّالِحَاتُ خَيْرٌ عِندَ رَبِّكَ ثَوَابًا وَخَيْرٌ مَّرَدًّا",
+      "translation": "And Allah increases those who were guided, in guidance, and the enduring good deeds are better to your Lord for reward and better for recourse."
+    },
+    {
+      "number": 77,
+      "arabicText": "أَفَرَأَيْتَ الَّذِي كَفَرَ بِآيَاتِنَا وَقَالَ لَأُوتَيَنَّ مَالًا وَوَلَدًا",
+      "translation": "Then, have you seen he who disbelieved in Our verses and said, \"I will surely be given wealth and children [in the next life]?\""
+    },
+    {
+      "number": 78,
+      "arabicText": "أَطَّلَعَ الْغَيْبَ أَمِ اتَّخَذَ عِندَ الرَّحْمَٰنِ عَهْدًا",
+      "translation": "Has he looked into the unseen, or has he taken from the Most Merciful a promise?"
+    },
+    {
+      "number": 79,
+      "arabicText": "كَلَّا ۚ سَنَكْتُبُ مَا يَقُولُ وَنَمُدُّ لَهُ مِنَ الْعَذَابِ مَدًّا",
+      "translation": "No! We will record what he says and extend for him from the punishment extensively."
+    },
+    {
+      "number": 80,
+      "arabicText": "وَنَرِثُهُ مَا يَقُولُ وَيَأْتِينَا فَرْدًا",
+      "translation": "And We will inherit him [in] what he mentions, and he will come to Us alone."
+    },
+    {
+      "number": 81,
+      "arabicText": "وَاتَّخَذُوا مِن دُونِ اللَّهِ آلِهَةً لِّيَكُونُوا لَهُمْ عِزًّا",
+      "translation": "And they have taken besides Allah [false] deities that they would be for them [a source of] honor."
+    },
+    {
+      "number": 82,
+      "arabicText": "كَلَّا ۚ سَيَكْفُرُونَ بِعِبَادَتِهِمْ وَيَكُونُونَ عَلَيْهِمْ ضِدًّا",
+      "translation": "No! Those \"gods\" will deny their worship of them and will be against them opponents [on the Day of Judgement]."
+    },
+    {
+      "number": 83,
+      "arabicText": "أَلَمْ تَرَ أَنَّا أَرْسَلْنَا الشَّيَاطِينَ عَلَى الْكَافِرِينَ تَؤُزُّهُمْ أَزًّا",
+      "translation": "Do you not see that We have sent the devils upon the disbelievers, inciting them to [evil] with [constant] incitement?"
+    },
+    {
+      "number": 84,
+      "arabicText": "فَلَا تَعْجَلْ عَلَيْهِمْ ۖ إِنَّمَا نَعُدُّ لَهُمْ عَدًّا",
+      "translation": "So be not impatient over them. We only count out to them a [limited] number."
+    },
+    {
+      "number": 85,
+      "arabicText": "يَوْمَ نَحْشُرُ الْمُتَّقِينَ إِلَى الرَّحْمَٰنِ وَفْدًا",
+      "translation": "On the Day We will gather the righteous to the Most Merciful as a delegation"
+    },
+    {
+      "number": 86,
+      "arabicText": "وَنَسُوقُ الْمُجْرِمِينَ إِلَىٰ جَهَنَّمَ وِرْدًا",
+      "translation": "And will drive the criminals to Hell in thirst"
+    },
+    {
+      "number": 87,
+      "arabicText": "لَّا يَمْلِكُونَ الشَّفَاعَةَ إِلَّا مَنِ اتَّخَذَ عِندَ الرَّحْمَٰنِ عَهْدًا",
+      "translation": "None will have [power of] intercession except he who had taken from the Most Merciful a covenant."
+    },
+    {
+      "number": 88,
+      "arabicText": "وَقَالُوا اتَّخَذَ الرَّحْمَٰنُ وَلَدًا",
+      "translation": "And they say, \"The Most Merciful has taken [for Himself] a son.\""
+    },
+    {
+      "number": 89,
+      "arabicText": "لَّقَدْ جِئْتُمْ شَيْئًا إِدًّا",
+      "translation": "You have done an atrocious thing."
+    },
+    {
+      "number": 90,
+      "arabicText": "تَكَادُ السَّمَاوَاتُ يَتَفَطَّرْنَ مِنْهُ وَتَنشَقُّ الْأَرْضُ وَتَخِرُّ الْجِبَالُ هَدًّا",
+      "translation": "The heavens almost rupture therefrom and the earth splits open and the mountains collapse in devastation"
+    },
+    {
+      "number": 91,
+      "arabicText": "أَن دَعَوْا لِلرَّحْمَٰنِ وَلَدًا",
+      "translation": "That they attribute to the Most Merciful a son."
+    },
+    {
+      "number": 92,
+      "arabicText": "وَمَا يَنبَغِي لِلرَّحْمَٰنِ أَن يَتَّخِذَ وَلَدًا",
+      "translation": "And it is not appropriate for the Most Merciful that He should take a son."
+    },
+    {
+      "number": 93,
+      "arabicText": "إِن كُلُّ مَن فِي السَّمَاوَاتِ وَالْأَرْضِ إِلَّا آتِي الرَّحْمَٰنِ عَبْدًا",
+      "translation": "There is no one in the heavens and earth but that he comes to the Most Merciful as a servant."
+    },
+    {
+      "number": 94,
+      "arabicText": "لَّقَدْ أَحْصَاهُمْ وَعَدَّهُمْ عَدًّا",
+      "translation": "He has enumerated them and counted them a [full] counting."
+    },
+    {
+      "number": 95,
+      "arabicText": "وَكُلُّهُمْ آتِيهِ يَوْمَ الْقِيَامَةِ فَرْدًا",
+      "translation": "And all of them are coming to Him on the Day of Resurrection alone."
+    },
+    {
+      "number": 96,
+      "arabicText": "إِنَّ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ سَيَجْعَلُ لَهُمُ الرَّحْمَٰنُ وُدًّا",
+      "translation": "Indeed, those who have believed and done righteous deeds - the Most Merciful will appoint for them affection."
+    },
+    {
+      "number": 97,
+      "arabicText": "فَإِنَّمَا يَسَّرْنَاهُ بِلِسَانِكَ لِتُبَشِّرَ بِهِ الْمُتَّقِينَ وَتُنذِرَ بِهِ قَوْمًا لُّدًّا",
+      "translation": "So, [O Muhammad], We have only made Qur'an easy in the Arabic language that you may give good tidings thereby to the righteous and warn thereby a hostile people."
+    },
+    {
+      "number": 98,
+      "arabicText": "وَكَمْ أَهْلَكْنَا قَبْلَهُم مِّن قَرْنٍ هَلْ تُحِسُّ مِنْهُم مِّنْ أَحَدٍ أَوْ تَسْمَعُ لَهُمْ رِكْزًا",
+      "translation": "And how many have We destroyed before them of generations? Do you perceive of them anyone or hear from them a sound?"
+    }
+  ]
+}

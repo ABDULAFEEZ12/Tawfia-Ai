@@ -1,0 +1,1140 @@
+{
+  "surahName": "Ash-Shu'araa",
+  "verses": [
+    {
+      "number": 1,
+      "arabicText": "طسم",
+      "translation": "Ta, Seen, Meem."
+    },
+    {
+      "number": 2,
+      "arabicText": "تِلْكَ آيَاتُ الْكِتَابِ الْمُبِينِ",
+      "translation": "These are the verses of the clear Book."
+    },
+    {
+      "number": 3,
+      "arabicText": "لَعَلَّكَ بَاخِعٌ نَّفْسَكَ أَلَّا يَكُونُوا مُؤْمِنِينَ",
+      "translation": "Perhaps, [O Muhammad], you would kill yourself with grief that they will not be believers."
+    },
+    {
+      "number": 4,
+      "arabicText": "إِن نَّشَأْ نُنَزِّلْ عَلَيْهِم مِّنَ السَّمَاءِ آيَةً فَظَلَّتْ أَعْنَاقُهُمْ لَهَا خَاضِعِينَ",
+      "translation": "If We willed, We could send down to them from the sky a sign for which their necks would remain humbled."
+    },
+    {
+      "number": 5,
+      "arabicText": "وَمَا يَأْتِيهِم مِّن ذِكْرٍ مِّنَ الرَّحْمَٰنِ مُحْدَثٍ إِلَّا كَانُوا عَنْهُ مُعْرِضِينَ",
+      "translation": "And no revelation comes to them anew from the Most Merciful except that they turn away from it."
+    },
+    {
+      "number": 6,
+      "arabicText": "فَقَدْ كَذَّبُوا فَسَيَأْتِيهِمْ أَنبَاءُ مَا كَانُوا بِهِ يَسْتَهْزِئُونَ",
+      "translation": "For they have already denied, but there will come to them the news of that which they used to ridicule."
+    },
+    {
+      "number": 7,
+      "arabicText": "أَوَلَمْ يَرَوْا إِلَى الْأَرْضِ كَمْ أَنبَتْنَا فِيهَا مِن كُلِّ زَوْجٍ كَرِيمٍ",
+      "translation": "Did they not look at the earth - how much We have produced therein from every noble kind?"
+    },
+    {
+      "number": 8,
+      "arabicText": "إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      "translation": "Indeed in that is a sign, but most of them were not to be believers."
+    },
+    {
+      "number": 9,
+      "arabicText": "وَإِنَّ رَبَّكَ لَهُوَ الْعَزِيزُ الرَّحِيمُ",
+      "translation": "And indeed, your Lord - He is the Exalted in Might, the Merciful."
+    },
+    {
+      "number": 10,
+      "arabicText": "وَإِذْ نَادَىٰ رَبُّكَ مُوسَىٰ أَنِ ائْتِ الْقَوْمَ الظَّالِمِينَ",
+      "translation": "And [mention] when your Lord called Moses, [saying], \"Go to the wrongdoing people -"
+    },
+    {
+      "number": 11,
+      "arabicText": "قَوْمَ فِرْعَوْنَ ۚ أَلَا يَتَّقُونَ",
+      "translation": "The people of Pharaoh. Will they not fear Allah?\""
+    },
+    {
+      "number": 12,
+      "arabicText": "قَالَ رَبِّ إِنِّي أَخَافُ أَن يُكَذِّبُونِ",
+      "translation": "He said, \"My Lord, indeed I fear that they will deny me"
+    },
+    {
+      "number": 13,
+      "arabicText": "وَيَضِيقُ صَدْرِي وَلَا يَنطَلِقُ لِسَانِي فَأَرْسِلْ إِلَىٰ هَارُونَ",
+      "translation": "And that my breast will tighten and my tongue will not be fluent, so send for Aaron."
+    },
+    {
+      "number": 14,
+      "arabicText": "وَلَهُمْ عَلَيَّ ذَنبٌ فَأَخَافُ أَن يَقْتُلُونِ",
+      "translation": "And they have upon me a [claim due to] sin, so I fear that they will kill me.\""
+    },
+    {
+      "number": 15,
+      "arabicText": "قَالَ كَلَّا ۖ فَاذْهَبَا بِآيَاتِنَا ۖ إِنَّا مَعَكُم مُّسْتَمِعُونَ",
+      "translation": "[Allah] said, \"No. Go both of you with Our signs; indeed, We are with you, listening."
+    },
+    {
+      "number": 16,
+      "arabicText": "فَأْتِيَا فِرْعَوْنَ فَقُولَا إِنَّا رَسُولُ رَبِّ الْعَالَمِينَ",
+      "translation": "Go to Pharaoh and say, 'We are the messengers of the Lord of the worlds,"
+    },
+    {
+      "number": 17,
+      "arabicText": "أَنْ أَرْسِلْ مَعَنَا بَنِي إِسْرَائِيلَ",
+      "translation": "[Commanded to say], \"Send with us the Children of Israel.\"'\""
+    },
+    {
+      "number": 18,
+      "arabicText": "قَالَ أَلَمْ نُرَبِّكَ فِينَا وَلِيدًا وَلَبِثْتَ فِينَا مِنْ عُمُرِكَ سِنِينَ",
+      "translation": "[Pharaoh] said, \"Did we not raise you among us as a child, and you remained among us for years of your life?"
+    },
+    {
+      "number": 19,
+      "arabicText": "وَفَعَلْتَ فَعْلَتَكَ الَّتِي فَعَلْتَ وَأَنتَ مِنَ الْكَافِرِينَ",
+      "translation": "And [then] you did your deed which you did, and you were of the ungrateful.\""
+    },
+    {
+      "number": 20,
+      "arabicText": "قَالَ فَعَلْتُهَا إِذًا وَأَنَا مِنَ الضَّالِّينَ",
+      "translation": "[Moses] said, \"I did it, then, while I was of those astray."
+    },
+    {
+      "number": 21,
+      "arabicText": "فَفَرَرْتُ مِنكُمْ لَمَّا خِفْتُكُمْ فَوَهَبَ لِي رَبِّي حُكْمًا وَجَعَلَنِي مِنَ الْمُرْسَلِينَ",
+      "translation": "So I fled from you when I feared you. Then my Lord granted me wisdom and prophethood and appointed me [as one] of the messengers."
+    },
+    {
+      "number": 22,
+      "arabicText": "وَتِلْكَ نِعْمَةٌ تَمُنُّهَا عَلَيَّ أَنْ عَبَّدتَّ بَنِي إِسْرَائِيلَ",
+      "translation": "And is this a favor of which you remind me - that you have enslaved the Children of Israel?\""
+    },
+    {
+      "number": 23,
+      "arabicText": "قَالَ فِرْعَوْنُ وَمَا رَبُّ الْعَالَمِينَ",
+      "translation": "Said Pharaoh, \"And what is the Lord of the worlds?\""
+    },
+    {
+      "number": 24,
+      "arabicText": "قَالَ رَبُّ السَّمَاوَاتِ وَالْأَرْضِ وَمَا بَيْنَهُمَا ۖ إِن كُنتُم مُّوقِنِينَ",
+      "translation": "[Moses] said, \"The Lord of the heavens and earth and that between them, if you should be convinced.\""
+    },
+    {
+      "number": 25,
+      "arabicText": "قَالَ لِمَنْ حَوْلَهُ أَلَا تَسْتَمِعُونَ",
+      "translation": "[Pharaoh] said to those around him, \"Do you not hear?\""
+    },
+    {
+      "number": 26,
+      "arabicText": "قَالَ رَبُّكُمْ وَرَبُّ آبَائِكُمُ الْأَوَّلِينَ",
+      "translation": "[Moses] said, \"Your Lord and the Lord of your first forefathers.\""
+    },
+    {
+      "number": 27,
+      "arabicText": "قَالَ إِنَّ رَسُولَكُمُ الَّذِي أُرْسِلَ إِلَيْكُمْ لَمَجْنُونٌ",
+      "translation": "[Pharaoh] said, \"Indeed, your 'messenger' who has been sent to you is mad.\""
+    },
+    {
+      "number": 28,
+      "arabicText": "قَالَ رَبُّ الْمَشْرِقِ وَالْمَغْرِبِ وَمَا بَيْنَهُمَا ۖ إِن كُنتُمْ تَعْقِلُونَ",
+      "translation": "[Moses] said, \"Lord of the east and the west and that between them, if you were to reason.\""
+    },
+    {
+      "number": 29,
+      "arabicText": "قَالَ لَئِنِ اتَّخَذْتَ إِلَٰهًا غَيْرِي لَأَجْعَلَنَّكَ مِنَ الْمَسْجُونِينَ",
+      "translation": "[Pharaoh] said, \"If you take a god other than me, I will surely place you among those imprisoned.\""
+    },
+    {
+      "number": 30,
+      "arabicText": "قَالَ أَوَلَوْ جِئْتُكَ بِشَيْءٍ مُّبِينٍ",
+      "translation": "[Moses] said, \"Even if I brought you proof manifest?\""
+    },
+    {
+      "number": 31,
+      "arabicText": "قَالَ فَأْتِ بِهِ إِن كُنتَ مِنَ الصَّادِقِينَ",
+      "translation": "[Pharaoh] said, \"Then bring it, if you should be of the truthful.\""
+    },
+    {
+      "number": 32,
+      "arabicText": "فَأَلْقَىٰ عَصَاهُ فَإِذَا هِيَ ثُعْبَانٌ مُّبِينٌ",
+      "translation": "So [Moses] threw his staff, and suddenly it was a serpent manifest."
+    },
+    {
+      "number": 33,
+      "arabicText": "وَنَزَعَ يَدَهُ فَإِذَا هِيَ بَيْضَاءُ لِلنَّاظِرِينَ",
+      "translation": "And he drew out his hand; thereupon it was white for the observers."
+    },
+    {
+      "number": 34,
+      "arabicText": "قَالَ لِلْمَلَإِ حَوْلَهُ إِنَّ هَٰذَا لَسَاحِرٌ عَلِيمٌ",
+      "translation": "[Pharaoh] said to the eminent ones around him, \"Indeed, this is a learned magician."
+    },
+    {
+      "number": 35,
+      "arabicText": "يُرِيدُ أَن يُخْرِجَكُم مِّنْ أَرْضِكُم بِسِحْرِهِ فَمَاذَا تَأْمُرُونَ",
+      "translation": "He wants to drive you out of your land by his magic, so what do you advise?\""
+    },
+    {
+      "number": 36,
+      "arabicText": "قَالُوا أَرْجِهْ وَأَخَاهُ وَابْعَثْ فِي الْمَدَائِنِ حَاشِرِينَ",
+      "translation": "They said, \"Postpone [the matter of] him and his brother and send among the cities gatherers"
+    },
+    {
+      "number": 37,
+      "arabicText": "يَأْتُوكَ بِكُلِّ سَحَّارٍ عَلِيمٍ",
+      "translation": "Who will bring you every learned, skilled magician.\""
+    },
+    {
+      "number": 38,
+      "arabicText": "فَجُمِعَ السَّحَرَةُ لِمِيقَاتِ يَوْمٍ مَّعْلُومٍ",
+      "translation": "So the magicians were assembled for the appointment of a well-known day."
+    },
+    {
+      "number": 39,
+      "arabicText": "وَقِيلَ لِلنَّاسِ هَلْ أَنتُم مُّجْتَمِعُونَ",
+      "translation": "And it was said to the people, \"Will you congregate"
+    },
+    {
+      "number": 40,
+      "arabicText": "لَعَلَّنَا نَتَّبِعُ السَّحَرَةَ إِن كَانُوا هُمُ الْغَالِبِينَ",
+      "translation": "That we might follow the magicians if they are the predominant?\""
+    },
+    {
+      "number": 41,
+      "arabicText": "فَلَمَّا جَاءَ السَّحَرَةُ قَالُوا لِفِرْعَوْنَ أَئِنَّ لَنَا لَأَجْرًا إِن كُنَّا نَحْنُ الْغَالِبِينَ",
+      "translation": "And when the magicians arrived, they said to Pharaoh, \"Is there indeed for us a reward if we are the predominant?\""
+    },
+    {
+      "number": 42,
+      "arabicText": "قَالَ نَعَمْ وَإِنَّكُمْ إِذًا لَّمِنَ الْمُقَرَّبِينَ",
+      "translation": "He said, \"Yes, and indeed, you will then be of those near [to me].\""
+    },
+    {
+      "number": 43,
+      "arabicText": "قَالَ لَهُم مُّوسَىٰ أَلْقُوا مَا أَنتُم مُّلْقُونَ",
+      "translation": "Moses said to them, \"Throw whatever you will throw.\""
+    },
+    {
+      "number": 44,
+      "arabicText": "فَأَلْقَوْا حِبَالَهُمْ وَعِصِيَّهُمْ وَقَالُوا بِعِزَّةِ فِرْعَوْنَ إِنَّا لَنَحْنُ الْغَالِبُونَ",
+      "translation": "So they threw their ropes and their staffs and said, \"By the might of Pharaoh, indeed it is we who are predominant.\""
+    },
+    {
+      "number": 45,
+      "arabicText": "فَأَلْقَىٰ مُوسَىٰ عَصَاهُ فَإِذَا هِيَ تَلْقَفُ مَا يَأْفِكُونَ",
+      "translation": "Then Moses threw his staff, and at once it devoured what they falsified."
+    },
+    {
+      "number": 46,
+      "arabicText": "فَأُلْقِيَ السَّحَرَةُ سَاجِدِينَ",
+      "translation": "So the magicians fell down in prostration [to Allah]."
+    },
+    {
+      "number": 47,
+      "arabicText": "قَالُوا آمَنَّا بِرَبِّ الْعَالَمِينَ",
+      "translation": "They said, \"We have believed in the Lord of the worlds,"
+    },
+    {
+      "number": 48,
+      "arabicText": "رَبِّ مُوسَىٰ وَهَارُونَ",
+      "translation": "The Lord of Moses and Aaron.\""
+    },
+    {
+      "number": 49,
+      "arabicText": "قَالَ آمَنتُمْ لَهُ قَبْلَ أَنْ آذَنَ لَكُمْ ۖ إِنَّهُ لَكَبِيرُكُمُ الَّذِي عَلَّمَكُمُ السِّحْرَ فَلَسَوْفَ تَعْلَمُونَ ۚ لَأُقَطِّعَنَّ أَيْدِيَكُمْ وَأَرْجُلَكُم مِّنْ خِلَافٍ وَلَأُصَلِّبَنَّكُمْ أَجْمَعِينَ",
+      "translation": "[Pharaoh] said, \"You believed Moses before I gave you permission. Indeed, he is your leader who has taught you magic, but you are going to know. I will surely cut off your hands and your feet on opposite sides, and I will surely crucify you all.\""
+    },
+    {
+      "number": 50,
+      "arabicText": "قَالُوا لَا ضَيْرَ ۖ إِنَّا إِلَىٰ رَبِّنَا مُنقَلِبُونَ",
+      "translation": "They said, \"No harm. Indeed, to our Lord we will return."
+    },
+    {
+      "number": 51,
+      "arabicText": "إِنَّا نَطْمَعُ أَن يَغْفِرَ لَنَا رَبُّنَا خَطَايَانَا أَن كُنَّا أَوَّلَ الْمُؤْمِنِينَ",
+      "translation": "Indeed, we aspire that our Lord will forgive us our sins because we were the first of the believers.\""
+    },
+    {
+      "number": 52,
+      "arabicText": "۞ وَأَوْحَيْنَا إِلَىٰ مُوسَىٰ أَنْ أَسْرِ بِعِبَادِي إِنَّكُم مُّتَّبَعُونَ",
+      "translation": "And We inspired to Moses, \"Travel by night with My servants; indeed, you will be pursued.\""
+    },
+    {
+      "number": 53,
+      "arabicText": "فَأَرْسَلَ فِرْعَوْنُ فِي الْمَدَائِنِ حَاشِرِينَ",
+      "translation": "Then Pharaoh sent among the cities gatherers"
+    },
+    {
+      "number": 54,
+      "arabicText": "إِنَّ هَٰؤُلَاءِ لَشِرْذِمَةٌ قَلِيلُونَ",
+      "translation": "[And said], \"Indeed, those are but a small band,"
+    },
+    {
+      "number": 55,
+      "arabicText": "وَإِنَّهُمْ لَنَا لَغَائِظُونَ",
+      "translation": "And indeed, they are enraging us,"
+    },
+    {
+      "number": 56,
+      "arabicText": "وَإِنَّا لَجَمِيعٌ حَاذِرُونَ",
+      "translation": "And indeed, we are a cautious society... \""
+    },
+    {
+      "number": 57,
+      "arabicText": "فَأَخْرَجْنَاهُم مِّن جَنَّاتٍ وَعُيُونٍ",
+      "translation": "So We removed them from gardens and springs"
+    },
+    {
+      "number": 58,
+      "arabicText": "وَكُنُوزٍ وَمَقَامٍ كَرِيمٍ",
+      "translation": "And treasures and honorable station -"
+    },
+    {
+      "number": 59,
+      "arabicText": "كَذَٰلِكَ وَأَوْرَثْنَاهَا بَنِي إِسْرَائِيلَ",
+      "translation": "Thus. And We caused to inherit it the Children of Israel."
+    },
+    {
+      "number": 60,
+      "arabicText": "فَأَتْبَعُوهُم مُّشْرِقِينَ",
+      "translation": "So they pursued them at sunrise."
+    },
+    {
+      "number": 61,
+      "arabicText": "فَلَمَّا تَرَاءَى الْجَمْعَانِ قَالَ أَصْحَابُ مُوسَىٰ إِنَّا لَمُدْرَكُونَ",
+      "translation": "And when the two companies saw one another, the companions of Moses said, \"Indeed, we are to be overtaken!\""
+    },
+    {
+      "number": 62,
+      "arabicText": "قَالَ كَلَّا ۖ إِنَّ مَعِيَ رَبِّي سَيَهْدِينِ",
+      "translation": "[Moses] said, \"No! Indeed, with me is my Lord; He will guide me.\""
+    },
+    {
+      "number": 63,
+      "arabicText": "فَأَوْحَيْنَا إِلَىٰ مُوسَىٰ أَنِ اضْرِب بِّعَصَاكَ الْبَحْرَ ۖ فَانفَلَقَ فَكَانَ كُلُّ فِرْقٍ كَالطَّوْدِ الْعَظِيمِ",
+      "translation": "Then We inspired to Moses, \"Strike with your staff the sea,\" and it parted, and each portion was like a great towering mountain."
+    },
+    {
+      "number": 64,
+      "arabicText": "وَأَزْلَفْنَا ثَمَّ الْآخَرِينَ",
+      "translation": "And We advanced thereto the pursuers."
+    },
+    {
+      "number": 65,
+      "arabicText": "وَأَنجَيْنَا مُوسَىٰ وَمَن مَّعَهُ أَجْمَعِينَ",
+      "translation": "And We saved Moses and those with him, all together."
+    },
+    {
+      "number": 66,
+      "arabicText": "ثُمَّ أَغْرَقْنَا الْآخَرِينَ",
+      "translation": "Then We drowned the others."
+    },
+    {
+      "number": 67,
+      "arabicText": "إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      "translation": "Indeed in that is a sign, but most of them were not to be believers."
+    },
+    {
+      "number": 68,
+      "arabicText": "وَإِنَّ رَبَّكَ لَهُوَ الْعَزِيزُ الرَّحِيمُ",
+      "translation": "And indeed, your Lord - He is the Exalted in Might, the Merciful."
+    },
+    {
+      "number": 69,
+      "arabicText": "وَاتْلُ عَلَيْهِمْ نَبَأَ إِبْرَاهِيمَ",
+      "translation": "And recite to them the news of Abraham,"
+    },
+    {
+      "number": 70,
+      "arabicText": "إِذْ قَالَ لِأَبِيهِ وَقَوْمِهِ مَا تَعْبُدُونَ",
+      "translation": "When he said to his father and his people, \"What do you worship?\""
+    },
+    {
+      "number": 71,
+      "arabicText": "قَالُوا نَعْبُدُ أَصْنَامًا فَنَظَلُّ لَهَا عَاكِفِينَ",
+      "translation": "They said, \"We worship idols and remain to them devoted.\""
+    },
+    {
+      "number": 72,
+      "arabicText": "قَالَ هَلْ يَسْمَعُونَكُمْ إِذْ تَدْعُونَ",
+      "translation": "He said, \"Do they hear you when you supplicate?"
+    },
+    {
+      "number": 73,
+      "arabicText": "أَوْ يَنفَعُونَكُمْ أَوْ يَضُرُّونَ",
+      "translation": "Or do they benefit you, or do they harm?\""
+    },
+    {
+      "number": 74,
+      "arabicText": "قَالُوا بَلْ وَجَدْنَا آبَاءَنَا كَذَٰلِكَ يَفْعَلُونَ",
+      "translation": "They said, \"But we found our fathers doing thus.\""
+    },
+    {
+      "number": 75,
+      "arabicText": "قَالَ أَفَرَأَيْتُم مَّا كُنتُمْ تَعْبُدُونَ",
+      "translation": "He said, \"Then do you see what you have been worshipping,"
+    },
+    {
+      "number": 76,
+      "arabicText": "أَنتُمْ وَآبَاؤُكُمُ الْأَقْدَمُونَ",
+      "translation": "You and your ancient forefathers?"
+    },
+    {
+      "number": 77,
+      "arabicText": "فَإِنَّهُمْ عَدُوٌّ لِّي إِلَّا رَبَّ الْعَالَمِينَ",
+      "translation": "Indeed, they are enemies to me, except the Lord of the worlds,"
+    },
+    {
+      "number": 78,
+      "arabicText": "الَّذِي خَلَقَنِي فَهُوَ يَهْدِينِ",
+      "translation": "Who created me, and He [it is who] guides me."
+    },
+    {
+      "number": 79,
+      "arabicText": "وَالَّذِي هُوَ يُطْعِمُنِي وَيَسْقِينِ",
+      "translation": "And it is He who feeds me and gives me drink."
+    },
+    {
+      "number": 80,
+      "arabicText": "وَإِذَا مَرِضْتُ فَهُوَ يَشْفِينِ",
+      "translation": "And when I am ill, it is He who cures me"
+    },
+    {
+      "number": 81,
+      "arabicText": "وَالَّذِي يُمِيتُنِي ثُمَّ يُحْيِينِ",
+      "translation": "And who will cause me to die and then bring me to life"
+    },
+    {
+      "number": 82,
+      "arabicText": "وَالَّذِي أَطْمَعُ أَن يَغْفِرَ لِي خَطِيئَتِي يَوْمَ الدِّينِ",
+      "translation": "And who I aspire that He will forgive me my sin on the Day of Recompense.\""
+    },
+    {
+      "number": 83,
+      "arabicText": "رَبِّ هَبْ لِي حُكْمًا وَأَلْحِقْنِي بِالصَّالِحِينَ",
+      "translation": "[And he said], \"My Lord, grant me authority and join me with the righteous."
+    },
+    {
+      "number": 84,
+      "arabicText": "وَاجْعَل لِّي لِسَانَ صِدْقٍ فِي الْآخِرِينَ",
+      "translation": "And grant me a reputation of honor among later generations."
+    },
+    {
+      "number": 85,
+      "arabicText": "وَاجْعَلْنِي مِن وَرَثَةِ جَنَّةِ النَّعِيمِ",
+      "translation": "And place me among the inheritors of the Garden of Pleasure."
+    },
+    {
+      "number": 86,
+      "arabicText": "وَاغْفِرْ لِأَبِي إِنَّهُ كَانَ مِنَ الضَّالِّينَ",
+      "translation": "And forgive my father. Indeed, he has been of those astray."
+    },
+    {
+      "number": 87,
+      "arabicText": "وَلَا تُخْزِنِي يَوْمَ يُبْعَثُونَ",
+      "translation": "And do not disgrace me on the Day they are [all] resurrected -"
+    },
+    {
+      "number": 88,
+      "arabicText": "يَوْمَ لَا يَنفَعُ مَالٌ وَلَا بَنُونَ",
+      "translation": "The Day when there will not benefit [anyone] wealth or children"
+    },
+    {
+      "number": 89,
+      "arabicText": "إِلَّا مَنْ أَتَى اللَّهَ بِقَلْبٍ سَلِيمٍ",
+      "translation": "But only one who comes to Allah with a sound heart.\""
+    },
+    {
+      "number": 90,
+      "arabicText": "وَأُزْلِفَتِ الْجَنَّةُ لِلْمُتَّقِينَ",
+      "translation": "And Paradise will be brought near [that Day] to the righteous."
+    },
+    {
+      "number": 91,
+      "arabicText": "وَبُرِّزَتِ الْجَحِيمُ لِلْغَاوِينَ",
+      "translation": "And Hellfire will be brought forth for the deviators,"
+    },
+    {
+      "number": 92,
+      "arabicText": "وَقِيلَ لَهُمْ أَيْنَ مَا كُنتُمْ تَعْبُدُونَ",
+      "translation": "And it will be said to them, \"Where are those you used to worship"
+    },
+    {
+      "number": 93,
+      "arabicText": "مِن دُونِ اللَّهِ هَلْ يَنصُرُونَكُمْ أَوْ يَنتَصِرُونَ",
+      "translation": "Other than Allah? Can they help you or help themselves?\""
+    },
+    {
+      "number": 94,
+      "arabicText": "فَكُبْكِبُوا فِيهَا هُمْ وَالْغَاوُونَ",
+      "translation": "So they will be overturned into Hellfire, they and the deviators"
+    },
+    {
+      "number": 95,
+      "arabicText": "وَجُنُودُ إِبْلِيسَ أَجْمَعُونَ",
+      "translation": "And the soldiers of Iblees, all together."
+    },
+    {
+      "number": 96,
+      "arabicText": "قَالُوا وَهُمْ فِيهَا يَخْتَصِمُونَ",
+      "translation": "They will say while they dispute therein,"
+    },
+    {
+      "number": 97,
+      "arabicText": "تَاللَّهِ إِن كُنَّا لَفِي ضَلَالٍ مُّبِينٍ",
+      "translation": "\"By Allah, we were indeed in manifest error"
+    },
+    {
+      "number": 98,
+      "arabicText": "إِذْ نُسَوِّيكُم بِرَبِّ الْعَالَمِينَ",
+      "translation": "When we equated you with the Lord of the worlds."
+    },
+    {
+      "number": 99,
+      "arabicText": "وَمَا أَضَلَّنَا إِلَّا الْمُجْرِمُونَ",
+      "translation": "And no one misguided us except the criminals."
+    },
+    {
+      "number": 100,
+      "arabicText": "فَمَا لَنَا مِن شَافِعِينَ",
+      "translation": "So now we have no intercessors"
+    },
+    {
+      "number": 101,
+      "arabicText": "وَلَا صَدِيقٍ حَمِيمٍ",
+      "translation": "And not a devoted friend."
+    },
+    {
+      "number": 102,
+      "arabicText": "فَلَوْ أَنَّ لَنَا كَرَّةً فَنَكُونَ مِنَ الْمُؤْمِنِينَ",
+      "translation": "Then if we only had a return [to the world] and could be of the believers... \""
+    },
+    {
+      "number": 103,
+      "arabicText": "إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      "translation": "Indeed in that is a sign, but most of them were not to be believers."
+    },
+    {
+      "number": 104,
+      "arabicText": "وَإِنَّ رَبَّكَ لَهُوَ الْعَزِيزُ الرَّحِيمُ",
+      "translation": "And indeed, your Lord - He is the Exalted in Might, the Merciful."
+    },
+    {
+      "number": 105,
+      "arabicText": "كَذَّبَتْ قَوْمُ نُوحٍ الْمُرْسَلِينَ",
+      "translation": "The people of Noah denied the messengers"
+    },
+    {
+      "number": 106,
+      "arabicText": "إِذْ قَالَ لَهُمْ أَخُوهُمْ نُوحٌ أَلَا تَتَّقُونَ",
+      "translation": "When their brother Noah said to them, \"Will you not fear Allah?"
+    },
+    {
+      "number": 107,
+      "arabicText": "إِنِّي لَكُمْ رَسُولٌ أَمِينٌ",
+      "translation": "Indeed, I am to you a trustworthy messenger."
+    },
+    {
+      "number": 108,
+      "arabicText": "فَاتَّقُوا اللَّهَ وَأَطِيعُونِ",
+      "translation": "So fear Allah and obey me."
+    },
+    {
+      "number": 109,
+      "arabicText": "وَمَا أَسْأَلُكُمْ عَلَيْهِ مِنْ أَجْرٍ ۖ إِنْ أَجْرِيَ إِلَّا عَلَىٰ رَبِّ الْعَالَمِينَ",
+      "translation": "And I do not ask you for it any payment. My payment is only from the Lord of the worlds."
+    },
+    {
+      "number": 110,
+      "arabicText": "فَاتَّقُوا اللَّهَ وَأَطِيعُونِ",
+      "translation": "So fear Allah and obey me.\""
+    },
+    {
+      "number": 111,
+      "arabicText": "۞ قَالُوا أَنُؤْمِنُ لَكَ وَاتَّبَعَكَ الْأَرْذَلُونَ",
+      "translation": "They said, \"Should we believe you while you are followed by the lowest [class of people]?\""
+    },
+    {
+      "number": 112,
+      "arabicText": "قَالَ وَمَا عِلْمِي بِمَا كَانُوا يَعْمَلُونَ",
+      "translation": "He said, \"And what is my knowledge of what they used to do?"
+    },
+    {
+      "number": 113,
+      "arabicText": "إِنْ حِسَابُهُمْ إِلَّا عَلَىٰ رَبِّي ۖ لَوْ تَشْعُرُونَ",
+      "translation": "Their account is only upon my Lord, if you [could] perceive."
+    },
+    {
+      "number": 114,
+      "arabicText": "وَمَا أَنَا بِطَارِدِ الْمُؤْمِنِينَ",
+      "translation": "And I am not one to drive away the believers."
+    },
+    {
+      "number": 115,
+      "arabicText": "إِنْ أَنَا إِلَّا نَذِيرٌ مُّبِينٌ",
+      "translation": "I am only a clear warner.\""
+    },
+    {
+      "number": 116,
+      "arabicText": "قَالُوا لَئِن لَّمْ تَنتَهِ يَا نُوحُ لَتَكُونَنَّ مِنَ الْمَرْجُومِينَ",
+      "translation": "They said, \"If you do not desist, O Noah, you will surely be of those who are stoned.\""
+    },
+    {
+      "number": 117,
+      "arabicText": "قَالَ رَبِّ إِنَّ قَوْمِي كَذَّبُونِ",
+      "translation": "He said, \"My Lord, indeed my people have denied me."
+    },
+    {
+      "number": 118,
+      "arabicText": "فَافْتَحْ بَيْنِي وَبَيْنَهُمْ فَتْحًا وَنَجِّنِي وَمَن مَّعِيَ مِنَ الْمُؤْمِنِينَ",
+      "translation": "Then judge between me and them with decisive judgement and save me and those with me of the believers.\""
+    },
+    {
+      "number": 119,
+      "arabicText": "فَأَنجَيْنَاهُ وَمَن مَّعَهُ فِي الْفُلْكِ الْمَشْحُونِ",
+      "translation": "So We saved him and those with him in the laden ship."
+    },
+    {
+      "number": 120,
+      "arabicText": "ثُمَّ أَغْرَقْنَا بَعْدُ الْبَاقِينَ",
+      "translation": "Then We drowned thereafter the remaining ones."
+    },
+    {
+      "number": 121,
+      "arabicText": "إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      "translation": "Indeed in that is a sign, but most of them were not to be believers."
+    },
+    {
+      "number": 122,
+      "arabicText": "وَإِنَّ رَبَّكَ لَهُوَ الْعَزِيزُ الرَّحِيمُ",
+      "translation": "And indeed, your Lord - He is the Exalted in Might, the Merciful."
+    },
+    {
+      "number": 123,
+      "arabicText": "كَذَّبَتْ عَادٌ الْمُرْسَلِينَ",
+      "translation": "'Aad denied the messengers"
+    },
+    {
+      "number": 124,
+      "arabicText": "إِذْ قَالَ لَهُمْ أَخُوهُمْ هُودٌ أَلَا تَتَّقُونَ",
+      "translation": "When their brother Hud said to them, \"Will you not fear Allah?"
+    },
+    {
+      "number": 125,
+      "arabicText": "إِنِّي لَكُمْ رَسُولٌ أَمِينٌ",
+      "translation": "Indeed, I am to you a trustworthy messenger."
+    },
+    {
+      "number": 126,
+      "arabicText": "فَاتَّقُوا اللَّهَ وَأَطِيعُونِ",
+      "translation": "So fear Allah and obey me."
+    },
+    {
+      "number": 127,
+      "arabicText": "وَمَا أَسْأَلُكُمْ عَلَيْهِ مِنْ أَجْرٍ ۖ إِنْ أَجْرِيَ إِلَّا عَلَىٰ رَبِّ الْعَالَمِينَ",
+      "translation": "And I do not ask you for it any payment. My payment is only from the Lord of the worlds."
+    },
+    {
+      "number": 128,
+      "arabicText": "أَتَبْنُونَ بِكُلِّ رِيعٍ آيَةً تَعْبَثُونَ",
+      "translation": "Do you construct on every elevation a sign, amusing yourselves,"
+    },
+    {
+      "number": 129,
+      "arabicText": "وَتَتَّخِذُونَ مَصَانِعَ لَعَلَّكُمْ تَخْلُدُونَ",
+      "translation": "And take for yourselves palaces and fortresses that you might abide eternally?"
+    },
+    {
+      "number": 130,
+      "arabicText": "وَإِذَا بَطَشْتُم بَطَشْتُمْ جَبَّارِينَ",
+      "translation": "And when you strike, you strike as tyrants."
+    },
+    {
+      "number": 131,
+      "arabicText": "فَاتَّقُوا اللَّهَ وَأَطِيعُونِ",
+      "translation": "So fear Allah and obey me."
+    },
+    {
+      "number": 132,
+      "arabicText": "وَاتَّقُوا الَّذِي أَمَدَّكُم بِمَا تَعْلَمُونَ",
+      "translation": "And fear He who provided you with that which you know,"
+    },
+    {
+      "number": 133,
+      "arabicText": "أَمَدَّكُم بِأَنْعَامٍ وَبَنِينَ",
+      "translation": "Provided you with grazing livestock and children"
+    },
+    {
+      "number": 134,
+      "arabicText": "وَجَنَّاتٍ وَعُيُونٍ",
+      "translation": "And gardens and springs."
+    },
+    {
+      "number": 135,
+      "arabicText": "إِنِّي أَخَافُ عَلَيْكُمْ عَذَابَ يَوْمٍ عَظِيمٍ",
+      "translation": "Indeed, I fear for you the punishment of a terrible day.\""
+    },
+    {
+      "number": 136,
+      "arabicText": "قَالُوا سَوَاءٌ عَلَيْنَا أَوَعَظْتَ أَمْ لَمْ تَكُن مِّنَ الْوَاعِظِينَ",
+      "translation": "They said, \"It is all the same to us whether you advise or are not of the advisors."
+    },
+    {
+      "number": 137,
+      "arabicText": "إِنْ هَٰذَا إِلَّا خُلُقُ الْأَوَّلِينَ",
+      "translation": "This is not but the custom of the former peoples,"
+    },
+    {
+      "number": 138,
+      "arabicText": "وَمَا نَحْنُ بِمُعَذَّبِينَ",
+      "translation": "And we are not to be punished.\""
+    },
+    {
+      "number": 139,
+      "arabicText": "فَكَذَّبُوهُ فَأَهْلَكْنَاهُمْ ۗ إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      "translation": "And they denied him, so We destroyed them. Indeed in that is a sign, but most of them were not to be believers."
+    },
+    {
+      "number": 140,
+      "arabicText": "وَإِنَّ رَبَّكَ لَهُوَ الْعَزِيزُ الرَّحِيمُ",
+      "translation": "And indeed, your Lord - He is the Exalted in Might, the Merciful."
+    },
+    {
+      "number": 141,
+      "arabicText": "كَذَّبَتْ ثَمُودُ الْمُرْسَلِينَ",
+      "translation": "Thamud denied the messengers"
+    },
+    {
+      "number": 142,
+      "arabicText": "إِذْ قَالَ لَهُمْ أَخُوهُمْ صَالِحٌ أَلَا تَتَّقُونَ",
+      "translation": "When their brother Salih said to them, \"Will you not fear Allah?"
+    },
+    {
+      "number": 143,
+      "arabicText": "إِنِّي لَكُمْ رَسُولٌ أَمِينٌ",
+      "translation": "Indeed, I am to you a trustworthy messenger."
+    },
+    {
+      "number": 144,
+      "arabicText": "فَاتَّقُوا اللَّهَ وَأَطِيعُونِ",
+      "translation": "So fear Allah and obey me."
+    },
+    {
+      "number": 145,
+      "arabicText": "وَمَا أَسْأَلُكُمْ عَلَيْهِ مِنْ أَجْرٍ ۖ إِنْ أَجْرِيَ إِلَّا عَلَىٰ رَبِّ الْعَالَمِينَ",
+      "translation": "And I do not ask you for it any payment. My payment is only from the Lord of the worlds."
+    },
+    {
+      "number": 146,
+      "arabicText": "أَتُتْرَكُونَ فِي مَا هَاهُنَا آمِنِينَ",
+      "translation": "Will you be left in what is here, secure [from death],"
+    },
+    {
+      "number": 147,
+      "arabicText": "فِي جَنَّاتٍ وَعُيُونٍ",
+      "translation": "Within gardens and springs"
+    },
+    {
+      "number": 148,
+      "arabicText": "وَزُرُوعٍ وَنَخْلٍ طَلْعُهَا هَضِيمٌ",
+      "translation": "And fields of crops and palm trees with softened fruit?"
+    },
+    {
+      "number": 149,
+      "arabicText": "وَتَنْحِتُونَ مِنَ الْجِبَالِ بُيُوتًا فَارِهِينَ",
+      "translation": "And you carve out of the mountains, homes, with skill."
+    },
+    {
+      "number": 150,
+      "arabicText": "فَاتَّقُوا اللَّهَ وَأَطِيعُونِ",
+      "translation": "So fear Allah and obey me."
+    },
+    {
+      "number": 151,
+      "arabicText": "وَلَا تُطِيعُوا أَمْرَ الْمُسْرِفِينَ",
+      "translation": "And do not obey the order of the transgressors,"
+    },
+    {
+      "number": 152,
+      "arabicText": "الَّذِينَ يُفْسِدُونَ فِي الْأَرْضِ وَلَا يُصْلِحُونَ",
+      "translation": "Who cause corruption in the land and do not amend.\""
+    },
+    {
+      "number": 153,
+      "arabicText": "قَالُوا إِنَّمَا أَنتَ مِنَ الْمُسَحَّرِينَ",
+      "translation": "They said, \"You are only of those affected by magic."
+    },
+    {
+      "number": 154,
+      "arabicText": "مَا أَنتَ إِلَّا بَشَرٌ مِّثْلُنَا فَأْتِ بِآيَةٍ إِن كُنتَ مِنَ الصَّادِقِينَ",
+      "translation": "You are but a man like ourselves, so bring a sign, if you should be of the truthful.\""
+    },
+    {
+      "number": 155,
+      "arabicText": "قَالَ هَٰذِهِ نَاقَةٌ لَّهَا شِرْبٌ وَلَكُمْ شِرْبُ يَوْمٍ مَّعْلُومٍ",
+      "translation": "He said, \"This is a she-camel. For her is a [time of] drink, and for you is a [time of] drink, [each] on a known day."
+    },
+    {
+      "number": 156,
+      "arabicText": "وَلَا تَمَسُّوهَا بِسُوءٍ فَيَأْخُذَكُمْ عَذَابُ يَوْمٍ عَظِيمٍ",
+      "translation": "And do not touch her with harm, lest you be seized by the punishment of a terrible day.\""
+    },
+    {
+      "number": 157,
+      "arabicText": "فَعَقَرُوهَا فَأَصْبَحُوا نَادِمِينَ",
+      "translation": "But they hamstrung her and so became regretful."
+    },
+    {
+      "number": 158,
+      "arabicText": "فَأَخَذَهُمُ الْعَذَابُ ۗ إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      "translation": "And the punishment seized them. Indeed in that is a sign, but most of them were not to be believers."
+    },
+    {
+      "number": 159,
+      "arabicText": "وَإِنَّ رَبَّكَ لَهُوَ الْعَزِيزُ الرَّحِيمُ",
+      "translation": "And indeed, your Lord - He is the Exalted in Might, the Merciful."
+    },
+    {
+      "number": 160,
+      "arabicText": "كَذَّبَتْ قَوْمُ لُوطٍ الْمُرْسَلِينَ",
+      "translation": "The people of Lot denied the messengers"
+    },
+    {
+      "number": 161,
+      "arabicText": "إِذْ قَالَ لَهُمْ أَخُوهُمْ لُوطٌ أَلَا تَتَّقُونَ",
+      "translation": "When their brother Lot said to them, \"Will you not fear Allah?"
+    },
+    {
+      "number": 162,
+      "arabicText": "إِنِّي لَكُمْ رَسُولٌ أَمِينٌ",
+      "translation": "Indeed, I am to you a trustworthy messenger."
+    },
+    {
+      "number": 163,
+      "arabicText": "فَاتَّقُوا اللَّهَ وَأَطِيعُونِ",
+      "translation": "So fear Allah and obey me."
+    },
+    {
+      "number": 164,
+      "arabicText": "وَمَا أَسْأَلُكُمْ عَلَيْهِ مِنْ أَجْرٍ ۖ إِنْ أَجْرِيَ إِلَّا عَلَىٰ رَبِّ الْعَالَمِينَ",
+      "translation": "And I do not ask you for it any payment. My payment is only from the Lord of the worlds."
+    },
+    {
+      "number": 165,
+      "arabicText": "أَتَأْتُونَ الذُّكْرَانَ مِنَ الْعَالَمِينَ",
+      "translation": "Do you approach males among the worlds"
+    },
+    {
+      "number": 166,
+      "arabicText": "وَتَذَرُونَ مَا خَلَقَ لَكُمْ رَبُّكُم مِّنْ أَزْوَاجِكُم ۚ بَلْ أَنتُمْ قَوْمٌ عَادُونَ",
+      "translation": "And leave what your Lord has created for you as mates? But you are a people transgressing.\""
+    },
+    {
+      "number": 167,
+      "arabicText": "قَالُوا لَئِن لَّمْ تَنتَهِ يَا لُوطُ لَتَكُونَنَّ مِنَ الْمُخْرَجِينَ",
+      "translation": "They said, \"If you do not desist, O Lot, you will surely be of those evicted.\""
+    },
+    {
+      "number": 168,
+      "arabicText": "قَالَ إِنِّي لِعَمَلِكُم مِّنَ الْقَالِينَ",
+      "translation": "He said, \"Indeed, I am, toward your deed, of those who detest [it]."
+    },
+    {
+      "number": 169,
+      "arabicText": "رَبِّ نَجِّنِي وَأَهْلِي مِمَّا يَعْمَلُونَ",
+      "translation": "My Lord, save me and my family from [the consequence of] what they do.\""
+    },
+    {
+      "number": 170,
+      "arabicText": "فَنَجَّيْنَاهُ وَأَهْلَهُ أَجْمَعِينَ",
+      "translation": "So We saved him and his family, all,"
+    },
+    {
+      "number": 171,
+      "arabicText": "إِلَّا عَجُوزًا فِي الْغَابِرِينَ",
+      "translation": "Except an old woman among those who remained behind."
+    },
+    {
+      "number": 172,
+      "arabicText": "ثُمَّ دَمَّرْنَا الْآخَرِينَ",
+      "translation": "Then We destroyed the others."
+    },
+    {
+      "number": 173,
+      "arabicText": "وَأَمْطَرْنَا عَلَيْهِم مَّطَرًا ۖ فَسَاءَ مَطَرُ الْمُنذَرِينَ",
+      "translation": "And We rained upon them a rain [of stones], and evil was the rain of those who were warned."
+    },
+    {
+      "number": 174,
+      "arabicText": "إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      "translation": "Indeed in that is a sign, but most of them were not to be believers."
+    },
+    {
+      "number": 175,
+      "arabicText": "وَإِنَّ رَبَّكَ لَهُوَ الْعَزِيزُ الرَّحِيمُ",
+      "translation": "And indeed, your Lord - He is the Exalted in Might, the Merciful."
+    },
+    {
+      "number": 176,
+      "arabicText": "كَذَّبَ أَصْحَابُ الْأَيْكَةِ الْمُرْسَلِينَ",
+      "translation": "The companions of the thicket denied the messengers"
+    },
+    {
+      "number": 177,
+      "arabicText": "إِذْ قَالَ لَهُمْ شُعَيْبٌ أَلَا تَتَّقُونَ",
+      "translation": "When Shu'ayb said to them, \"Will you not fear Allah?"
+    },
+    {
+      "number": 178,
+      "arabicText": "إِنِّي لَكُمْ رَسُولٌ أَمِينٌ",
+      "translation": "Indeed, I am to you a trustworthy messenger."
+    },
+    {
+      "number": 179,
+      "arabicText": "فَاتَّقُوا اللَّهَ وَأَطِيعُونِ",
+      "translation": "So fear Allah and obey me."
+    },
+    {
+      "number": 180,
+      "arabicText": "وَمَا أَسْأَلُكُمْ عَلَيْهِ مِنْ أَجْرٍ ۖ إِنْ أَجْرِيَ إِلَّا عَلَىٰ رَبِّ الْعَالَمِينَ",
+      "translation": "And I do not ask you for it any payment. My payment is only from the Lord of the worlds."
+    },
+    {
+      "number": 181,
+      "arabicText": "۞ أَوْفُوا الْكَيْلَ وَلَا تَكُونُوا مِنَ الْمُخْسِرِينَ",
+      "translation": "Give full measure and do not be of those who cause loss."
+    },
+    {
+      "number": 182,
+      "arabicText": "وَزِنُوا بِالْقِسْطَاسِ الْمُسْتَقِيمِ",
+      "translation": "And weigh with an even balance."
+    },
+    {
+      "number": 183,
+      "arabicText": "وَلَا تَبْخَسُوا النَّاسَ أَشْيَاءَهُمْ وَلَا تَعْثَوْا فِي الْأَرْضِ مُفْسِدِينَ",
+      "translation": "And do not deprive people of their due and do not commit abuse on earth, spreading corruption."
+    },
+    {
+      "number": 184,
+      "arabicText": "وَاتَّقُوا الَّذِي خَلَقَكُمْ وَالْجِبِلَّةَ الْأَوَّلِينَ",
+      "translation": "And fear He who created you and the former creation.\""
+    },
+    {
+      "number": 185,
+      "arabicText": "قَالُوا إِنَّمَا أَنتَ مِنَ الْمُسَحَّرِينَ",
+      "translation": "They said, \"You are only of those affected by magic."
+    },
+    {
+      "number": 186,
+      "arabicText": "وَمَا أَنتَ إِلَّا بَشَرٌ مِّثْلُنَا وَإِن نَّظُنُّكَ لَمِنَ الْكَاذِبِينَ",
+      "translation": "You are but a man like ourselves, and indeed, we think you are among the liars."
+    },
+    {
+      "number": 187,
+      "arabicText": "فَأَسْقِطْ عَلَيْنَا كِسَفًا مِّنَ السَّمَاءِ إِن كُنتَ مِنَ الصَّادِقِينَ",
+      "translation": "So cause to fall upon us fragments of the sky, if you should be of the truthful.\""
+    },
+    {
+      "number": 188,
+      "arabicText": "قَالَ رَبِّي أَعْلَمُ بِمَا تَعْمَلُونَ",
+      "translation": "He said, \"My Lord is most knowing of what you do.\""
+    },
+    {
+      "number": 189,
+      "arabicText": "فَكَذَّبُوهُ فَأَخَذَهُمْ عَذَابُ يَوْمِ الظُّلَّةِ ۚ إِنَّهُ كَانَ عَذَابَ يَوْمٍ عَظِيمٍ",
+      "translation": "And they denied him, so the punishment of the day of the black cloud seized them. Indeed, it was the punishment of a terrible day."
+    },
+    {
+      "number": 190,
+      "arabicText": "إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      "translation": "Indeed in that is a sign, but most of them were not to be believers."
+    },
+    {
+      "number": 191,
+      "arabicText": "وَإِنَّ رَبَّكَ لَهُوَ الْعَزِيزُ الرَّحِيمُ",
+      "translation": "And indeed, your Lord - He is the Exalted in Might, the Merciful."
+    },
+    {
+      "number": 192,
+      "arabicText": "وَإِنَّهُ لَتَنزِيلُ رَبِّ الْعَالَمِينَ",
+      "translation": "And indeed, the Qur'an is the revelation of the Lord of the worlds."
+    },
+    {
+      "number": 193,
+      "arabicText": "نَزَلَ بِهِ الرُّوحُ الْأَمِينُ",
+      "translation": "The Trustworthy Spirit has brought it down"
+    },
+    {
+      "number": 194,
+      "arabicText": "عَلَىٰ قَلْبِكَ لِتَكُونَ مِنَ الْمُنذِرِينَ",
+      "translation": "Upon your heart, [O Muhammad] - that you may be of the warners -"
+    },
+    {
+      "number": 195,
+      "arabicText": "بِلِسَانٍ عَرَبِيٍّ مُّبِينٍ",
+      "translation": "In a clear Arabic language."
+    },
+    {
+      "number": 196,
+      "arabicText": "وَإِنَّهُ لَفِي زُبُرِ الْأَوَّلِينَ",
+      "translation": "And indeed, it is [mentioned] in the scriptures of former peoples."
+    },
+    {
+      "number": 197,
+      "arabicText": "أَوَلَمْ يَكُن لَّهُمْ آيَةً أَن يَعْلَمَهُ عُلَمَاءُ بَنِي إِسْرَائِيلَ",
+      "translation": "And has it not been a sign to them that it is recognized by the scholars of the Children of Israel?"
+    },
+    {
+      "number": 198,
+      "arabicText": "وَلَوْ نَزَّلْنَاهُ عَلَىٰ بَعْضِ الْأَعْجَمِينَ",
+      "translation": "And even if We had revealed it to one among the foreigners"
+    },
+    {
+      "number": 199,
+      "arabicText": "فَقَرَأَهُ عَلَيْهِم مَّا كَانُوا بِهِ مُؤْمِنِينَ",
+      "translation": "And he had recited it to them [perfectly], they would [still] not have been believers in it."
+    },
+    {
+      "number": 200,
+      "arabicText": "كَذَٰلِكَ سَلَكْنَاهُ فِي قُلُوبِ الْمُجْرِمِينَ",
+      "translation": "Thus have We inserted disbelief into the hearts of the criminals."
+    },
+    {
+      "number": 201,
+      "arabicText": "لَا يُؤْمِنُونَ بِهِ حَتَّىٰ يَرَوُا الْعَذَابَ الْأَلِيمَ",
+      "translation": "They will not believe in it until they see the painful punishment."
+    },
+    {
+      "number": 202,
+      "arabicText": "فَيَأْتِيَهُم بَغْتَةً وَهُمْ لَا يَشْعُرُونَ",
+      "translation": "And it will come to them suddenly while they perceive [it] not."
+    },
+    {
+      "number": 203,
+      "arabicText": "فَيَقُولُوا هَلْ نَحْنُ مُنظَرُونَ",
+      "translation": "And they will say, \"May we be reprieved?\""
+    },
+    {
+      "number": 204,
+      "arabicText": "أَفَبِعَذَابِنَا يَسْتَعْجِلُونَ",
+      "translation": "So for Our punishment are they impatient?"
+    },
+    {
+      "number": 205,
+      "arabicText": "أَفَرَأَيْتَ إِن مَّتَّعْنَاهُمْ سِنِينَ",
+      "translation": "Then have you considered if We gave them enjoyment for years"
+    },
+    {
+      "number": 206,
+      "arabicText": "ثُمَّ جَاءَهُم مَّا كَانُوا يُوعَدُونَ",
+      "translation": "And then there came to them that which they were promised?"
+    },
+    {
+      "number": 207,
+      "arabicText": "مَا أَغْنَىٰ عَنْهُم مَّا كَانُوا يُمَتَّعُونَ",
+      "translation": "They would not be availed by the enjoyment with which they were provided."
+    },
+    {
+      "number": 208,
+      "arabicText": "وَمَا أَهْلَكْنَا مِن قَرْيَةٍ إِلَّا لَهَا مُنذِرُونَ",
+      "translation": "And We did not destroy any city except that it had warners"
+    },
+    {
+      "number": 209,
+      "arabicText": "ذِكْرَىٰ وَمَا كُنَّا ظَالِمِينَ",
+      "translation": "As a reminder; and never have We been unjust."
+    },
+    {
+      "number": 210,
+      "arabicText": "وَمَا تَنَزَّلَتْ بِهِ الشَّيَاطِينُ",
+      "translation": "And the devils have not brought the revelation down."
+    },
+    {
+      "number": 211,
+      "arabicText": "وَمَا يَنبَغِي لَهُمْ وَمَا يَسْتَطِيعُونَ",
+      "translation": "It is not allowable for them, nor would they be able."
+    },
+    {
+      "number": 212,
+      "arabicText": "إِنَّهُمْ عَنِ السَّمْعِ لَمَعْزُولُونَ",
+      "translation": "Indeed they, from [its] hearing, are removed."
+    },
+    {
+      "number": 213,
+      "arabicText": "فَلَا تَدْعُ مَعَ اللَّهِ إِلَٰهًا آخَرَ فَتَكُونَ مِنَ الْمُعَذَّبِينَ",
+      "translation": "So do not invoke with Allah another deity and [thus] be among the punished."
+    },
+    {
+      "number": 214,
+      "arabicText": "وَأَنذِرْ عَشِيرَتَكَ الْأَقْرَبِينَ",
+      "translation": "And warn, [O Muhammad], your closest kindred."
+    },
+    {
+      "number": 215,
+      "arabicText": "وَاخْفِضْ جَنَاحَكَ لِمَنِ اتَّبَعَكَ مِنَ الْمُؤْمِنِينَ",
+      "translation": "And lower your wing to those who follow you of the believers."
+    },
+    {
+      "number": 216,
+      "arabicText": "فَإِنْ عَصَوْكَ فَقُلْ إِنِّي بَرِيءٌ مِّمَّا تَعْمَلُونَ",
+      "translation": "And if they disobey you, then say, \"Indeed, I am disassociated from what you are doing.\""
+    },
+    {
+      "number": 217,
+      "arabicText": "وَتَوَكَّلْ عَلَى الْعَزِيزِ الرَّحِيمِ",
+      "translation": "And rely upon the Exalted in Might, the Merciful,"
+    },
+    {
+      "number": 218,
+      "arabicText": "الَّذِي يَرَاكَ حِينَ تَقُومُ",
+      "translation": "Who sees you when you arise"
+    },
+    {
+      "number": 219,
+      "arabicText": "وَتَقَلُّبَكَ فِي السَّاجِدِينَ",
+      "translation": "And your movement among those who prostrate."
+    },
+    {
+      "number": 220,
+      "arabicText": "إِنَّهُ هُوَ السَّمِيعُ الْعَلِيمُ",
+      "translation": "Indeed, He is the Hearing, the Knowing."
+    },
+    {
+      "number": 221,
+      "arabicText": "هَلْ أُنَبِّئُكُمْ عَلَىٰ مَن تَنَزَّلُ الشَّيَاطِينُ",
+      "translation": "Shall I inform you upon whom the devils descend?"
+    },
+    {
+      "number": 222,
+      "arabicText": "تَنَزَّلُ عَلَىٰ كُلِّ أَفَّاكٍ أَثِيمٍ",
+      "translation": "They descend upon every sinful liar."
+    },
+    {
+      "number": 223,
+      "arabicText": "يُلْقُونَ السَّمْعَ وَأَكْثَرُهُمْ كَاذِبُونَ",
+      "translation": "They pass on what is heard, and most of them are liars."
+    },
+    {
+      "number": 224,
+      "arabicText": "وَالشُّعَرَاءُ يَتَّبِعُهُمُ الْغَاوُونَ",
+      "translation": "And the poets - [only] the deviators follow them;"
+    },
+    {
+      "number": 225,
+      "arabicText": "أَلَمْ تَرَ أَنَّهُمْ فِي كُلِّ وَادٍ يَهِيمُونَ",
+      "translation": "Do you not see that in every valley they roam"
+    },
+    {
+      "number": 226,
+      "arabicText": "وَأَنَّهُمْ يَقُولُونَ مَا لَا يَفْعَلُونَ",
+      "translation": "And that they say what they do not do? -"
+    },
+    {
+      "number": 227,
+      "arabicText": "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَذَكَرُوا اللَّهَ كَثِيرًا وَانتَصَرُوا مِن بَعْدِ مَا ظُلِمُوا ۗ وَسَيَعْلَمُ الَّذِينَ ظَلَمُوا أَيَّ مُنقَلَبٍ يَنقَلِبُونَ",
+      "translation": "Except those [poets] who believe and do righteous deeds and remember Allah often and defend [the Muslims] after they were wronged. And those who have wronged are going to know to what [kind of] return they will be returned."
+    }
+  ]
+}

@@ -1,0 +1,1745 @@
+{
+        "who_is_allah": {
+            "question": "Who is Allah?",
+            "answer": "Allah is the one God in Islam, the Creator of the universe, who is unique and without partners.",
+            "keywords": [
+                "What does Allah mean?",
+                "Who is the God of Islam?",
+                "Tell me about Allah.",
+                "Is Allah the same as God?",
+                "Describe Allah."
+            ],
+        "who_is_final_prophet": {
+            "question": "Who is the final Prophet of Islam?",
+            "answer": "The final Prophet of Islam is Prophet Muhammad (Peace Be Upon Him).",
+            "keywords": [
+                "Who is the last Prophet?",
+                "What is the name of the final Prophet?",
+                "Who was the last messenger of Islam?",
+                "Tell me about Prophet Muhammad."
+            ]
+        },
+        "name_of_religion": {
+            "question": "What is the name of the religion revealed to Prophet Muhammad?",
+            "answer": "The name of the religion revealed to Prophet Muhammad (Peace Be Upon Him) is Islam.",
+            "keywords": [
+                "What is the religion of Muhammad?",
+                "Name of the religion in Islam.",
+                "What do we call the religion revealed to Prophet Muhammad?"
+            ]
+        },
+        "meaning_la_ilaha_illallah": {
+            "question": "What is the meaning of 'La ilaha illallah'?",
+            "answer": "The meaning of 'La ilaha illallah' is 'There is no god but Allah'.",
+            "keywords": [
+                "What does 'La ilaha illallah' mean?",
+                "Explain 'La ilaha illallah'.",
+                "Interpretation of 'La ilaha illallah'."
+            ]
+        },
+        "meaning_of_islam": {
+            "question": "What does 'Islam' mean?",
+            "answer": "Islam means 'submission' or 'surrender' to the will of Allah.",
+            "keywords": [
+                "What is the definition of Islam?",
+                "Explain the meaning of Islam.",
+                "Describe what Islam means."
+            ]
+        },
+        "who_are_the_angels": {
+            "question": "Who are the angels in Islam?",
+            "answer": "Angels in Islam are beings created by Allah from light, who perform various tasks including delivering messages to prophets.",
+            "keywords": [
+                "Explain angels in Islam.",
+                "What are angels in Islam?",
+                "Who are the beings created from light?"
+            ]
+        },
+        "meaning_of_tawheed": {
+            "question": "What is the meaning of 'Tawheed'?",
+            "answer": "'Tawheed' means the oneness of Allah, affirming that there is no deity worthy of worship except Him.",
+            "keywords": [
+                "What does 'Tawheed' mean?",
+                "Explain the concept of Tawheed.",
+                "What is the significance of Tawheed in Islam?"
+            ]
+        },
+        "who_wrote_the_quran": {
+            "question": "Who wrote the Quran?",
+            "answer": "The Quran was revealed to Prophet Muhammad (Peace Be Upon Him) through the Angel Gabriel (Jibril); it was not written by a single person.",
+            "keywords": [
+                "Who is the author of the Quran?",
+                "How was the Quran written?",
+                "Who revealed the Quran to Muhammad?"
+            ]
+        },
+        "what_book_prophet_muhammad_received": {
+            "question": "What book did Prophet Muhammad receive?",
+            "answer": "Prophet Muhammad (Peace Be Upon Him) received the Quran.",
+            "keywords": [
+                "What was revealed to Prophet Muhammad?",
+                "Which book is considered the holy book of Islam?",
+                "What scripture did Muhammad receive?"
+            ]
+        },
+        "who_was_first_prophet": {
+            "question": "Who was the first prophet in Islam?",
+            "answer": "The first prophet in Islam was Adam (Peace Be Upon Him).",
+            "keywords": [
+                "Who was the first prophet?",
+                "What is the name of the first prophet in Islam?",
+                "Who is considered the first prophet?"
+            ]
+        },
+        "who_was_last_prophet": {
+            "question": "Who was the last prophet in Islam?",
+            "answer": "The last prophet in Islam was Prophet Muhammad (Peace Be Upon Him).",
+            "keywords": [
+                "Who is the last messenger in Islam?",
+                "What is the name of the last prophet?",
+                "Who was the final prophet of Islam?"
+            ],
+                "who_built_the_kaaba": {
+                    "question": "Who built the Kaaba with his son?",
+                    "answer": "The Kaaba was built by Prophet Ibrahim (Abraham) and his son Ismail (Ishmael).",
+                    "keywords": [
+                        "Who constructed the Kaaba?",
+                        "What is the history of the Kaaba's construction?",
+                        "Which prophets built the Kaaba?",
+                        "Who was responsible for building the Kaaba?"
+                    ]
+                },
+                "who_swallowed_by_big_fish": {
+                    "question": "Who was swallowed by a big fish?",
+                    "answer": "Prophet Yunus (Jonah) was swallowed by a big fish.",
+                    "keywords": [
+                        "Who is Yunus in Islam?",
+                        "What happened to Prophet Yunus?",
+                        "Who was swallowed by a fish in Islamic tradition?",
+                        "What is the story of Yunus?"
+                    ]
+                },
+                "which_prophet_could_speak_to_animals": {
+                    "question": "Which prophet could speak to animals?",
+                    "answer": "Prophet Solomon (Sulayman) could speak to animals.",
+                    "keywords": [
+                        "Who was known for speaking to animals?",
+                        "What prophet conversed with animals?",
+                        "Which prophet had the ability to communicate with animals?",
+                        "Who is the animal-speaking prophet?"
+                    ]
+                },
+                "who_was_prophet_during_flood": {
+                    "question": "Who was the prophet during the flood?",
+                    "answer": "The prophet during the flood was Prophet Nuh (Noah).",
+                    "keywords": [
+                        "Who is the prophet associated with the flood?",
+                        "What was Nuh's role during the flood?",
+                        "Who was the messenger during the flood?",
+                        "Which prophet is related to the great flood?"
+                    ]
+                },
+                "which_prophet_received_the_zabur": {
+                    "question": "Which prophet received the Zabur (Psalms)?",
+                    "answer": "Prophet Dawood (David) received the Zabur (Psalms).",
+                    "keywords": [
+                        "Who is Dawood in Islam?",
+                        "What is the Zabur?",
+                        "Which prophet was given the Psalms?",
+                        "Who received the book known as the Psalms?"
+                    ]
+                },
+                "which_prophet_known_for_wisdom": {
+                    "question": "Which prophet was known for his wisdom and kingdom?",
+                    "answer": "Prophet Solomon (Sulayman) was known for his wisdom and kingdom.",
+                    "keywords": [
+                        "Who is known for wisdom in Islam?",
+                        "What made Prophet Solomon wise?",
+                        "Who was the king with great wisdom?",
+                        "Which prophet is famous for his intelligence?"
+                    ]
+                },
+                "which_prophet_tested_by_wealth_and_health": {
+                    "question": "Which prophet was tested by losing all his wealth and health?",
+                    "answer": "Prophet Ayyub (Job) was tested by losing all his wealth and health.",
+                    "keywords": [
+                        "Who is Ayyub in Islam?",
+                        "What was Job tested with?",
+                        "Which prophet faced trials of wealth and health?",
+                        "What challenges did Ayyub experience?"
+                    ]
+                },
+                "who_split_the_sea": {
+                    "question": "Who was the prophet that split the sea?",
+                    "answer": "Prophet Musa (Moses) split the sea.",
+                    "keywords": [
+                        "Who is the sea-splitting prophet?",
+                        "What did Musa do according to the Quran?",
+                        "Which prophet parted the sea?",
+                        "Who led the Israelites across the sea?"
+                    ]
+                },
+                "first_man_to_accept_islam": {
+                    "question": "Who was the first man to accept Islam?",
+                    "answer": "The first man to accept Islam was Abu Bakr Siddiq (May Allah be pleased with him).",
+                    "keywords": [
+                        "Who was the first Muslim?",
+                        "What is the name of the first person to embrace Islam?",
+                        "Who accepted Islam first among men?",
+                        "Who is Abu Bakr in Islam?"
+                    ]
+                },
+                "first_woman_to_accept_islam": {
+                    "question": "Who was the first woman to accept Islam?",
+                    "answer": "The first woman to accept Islam was Khadijah bint Khuwaylid (May Allah be pleased with her), the wife of Prophet Muhammad (Peace Be Upon Him).",
+                    "keywords": [
+                        "Who was Khadijah?",
+                        "First woman to embrace Islam?",
+                        "What is the significance of Khadijah in Islam?",
+                        "Who accepted Islam first among women?"
+                    ]
+                },
+                "prophets_closest_friend": {
+                    "question": "Who was the Prophet’s closest friend and first caliph?",
+                    "answer": "The Prophet's closest friend and first caliph was Abu Bakr Siddiq (May Allah be pleased with him).",
+                    "keywords": [
+                        "Who was the closest companion of Prophet Muhammad?",
+                        "What is the role of Abu Bakr in Islam?",
+                        "Who was the first caliph after the Prophet's death?",
+                        "Significance of Abu Bakr in Islamic history?"
+                    ],
+                        "second_caliph": {
+                            "question": "Who was the second caliph of Islam?",
+                            "answer": "The second caliph of Islam was Umar ibn al-Khattab (May Allah be pleased with him).",
+                            "keywords": [
+                                "Who is Umar?",
+                                "What role did Umar play in early Islam?",
+                                "Who was the second caliph after Abu Bakr?",
+                                "Significance of Umar in Islamic history?",
+                                "Umar's contributions to Islam"
+                            ]
+                        },
+                        "known_as_lion_of_allah": {
+                            "question": "Who was known as the 'Lion of Allah'?",
+                            "answer": "Ali ibn Abi Talib (May Allah be pleased with him), the cousin and son-in-law of Prophet Muhammad (Peace Be Upon Him), was known as the 'Lion of Allah'.",
+                            "keywords": [
+                                "Who is Ali in Islam?",
+                                "What does 'Lion of Allah' refer to?",
+                                "Why is Ali known as the Lion of Allah?",
+                                "Significance of Ali ibn Abi Talib in Islamic history?",
+                                "Ali's relationship to the Prophet"
+                            ]
+                        },
+                        "who_compiled_the_quran": {
+                            "question": "Who compiled the Quran into one book form?",
+                            "answer": "The Quran was compiled into one book form under the caliphate of Abu Bakr Siddiq (May Allah be pleased with him) and finalized by Uthman ibn Affan (May Allah be pleased with him).",
+                            "keywords": [
+                                "Who compiled the Quran?",
+                                "Quran compilation history",
+                                "Uthman's role in the Quran",
+                                "What was the process of compiling the Quran?"
+                            ]
+                        },
+                        "who_was_prophets_cousin": {
+                            "question": "Who was the Prophet’s cousin and son-in-law?",
+                            "answer": "Ali ibn Abi Talib (May Allah be pleased with him) was the Prophet’s cousin and son-in-law.",
+                            "keywords": [
+                                "Who is Ali?",
+                                "Relation of Ali to Prophet Muhammad",
+                                "Significance of Ali as a cousin",
+                                "Ali's role in early Islam"
+                            ]
+                        },
+                        "who_was_prophets_scribe": {
+                            "question": "Who was the Prophet’s scribe?",
+                            "answer": "Zayd ibn Thabit (May Allah be pleased with him) was the Prophet’s scribe.",
+                            "keywords": [
+                                "Who is Zayd ibn Thabit?",
+                                "Role of Zayd as a scribe",
+                                "Significance of Zayd in Islamic history",
+                                "What did Zayd do for the Prophet?"
+                            ]
+                        },
+                        "first_martyr_in_islam": {
+                            "question": "Who was the first martyr in Islam?",
+                            "answer": "The first martyr in Islam was Sumayyah bint Khayyat (May Allah be pleased with her).",
+                            "keywords": [
+                                "Who is Sumayyah?",
+                                "Significance of Sumayyah in Islam",
+                                "First martyr's role in Islamic history",
+                                "Why was Sumayyah martyred?"
+                            ]
+                        },
+                        "who_led_muslims_after_prophet": {
+                            "question": "Who led the Muslims after Prophet Muhammad passed away?",
+                            "answer": "Abu Bakr Siddiq (May Allah be pleased with him) led the Muslims after Prophet Muhammad (Peace Be Upon Him) passed away.",
+                            "keywords": [
+                                "Who succeeded the Prophet?",
+                                "Abu Bakr's leadership",
+                                "Significance of Abu Bakr after the Prophet",
+                                "First caliph of Islam"
+                            ]
+                        },
+                        "how_many_surahs_in_quran": {
+                            "question": "How many Surahs are in the Quran?",
+                            "answer": "There are 114 Surahs in the Quran.",
+                            "keywords": [
+                                "Total Surahs in the Quran?",
+                                "Count of Surahs in Quran",
+                                "Surah statistics in Quran",
+                                "Quran structure"
+                            ]
+                        },
+                        "longest_surah": {
+                            "question": "What is the longest Surah in the Quran?",
+                            "answer": "The longest Surah in the Quran is Surah Al-Baqarah.",
+                            "keywords": [
+                                "Which Surah is the longest?",
+                                "Details about Surah Al-Baqarah",
+                                "Longest chapters in the Quran",
+                                "Length of Surah Al-Baqarah"
+                            ]
+                        },
+                        "shortest_surah": {
+                            "question": "What is the shortest Surah in the Quran?",
+                            "answer": "The shortest Surah in the Quran is Surah Al-Kawthar.",
+                            "keywords": [
+                                "Which Surah is the shortest?",
+                                "Details on Surah Al-Kawthar",
+                                "Shortest chapters in the Quran",
+                                "Length of Surah Al-Kawthar"
+                            ]
+                        },
+                        "first_surah": {
+                            "question": "What is the first Surah of the Quran?",
+                            "answer": "The first Surah of the Quran is Surah Al-Fatiha.",
+                            "keywords": [
+                                "First Surah in the Quran?",
+                                "What is Surah Al-Fatiha?",
+                                "Opening chapter of the Quran",
+                                "Importance of Surah Al-Fatiha"
+                            ]
+                        },
+                        "language_of_quran": {
+                            "question": "In which language was the Quran revealed?",
+                            "answer": "The Quran was revealed in Arabic.",
+                            "keywords": [
+                                "Language of the Quran?",
+                                "Why was the Quran revealed in Arabic?",
+                                "Quran's original language",
+                                "Significance of Arabic in Islam"
+                            ]
+                        },
+                        "name_of_angel": {
+                            "question": "What is the name of the angel who brought revelation?",
+                            "answer": "The angel who brought revelation is Angel Gabriel (Jibril).",
+                            "keywords": [
+                                "Who is Angel Gabriel?",
+                                "Role of Jibril in Islam",
+                                "Jibril's significance in revelation",
+                                "Angel of Revelation in Islam"
+                            ]
+                        },
+                        "what_is_hadith": {
+                            "question": "What is Hadith?",
+                            "answer": "Hadith refers to the sayings, actions, and approvals of Prophet Muhammad (Peace Be Upon Him).",
+                            "keywords": [
+                                "Definition of Hadith",
+                                "What does it mean to have Hadith?",
+                                "Importance of Hadith in Islam",
+                                "Hadith vs. Quran"
+                            ]
+                        },
+                        "who_collected_authentic_hadiths": {
+                            "question": "Who collected the most authentic Hadiths?",
+                            "answer": "Imam Al-Bukhari is known for collecting the most authentic Hadiths.",
+                            "keywords": [
+                                "Who is Imam Al-Bukhari?",
+                                "Al-Bukhari's contribution to Hadith",
+                                "Most authentic Hadith collector",
+                                "Importance of Al-Bukhari's work"
+                            ]
+                        },
+                        "last_surah": {
+                            "question": "What is the name of the last Surah in the Quran?",
+                            "answer": "The last Surah in the Quran is Surah An-Nas.",
+                            "keywords": [
+                                "What is the final Surah?",
+                                "Last chapter of the Quran",
+                                "Details on Surah An-Nas",
+                                "Importance of the last Surah"
+                            ]
+                        },
+                        "surah_recited_in_every_salah": {
+                            "question": "What is the Surah that must be recited in every Salah?",
+                            "answer": "Surah Al-Fatiha must be recited in every Salah.",
+                            "keywords": [
+                                "What Surah is essential in Salah?",
+                                "Importance of Surah Al-Fatiha in prayer",
+                                "Recitation in Salah",
+                                "Salah requirements"
+                            ]
+                        },
+                        "how_many_daily_prayers": {
+                            "question": "How many daily prayers are there in Islam?",
+                            "answer": "There are five daily prayers (Salah) in Islam.",
+                            "keywords": [
+                                "Total daily prayers in Islam",
+                                "Daily Salah count",
+                                "Importance of daily prayers",
+                                "Five pillars of Islam"
+                            ]
+                        },
+                        "direction_praying_facing": {
+                            "question": "What direction do Muslims face when praying?",
+                            "answer": "Muslims face the Kaaba in Mecca when praying.",
+                            "keywords": [
+                                "Praying direction in Islam",
+                                "Qibla in Salah",
+                                "Why face the Kaaba?",
+                                "Significance of the Kaaba"
+                            ]
+                        },
+                        "month_of_fasting": {
+                            "question": "What is the month of fasting in Islam?",
+                            "answer": "The month of fasting in Islam is Ramadan.",
+                            "keywords": [
+                                "Fasting month in Islam",
+                                "Importance of Ramadan",
+                                "What happens during Ramadan?",
+                                "Ramadan and its significance"
+                            ]
+                        },
+                        "what_is_zakat": {
+                            "question": "What is Zakat?",
+                            "answer": "Zakat is an obligatory form of charity in Islam, usually calculated as 2.5% of savings.",
+                            "keywords": [
+                                "Definition of Zakat",
+                                "Zakat importance in Islam",
+                                "How is Zakat calculated?",
+                                "Obligations related to Zakat"
+                            ]
+                        },
+                        "how_often_hajj_performed": {
+                            "question": "How often is Hajj performed?",
+                            "answer": "Hajj is performed annually during the Islamic month of Dhul-Hijjah.",
+                            "keywords": [
+                                "Frequency of Hajj",
+                                "When is Hajj done?",
+                                "Dhul-Hijjah and Hajj",
+                                "Significance of Hajj in Islam"
+                            ]
+                        },
+                        "who_required_to_pay_zakat": {
+                            "question": "Who is required to pay Zakat?",
+                            "answer": "Every adult Muslim who meets the minimum wealth threshold (Nisab) is required to pay Zakat.",
+                            "keywords": [
+                                "Who should pay Zakat?",
+                                "Zakat eligibility criteria",
+                                "Nisab requirement for Zakat",
+                                "Zakat and wealth distribution"
+                            ]
+                        },
+                        "when_islamic_day_begin": {
+                            "question": "When does the Islamic day begin?",
+                            "answer": "The Islamic day begins at sunset.",
+                            "keywords": [
+                                "Start of Islamic day",
+                                "Islamic calendar timings",
+                                "Sunset and Islamic day",
+                                "When does the day start in Islam?"
+                            ]
+                        },
+                        "name_of_prayer_after_sunset": {
+                            "question": "What is the name of the prayer after sunset?",
+                            "answer": "The prayer after sunset is called Maghrib.",
+                            "keywords": [
+                                "What do we call the Maghrib prayer?",
+                                "Timing of Maghrib prayer",
+                                "Significance of Maghrib in Islam",
+                                "Maghrib details"
+                            ]
+                        },
+                        "name_of_prayer_before_sunrise": {
+                            "question": "What is the prayer before sunrise called?",
+                            "answer": "The prayer before sunrise is called Fajr.",
+                            "keywords": [
+                                "Fajr prayer definition",
+                                "Importance of Fajr prayer",
+                                "Timing of Fajr",
+                                "Fajr in daily prayer"
+                            ]
+                        },
+                        "how_many_units_in_fajr": {
+                            "question": "How many units (rak’ahs) are in Fajr prayer?",
+                            "answer": "Fajr prayer consists of 2 rak'ahs.",
+                            "keywords": [
+                                "Rak'ahs in Fajr prayer",
+                                "Fajr prayer structure",
+                                "Components of Fajr prayer",
+                                "Daily prayers rak'ahs"
+                            ]
+                        },
+                        "how_many_rak'ahs_in_dhuhr": {
+                            "question": "How many rak’ahs are in Dhuhr prayer?",
+                            "answer": "Dhuhr prayer consists of 4 rak'ahs.",
+                            "keywords": [
+                                "Rak'ahs in Dhuhr prayer",
+                                "Dhuhr prayer details",
+                                "Components of Dhuhr",
+                                "Daily prayers rak'ahs"
+                            ]
+                        },
+                        "how_many_rak'ahs_in_asr": {
+                            "question": "How many rak’ahs are in Asr prayer?",
+                            "answer": "Asr prayer consists of 4 rak'ahs.",
+                            "keywords": [
+                                "Rak'ahs in Asr prayer",
+                                "Asr prayer details",
+                                "Components of Asr",
+                                "Daily prayers rak'ahs"
+                            ]
+                        },
+                        "how_many_rak'ahs_in_maghrib": {
+                            "question": "How many rak’ahs are in Maghrib prayer?",
+                            "answer": "Maghrib prayer consists of 3 rak'ahs.",
+                            "keywords": [
+                                "Rak'ahs in Maghrib prayer",
+                                "Maghrib prayer details",
+                                "Components of Maghrib",
+                                "Daily prayers rak'ahs"
+                            ]
+                        },
+                        "how_many_rak'ahs_in_isha": {
+                            "question": "How many rak’ahs are in Isha prayer?",
+                            "answer": "Isha prayer consists of 4 rak'ahs.",
+                            "keywords": [
+                                "Rak'ahs in Isha prayer",
+                                "Isha prayer details",
+                                "Components of Isha",
+                                "Daily prayers rak'ahs"
+                            ]
+                        },
+                        "what_muslims_say_after_sneezing": {
+                            "question": "What do Muslims say after sneezing?",
+                            "answer": "Muslims say 'Alhamdulillah' after sneezing.",
+                            "keywords": [
+                                "Response to sneezing in Islam",
+                                "What to say after sneezing?",
+                                "Cultural practices after sneezing",
+                                "Alhamdulillah meaning"
+                            ]
+                        },
+                        "reply_after_alhamdulillah": {
+                            "question": "What should a Muslim reply when someone says 'Alhamdulillah'?",
+                            "answer": "The reply is 'Yarhamuk Allah', which means 'May Allah have mercy on you'.",
+                            "keywords": [
+                                "Response to Alhamdulillah",
+                                "Correct reply to when someone sneezes",
+                                "'Yarhamuk Allah' meaning",
+                                "Cultural response to Alhamdulillah"
+                            ]
+                        },
+                        "what_muslims_say_before_eating": {
+                            "question": "What do Muslims say before eating?",
+                            "answer": "Muslims say 'Bismillah' which means 'In the name of Allah' before eating.",
+                            "keywords": [
+                                "What is said before meals?",
+                                "Bismillah in Islam",
+                                "Pre-meal sayings in Islam",
+                                "Importance of Bismillah"
+                            ]
+                        },
+                        "dua_entering_toilet": {
+                            "question": "What is the dua when entering the toilet?",
+                            "answer": "The dua when entering the toilet is: 'Allahumma inni a'udhu bika min al-khubthi wal-khaba'ith.'",
+                            "keywords": [
+                                "Dua for entering the toilet",
+                                "What to say before using the restroom?",
+                                "Islamic toilet dua",
+                                "Bathroom etiquette in Islam"
+                            ]
+                        },
+                        "dua_before_sleeping": {
+                            "question": "What is the dua before sleeping?",
+                            "answer": "The dua before sleeping is: 'Bismika Allahumma, amutu wa ahya.'",
+                            "keywords": [
+                                "Dua for sleep",
+                                "What to say before bed?",
+                                "Islamic nighttime prayers",
+                                "Importance of dua before sleeping"
+                            ]
+                        },
+                        "where_was_prophet_born": {
+                            "question": "Where was Prophet Muhammad born?",
+                            "answer": "Prophet Muhammad (Peace Be Upon Him) was born in Makkah.",
+                            "keywords": [
+                                "Birthplace of Prophet Muhammad",
+                                "Where did the Prophet grow up?",
+                                "Makkah's significance in Islam",
+                                "History of Makkah"
+                            ]
+                        },
+                        "year_prophet_born": {
+                            "question": "In which year was Prophet Muhammad born?",
+                            "answer": "Prophet Muhammad (Peace Be Upon Him) was born in the Year of the Elephant (around 570 CE).",
+                            "keywords": [
+                                "When was the Prophet born?",
+                                "Year of the Elephant details",
+                                "Historical context of Prophet's birth",
+                                "Significance of the year 570 CE"
+                            ]
+                        },
+                        "who_was_prophets_mother": {
+                            "question": "Who was the Prophet’s mother?",
+                            "answer": "The Prophet Muhammad’s mother was Amina bint Wahb.",
+                            "keywords": [
+                                "Who is Amina?",
+                                "Prophet Muhammad's maternal background",
+                                "History of Amina bint Wahb",
+                                "Significance of the Prophet's mother"
+                            ]
+                        },
+                        "who_was_prophets_father": {
+                            "question": "Who was the Prophet’s father?",
+                            "answer": "The Prophet Muhammad’s father was Abdullah ibn Abd al-Muttalib.",
+                            "keywords": [
+                                "Who is Abdullah?",
+                                "Prophet Muhammad's paternal background",
+                                "History of Abdullah ibn Abd al-Muttalib",
+                                "Significance of the Prophet's father"
+                            ]
+                        },
+                        "who_was_prophets_grandfather": {
+                            "question": "Who was the Prophet’s grandfather?",
+                            "answer": "The Prophet Muhammad’s grandfather was Abdul Muttalib.",
+                            "keywords": [
+                                "Who is Abdul Muttalib?",
+                                "Prophet Muhammad's family tree",
+                                "History of Abdul Muttalib",
+                                "Significance of the Prophet's grandfather"
+                            ]
+                        },
+                        "who_raised_prophet": {
+                            "question": "Who raised the Prophet after his mother died?",
+                            "answer": "The Prophet Muhammad was raised by his grandfather Abdul Muttalib and later by his uncle Abu Talib (May Allah be pleased with him).",
+                            "keywords": [
+                                "Who raised the Prophet Muhammad?",
+                                "Prophet's guardianship history",
+                                "Role of Abu Talib in the Prophet's life",
+                                "After the death of Amina"
+                            ]
+                        },
+                        "who_was_prophets_first_wife": {
+                            "question": "Who was the Prophet’s first wife?",
+                            "answer": "The Prophet Muhammad’s first wife was Khadijah bint Khuwaylid (May Allah be pleased with her).",
+                            "keywords": [
+                                "Who is Khadijah?",
+                                "Significance of Khadijah in Islam",
+                                "Prophet Muhammad's first marriage",
+                                "Khadijah's role in the early Islamic community"
+                            ]
+                        },
+                        "profession_of_prophet_before_prophethood": {
+                            "question": "What was the profession of the Prophet before Prophethood?",
+                            "answer": "Before Prophethood, Prophet Muhammad (Peace Be Upon Him) was a merchant.",
+                            "keywords": [
+                                "Prophet's profession",
+                                "What did Muhammad do before Prophethood?",
+                                "Merchant role of the Prophet",
+                                "Life of the Prophet before Islam"
+                            ]
+                        },
+                        "age_prophet_received_revelation": {
+                            "question": "At what age did the Prophet receive revelation?",
+                            "answer": "The Prophet Muhammad (Peace Be Upon Him) received revelation at the age of 40.",
+                            "keywords": [
+                                "At what age was revelation received?",
+                                "Significant age in the Prophet's life",
+                                "40 years old revelation",
+                                "When did the Prophet start preaching?"
+                            ]
+                        },
+                        "where_first_revelation_taken_place": {
+                            "question": "Where did the first revelation take place?",
+                            "answer": "The first revelation took place in the Cave of Hira.",
+                            "keywords": [
+                                "Location of first revelation",
+                                "Cave of Hira details",
+                                "Significance of Cave of Hira",
+                                "What happened in the Cave of Hira?"
+                            ]
+                        },
+                        "first_word_revealed": {
+                            "question": "What was the first word revealed in the Quran?",
+                            "answer": "The first word revealed in the Quran was 'Iqra' (Read).",
+                            "keywords": [
+                                "Initial word of the Quran",
+                                "Iqra meaning",
+                                "Context of the first revelation",
+                                "Importance of 'Read' in Islam"
+                            ]
+                        },
+                        "first_child_to_accept_islam": {
+                            "question": "Who was the first child to accept Islam?",
+                            "answer": "The first child to accept Islam was Ali ibn Abi Talib (May Allah be pleased with him).",
+                            "keywords": [
+                                "First child in Islam",
+                                "Who accepted Islam as a child?",
+                                "Ali's early acceptance of Islam",
+                                "Significance of Ali's childhood in Islam"
+                            ]
+                        },
+                        "angel_first_revelation": {
+                            "question": "Which angel appeared to the Prophet with the first revelation?",
+                            "answer": "Angel Gabriel (Jibril) appeared to the Prophet Muhammad (Peace Be Upon Him) with the first revelation.",
+                            "keywords": [
+                                "Which angel brought the first revelation?",
+                                "Angel of Revelation details",
+                                "Gabriel's significance",
+                                "Role of Jibril in Islam"
+                            ]
+                        },
+                        "name_of_prophets_wet_nurse": {
+                            "question": "What was the name of the Prophet’s wet nurse?",
+                            "answer": "The Prophet Muhammad’s wet nurse was Halimah Sa'diyah (May Allah be pleased with her).",
+                            "keywords": [
+                                "Who is Halimah Sa'diyah?",
+                                "Significance of the wet nurse in the Prophet's life",
+                                "Halimah's story in Islam",
+                                "Role of wet nurses in Arab culture"
+                            ]
+                        },
+                        "which_surah_was_revealed_first": {
+                            "question": "Which Surah was revealed first?",
+                            "answer": "The first Surah revealed was Surah Al-Alaq.",
+                            "keywords": [
+                                "First Surah revealed?",
+                                "Context of Surah Al-Alaq",
+                                "Importance of Al-Alaq in revelation",
+                                "When was Surah Al-Alaq revealed?"
+                            ]
+                        },
+                        "who_was_prophets_best_friend": {
+                            "question": "Who was the Prophet’s best friend?",
+                            "answer": "The Prophet Muhammad’s best friend was Abu Bakr Siddiq (May Allah be pleased with him).",
+                            "keywords": [
+                                "Who is Abu Bakr?",
+                                "Prophet's closest companion",
+                                "Significance of Abu Bakr in the Prophet's life",
+                                "Friendship between Muhammad and Abu Bakr"
+                            ]
+                        },
+                        "treaty_signed_with_quraysh": {
+                            "question": "What was the name of the treaty signed with the Quraysh?",
+                            "answer": "The treaty signed with the Quraysh was known as the Treaty of Hudaybiyyah.",
+                            "keywords": [
+                                "What is the Treaty of Hudaybiyyah?",
+                                "Importance of the treaty with Quraysh",
+                                "Details on Hudaybiyyah",
+                                "Historical significance of the treaty"
+                            ]
+                        },
+                        "years_in_makkah_after_prophethood": {
+                            "question": "How many years did the Prophet live in Makkah after Prophethood began?",
+                            "answer": "The Prophet Muhammad (Peace Be Upon Him) lived in Makkah for 13 years after Prophethood began.",
+                            "keywords": [
+                                "Years in Makkah post-Prophethood",
+                                "Significance of the 13 years",
+                                "Time in Makkah",
+                                "Prophet's life stages"
+                            ]
+                        },
+                        "years_in_madinah": {
+                            "question": "How many years did the Prophet live in Madinah?",
+                            "answer": "The Prophet Muhammad (Peace Be Upon Him) lived in Madinah for 10 years.",
+                            "keywords": [
+                                "Years in Madinah",
+                                "Significance of Madinah",
+                                "Time spent in Madinah",
+                                "Madinah's role in early Islam"
+                            ]
+                        },
+                        "name_of_prophets_camel": {
+                            "question": "What was the name of the Prophet’s camel?",
+                            "answer": "The name of the Prophet Muhammad’s camel was Qaswa.",
+                            "keywords": [
+                                "Who is Qaswa?",
+                                "Prophet's camel significance",
+                                "Qaswa in Islamic history",
+                                "What happened to the Prophet's camel?"
+                                        ]
+                                    },
+                                    "first_month_of_islamic_calendar": {
+                                        "question": "What is the first month of the Islamic calendar?",
+                                        "answer": "The first month of the Islamic calendar is Muharram.",
+                                        "keywords": [
+                                            "What is the name of the first month in the Islamic calendar?",
+                                            "Which month follows the Hijri New Year?",
+                                            "What does Muharram signify?"
+                                        ]
+                                    },
+                                    "ninth_month_of_islamic_calendar": {
+                                        "question": "What is the ninth month of the Islamic calendar?",
+                                        "answer": "The ninth month of the Islamic calendar is Ramadan.",
+                                        "keywords": [
+                                            "What month is Ramadan?",
+                                            "When does Ramadan occur in the Islamic calendar?",
+                                            "What is the significance of Ramadan?"
+                                        ]
+                                    },
+                                    "month_quran_first_revealed": {
+                                        "question": "In which month was the Quran first revealed?",
+                                        "answer": "The Quran was first revealed in the month of Ramadan.",
+                                        "keywords": [
+                                            "In which month did the Quran begin to be revealed?",
+                                            "What significant event happened in Ramadan?",
+                                            "When was the Quran revealed?"
+                                        ]
+                                    },
+                                    "month_contains_day_of_ashura": {
+                                        "question": "Which month contains the day of Ashura?",
+                                        "answer": "The day of Ashura is on the 10th of Muharram.",
+                                        "keywords": [
+                                            "What is Ashura?",
+                                            "In which month is Ashura observed?",
+                                            "What happens on Ashura?"
+                                        ]
+                                    },
+                                    "month_hajj_performed": {
+                                        "question": "Which month is Hajj performed in?",
+                                        "answer": "Hajj is performed in the month of Dhul-Hijjah.",
+                                        "keywords": [
+                                            "When is Hajj performed?",
+                                            "What month is associated with the Hajj pilgrimage?",
+                                            "What is Dhul-Hijjah?"
+                                        ]
+                                    },
+                                    "islamic_year_based_on": {
+                                        "question": "What is the Islamic year based on?",
+                                        "answer": "The Islamic year is based on the lunar calendar.",
+                                        "keywords": [
+                                            "What type of calendar does the Islamic year use?",
+                                            "Is the Islamic calendar lunar or solar?",
+                                            "How is the Islamic calendar determined?"
+                                        ]
+                                    },
+                                    "day_of_eid_after_ramadan": {
+                                        "question": "What is the day of Eid after Ramadan called?",
+                                        "answer": "The day of Eid after Ramadan is called Eid al-Fitr.",
+                                        "keywords": [
+                                            "What is the significance of Eid al-Fitr?",
+                                            "When does Eid al-Fitr take place?",
+                                            "What do Muslims celebrate on Eid al-Fitr?"
+                                        ]
+                                    },
+                                    "day_of_eid_after_hajj": {
+                                        "question": "What is the day of Eid after Hajj called?",
+                                        "answer": "The day of Eid after Hajj is called Eid al-Adha.",
+                                        "keywords": [
+                                            "What do Muslims commemorate on Eid al-Adha?",
+                                            "When is Eid al-Adha celebrated?",
+                                            "What is the significance of the Qurbani on Eid al-Adha?"
+                                        ]
+                                    },
+                                    "name_of_day_for_weekly_prayer": {
+                                        "question": "What is the name of the day Muslims gather for prayer weekly?",
+                                        "answer": "The name of the day Muslims gather for prayer weekly is Friday (Jumu'ah).",
+                                        "keywords": [
+                                            "What day is Jumu'ah?",
+                                            "Why is Friday significant for Muslims?",
+                                            "What happens on the day of Jumu'ah?"
+                                        ]
+                                    },
+                                    "holiest_city_in_islam": {
+                                        "question": "What is the holiest city in Islam?",
+                                        "answer": "The holiest city in Islam is Makkah.",
+                                        "keywords": [
+                                            "What city is considered the holiest in Islam?",
+                                            "Why is Makkah important to Muslims?",
+                                            "What is located in Makkah?"
+                                        ]
+                                    },
+                                    "second_holiest_city_in_islam": {
+                                        "question": "What is the second holiest city in Islam?",
+                                        "answer": "The second holiest city in Islam is Madinah.",
+                                        "keywords": [
+                                            "What city is the second holiest in Islam?",
+                                            "What is significant about Madinah?",
+                                            "Who is buried in Madinah?"
+                                        ]
+                                    },
+                                    "third_holiest_site_in_islam": {
+                                        "question": "What is the third holiest site in Islam?",
+                                        "answer": "The third holiest site in Islam is Masjid Al-Aqsa in Jerusalem.",
+                                        "keywords": [
+                                            "What is the third holy site in Islam?",
+                                            "Why is Masjid Al-Aqsa important?",
+                                            "Which city is home to Masjid Al-Aqsa?"
+                                        ]
+                                    },
+                                    "name_of_mosque_in_makkah": {
+                                        "question": "What is the name of the mosque in Makkah?",
+                                        "answer": "The name of the mosque in Makkah is Masjid Al-Haram.",
+                                        "keywords": [
+                                            "What mosque is located in Makkah?",
+                                            "What is the significance of Masjid Al-Haram?",
+                                            "Where do Muslims perform Hajj?"
+                                        ]
+                                    },
+                                    "name_of_mosque_in_madinah": {
+                                        "question": "What is the name of the mosque in Madinah?",
+                                        "answer": "The name of the mosque in Madinah is Masjid Nabawi.",
+                                        "keywords": [
+                                            "What mosque is located in Madinah?",
+                                            "What is significant about Masjid Nabawi?",
+                                            "What does Masjid Nabawi contain?"
+                                        ]
+                                    },
+                                    "name_of_rock_in_masjid_al_aqsa": {
+                                        "question": "What is the name of the rock in Masjid Al-Aqsa?",
+                                        "answer": "The name of the rock in Masjid Al-Aqsa is the Dome of the Rock.",
+                                        "keywords": [
+                                            "What is the Dome of the Rock?",
+                                            "Why is the Dome of the Rock significant?",
+                                            "Where is the Dome of the Rock located?"
+                                        ]
+                                    },
+                                    "where_prophet_migrated_from_makkah": {
+                                        "question": "Where did the Prophet migrate to from Makkah?",
+                                        "answer": "The Prophet Muhammad (Peace Be Upon Him) migrated to Madinah from Makkah.",
+                                        "keywords": [
+                                            "Where did the Prophet go during Hijrah?",
+                                            "What is Hijrah?",
+                                            "Why did the Prophet migrate?"
+                                        ]
+                                    },
+                                    "grave_of_prophet_located": {
+                                        "question": "Where is the grave of the Prophet Muhammad located?",
+                                        "answer": "The grave of Prophet Muhammad (Peace Be Upon Him) is located in Madinah.",
+                                        "keywords": [
+                                            "Where is Prophet Muhammad buried?",
+                                            "What is the significance of the grave of the Prophet?",
+                                            "Which city contains the Prophet's grave?"
+                                        ]
+                                    },
+                                    "place_of_last_sermon": {
+                                        "question": "What is the name of the place where Prophet Muhammad gave his last sermon?",
+                                        "answer": "The last sermon was given at Mount Arafat during Hajj.",
+                                        "keywords": [
+                                            "Where did the Prophet give his last sermon?",
+                                            "What did the Prophet address in his last sermon?",
+                                            "Why is Mount Arafat important?"
+                                        ]
+                                    },
+                                    "direction_of_prayer_for_muslims": {
+                                        "question": "What is the direction of prayer for Muslims?",
+                                        "answer": "The direction of prayer for Muslims (Qibla) is towards the Kaaba in Makkah.",
+                                        "keywords": [
+                                            "What is the Qibla?",
+                                            "In which direction do Muslims pray?",
+                                            "Why is the Kaaba important in prayer?"
+                                        ]
+                                    },
+                                    "what_say_leaving_house": {
+                                        "question": "What should a Muslim say when leaving someone's house?",
+                                        "answer": "A Muslim should say 'Assalamu Alaikum' when leaving someone's house as well.",
+                                        "keywords": [
+                                            "What greetings should a Muslim use when leaving?",
+                                            "What does 'Assalamu Alaikum' mean?",
+                                            "How should Muslims say goodbye?"
+                                        ]
+                                    },
+                                    "what_is_islamic_greeting": {
+                                        "question": "What is the Islamic greeting?",
+                                        "answer": "The Islamic greeting is 'Assalamu Alaikum' (Peace be upon you).",
+                                        "keywords": [
+                                            "What is the meaning of 'Assalamu Alaikum'?",
+                                            "How do Muslims greet each other?",
+                                            "What is a common Islamic salutation?"
+                                        ]
+                                    },
+                                    "what_say_after_eating": {
+                                        "question": "What should a Muslim say after finishing eating?",
+                                        "answer": "After finishing eating, a Muslim should say 'Alhamdulillah' (All praise is due to Allah).",
+                                        "keywords": [
+                                            "What do Muslims say after meals?",
+                                            "What does 'Alhamdulillah' mean?",
+                                            "Why should Muslims express gratitude after eating?"
+                                        ]
+                                    },
+                                    "how_treat_parents": {
+                                        "question": "How should a Muslim treat their parents?",
+                                        "answer": "A Muslim should treat their parents with respect, kindness, and honor.",
+                                        "keywords": [
+                                            "What does Islam say about treating parents?",
+                                            "How should one honor their parents in Islam?",
+                                            "What is the importance of respecting parents?"
+                                        ]
+                                    },
+                                    "islam_teach_about_lying": {
+                                        "question": "What does Islam teach about lying?",
+                                        "answer": "Islam strictly prohibits lying and considers it a major sin.",
+                                        "keywords": [
+                                            "Is lying a sin in Islam?",
+                                            "What are the consequences of lying?",
+                                            "What does the Quran say about honesty?"
+                                        ]
+                                    },
+                                    "is_backbiting_allowed": {
+                                        "question": "Is backbiting allowed in Islam?",
+                                        "answer": "Backbiting is not allowed in Islam; it is considered a serious offense.",
+                                        "keywords": [
+                                            "What is backbiting?",
+                                            "Is gossip allowed in Islam?",
+                                            "What does the Quran say about backbiting?"
+                                        ]
+                                    },
+                                    "what_do_when_angry": {
+                                        "question": "What should a Muslim do when angry?",
+                                        "answer": "A Muslim should seek refuge in Allah, remain silent, and avoid actions or words that could lead to wrongdoing.",
+                                        "keywords": [
+                                            "How should Muslims manage anger?",
+                                            "What is the Islamic way to deal with anger?",
+                                            "What to do when feeling angry in Islam?"
+                                        ]
+                                    },
+                                    "how_treat_neighbors": {
+                                        "question": "How should a Muslim treat their neighbors?",
+                                        "answer": "A Muslim should treat their neighbors with kindness, generosity, and respect.",
+                                        "keywords": [
+                                            "What does Islam say about neighbors?",
+                                            "How should Muslims treat their neighbors?",
+                                            "What are the rights of neighbors in Islam?"
+                                        ]
+                                    },
+                                    "islam_say_about_cheating": {
+                                        "question": "What does Islam say about cheating?",
+                                        "answer": "Islam prohibits cheating in all forms; it is considered dishonest and immoral.",
+                                        "keywords": [
+                                            "What is the stance on cheating in Islam?",
+                                            "Is cheating forbidden?",
+                                            "What are the consequences of cheating in Islam?"
+                                        ]
+                                    },
+                                    "first_battle_in_islam": {
+                                        "question": "What was the first battle in Islam?",
+                                        "answer": "The first battle in Islam was the Battle of Badr.",
+                                        "keywords": [
+                                            "What is the Battle of Badr?",
+                                            "Why was the Battle of Badr significant?",
+                                            "When did the Battle of Badr take place?"
+                                        ]
+                                    },
+                                    "commander_battle_of_badr": {
+                                        "question": "Who was the commander in the Battle of Badr?",
+                                        "answer": "The commander in the Battle of Badr was Prophet Muhammad (Peace Be Upon Him).",
+                                        "keywords": [
+                                            "Who led the Muslims in the Battle of Badr?",
+                                            "What role did the Prophet play in the Battle of Badr?",
+                                            "Who are the key figures in the Battle of Badr?"
+                                        ]
+                                    },
+                                    "battle_fought_third_year_hijrah": {
+                                        "question": "What battle was fought in the third year after Hijrah?",
+                                        "answer": "The battle fought in the third year after Hijrah was the Battle of Uhud.",
+                                        "keywords": [
+                                            "Which battle took place in the third year of Hijrah?",
+                                            "What was significant about the Battle of Uhud?",
+                                            "Who fought in the Battle of Uhud?"
+                                        ]
+                                    },
+                                    "battle_dig_trench": {
+                                        "question": "Which battle did the Muslims dig a trench?",
+                                        "answer": "The battle where Muslims dug a trench was the Battle of the Trench (also known as the Battle of Ahzab).",
+                                        "keywords": [
+                                            "What was the Battle of the Trench?",
+                                            "Why did the Muslims dig a trench?",
+                                            "When did the Battle of the Trench occur?"
+                                        ]
+                                    },
+                                    "battle_prophet_injured": {
+                                        "question": "Which battle was the Prophet injured in?",
+                                        "answer": "The Prophet was injured in the Battle of Uhud.",
+                                        "keywords": [
+                                            "What happened to the Prophet during the Battle of Uhud?",
+                                            "In which battle did the Prophet sustain injuries?",
+                                            "What is the significance of the Prophet's injuries?"
+                                        ]
+                                    },
+                                    "flag_bearer_battle_of_badr": {
+                                        "question": "Who was the flag bearer in the Battle of Badr?",
+                                        "answer": "The flag bearer in the Battle of Badr was Mus'ab ibn Umayr (May Allah be pleased with him).",
+                                        "keywords": [
+                                            "Who carried the flag in the Battle of Badr?",
+                                            "What is the story of Mus'ab ibn Umayr?",
+                                            "What significance did the flag bearer hold?"
+                                        ]
+                                    },
+                                    "name_of_treaty_broken_by_quraysh": {
+                                        "question": "What is the name of the treaty that was broken by the Quraysh?",
+                                        "answer": "The treaty that was broken by the Quraysh is known as the Treaty of Hudaybiyyah.",
+                                        "keywords": [
+                                            "What was the Treaty of Hudaybiyyah?",
+                                            "Why did the Quraysh break the treaty?",
+                                            "What were the consequences of the Treaty of Hudaybiyyah?"
+                                        ]
+                                    },
+                                    "year_prophet_perform_hajj": {
+                                        "question": "What year did the Prophet perform Hajj?",
+                                        "answer": "The Prophet performed Hajj in the year 10 AH (after Hijrah).",
+                                        "keywords": [
+                                            "When did the Prophet complete Hajj?",
+                                            "What year marks the Prophet's Hajj?",
+                                            "What was significant about the Prophet's Hajj?"
+                                        ]
+                                    },
+                                    "year_prophet_passed_away": {
+                                        "question": "What year did the Prophet pass away?",
+                                        "answer": "The Prophet passed away in the year 11 AH.",
+                                        "keywords": [
+                                            "In which year did the Prophet Muhammad die?",
+                                            "What were the events surrounding the Prophet's death?",
+                                            "How did the Prophet's death impact the Muslim community?"
+                                        ]
+                                    },
+                                    "first_caliph_after_prophet": {
+                                        "question": "Who became the first caliph after the Prophet?",
+                                        "answer": "Abu Bakr Siddiq (May Allah be pleased with him) became the first caliph after the Prophet.",
+                                        "keywords": [
+                                            "Who succeeded the Prophet Muhammad?",
+                                            "What was the significance of Abu Bakr's caliphate?",
+                                            "Why was Abu Bakr chosen as the first caliph?"
+                                        ]
+                                    },
+                                    "what_is_wudu": {
+                                        "question": "What is Wudu?",
+                                        "answer": "Wudu is the ritual washing performed by Muslims before prayer.",
+                                        "keywords": [
+                                            "What is the purpose of Wudu?",
+                                            "How is Wudu performed?",
+                                            "Why is Wudu important before Salah?"
+                                        ]
+                                    },
+                                    "what_breaks_wudu": {
+                                        "question": "What breaks Wudu?",
+                                        "answer": "Wudu is broken by any act that invalidates it, such as using the restroom, deep sleep, or passing gas.",
+                                        "keywords": [
+                                            "What can invalidate Wudu?",
+                                            "How is Wudu broken?",
+                                            "What actions require renewing Wudu?"
+                                        ]
+                                    },
+                                    "what_is_ghusl": {
+                                        "question": "What is Ghusl?",
+                                        "answer": "Ghusl is the full ritual washing of the body that is obligatory in certain circumstances.",
+                                        "keywords": [
+                                            "When is Ghusl required?",
+                                            "How do Muslims perform Ghusl?",
+                                            "What are the circumstances that necessitate Ghusl?"
+                                        ]
+                                    },
+                                    "when_is_ghusl_required": {
+                                        "question": "When is Ghusl required?",
+                                        "answer": "Ghusl is required after sexual discharge, menstruation, or childbirth.",
+                                        "keywords": [
+                                            "What conditions necessitate Ghusl?",
+                                            "Why is Ghusl important in Islam?",
+                                            "How does Ghusl relate to purity in Islam?"
+                                        ]
+                                    },
+                                    "what_is_tayammum": {
+                                        "question": "What is Tayammum?",
+                                        "answer": "Tayammum is a dry ablution performed with clean earth or dust when water is unavailable.",
+                                        "keywords": [
+                                            "What is the purpose of Tayammum?",
+                                            "When is Tayammum performed?",
+                                            "How is Tayammum different from Wudu?"
+                                        ]
+                                    },
+                                    "when_can_perform_tayammum": {
+                                        "question": "When can a Muslim perform Tayammum?",
+                                        "answer": "A Muslim can perform Tayammum when water is not available or when using water may cause harm.",
+                                        "keywords": [
+                                            "What are the conditions for performing Tayammum?",
+                                            "When is Tayammum allowed?",
+                                            "Why might Tayammum be necessary?"
+                                        ]
+                                    },
+                                    "ruling_on_praying_without_wudu": {
+                                        "question": "What is the ruling on praying without Wudu?",
+                                        "answer": "It is not valid to pray without Wudu.",
+                                        "keywords": [
+                                            "Can Muslims pray without Wudu?",
+                                            "What are the consequences of praying without Wudu?",
+                                            "Why is Wudu necessary for Salah?"
+                                        ]
+                                    },
+                                    "conditions_of_salah": {
+                                        "question": "What are the conditions of Salah?",
+                                        "answer": "The conditions of Salah include being in a state of Wudu, facing the Qibla, and having the proper intention.",
+                                        "keywords": [
+                                            "What must be fulfilled to perform Salah?",
+                                            "What are the prerequisites for prayer?",
+                                            "How to prepare for Salah?"
+                                        ]
+                                    },
+                                    "what_is_sujood": {
+                                        "question": "What is Sujood?",
+                                        "answer": "Sujood is the act of prostration in prayer.",
+                                        "keywords": [
+                                            "What role does Sujood play in Salah?",
+                                            "How is Sujood performed?",
+                                            "Why is Sujood important?"
+                                        ]
+                                    },
+                                    "what_is_ruku": {
+                                        "question": "What is Ruku?",
+                                        "answer": "Ruku is the act of bowing down during prayer.",
+                                        "keywords": [
+                                            "What is the significance of Ruku?",
+                                            "When does Ruku take place in Salah?",
+                                            "How must one perform Ruku?"
+                                        ]
+                                    },
+                                    "mother_of_isa": {
+                                        "question": "Who was the mother of Isa (Jesus) in Islam?",
+                                        "answer": "The mother of Isa (Jesus) in Islam is Maryam (Mary).",
+                                        "keywords": [
+                                            "What do Muslims believe about Maryam?",
+                                            "Who is considered the mother of Isa in Islam?",
+                                            "What is Maryam’s significance in Islamic tradition?"
+                                        ]
+                                    },
+                                    "wife_of_prophet_mother_of_believers": {
+                                        "question": "Which wife of the Prophet is known as 'Mother of the Believers'?",
+                                        "answer": "Khadijah bint Khuwaylid (May Allah be pleased with her) is known as 'Mother of the Believers'.",
+                                        "keywords": [
+                                            "What role did Khadijah play in Islam?",
+                                            "Why is Khadijah called 'Mother of the Believers'?",
+                                            "What are Khadijah's contributions to early Islam?"
+                                        ]
+                                    },
+                                    "daughter_of_prophet": {
+                                        "question": "Who was the daughter of the Prophet Muhammad?",
+                                        "answer": "The daughter of the Prophet Muhammad (Peace Be Upon Him) was Fatimah (May Allah be pleased with her).",
+                                        "keywords": [
+                                            "What was the name of the Prophet's daughter?",
+                                            "What is Fatimah's significance in Islam?",
+                                            "How did Fatimah contribute to Islamic history?"
+                                        ]
+                                    },
+                                    "wife_of_prophet_known_for_knowledge": {
+                                        "question": "Who was the wife of the Prophet known for her knowledge and narrations of Hadith?",
+                                        "answer": "Aisha bint Abi Bakr (May Allah be pleased with her) was known for her knowledge and narrations of Hadith.",
+                                        "keywords": [
+                                            "What role did Aisha play in early Islam?",
+                                            "How did Aisha contribute to Hadith literature?",
+                                            "What is Aisha’s significance in Islamic history?"
+                                        ]
+                                    },
+                                    "how_many_daughters_prophet_have": {
+                                        "question": "How many daughters did the Prophet have?",
+                                        "answer": "The Prophet Muhammad (Peace Be Upon Him) had four daughters.",
+                                        "keywords": [
+                                            "What were the names of the Prophet's daughters?",
+                                            "What is the significance of the Prophet's daughters in Islam?",
+                                            "How did the Prophet's family influence early Islam?"
+                                        ]
+                                    },
+                                    "who_was_asiyah_in_quran": {
+                                        "question": "Who was Asiyah in the Quran?",
+                                        "answer": "Asiyah was the wife of Pharaoh and is considered a model of faith and patience.",
+                                        "keywords": [
+                                            "What is Asiyah's story in the Quran?",
+                                            "Why is Asiyah significant in Islamic teachings?",
+                                            "What qualities made Asiyah a role model?"
+                                        ]
+                                    },
+                                    "who_was_khadijah_bint_khuwaylid": {
+                                        "question": "Who was Khadijah bint Khuwaylid?",
+                                        "answer": "Khadijah bint Khuwaylid (May Allah be pleased with her) was the first wife of Prophet Muhammad (Peace Be Upon Him) and the first person to accept Islam.",
+                                        "keywords": [
+                                            "What is Khadijah's role in early Islam?",
+                                            "How did Khadijah support the Prophet?",
+                                            "What qualities made Khadijah a significant figure?"
+                                        ]
+                                    },
+                                    "name_of_prophets_daughter_marry_ali": {
+                                        "question": "What was the name of the Prophet’s daughter who married Ali?",
+                                        "answer": "The name of the Prophet’s daughter who married Ali ibn Abi Talib (May Allah be pleased with him) is Fatimah (May Allah be pleased with her).",
+                                        "keywords": [
+                                            "Who was Fatimah?",
+                                            "What is the significance of Fatimah's marriage to Ali?",
+                                            "How did Fatimah contribute to Islamic history?"
+                                        ]
+                                    },
+                                    "woman_defended_prophet_battle_of_uhud": {
+                                        "question": "Which woman defended the Prophet in the Battle of Uhud?",
+                                        "answer": "Hind bint Utbah defended the Prophet Muhammad (Peace Be Upon Him) in the Battle of Uhud.",
+                                        "keywords": [
+                                            "What did Hind bint Utbah do during the Battle of Uhud?",
+                                            "Why is Hind bint Utbah significant?",
+                                            "How did women participate in early Islamic battles?"
+                                        ]
+                                    },
+                                    "ruling_on_treating_women_with_respect": {
+                                        "question": "What is the Islamic ruling on treating women with respect?",
+                                        "answer": "Islam emphasizes the importance of treating women with respect, kindness, and justice.",
+                                        "keywords": [
+                                            "What does Islam say about gender equality?",
+                                            "How should women be treated in Islam?",
+                                            "What are the rights of women in Islamic teachings?"
+                                        ]
+                                    },
+                                    "believe_about_prophet_isa": {
+                                        "question": "What do Muslims believe about Prophet Isa (Jesus)?",
+                                        "answer": "Muslims believe that Prophet Isa (Jesus) is a prophet and messenger of Allah, born of the Virgin Mary.",
+                                        "keywords": [
+                                            "What is Islamic belief about Jesus?",
+                                            "How does Islam view Prophet Isa?",
+                                            "What are the miracles associated with Isa?"
+                                        ]
+                                    },
+                                    "believe_in_bible": {
+                                        "question": "Do Muslims believe in the Bible (Injeel)?",
+                                        "answer": "Muslims believe in the original message of the Bible (Injeel) as revealed to Prophet Isa, but do not accept the current versions as fully reliable.",
+                                        "keywords": [
+                                            "What do Muslims think about the Bible?",
+                                            "How do Muslims view the Injeel?",
+                                            "What is the relationship between Islam and the Bible?"
+                                        ]
+                                    },
+                                    "mother_of_prophet_isa": {
+                                        "question": "Who was the mother of Prophet Isa?",
+                                        "answer": "The mother of Prophet Isa (Jesus) was Maryam (Mary).",
+                                        "keywords": [
+                                            "What is Maryam's role in Islam?",
+                                            "Why is Maryam important to Muslims?",
+                                            "What are the teachings about Maryam in the Quran?"
+                                        ]
+                                    },
+                                    "believe_about_prophet_musa": {
+                                        "question": "What do Muslims believe about Prophet Musa (Moses)?",
+                                        "answer": "Muslims believe that Prophet Musa (Moses) was a messenger of Allah who led the Israelites out of Egypt.",
+                                        "keywords": [
+                                            "What is the story of Musa in Islam?",
+                                            "Why is Musa significant in the Quran?",
+                                            "What are the miracles performed by Musa?"
+                                        ]
+                                    },
+                                    "pharaoh_during_musas_time": {
+                                        "question": "Who was the Pharaoh during Musa’s time?",
+                                        "answer": "The Pharaoh during Musa’s time is not named in the Quran, but is commonly referred to as Fir'aun.",
+                                        "keywords": [
+                                            "What is known about Fir'aun?",
+                                            "What were the events during Musa's confrontation with the Pharaoh?",
+                                            "Why is the story of Musa and Fir'aun significant?"
+                                        ]
+                                    },
+                                    "miracle_given_to_musa": {
+                                        "question": "What miracle did Allah give to Musa?",
+                                        "answer": "Allah gave Musa the miracle of his staff turning into a serpent and the splitting of the sea.",
+                                        "keywords": [
+                                            "What miracles did Musa perform?",
+                                            "How did Musa demonstrate his prophethood?",
+                                            "What happened during the parting of the sea?"
+                                        ]
+                                    },
+                                    "nation_of_prophet_nuh_called_to_do": {
+                                        "question": "What was the nation of Prophet Nuh called to do?",
+                                        "answer": "The nation of Prophet Nuh (Noah) was called to worship Allah and abandon idol worship.",
+                                        "keywords": [
+                                            "What message did Nuh convey to his people?",
+                                            "What did the people of Nuh deny?",
+                                            "What lessons can be learned from the story of Nuh?"
+                                        ]
+                                    },
+                                    "punishment_came_to_people_of_prophet_lut": {
+                                        "question": "What punishment came to the people of Prophet Lut?",
+                                        "answer": "The punishment that came to the people of Prophet Lut was the destruction of their cities by a rain of stones.",
+                                        "keywords": [
+                                            "What was the fate of Lut's people?",
+                                            "Why were the people of Lut punished?",
+                                            "What lessons can we learn from the story of Prophet Lut?"
+                                        ]
+                                    },
+                                    "miracle_given_to_prophet_isa": {
+                                        "question": "What was the miracle given to Prophet Isa?",
+                                        "answer": "The miracles given to Prophet Isa include healing the blind and the lepers and raising the dead.",
+                                        "keywords": [
+                                            "What miracles did Isa perform?",
+                                            "How did Isa demonstrate his divine mission?",
+                                            "What significance do Isa's miracles hold?"
+                                        ]
+                                    },
+                                    "prophet_mentioned_most_in_quran": {
+                                        "question": "Which Prophet is mentioned most in the Quran?",
+                                        "answer": "Prophet Musa (Moses) is mentioned most in the Quran.",
+                                        "keywords": [
+                                            "How many times is Musa mentioned in the Quran?",
+                                            "Why is Musa's story significant in Islam?",
+                                            "What lessons can we derive from the story of Musa?"
+                                        ]
+                                    },
+                                    "ashab_al_kahf": {
+                                        "question": "Who were the Ashab al-Kahf (People of the Cave)?",
+                                        "answer": "The Ashab al-Kahf, or People of the Cave, were a group of young believers who sought refuge in a cave to escape religious persecution and miraculously slept for several centuries by Allah's will.",
+                                        "keywords": [
+                                            "What is the story of the People of the Cave?",
+                                            "Why is the tale of Ashab al-Kahf significant?",
+                                            "What moral lessons can be drawn from the Ashab al-Kahf?"
+                                        ]
+                                    },
+                                    "quran_patience": {
+                                        "question": "What does the Quran say about patience (sabr)?",
+                                        "answer": "The Quran emphasizes the importance of patience (sabr), praising those who are patient during hardships and promising them great rewards.",
+                                        "keywords": [
+                                            "What is the significance of patience in the Quran?",
+                                            "How does the Quran encourage patience?",
+                                            "What rewards are promised for the patient in Islam?"
+                                        ]
+                                    },
+                                    "prophet_swallowed_by_fish": {
+                                        "question": "Which Prophet was swallowed by a big fish?",
+                                        "answer": "Prophet Yunus (Jonah, peace be upon him) was swallowed by a big fish after leaving his people without Allah’s command.",
+                                        "keywords": [
+                                            "What happened to Prophet Yunus?",
+                                            "What is the significance of the story of Yunus?",
+                                            "What can we learn from the experience of Yunus in the fish?"
+                                        ]
+                                    },
+                                    "night_journey": {
+                                        "question": "What is the Night Journey (Isra and Mi'raj)?",
+                                        "answer": "The Night Journey (Isra) and Ascension (Mi'raj) refer to the miraculous journey of Prophet Muhammad (peace be upon him) from Mecca to Jerusalem and then through the heavens in a single night.",
+                                        "keywords": [
+                                            "What events occurred during the Night Journey?",
+                                            "What is the significance of Isra and Mi'raj?",
+                                            "How did the Night Journey affect the Muslim community?"
+                                        ]
+                                    },
+                                    "angel_brought_revelations": {
+                                        "question": "Which angel brought revelations to the Prophets?",
+                                        "answer": "Angel Jibreel (Gabriel, peace be upon him) was tasked by Allah to deliver revelations to the Prophets.",
+                                        "keywords": [
+                                            "Who is Angel Jibreel?",
+                                            "What is the role of Jibreel in delivering revelations?",
+                                            "How does Jibreel's role impact the message of the Prophets?"
+                                        ]
+                                    },
+                                    "significance_of_zamzam_well": {
+                                        "question": "What is the significance of the Zamzam well?",
+                                        "answer": "The Zamzam well is a miraculous source of water in Mecca that was provided by Allah to Hajar (Hagar, peace be upon her) and her son Isma'il (Ishmael, peace be upon him). It continues to flow to this day and is integral to the Hajj pilgrimage.",
+                                        "keywords": [
+                                            "Why is the Zamzam well important?",
+                                            "What happened to Hajar and Isma'il at Zamzam?",
+                                            "What role does Zamzam play in Hajj?"
+                                        ]
+                                    },
+                                    "importance_first_10_days_dhul_hijjah": {
+                                        "question": "What is the importance of the first 10 days of Dhul Hijjah?",
+                                        "answer": "The first 10 days of Dhul Hijjah are among the most sacred days in Islam. Good deeds performed during these days are highly rewarded, and the 10th day is Eid al-Adha.",
+                                        "keywords": [
+                                            "What makes the first 10 days of Dhul Hijjah special?",
+                                            "What are the spiritual benefits during these days?",
+                                            "How do Muslims prepare for Eid al-Adha?"
+                                        ]
+                                    },
+                                    "meaning_of_bismillah": {
+                                        "question": "What is the meaning of Bismillah?",
+                                        "answer": "'Bismillah' means 'In the name of Allah' and is recited before starting any action to seek blessings and success.",
+                                        "keywords": [
+                                            "What does 'Bismillah' signify?",
+                                            "When do Muslims say 'Bismillah'?",
+                                            "Why is saying 'Bismillah' important?"
+                                        ]
+                                    },
+                                    "significance_surah_al_fatiha": {
+                                        "question": "What is the significance of Surah Al-Fatiha?",
+                                        "answer": "Surah Al-Fatiha is the opening chapter of the Quran, recited in every unit of prayer. It contains essential themes such as praise, guidance, and supplication.",
+                                        "keywords": [
+                                            "Why is Surah Al-Fatiha important in Salah?",
+                                            "What themes are present in Al-Fatiha?",
+                                            "How does Surah Al-Fatiha emphasize the relationship between Allah and believers?"
+                                        ]
+                                    },
+                                    "what_is_kaaba": {
+                                        "question": "What is the Kaaba and where is it located?",
+                                        "answer": "The Kaaba is a cube-shaped sacred structure located in Masjid al-Haram in Mecca. It is the Qibla, the direction Muslims face during prayer.",
+                                        "keywords": [
+                                            "What is the Kaaba's significance?",
+                                            "How is the Kaaba related to Hajj?",
+                                            "What do Muslims do when they arrive at the Kaaba?"
+                                        ]
+                                    },
+                                    "difference_between_sunni_shia": {
+                                        "question": "What is the difference between Sunni and Shia Muslims?",
+                                        "answer": "The primary difference lies in beliefs about leadership after Prophet Muhammad (peace be upon him). Sunnis accept the first four caliphs, while Shias believe leadership was divinely appointed to Ali (may Allah be pleased with him) and his descendants.",
+                                        "keywords": [
+                                            "What are the main beliefs of Sunni Muslims?",
+                                            "What distinguishes Shia Muslims from Sunni Muslims?",
+                                            "How did the Sunni-Shia split occur?"
+                                        ]
+                                    },
+                                    "purpose_of_zakat": {
+                                        "question": "What is the purpose of Zakat?",
+                                        "answer": "Zakat is a compulsory act of charity in Islam. It purifies wealth and helps support the poor and those in need.",
+                                        "keywords": [
+                                            "Why is Zakat important in Islam?",
+                                            "What is the process of giving Zakat?",
+                                            "How does Zakat benefit the community?"
+                                        ]
+                                    },
+                                    "categories_of_people_eligible_for_zakat": {
+                                        "question": "What are the categories of people eligible to receive Zakat?",
+                                        "answer": "Eligible recipients of Zakat include the poor, the needy, administrators of Zakat, new Muslims, those in debt, those striving in the path of Allah, travelers in need, and those in bondage.",
+                                        "keywords": [
+                                            "Who can receive Zakat?",
+                                            "What are the different categories of Zakat recipients?",
+                                            "How is Zakat distributed in the community?"
+                                        ]
+                                    },
+                                    "five_pillars_of_islam": {
+                                        "question": "What are the five pillars of Islam?",
+                                        "answer": "The five pillars of Islam are Shahada (faith), Salah (prayer), Zakat (charity), Sawm (fasting during Ramadan), and Hajj (pilgrimage to Mecca).",
+                                        "keywords": [
+                                            "What are the essential practices in Islam?",
+                                            "How do the five pillars define a Muslim's faith?",
+                                            "What is the significance of each pillar?"
+                                        ]
+                                    },
+                                    "meaning_of_shahada": {
+                                        "question": "What is the meaning of the Shahada?",
+                                        "answer": "The Shahada is the Islamic declaration of faith: 'There is no god but Allah, and Muhammad is His messenger.'",
+                                        "keywords": [
+                                            "What does the Shahada declare?",
+                                            "Why is the Shahada important for Muslims?",
+                                            "How does one recite the Shahada?"
+                                        ]
+                                    },
+                                    "how_often_pray_salah": {
+                                        "question": "How often should a Muslim pray Salah?",
+                                        "answer": "Muslims are required to perform Salah five times daily at specific times: Fajr, Dhuhr, Asr, Maghrib, and Isha.",
+                                        "keywords": [
+                                            "What are the times for Muslim prayers?",
+                                            "How many daily prayers are prescribed in Islam?",
+                                            "What is the significance of praying five times a day?"
+                                        ]
+                                    },
+                                    "mandatory_hajj_once_lifetime": {
+                                        "question": "Why is Hajj only mandatory once in a lifetime?",
+                                        "answer": "Hajj is a major physical and financial commitment. Therefore, it is only required once in a lifetime for those who are able, highlighting Islam’s mercy and balance.",
+                                        "keywords": [
+                                            "When is Hajj mandatory?",
+                                            "What are the requirements for performing Hajj?",
+                                            "Why is Hajj considered a significant pilgrimage?"
+                                        ]
+                                    },
+                                    "role_of_mufti": {
+                                        "question": "What is the role of a Mufti?",
+                                        "answer": "A Mufti is a qualified Islamic scholar who issues legal rulings (fatwas) based on the Quran, Hadith, and Islamic jurisprudence.",
+                                        "keywords": [
+                                            "What qualifications does a Mufti have?",
+                                            "How does a Mufti contribute to Islamic law?",
+                                            "What is the significance of fatwas?"
+                                        ]
+                                    },
+                                    "meaning_halal_haram": {
+                                        "question": "What is the meaning of Halal and Haram?",
+                                        "answer": "Halal means lawful or permissible in Islam, while Haram means unlawful or forbidden.",
+                                        "keywords": [
+                                            "What is the difference between Halal and Haram?",
+                                            "How do Muslims determine what is Halal?",
+                                            "What are examples of Halal and Haram?"
+                                        ]
+                                    },
+                                    "signs_of_day_of_judgment": {
+                                        "question": "What are the signs of the Day of Judgment?",
+                                        "answer": "Signs of the Day of Judgment include minor signs like dishonesty and major signs such as the appearance of the Dajjal, the return of Isa (Jesus), and the rising of the sun from the west.",
+                                        "keywords": [
+                                            "What are considered minor signs of the Day of Judgment?",
+                                            "What major events will occur before the Day of Judgment?",
+                                            "Why is it important to learn about the signs of the Day of Judgment?"
+                                        ]
+                                    },
+                                    "major_sins_in_islam": {
+                                        "question": "What are the major sins in Islam?",
+                                        "answer": "Major sins include shirk (associating partners with Allah), murder, theft, adultery, consuming interest, and false testimony.",
+                                        "keywords": [
+                                            "What defines a major sin in Islam?",
+                                            "What consequences do major sins have?",
+                                            "How can one seek forgiveness for major sins?"
+                                        ]
+                                    },
+                                    "prophet_hud_sent_to": {
+                                        "question": "Who was Prophet Hud sent to?",
+                                        "answer": "Prophet Hud (peace be upon him) was sent to the people of 'Aad, who were known for their arrogance and idolatry.",
+                                        "keywords": [
+                                            "What was the message of Prophet Hud?",
+                                            "What are the characteristics of the people of Aad?",
+                                            "What happened to the people of Aad?"
+                                        ]
+                                    },
+                                    "miracle_given_to_prophet_salih": {
+                                        "question": "What miracle was given to Prophet Salih?",
+                                        "answer": "Prophet Salih (peace be upon him) was given the miracle of a she-camel that emerged from a rock as a sign to the people of Thamud.",
+                                        "keywords": [
+                                            "What was the significance of the she-camel?",
+                                            "What message did Salih convey to his people?",
+                                            "How did the people of Thamud respond to the miracle?"
+                                        ]
+                                    },
+                                    "islamic_stance_on_backbiting": {
+                                        "question": "What is the Islamic stance on backbiting (ghibah)?",
+                                        "answer": "Backbiting (ghibah) is strictly prohibited in Islam and likened in the Quran to eating the flesh of one’s dead brother, emphasizing its seriousness.",
+                                        "keywords": [
+                                            "Why is backbiting considered a sin?",
+                                            "What does the Quran say about ghibah?",
+                                            "What are the consequences of engaging in backbiting?"
+                                        ]
+                                    },
+                                    "treat_neighbors": {
+                                        "question": "How should Muslims treat their neighbors?",
+                                        "answer": "Islam teaches Muslims to treat their neighbors with kindness, generosity, and good character, regardless of their faith.",
+                                        "keywords": [
+                                            "What are the rights of neighbors in Islam?",
+                                            "Why is it important to be good to neighbors?",
+                                            "How can Muslims demonstrate kindness to their neighbors?"
+                                        ]
+                                    },
+                                    "seeking_knowledge": {
+                                        "question": "What does Islam say about seeking knowledge?",
+                                        "answer": "Islam highly encourages the pursuit of knowledge, considering it an obligation for every Muslim, as it leads to greater understanding of the religion and life.",
+                                        "keywords": [
+                                            "Why is knowledge important in Islam?",
+                                            "What does the Quran say about seeking knowledge?",
+                                            "How should Muslims pursue education?"
+                                        ]
+                                    },
+                                    "importance_surah_al_ikhlas": {
+                                        "question": "What is the importance of Surah Al-Ikhlas?",
+                                        "answer": "Surah Al-Ikhlas emphasizes the oneness of Allah. Reciting it is equivalent to one-third of the Quran in reward.",
+                                        "keywords": [
+                                            "What is the message of Surah Al-Ikhlas?",
+                                            "How does Al-Ikhlas relate to Tawhid?",
+                                            "What benefits come from reciting Surah Al-Ikhlas?"
+                                        ]
+                                    },
+                                    "allah_promise_patient": {
+                                        "question": "What does Allah promise to the patient?",
+                                        "answer": "Allah promises immense reward, forgiveness, and mercy to those who remain patient during trials and hardship.",
+                                        "keywords": [
+                                            "What rewards are promised for patience in the Quran?",
+                                            "How does patience reflect one's faith?",
+                                            "What can Muslims do to cultivate patience?"
+                                        ]
+                                    },
+                                    "islam_teach_about_justice": {
+                                        "question": "What does Islam teach about justice?",
+                                        "answer": "Islam commands justice in all matters, even against oneself or loved ones. Allah loves those who are just and fair.",
+                                        "keywords": [
+                                            "Why is justice important in Islam?",
+                                            "How should a Muslim strive for justice?",
+                                            "What examples of justice are found in the Quran?"
+                                        ]
+                                    },
+                                    "importance_of_prayer": {
+                                        "question": "Why is prayer (Salah) important in Islam?",
+                                        "answer": "Prayer (Salah) is one of the five pillars of Islam and serves as a direct link between the worshipper and Allah. It reminds Muslims of their duties, purifies the soul, and fosters discipline and spiritual growth.",
+                                        "keywords": [
+                                            "What are the benefits of Salah?",
+                                            "How does prayer connect Muslims to Allah?",
+                                            "What is the significance of Salah in daily life?"
+                                        ]
+                                    },
+                                    "fasting_in_ramadan": {
+                                        "question": "Why do Muslims fast during Ramadan?",
+                                        "answer": "Muslims fast during Ramadan as a form of worship, self-discipline, and spiritual reflection. It helps them develop empathy for the needy and brings them closer to Allah.",
+                                        "keywords": [
+                                            "What is the purpose of fasting in Ramadan?",
+                                            "How does Ramadan affect a Muslim's spirituality?",
+                                            "What are the benefits of fasting?"
+                                        ]
+                                    },
+                                    "what_breaks_the_fast": {
+                                        "question": "What breaks a Muslim's fast?",
+                                        "answer": "Eating, drinking, intentional vomiting, and sexual intercourse during fasting hours break the fast. Forgetting or unintentional acts do not invalidate the fast.",
+                                        "keywords": [
+                                            "What actions invalidate fasting?",
+                                            "What should be avoided during Ramadan?",
+                                            "How do Muslims ensure their fast is valid?"
+                                        ]
+                                    },
+                                    "laylatul_qadr": {
+                                        "question": "What is Laylatul Qadr?",
+                                        "answer": "Laylatul Qadr, or the Night of Decree, is a special night in the last ten days of Ramadan. It is the night the Quran was revealed and is better than a thousand months in reward.",
+                                        "keywords": [
+                                            "When is Laylatul Qadr observed?",
+                                            "What makes the Night of Decree significant?",
+                                            "What actions are encouraged during Laylatul Qadr?"
+                                        ]
+                                    },
+                                    "difference_prophet_messenger": {
+                                        "question": "What is the difference between a prophet and a messenger in Islam?",
+                                        "answer": "In Islam, a messenger (rasul) is given a new divine law or book, while a prophet (nabi) follows and revives an existing message. All messengers are prophets, but not all prophets are messengers.",
+                                        "keywords": [
+                                            "What distinguishes a messenger from a prophet?",
+                                            "How are revelations received by messengers?",
+                                            "What roles do prophets play in Islam?"
+                                        ]
+                                    },
+                                    "treatment_of_parents": {
+                                        "question": "How should Muslims treat their parents?",
+                                        "answer": "Muslims are commanded to treat their parents with kindness, respect, and obedience. The Quran emphasizes honoring one's parents just after worshiping Allah.",
+                                        "keywords": [
+                                            "What does the Quran say about honoring parents?",
+                                            "How can children show respect to their parents?",
+                                            "Why is treating parents well important in Islam?"
+                                        ]
+                                    },
+                                    "is_music_haram": {
+                                        "question": "Is music haram in Islam?",
+                                        "answer": "Scholars differ on this issue. Some consider music haram due to its potential to distract from worship or promote immoral behavior, while others allow it if the content is halal and does not lead to sin.",
+                                        "keywords": [
+                                            "What is the Islamic perspective on music?",
+                                            "Are there any exceptions for listening to music?",
+                                            "What do scholars say about musical instruments?"
+                                        ]
+                                    },
+                                    "zakat_purpose": {
+                                        "question": "What is the purpose of Zakat in Islam?",
+                                        "answer": "Zakat is a form of almsgiving and one of the five pillars of Islam. It purifies wealth, supports the poor, and promotes economic justice in the community.",
+                                        "keywords": [
+                                            "Why is Zakat important?",
+                                            "How does Zakat benefit society?",
+                                            "What does Zakat purify?"
+                                        ]
+                                    },
+                                    "what_is_hajj": {
+                                        "question": "What is Hajj and why is it important?",
+                                        "answer": "Hajj is the annual pilgrimage to Makkah and one of the five pillars of Islam. It is obligatory once in a lifetime for those who are physically and financially able, and it symbolizes unity and submission to Allah.",
+                                        "keywords": [
+                                            "What are the rituals of Hajj?",
+                                            "Why is Hajj a pillar of Islam?",
+                                            "What should pilgrims do during Hajj?"
+                                        ]
+                                    },
+                                    "can_non_muslims_enter_makkah": {
+                                        "question": "Can non-Muslims enter Makkah?",
+                                        "answer": "No, non-Muslims are not allowed to enter the holy city of Makkah. This is to preserve its sanctity as a sacred space exclusively for Muslim worship.",
+                                        "keywords": [
+                                            "What are the rules for entering Makkah?",
+                                            "Why are non-Muslims prohibited from Makkah?",
+                                            "What is the significance of Makkah in Islam?"
+                                        ]
+                                    }
+                                
+                            }
+                        
+                    }
+            
+            }
+        
+    }
+
+                                
