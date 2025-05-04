@@ -3,7 +3,7 @@ import requests
 import json
 from difflib import get_close_matches
 from openai import OpenAI, APIError
-from dotenv import load_dotenv # type: ignore
+from dotenv import load_dotenv  # type: ignore
 import os
 
 # ✅ Load environment variables from .env file
@@ -15,8 +15,15 @@ app = Flask(__name__)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ✅ Load the Hadith file ONCE when the app starts
-with open('DATA\sahih_bukhari_coded.json', 'r', encoding='utf-8') as f:
-    hadith_data = json.load(f)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+hadith_path = os.path.join(BASE_DIR, 'DATA', 'sahih_bukhari_coded.json')
+
+try:
+    with open(hadith_path, 'r', encoding='utf-8') as f:
+        hadith_data = json.load(f)
+except FileNotFoundError:
+    print(f"[ERROR] Hadith file not found at: {hadith_path}")
+    hadith_data = {}  # fallback so app doesn’t crash
 
 @app.route('/')
 def index():
@@ -114,12 +121,20 @@ def quran_search():
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
-    query = data.get('query', '').strip().lower()
+    query = (
+        data.get('query', '')
+        .strip()
+        .lower()
+        .replace('hadith on ', '')
+        .replace('hadith by ', '')
+        .replace('hadith talking about ', '')
+    )
 
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.'})
 
-    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
+    if not hadith_data:
+        return jsonify({'result': 'Hadith data not loaded properly. Please try again later.'})
 
     try:
         matches = []
