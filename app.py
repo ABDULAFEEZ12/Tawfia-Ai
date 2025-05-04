@@ -2,22 +2,35 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-from openai import OpenAI, APIError, APIConnectionError  # ✅ Correct for OpenAI v1.x
+from openai import OpenAI, APIError, APIConnectionError
 from dotenv import load_dotenv
 import os
 
 # ✅ Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)  # App initialization
+app = Flask(__name__)
 
 # ✅ Set up the OpenAI client securely
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# ✅ Load the Hadith file ONCE when the app starts (safe path)
-json_path = os.path.join(os.path.dirname(__file__), 'data', 'sahih_bukhari_coded.json')
-with open(json_path, 'r', encoding='utf-8') as f:
-    hadith_data = json.load(f)
+# ✅ Load the Hadith file ONCE when the app starts
+hadith_data = {}
+try:
+    # First, try your **absolute Windows path**
+    json_path = r'C:\DATA\sahih_bukhari_coded.json'
+    with open(json_path, 'r', encoding='utf-8') as f:
+        hadith_data = json.load(f)
+    print(f"Loaded Hadith data from {json_path}")
+except FileNotFoundError:
+    # Fallback: use relative path (for servers like Render)
+    json_path = os.path.join(os.path.dirname(__file__), 'data', 'sahih_bukhari_coded.json')
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            hadith_data = json.load(f)
+        print(f"Loaded Hadith data from {json_path}")
+    except FileNotFoundError:
+        print("❌ ERROR: Hadith data file not found in either location.")
 
 @app.route('/')
 def index():
@@ -57,7 +70,6 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'Unexpected error. Try later.'})
 
-# ✅ Quran Sector (using Gading API)
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
@@ -67,18 +79,15 @@ def quran_search():
         return jsonify({'result': 'Please provide a Surah name.'})
 
     try:
-        # ✅ Get Surah list from Gading API
         response = requests.get('https://api.quran.gading.dev/surah')
         response.raise_for_status()
         surahs = response.json()['data']
 
-        # ✅ Map surah names to IDs
         surah_names = {surah['name']['transliteration']['en'].lower(): surah['number'] for surah in surahs}
         close_matches = get_close_matches(query, surah_names.keys(), n=1, cutoff=0.6)
 
         if close_matches:
             surah_number = surah_names[close_matches[0]]
-            # ✅ Fetch verses WITH translation
             verses_response = requests.get(
                 f'https://api.quran.gading.dev/surah/{surah_number}'
             )
@@ -109,7 +118,6 @@ def quran_search():
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.'})
 
-# ✅ Hadith Sector: Local JSON search
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
@@ -121,6 +129,9 @@ def hadith_search():
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     try:
+        if not hadith_data:
+            return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.'})
+
         matches = []
         for volume in hadith_data.get('volumes', []):
             volume_number = volume.get('volume_number', 'N/A')
@@ -145,7 +156,7 @@ def hadith_search():
                         matches.append(result_text)
 
         if matches:
-            return jsonify({'result': "\n\n---\n\n".join(matches[:5])})  # ✅ Limit to first 5 matches
+            return jsonify({'result': "\n\n---\n\n".join(matches[:5])})  # Limit to 5
         else:
             return jsonify({'result': f'No Hadith found for \"{query}\".'})
 
@@ -153,7 +164,6 @@ def hadith_search():
         print(f"Hadith Local Search Error: {e}")
         return jsonify({'result': 'Error searching Hadith. Try again later.'})
 
-# ✅ Return Surah list for dropdown
 @app.route('/get-surah-list')
 def get_surah_list():
     try:
