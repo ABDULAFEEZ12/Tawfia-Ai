@@ -3,17 +3,17 @@ import requests
 import json
 from difflib import get_close_matches
 import openai
-from openai.error import APIError  # Corrected import
+from openai import APIError  # ✅ Corrected import for OpenAI v1.x
 from dotenv import load_dotenv  # type: ignore
 import os
 
 # ✅ Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)  # Fixed the app instantiation
+app = Flask(__name__)  # App initialization
 
 # ✅ Set up the OpenAI client securely
-openai.api_key = os.getenv("OPENAI_API_KEY")  # Corrected OpenAI API initialization
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # ✅ Load the Hadith file ONCE when the app starts
 with open(r"C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\sahih_bukhari_coded.json", 'r', encoding='utf-8') as f:
@@ -37,7 +37,7 @@ def ask():
             " If unrelated to Islam, politely decline."
         )
 
-        response = openai.ChatCompletion.create(  # Corrected OpenAI request
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -47,7 +47,7 @@ def ask():
             max_tokens=500,
         )
 
-        answer = response.choices[0].message['content'].strip()  # Corrected access to message
+        answer = response.choices[0].message['content'].strip()
         return jsonify({'answer': answer})
 
     except APIError as e:
@@ -167,5 +167,5 @@ def get_surah_list():
         print(f"Error loading Surah list: {e}")
         return jsonify({'surahs': []})
 
-if __name__ == '__main__':  # Fixed condition for running the app
+if __name__ == '__main__':
     app.run(debug=True)
