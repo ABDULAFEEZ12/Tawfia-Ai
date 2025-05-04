@@ -2,9 +2,8 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-import openai
-from openai import APIError  # ✅ Corrected import for OpenAI v1.x
-from dotenv import load_dotenv  # type: ignore
+from openai import OpenAI, APIError, APIConnectionError  # ✅ Correct for OpenAI v1.x
+from dotenv import load_dotenv
 import os
 
 # ✅ Load environment variables from .env file
@@ -13,10 +12,11 @@ load_dotenv()
 app = Flask(__name__)  # App initialization
 
 # ✅ Set up the OpenAI client securely
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# ✅ Load the Hadith file ONCE when the app starts
-with open(r"C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\sahih_bukhari_coded.json", 'r', encoding='utf-8') as f:
+# ✅ Load the Hadith file ONCE when the app starts (safe path)
+json_path = os.path.join(os.path.dirname(__file__), 'data', 'sahih_bukhari_coded.json')
+with open(json_path, 'r', encoding='utf-8') as f:
     hadith_data = json.load(f)
 
 @app.route('/')
@@ -37,7 +37,7 @@ def ask():
             " If unrelated to Islam, politely decline."
         )
 
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -47,7 +47,7 @@ def ask():
             max_tokens=500,
         )
 
-        answer = response.choices[0].message['content'].strip()
+        answer = response.choices[0].message.content.strip()
         return jsonify({'answer': answer})
 
     except APIError as e:
@@ -133,7 +133,6 @@ def hadith_search():
                     keywords = hadith.get('keywords', [])
 
                     if query in text or any(query in k.lower() for k in keywords):
-                        info = hadith.get('info', 'No info')
                         narrator = hadith.get('by', 'Unknown narrator')
                         hadith_text = hadith.get('text', 'No text')
 
