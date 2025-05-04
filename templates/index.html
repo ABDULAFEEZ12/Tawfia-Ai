@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -244,13 +245,13 @@ function searchQuran() {
     const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
     if (!query) return;
     const resultDiv = document.getElementById("quranResult");
-    resultDiv.innerHTML = <div class="user-message">Searching: ${query}</div>;
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
     fetch('/quran-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
-        resultDiv.innerHTML += <div>${data.result || "No result found."}</div>;
+        resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
     });
 }
 
@@ -258,13 +259,13 @@ function searchHadith() {
     const query = document.getElementById("hadithInput").value.trim();
     if (!query) return;
     const resultDiv = document.getElementById("hadithResult");
-    resultDiv.innerHTML = <div class="user-message">Searching: ${query}</div>;
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
     fetch('/hadith-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
-        resultDiv.innerHTML += <div>${data.result || "No result found."}</div>;
+        resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
     });
 }
 
