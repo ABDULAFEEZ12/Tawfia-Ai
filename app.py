@@ -77,7 +77,7 @@ def quran_search():
 
         if close_matches:
             surah_number = surah_names[close_matches[0]]
-            # ✅ Fetch verses WITH translation & audio
+            # ✅ Fetch verses WITH translation
             verses_response = requests.get(
                 f'https://api.quran.gading.dev/surah/{surah_number}'
             )
@@ -91,12 +91,10 @@ def quran_search():
                 ayah_num = v['number']['inSurah']
                 translation = v['translation']['en']
                 arabic_text = v['text']['arab']
-                audio_url = v['audio']['primary']  # audio link
 
                 formatted = (
                     f"{surah_number}:{ayah_num} {translation}\n\n"
                     f"{arabic_text}\n\n"
-                    f"🎧 Audio: {audio_url}"
                 )
                 formatted_verses.append(formatted)
 
