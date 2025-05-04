@@ -168,5 +168,7 @@ def get_surah_list():
         print(f"Error loading Surah list: {e}")
         return jsonify({'surahs': []})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# ✅ Run the Flask app with the correct bind to 0.0.0.0 and use PORT environment variable
+if __name__ == '_main_':
+    port = int(os.environ.get('PORT', 5000))  # Use the PORT environment variable from Render
+    app.run(debug=False, host='0.0.0.0', port=port)
