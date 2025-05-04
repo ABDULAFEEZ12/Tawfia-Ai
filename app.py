@@ -9,13 +9,13 @@ import os
 # ✅ Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(_name_)
 
 # ✅ Set up the OpenAI client securely
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ✅ Load the Hadith file ONCE when the app starts
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(_file_))
 hadith_path = os.path.join(BASE_DIR, 'DATA', 'sahih_bukhari_coded.json')
 
 try:
@@ -84,7 +84,7 @@ def quran_search():
 
         if close_matches:
             surah_number = surah_names[close_matches[0]]
-            # ✅ Fetch verses WITH translation & audio
+            # ✅ Fetch verses WITH translation
             verses_response = requests.get(
                 f'https://api.quran.gading.dev/surah/{surah_number}'
             )
@@ -98,12 +98,10 @@ def quran_search():
                 ayah_num = v['number']['inSurah']
                 translation = v['translation']['en']
                 arabic_text = v['text']['arab']
-                audio_url = v['audio']['primary']  # audio link
 
                 formatted = (
                     f"{surah_number}:{ayah_num} {translation}\n\n"
-                    f"{arabic_text}\n\n"
-                    f"🎧 Audio: {audio_url}"
+                    f"{arabic_text}"
                 )
                 formatted_verses.append(formatted)
 
@@ -183,5 +181,5 @@ def get_surah_list():
         print(f"Error loading Surah list: {e}")
         return jsonify({'surahs': []})
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(debug=True)
