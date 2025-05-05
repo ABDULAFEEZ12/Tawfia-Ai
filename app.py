@@ -35,7 +35,7 @@ except FileNotFoundError:
 # ✅ Load Basic Islamic Knowledge JSON ONCE
 basic_knowledge_data = {}
 try:
-    knowledge_path = r'C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\basic_islamic_knowledge.json'
+    knowledge_path = r'C:\DATA\basic_islamic_knowledge.json'
     with open(knowledge_path, 'r', encoding='utf-8') as f:
         basic_knowledge_data = json.load(f)
     print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
