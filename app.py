@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify, render_template
-import requests
 import json
+import requests
 from difflib import get_close_matches
-from openai import OpenAI, APIError
+import openai
+from openai import APIError
 from dotenv import load_dotenv  # type: ignore
 import os
 
@@ -12,7 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # ✅ Set up the OpenAI client securely
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # ✅ Load the Hadith file ONCE when the app starts
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,6 +25,40 @@ try:
 except FileNotFoundError:
     print(f"[ERROR] Hadith file not found at: {hadith_path}")
     hadith_data = {}  # fallback so app doesn’t crash
+
+# ✅ Load basic Islamic knowledge from the JSON file
+def load_basic_knowledge():
+    knowledge_path = os.path.join(BASE_DIR, 'DATA', 'basic_islamic_knowledge.json')
+    try:
+        with open(knowledge_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"[ERROR] Basic knowledge file not found at: {knowledge_path}")
+        return {}
+
+# ✅ Function to get answer from local knowledge or fallback to OpenAI
+def get_answer(user_question):
+    basic_knowledge = load_basic_knowledge()
+
+    # Check if the question is in the local knowledge
+    if user_question in basic_knowledge:
+        return basic_knowledge[user_question]
+
+    # If not found, fallback to OpenAI
+    return query_openai(user_question)
+
+# ✅ Function to query OpenAI
+def query_openai(user_question):
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=user_question,
+            max_tokens=150
+        )
+        return response.choices[0].text.strip()
+    except Exception as e:
+        print(f"Error querying OpenAI: {e}")
+        return "Error querying OpenAI. Please try again later."
 
 @app.route('/')
 def index():
@@ -38,27 +73,11 @@ def ask():
         return jsonify({'answer': 'Please type a question.'})
 
     try:
-        system_prompt = (
-            "You are Tawfiq AI, an Islamic assistant. Answer strictly based on Quran and authentic Hadith."
-            " If unrelated to Islam, politely decline."
-        )
+        # Get the answer (either from local knowledge or OpenAI)
+        answer = get_answer(question)
 
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": question}
-            ],
-            temperature=0.2,
-            max_tokens=500,
-        )
-
-        answer = response.choices[0].message.content.strip()
         return jsonify({'answer': answer})
 
-    except APIError as e:
-        print(f"AI Error: {e}")
-        return jsonify({'answer': 'Tawfiq AI is facing an issue. Please try later.'})
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'Unexpected error. Try later.'})

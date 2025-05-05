@@ -2,4 +2,8 @@ Flask
 gunicorn
 openai
 requests
+<<<<<<< HEAD
 python-dotenv
+=======
+python-dotenv
+>>>>>>> d5152bda79ba99f8235b382fb9d0e34dc08f6fe7
