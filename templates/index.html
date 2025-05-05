@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,94 +12,100 @@
             flex-direction: column;
             align-items: center;
             height: 100vh;
-            overflow: hidden;
             transition: background 0.3s, color 0.3s;
         }
         header {
             text-align: center;
-            padding: 20px;
+            padding: 25px;
             width: 100%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.05);
         }
         header h1 {
             margin: 0;
-            font-size: 28px;
-            letter-spacing: 1px;
+            font-size: 36px;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            color: #009688;
         }
         header h3 {
-            margin: 5px 0 0;
-            font-weight: normal;
-            font-size: 16px;
-            opacity: 0.8;
+            margin: 10px 0 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #555;
         }
         .tabs {
             display: flex;
             justify-content: center;
             margin: 20px 0;
             width: 100%;
-            background: rgba(0,0,0,0.05);
+            background: rgba(0,0,0,0.1);
             border-radius: 30px;
             overflow: hidden;
-            max-width: 600px;
+            max-width: 700px;
         }
         .tab {
             flex: 1;
             text-align: center;
-            padding: 15px;
+            padding: 18px;
             cursor: pointer;
-            transition: background 0.3s, color 0.3s;
-            font-size: 16px;
+            transition: background 0.3s, color 0.3s, font-size 0.3s;
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
         .tab:hover {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.2);
         }
         .tab.active {
             background: #009688;
-            font-weight: bold;
             color: #fff;
+            font-size: 20px;
+            font-weight: 800;
         }
         .section {
             display: none;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 700px;
-            padding: 20px;
+            max-width: 750px;
+            padding: 25px;
             background: rgba(0,0,0,0.05);
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 0 25px rgba(0,0,0,0.15);
             overflow-y: auto;
-            height: 65vh;
-            animation: fadeIn 0.5s ease forwards;
+            flex: 1;
+            margin-bottom: 70px; /* Leave space for toggle button */
         }
         .section.active {
             display: flex;
         }
         input[type="text"], select {
-            width: 80%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
+            width: 85%;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            font-size: 18px;
             outline: none;
         }
         button {
-            padding: 12px 25px;
+            padding: 14px 30px;
             border: none;
             background: #009688;
             color: #fff;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-            transition: background 0.3s;
+            font-size: 18px;
+            margin-top: 15px;
+            transition: background 0.3s, transform 0.2s;
         }
         button:hover {
             background: #00796b;
+            transform: scale(1.05);
         }
         .messages, .results {
-            margin-top: 20px;
+            margin-top: 25px;
             width: 100%;
             max-height: 400px;
             overflow-y: auto;
@@ -108,29 +113,34 @@
         }
         .messages p, .results div {
             background: rgba(0, 0, 0, 0.05);
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 12px 0;
+            font-size: 16px;
             word-wrap: break-word;
         }
         .user-message {
             background: rgba(0, 150, 136, 0.2);
+            font-weight: 600;
         }
         .toggle-btn {
-            position: absolute;
-            top: 20px;
+            position: fixed;
+            bottom: 20px;
             right: 20px;
-            padding: 8px 15px;
-            font-size: 14px;
+            padding: 10px 20px;
+            font-size: 16px;
             cursor: pointer;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             background-color: #4CAF50;
             color: white;
-            transition: background-color 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: background-color 0.3s, transform 0.2s;
+            z-index: 1000;
         }
         .toggle-btn:hover {
             background-color: #45a049;
+            transform: scale(1.05);
         }
         @keyframes fadeIn {
             from {opacity: 0; transform: translateY(20px);}
@@ -185,6 +195,14 @@
 
 <!-- AI Section -->
 <div class="section active" id="aiSection">
+    <select id="aiCategory">
+        <option value="">Select Topic</option>
+        <option value="Islamic guidance">Islamic Guidance</option>
+        <option value="fiqh">Fiqh</option>
+        <option value="history">Islamic History</option>
+        <option value="duas">Duas</option>
+        <option value="general">General Questions</option>
+    </select>
     <input type="text" id="userInput" placeholder="Type your question here...">
     <button onclick="sendQuestion()">Ask</button>
     <div class="messages" id="messages"></div>
@@ -222,6 +240,7 @@ function toggleMode() {
 
 function sendQuestion() {
     const input = document.getElementById("userInput").value.trim();
+    const category = document.getElementById("aiCategory").value;
     if (!input) return;
     const messagesDiv = document.getElementById("messages");
     const userMsg = document.createElement("p");
@@ -232,7 +251,7 @@ function sendQuestion() {
     fetch('/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: input })
+        body: JSON.stringify({ question: input, category })
     }).then(res => res.json()).then(data => {
         const aiMsg = document.createElement("p");
         aiMsg.textContent = "Tawfiq AI: " + (data.answer || "Sorry, couldn't answer.");
@@ -259,7 +278,7 @@ function searchHadith() {
     const query = document.getElementById("hadithInput").value.trim();
     if (!query) return;
     const resultDiv = document.getElementById("hadithResult");
-    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+    resultDiv.innerHTML = `<div class="user-message">Searching Hadith: ${query}</div>`;
     fetch('/hadith-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -268,36 +287,6 @@ function searchHadith() {
         resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
     });
 }
-
-function loadSurahList() {
-    const surahs = [
-        "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-An'am", "Al-A'raf", "Al-Anfal",
-        "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
-        "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan",
-        "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab",
-        "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
-        "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
-        "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadila",
-        "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
-        "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil",
-        "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
-        "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la",
-        "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Layl", "Ad-Duhaa", "Ash-Sharh", "At-Tin",
-        "Al-Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'ah", "At-Takathur",
-        "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
-        "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
-    ];
-    const select = document.getElementById("surahList");
-    surahs.forEach(surah => {
-        const option = document.createElement("option");
-        option.value = surah;
-        option.textContent = surah;
-        select.appendChild(option);
-    });
-}
-
-// Initialize Surah list on page load
-window.onload = loadSurahList;
 </script>
 
 </body>
