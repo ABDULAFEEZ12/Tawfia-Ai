@@ -18,7 +18,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 hadith_data = {}
 try:
     # First, try absolute path
-    json_path = r'C:\DATA\sahih_bukhari_coded.json'
+    json_path = r'C:\DATA\sahih_bukhari_coded.json'  # Ensure this is the correct path on your machine
     with open(json_path, 'r', encoding='utf-8') as f:
         hadith_data = json.load(f)
     print(f"✅ Loaded Hadith data from {json_path}")
