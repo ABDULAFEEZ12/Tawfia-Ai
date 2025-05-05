@@ -25,7 +25,7 @@ try:
     print(f"✅ Loaded Hadith data from {json_path}")
 except FileNotFoundError:
     # Fallback to relative path
-    json_path = os.path.join(os.path.dirname(__file__), 'data', 'sahih_bukhari_coded.json')
+    json_path = os.path.join(os.path.dirname(__file__), 'DATA', 'sahih_bukhari_coded.json')
     print(f"Trying to load Hadith data from fallback path: {json_path}")
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
@@ -38,14 +38,14 @@ except FileNotFoundError:
 # ✅ Load Basic Islamic Knowledge JSON ONCE
 basic_knowledge_data = {}
 try:
-    knowledge_path = r'C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\basic_islamic_knowledge.json'
+    knowledge_path = r'C:\DATA\basic_islamic_knowledge.json'
     print(f"Trying to load Basic Islamic Knowledge data from: {knowledge_path}")
     with open(knowledge_path, 'r', encoding='utf-8') as f:
         basic_knowledge_data = json.load(f)
     print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
 except FileNotFoundError:
     # ✅ Add fallback for deployment
-    knowledge_path = os.path.join(os.path.dirname(__file__), 'data', 'basic_islamic_knowledge.json')
+    knowledge_path = os.path.join(os.path.dirname(__file__), 'DATA', 'basic_islamic_knowledge.json')
     print(f"Trying to load Basic Islamic Knowledge data from fallback path: {knowledge_path}")
     try:
         with open(knowledge_path, 'r', encoding='utf-8') as f:
