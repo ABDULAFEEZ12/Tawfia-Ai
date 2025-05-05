@@ -3,7 +3,7 @@ import requests
 import json
 from difflib import get_close_matches
 from openai import OpenAI, APIError
-from dotenv import load_dotenv # type: ignore
+from dotenv import load_dotenv  # type: ignore
 import os
 
 # ✅ Load environment variables from .env file
@@ -15,8 +15,15 @@ app = Flask(__name__)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ✅ Load the Hadith file ONCE when the app starts
-with open(r"C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\sahih_bukhari_coded.json", 'r', encoding='utf-8') as f:
-    hadith_data = json.load(f)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+hadith_path = os.path.join(BASE_DIR, 'DATA', 'sahih_bukhari_coded.json')
+
+try:
+    with open(hadith_path, 'r', encoding='utf-8') as f:
+        hadith_data = json.load(f)
+except FileNotFoundError:
+    print(f"[ERROR] Hadith file not found at: {hadith_path}")
+    hadith_data = {}  # fallback so app doesn’t crash
 
 @app.route('/')
 def index():
@@ -77,7 +84,7 @@ def quran_search():
 
         if close_matches:
             surah_number = surah_names[close_matches[0]]
-            # ✅ Fetch verses WITH translation & audio
+            # ✅ Fetch verses WITH translation
             verses_response = requests.get(
                 f'https://api.quran.gading.dev/surah/{surah_number}'
             )
@@ -91,12 +98,10 @@ def quran_search():
                 ayah_num = v['number']['inSurah']
                 translation = v['translation']['en']
                 arabic_text = v['text']['arab']
-                audio_url = v['audio']['primary']  # audio link
 
                 formatted = (
                     f"{surah_number}:{ayah_num} {translation}\n\n"
-                    f"{arabic_text}\n\n"
-                    f"🎧 Audio: {audio_url}"
+                    f"{arabic_text}"
                 )
                 formatted_verses.append(formatted)
 
@@ -114,12 +119,20 @@ def quran_search():
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
-    query = data.get('query', '').strip().lower()
+    query = (
+        data.get('query', '')
+        .strip()
+        .lower()
+        .replace('hadith on ', '')
+        .replace('hadith by ', '')
+        .replace('hadith talking about ', '')
+    )
 
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.'})
 
-    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
+    if not hadith_data:
+        return jsonify({'result': 'Hadith data not loaded properly. Please try again later.'})
 
     try:
         matches = []
@@ -168,7 +181,5 @@ def get_surah_list():
         print(f"Error loading Surah list: {e}")
         return jsonify({'surahs': []})
 
-# ✅ Run the Flask app with the correct bind to 0.0.0.0 and use PORT environment variable
-if __name__ == '_main_':
-    port = int(os.environ.get('PORT', 5000))  # Use the PORT environment variable from Render
-    app.run(debug=False, host='0.0.0.0', port=port)
+if __name__ == '__main__':
+    app.run(debug=True)
