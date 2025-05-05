@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-from openai import OpenAI, APIError, APIConnectionError
+from openai import OpenAI, APIError
 from dotenv import load_dotenv
 import os
 
@@ -14,16 +14,14 @@ app = Flask(__name__)
 # ✅ Set up the OpenAI client securely
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# ✅ Load the Hadith file ONCE when the app starts
+# ✅ Load the Hadith data ONCE when the app starts
 hadith_data = {}
 try:
-    # First, try your **absolute Windows path**
     json_path = r'C:\DATA\sahih_bukhari_coded.json'
     with open(json_path, 'r', encoding='utf-8') as f:
         hadith_data = json.load(f)
     print(f"Loaded Hadith data from {json_path}")
 except FileNotFoundError:
-    # Fallback: use relative path (for servers like Render)
     json_path = os.path.join(os.path.dirname(__file__), 'data', 'sahih_bukhari_coded.json')
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
@@ -32,6 +30,16 @@ except FileNotFoundError:
     except FileNotFoundError:
         print("❌ ERROR: Hadith data file not found in either location.")
 
+# ✅ Load basic Islamic knowledge data
+basic_knowledge_data = {}
+try:
+    basic_path = r'C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\basic_islamic_knowledge.json'
+    with open(basic_path, 'r', encoding='utf-8') as f:
+        basic_knowledge_data = json.load(f)
+    print(f"Loaded basic Islamic knowledge from {basic_path}")
+except FileNotFoundError:
+    print("❌ ERROR: Basic Islamic knowledge file not found.")
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -39,11 +47,20 @@ def index():
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
-    question = data.get('question', '').strip()
+    question = data.get('question', '').strip().lower()
 
     if not question:
         return jsonify({'answer': 'Please type a question.'})
 
+    # ✅ Check local basic knowledge first
+    if basic_knowledge_data:
+        for item in basic_knowledge_data.get('data', []):
+            q = item.get('question', '').strip().lower()
+            if q and question in q:
+                answer = item.get('answer', 'No answer found.')
+                return jsonify({'answer': answer})
+
+    # ✅ If not found locally, use OpenAI
     try:
         system_prompt = (
             "You are Tawfiq AI, an Islamic assistant. Answer strictly based on Quran and authentic Hadith."
@@ -112,7 +129,7 @@ def quran_search():
             return jsonify({'result': result})
 
         else:
-            return jsonify({'result': f'No Surah found for \"{query}\". Try a valid name.'})
+            return jsonify({'result': f'No Surah found for "{query}". Try a valid name.'})
 
     except requests.RequestException as e:
         print(f"Quran API Error: {e}")
@@ -156,9 +173,9 @@ def hadith_search():
                         matches.append(result_text)
 
         if matches:
-            return jsonify({'result': "\n\n---\n\n".join(matches[:5])})  # Limit to 5
+            return jsonify({'result': "\n\n---\n\n".join(matches[:5])})
         else:
-            return jsonify({'result': f'No Hadith found for \"{query}\".'})
+            return jsonify({'result': f'No Hadith found for "{query}".'})
 
     except Exception as e:
         print(f"Hadith Local Search Error: {e}")
