@@ -3,7 +3,7 @@ import requests
 import json
 from difflib import get_close_matches
 from openai import OpenAI, APIError, APIConnectionError
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # type: ignore
 import os
 
 # ✅ Load environment variables from .env file
@@ -17,13 +17,13 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # ✅ Load the Hadith file ONCE when the app starts
 hadith_data = {}
 try:
-    # First, try your **absolute Windows path**
-    json_path = r'C:\sahih_bukhari_coded.json'
+    # First, try absolute path
+    json_path = r'C:\DATA\sahih_bukhari_coded.json'
     with open(json_path, 'r', encoding='utf-8') as f:
         hadith_data = json.load(f)
     print(f"✅ Loaded Hadith data from {json_path}")
 except FileNotFoundError:
-    # Fallback: use relative path (for servers like Render)
+    # Fallback to relative path
     json_path = os.path.join(os.path.dirname(__file__), 'data', 'sahih_bukhari_coded.json')
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
@@ -33,14 +33,21 @@ except FileNotFoundError:
         print("❌ ERROR: Hadith data file not found in either location.")
 
 # ✅ Load Basic Islamic Knowledge JSON ONCE
-basic_islamic_knowledge = {}
+basic_knowledge_data = {}
 try:
-    knowledge_path = r'C:\basic_islamic_knowledge.json'
+    knowledge_path = r'C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\basic_islamic_knowledge.json'
     with open(knowledge_path, 'r', encoding='utf-8') as f:
-        basic_islamic_knowledge = json.load(f)
+        basic_knowledge_data = json.load(f)
     print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
 except FileNotFoundError:
-    print("❌ ERROR: Basic Islamic Knowledge file not found.")
+    # ✅ Add fallback for deployment
+    knowledge_path = os.path.join(os.path.dirname(__file__), 'data', 'basic_islamic_knowledge.json')
+    try:
+        with open(knowledge_path, 'r', encoding='utf-8') as f:
+            basic_knowledge_data = json.load(f)
+        print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
+    except FileNotFoundError:
+        print("❌ ERROR: Basic Islamic Knowledge file not found in either location.")
 
 @app.route('/')
 def index():
@@ -174,8 +181,8 @@ def hadith_search():
         print(f"Hadith Local Search Error: {e}")
         return jsonify({'result': 'Error searching Hadith. Try again later.'})
 
-@app.route('/basic_islamic_knowledge', methods=['POST'])
-def basic_islamic_knowledge():
+@app.route('/basic-knowledge', methods=['POST'])
+def basic_knowledge():
     data = request.get_json()
     topic = data.get('topic', '').strip().lower()
 
@@ -183,19 +190,17 @@ def basic_islamic_knowledge():
         return jsonify({'result': 'Please provide a topic to search.'})
 
     try:
-        if not basic_islamic_knowledge.json:
+        if not basic_knowledge_data:
             return jsonify({'result': 'Basic Islamic knowledge data is not loaded. Please contact the admin.'})
 
-        # Search for the topic key
-        result = basic_islamic_knowledge_data.get(topic)
+        result = basic_knowledge_data.get(topic)
         if result:
             return jsonify({'result': result})
         else:
-            # Try fuzzy match if no direct match
             close_matches = get_close_matches(topic, basic_knowledge_data.keys(), n=1, cutoff=0.6)
             if close_matches:
                 best_match = close_matches[0]
-                return jsonify({'result': f"(Showing result for '{best_match}'):\n\n{basic_islamic_knowledge[best_match]}"})
+                return jsonify({'result': f"(Showing result for '{best_match}'):\n\n{basic_knowledge_data[best_match]}"})
             else:
                 return jsonify({'result': f'No information found for \"{topic}\".'})
 
