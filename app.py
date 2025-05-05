@@ -18,7 +18,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 hadith_data = {}
 try:
     # First, try your **absolute Windows path**
-    json_path = r'C:\DATA\sahih_bukhari_coded.json'
+    json_path = cd'C:\DATA\sahih_bukhari_coded.json'
     with open(json_path, 'r', encoding='utf-8') as f:
         hadith_data = json.load(f)
     print(f"✅ Loaded Hadith data from {json_path}")
@@ -35,7 +35,7 @@ except FileNotFoundError:
 # ✅ Load Basic Islamic Knowledge JSON ONCE
 basic_knowledge_data = {}
 try:
-    knowledge_path = r'C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\basic_islamic_knowledge.json'
+    knowledge_path = cd'C:\DATA\basic_islamic_knowledge.json'
     with open(knowledge_path, 'r', encoding='utf-8') as f:
         basic_knowledge_data = json.load(f)
     print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
