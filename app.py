@@ -21,16 +21,26 @@ try:
     json_path = r'C:\DATA\sahih_bukhari_coded.json'
     with open(json_path, 'r', encoding='utf-8') as f:
         hadith_data = json.load(f)
-    print(f"Loaded Hadith data from {json_path}")
+    print(f"✅ Loaded Hadith data from {json_path}")
 except FileNotFoundError:
     # Fallback: use relative path (for servers like Render)
     json_path = os.path.join(os.path.dirname(__file__), 'data', 'sahih_bukhari_coded.json')
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             hadith_data = json.load(f)
-        print(f"Loaded Hadith data from {json_path}")
+        print(f"✅ Loaded Hadith data from {json_path}")
     except FileNotFoundError:
         print("❌ ERROR: Hadith data file not found in either location.")
+
+# ✅ Load Basic Islamic Knowledge JSON ONCE
+basic_knowledge_data = {}
+try:
+    knowledge_path = r'C:\Users\ABDUL AFEEZ\Downloads\TAWFIQ AND SAHIH\TAWFIQ AI\Tawfiq_Ai\DATA\basic_islamic_knowledge.json'
+    with open(knowledge_path, 'r', encoding='utf-8') as f:
+        basic_knowledge_data = json.load(f)
+    print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
+except FileNotFoundError:
+    print("❌ ERROR: Basic Islamic Knowledge file not found.")
 
 @app.route('/')
 def index():
@@ -163,6 +173,35 @@ def hadith_search():
     except Exception as e:
         print(f"Hadith Local Search Error: {e}")
         return jsonify({'result': 'Error searching Hadith. Try again later.'})
+
+@app.route('/basic-knowledge', methods=['POST'])
+def basic_knowledge():
+    data = request.get_json()
+    topic = data.get('topic', '').strip().lower()
+
+    if not topic:
+        return jsonify({'result': 'Please provide a topic to search.'})
+
+    try:
+        if not basic_knowledge_data:
+            return jsonify({'result': 'Basic Islamic knowledge data is not loaded. Please contact the admin.'})
+
+        # Search for the topic key
+        result = basic_knowledge_data.get(topic)
+        if result:
+            return jsonify({'result': result})
+        else:
+            # Try fuzzy match if no direct match
+            close_matches = get_close_matches(topic, basic_knowledge_data.keys(), n=1, cutoff=0.6)
+            if close_matches:
+                best_match = close_matches[0]
+                return jsonify({'result': f"(Showing result for '{best_match}'):\n\n{basic_knowledge_data[best_match]}"})
+            else:
+                return jsonify({'result': f'No information found for \"{topic}\".'})
+
+    except Exception as e:
+        print(f"Basic Knowledge Search Error: {e}")
+        return jsonify({'result': 'Error searching basic knowledge. Try again later.'})
 
 @app.route('/get-surah-list')
 def get_surah_list():
