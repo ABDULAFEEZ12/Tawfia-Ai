@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -244,14 +245,13 @@ function searchQuran() {
     const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
     if (!query) return;
     const resultDiv = document.getElementById("quranResult");
-    resultDiv.innerHTML = <div class="user-message">Searching: ${query}</div>;
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
     fetch('/quran-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
-        resultDiv.innerHTML += <div>${data.result || "No result found."}</div>;
-        resultDiv.scrollTop = resultDiv.scrollHeight;
+        resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
     });
 }
 
@@ -259,36 +259,33 @@ function searchHadith() {
     const query = document.getElementById("hadithInput").value.trim();
     if (!query) return;
     const resultDiv = document.getElementById("hadithResult");
-    resultDiv.innerHTML = <div class="user-message">Searching: ${query}</div>;
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
     fetch('/hadith-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
-        resultDiv.innerHTML += <div>${data.result || "No result found."}</div>;
-        resultDiv.scrollTop = resultDiv.scrollHeight;
+        resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
     });
 }
 
 function loadSurahList() {
     const surahs = [
-        "Al-Fatiha", "Al-Baqara", "Aal-E-Imran", "An-Nisa", "Al-Maidah", "Al-An'am", "Al-A'raf", 
-        "Al-Anfal", "At-Tawba", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl",
-        "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", 
-        "Al-Furqan", "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", 
-        "As-Sajda", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", 
-        "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya", "Al-Ahqaf", 
-        "Muhammad", "Al-Fath", "Al-Hujraat", "Qaf", "Adh-Dhariyat", "At-Tur", "An-Najm", 
-        "Al-Qamar", "Ar-Rahman", "Al-Waqia", "Al-Hadid", "Al-Mujadila", "Al-Hashr", "Al-Mumtahina", 
-        "As-Saff", "Al-Jumua", "Al-Munafiqoon", "At-Taghabun", "At-Talaq", "At-Tahrim", 
-        "Al-Mulk", "Al-Qalam", "Al-Haaqqa", "Al-Maarij", "Nuh", "Al-Jinn", "Al-Muzzammil", 
-        "Al-Muddaththir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", 
-        "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Burooj", 
-        "At-Tariq", "Al-A'la", "Al-Ghashiya", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Lail", 
-        "Ad-Duhaa", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzala", 
-        "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humaza", "Al-Fil", "Quraish", 
-        "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas", "Al-Falaq", 
-        "An-Nas"
+        "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-An'am", "Al-A'raf", "Al-Anfal",
+        "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
+        "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan",
+        "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab",
+        "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
+        "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
+        "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadila",
+        "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
+        "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil",
+        "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
+        "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la",
+        "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Layl", "Ad-Duhaa", "Ash-Sharh", "At-Tin",
+        "Al-Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'ah", "At-Takathur",
+        "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
+        "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
     ];
     const select = document.getElementById("surahList");
     surahs.forEach(surah => {
@@ -299,7 +296,7 @@ function loadSurahList() {
     });
 }
 
-// Load Surah list on page load
+// Initialize Surah list on page load
 window.onload = loadSurahList;
 </script>
 
