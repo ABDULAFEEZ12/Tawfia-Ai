@@ -112,7 +112,7 @@ def quran_search():
             return jsonify({'result': result})
 
         else:
-            return jsonify({'result': f'No Surah found for "{query}". Try a valid name.'})
+            return jsonify({'result': f'No Surah found for \"{query}\". Try a valid name.'})
 
     except requests.RequestException as e:
         print(f"Quran API Error: {e}")
@@ -158,7 +158,7 @@ def hadith_search():
         if matches:
             return jsonify({'result': "\n\n---\n\n".join(matches[:5])})  # Limit to 5
         else:
-            return jsonify({'result': f'No Hadith found for "{query}".'})
+            return jsonify({'result': f'No Hadith found for \"{query}\".'})
 
     except Exception as e:
         print(f"Hadith Local Search Error: {e}")
