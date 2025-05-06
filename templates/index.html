@@ -145,7 +145,7 @@
         body.light-mode .section {
             background: rgba(255,255,255,0.9);
         }
-        body.light-mode .messages p, 
+        body.light-mode .messages p,
         body.light-mode .results div {
             background: rgba(0, 0, 0, 0.05);
         }
@@ -159,7 +159,7 @@
         body.dark-mode .section {
             background: rgba(0,0,0,0.3);
         }
-        body.dark-mode .messages p, 
+        body.dark-mode .messages p,
         body.dark-mode .results div {
             background: rgba(255, 255, 255, 0.1);
         }
@@ -196,7 +196,7 @@
     <button onclick="searchQuran()">Search Surah</button>
     <div class="results" id="quranResult"></div>
 </div>
-    
+
 <!-- Hadith Section -->
 <div class="section" id="hadithSection">
     <input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number...">
@@ -229,6 +229,8 @@ function sendQuestion() {
     userMsg.textContent = "You: " + input;
     messagesDiv.appendChild(userMsg);
     document.getElementById("userInput").value = "";
+    // This fetch call will only work if you have a backend server running at '/ask'
+    // that handles the AI logic and returns a JSON response with an 'answer' field.
     fetch('/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -238,6 +240,12 @@ function sendQuestion() {
         aiMsg.textContent = "Tawfiq AI: " + (data.answer || "Sorry, couldn't answer.");
         messagesDiv.appendChild(aiMsg);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }).catch(error => {
+        console.error('Error fetching AI response:', error);
+        const errorMsg = document.createElement("p");
+        errorMsg.textContent = "Tawfiq AI: Error getting response.";
+        messagesDiv.appendChild(errorMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
     });
 }
 
@@ -246,12 +254,17 @@ function searchQuran() {
     if (!query) return;
     const resultDiv = document.getElementById("quranResult");
     resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+    // This fetch call will only work if you have a backend server running at '/quran-search'
+    // that handles the Quran search logic and returns a JSON response with a 'result' field.
     fetch('/quran-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
         resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
+    }).catch(error => {
+        console.error('Error fetching Quran search result:', error);
+        resultDiv.innerHTML += `<div>Error searching Quran.</div>`;
     });
 }
 
@@ -262,12 +275,17 @@ function searchHadith() {
     if (!query) return;
     const resultDiv = document.getElementById("hadithResult");
     resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+    // This fetch call will only work if you have a backend server running at '/hadith-search'
+    // that handles the Hadith search logic and returns a JSON response with a 'result' field.
     fetch('/hadith-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
         resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
+    }).catch(error => {
+        console.error('Error fetching Hadith search result:', error);
+        resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
     });
 }
 
@@ -305,11 +323,6 @@ function loadHadithTopics() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadHadithTopics();
-});
-    }
-    
 function loadSurahList() {
     const surahs = [
         "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-An'am", "Al-A'raf", "Al-Anfal",
@@ -337,10 +350,12 @@ function loadSurahList() {
     });
 }
 
-// Initialize Surah list on page load
-window.onload = loadSurahList;
+// Initialize Hadith topics and Surah list on page load
+document.addEventListener("DOMContentLoaded", () => {
+    loadHadithTopics();
+    loadSurahList();
+});
 </script>
 
 </body>
 </html>
-
