@@ -2,13 +2,8 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-<<<<<<< HEAD
 # Removed DeepAI import: from openai import DeepAI, APIError, APIConnectionError
 from dotenv import load_dotenv # type: ignore
-=======
-from openai import OpenAI, APIError, APIConnectionError
-from dotenv import load_dotenv
->>>>>>> 57cbf9a28e802c344829fead07cf2d47554519ca
 import os
 
 # Load environment variables from .env file
@@ -16,15 +11,10 @@ load_dotenv()
 
 app = Flask(__name__)
 
-<<<<<<< HEAD
 # Removed DeepAI client setup: client = DeepAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Get DeepAI API key from environment variables
 deepai_api_key = os.getenv("DEEPAAI_API_KEY") # Ensure this is correctly named in your .env
-=======
-# Set up the OpenAI client securely
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
->>>>>>> 57cbf9a28e802c344829fead07cf2d47554519ca
 
 # Load the Hadith file ONCE when the app starts
 hadith_data = {}
@@ -105,7 +95,6 @@ def ask():
         if question_lower in friendly_responses_data:
             print(f"✨ Found exact match in friendly_responses for: {question}")
             return jsonify({'answer': friendly_responses_data[question_lower]})
-<<<<<<< HEAD
 
         # Check for close matches in friendly responses
         close_friendly_matches = get_close_matches(question_lower, friendly_responses_data.keys(), n=1, cutoff=0.9) # Higher cutoff for friendly
@@ -182,63 +171,12 @@ def ask():
 
         # Optional: Add a disclaimer if the answer comes from the external AI
         # answer = f"(AI generated) {answer}"
-=======
->>>>>>> 57cbf9a28e802c344829fead07cf2d47554519ca
 
-        # Check for close matches in friendly responses
-        close_friendly_matches = get_close_matches(question_lower, friendly_responses_data.keys(), n=1, cutoff=0.9) # Higher cutoff for friendly
-        if close_friendly_matches:
-             print(f"✨ Found close match in friendly_responses for: {question} -> {close_friendly_matches[0]}")
-             return jsonify({'answer': friendly_responses_data[close_friendly_matches[0]]})
-
-
-    # --- Step 2: Check Basic Islamic Knowledge ---
-    if basic_knowledge_data:
-        # Check for exact matches first
-        if question_lower in basic_knowledge_data:
-             print(f"📚 Found exact match in basic_knowledge for: {question}")
-             # Return structured data for basic knowledge (optional, but good practice)
-             return jsonify({'answer': basic_knowledge_data[question_lower]})
-
-        # Check for close matches in basic knowledge
-        close_knowledge_matches = get_close_matches(question_lower, basic_knowledge_data.keys(), n=1, cutoff=0.8) # Slightly lower cutoff for knowledge
-        if close_knowledge_matches:
-            best_match = close_knowledge_matches[0]
-            print(f"📚 Found close match in basic_knowledge for: {question} -> {best_match}")
-            # Return structured data for basic knowledge (optional, but good practice)
-            return jsonify({'answer': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
-
-
-    # --- Step 3: Fallback to OpenAI API ---
-    print(f"☁️ No local match found for: {question}. Consulting OpenAI.")
-    try:
-        system_prompt = (
-            "You are Tawfiq AI, an Islamic assistant. Answer strictly based on Quran and authentic Hadith."
-            " If unrelated to Islam, politely decline."
-        )
-
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": question}
-            ],
-            temperature=0.2,
-            max_tokens=500,
-        )
-
-        answer = response.choices[0].message.content.strip()
         return jsonify({'answer': answer})
 
-<<<<<<< HEAD
     except requests.RequestException as e:
         print(f"DeepAI API Error: {e}")
         return jsonify({'answer': 'Tawfiq AI is facing an issue with the external AI. Please try later.'})
-=======
-    except APIError as e:
-        print(f"AI Error: {e}")
-        return jsonify({'answer': 'Tawfiq AI is facing an issue. Please try later.'})
->>>>>>> 57cbf9a28e802c344829fead07cf2d47554519ca
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'Unexpected error. Try later.'})
