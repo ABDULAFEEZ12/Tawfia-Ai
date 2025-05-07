@@ -2,19 +2,19 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-from openai import OpenAI, APIError, APIConnectionError
-from dotenv import load_dotenv  # type: ignore
+from openai import DeepAI, APIError, APIConnectionError
+from dotenv import load_dotenv
 import os
 
-# ✅ Load environment variables from .env file
+# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
 
-# ✅ Set up the OpenAI client securely
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Set up the DeepAI client securely
+client = DeepAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# ✅ Load the Hadith file ONCE when the app starts
+# Load the Hadith file ONCE when the app starts
 hadith_data = {}
 try:
     # First, try absolute path
@@ -35,7 +35,7 @@ except FileNotFoundError:
         print(f"File not found at fallback path: {e}")
         print("❌ ERROR: Hadith data file not found in either location.")
 
-# ✅ Load Basic Islamic Knowledge JSON ONCE
+# Load Basic Islamic Knowledge JSON ONCE
 basic_knowledge_data = {}
 try:
     knowledge_path = r'C:\DATA\basic_islamic_knowledge.json'
@@ -44,7 +44,7 @@ try:
         basic_knowledge_data = json.load(f)
     print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
 except FileNotFoundError:
-    # ✅ Add fallback for deployment
+    # Add fallback for deployment
     knowledge_path = os.path.join(os.path.dirname(__file__), 'DATA', 'basic_islamic_knowledge.json')
     print(f"Trying to load Basic Islamic Knowledge data from fallback path: {knowledge_path}")
     try:
@@ -98,7 +98,7 @@ def quran_search():
     query = data.get('query', '').strip().lower()
 
     if not query:
-        return jsonify({'result': 'Please provide a Surah name.'})
+        return jsonify({'result': 'Please provide a Surah name.', 'results': []}) # Return empty list for frontend
 
     try:
         response = requests.get('https://api.quran.gading.dev/surah')
@@ -117,28 +117,27 @@ def quran_search():
             surah_data = verses_response.json()['data']
 
             surah_title = f"{surah_data['name']['transliteration']['en']} ({surah_data['name']['short']})"
-            formatted_verses = []
+            # ✅ Prepare structured list of verses
+            structured_verses = []
 
             for v in surah_data['verses']:
-                ayah_num = v['number']['inSurah']
-                translation = v['translation']['en']
-                arabic_text = v['text']['arab']
+                structured_verses.append({
+                    'surah_name': surah_data['name']['transliteration']['en'],
+                    'surah_number': surah_number,
+                    'verse_number': v['number']['inSurah'],
+                    'translation': v['translation']['en'],
+                    'arabic_text': v['text']['arab']
+                })
 
-                formatted = (
-                    f"{surah_number}:{ayah_num} {translation}\n\n"
-                    f"{arabic_text}\n\n"
-                )
-                formatted_verses.append(formatted)
-
-            result = f"{surah_title}:\n\n" + "\n\n---\n\n".join(formatted_verses)
-            return jsonify({'result': result})
+            # ✅ Return structured data
+            return jsonify({'surah_title': surah_title, 'results': structured_verses})
 
         else:
-            return jsonify({'result': f'No Surah found for \"{query}\". Try a valid name.'})
+            return jsonify({'result': f'No Surah found for \"{query}\". Try a valid name.', 'results': []})
 
     except requests.RequestException as e:
         print(f"Quran API Error: {e}")
-        return jsonify({'result': 'Error fetching Quran data. Try again.'})
+        return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
@@ -146,15 +145,18 @@ def hadith_search():
     query = data.get('query', '').strip().lower()
 
     if not query:
-        return jsonify({'result': 'Please provide a Hadith search keyword.'})
+        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []}) # Return empty list
 
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     try:
         if not hadith_data:
-            return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.'})
+            return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
 
-        matches = []
+        # ✅ Prepare structured list of Hadith matches
+        structured_matches = []
+        count = 0 # Keep track of results to limit
+
         for volume in hadith_data.get('volumes', []):
             volume_number = volume.get('volume_number', 'N/A')
             for book in volume.get('books', []):
@@ -166,25 +168,33 @@ def hadith_search():
                     keywords = hadith.get('keywords', [])
 
                     if query in text or any(query in k.lower() for k in keywords):
-                        narrator = hadith.get('by', 'Unknown narrator')
-                        hadith_text = hadith.get('text', 'No text')
+                        if count < 5: # Limit to 5 results
+                            structured_matches.append({
+                                'volume_number': volume_number,
+                                'book_number': book_number,
+                                'book_name': book_name,
+                                'hadith_info': hadith.get('info', f'Volume {volume_number}, Book {book_number}'),
+                                'narrator': hadith.get('by', 'Unknown narrator'),
+                                'text': hadith.get('text', 'No text')
+                            })
+                            count += 1
+                        else:
+                            break # Stop searching if we have 5 results
+                if count >= 5:
+                    break # Stop searching books if we have 5 results
+            if count >= 5:
+                break # Stop searching volumes if we have 5 results
 
-                        result_text = (
-                            f"{hadith.get('info', f'Volume {volume_number}, Book {book_number}')}\n"
-                            f"Narrated by: {narrator}\n"
-                            f"{hadith_text}\n"
-                            f"Book: {book_name} (Book {book_number}), Volume {volume_number}"
-                        )
-                        matches.append(result_text)
 
-        if matches:
-            return jsonify({'result': "\n\n---\n\n".join(matches[:5])})  # Limit to 5
+        if structured_matches:
+            # ✅ Return structured data
+            return jsonify({'results': structured_matches})
         else:
-            return jsonify({'result': f'No Hadith found for \"{query}\".'})
+            return jsonify({'result': f'No Hadith found for \"{query}\".', 'results': []})
 
     except Exception as e:
         print(f"Hadith Local Search Error: {e}")
-        return jsonify({'result': 'Error searching Hadith. Try again later.'})
+        return jsonify({'result': 'Error searching Hadith. Try again later.', 'results': []})
 
 @app.route('/basic-knowledge', methods=['POST'])
 def basic_knowledge():
@@ -200,18 +210,21 @@ def basic_knowledge():
 
         result = basic_knowledge_data.get(topic)
         if result:
-            return jsonify({'result': result})
+            # ✅ Return structured data for basic knowledge (optional, but good practice)
+             return jsonify({'topic': topic, 'info': result})
         else:
             close_matches = get_close_matches(topic, basic_knowledge_data.keys(), n=1, cutoff=0.6)
             if close_matches:
                 best_match = close_matches[0]
-                return jsonify({'result': f"(Showing result for '{best_match}'):\n\n{basic_knowledge_data[best_match]}"})
+                # ✅ Return structured data for basic knowledge (optional, but good practice)
+                return jsonify({'topic': best_match, 'info': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
             else:
                 return jsonify({'result': f'No information found for \"{topic}\".'})
 
     except Exception as e:
         print(f"Basic Knowledge Search Error: {e}")
         return jsonify({'result': 'Error searching basic knowledge. Try again later.'})
+
 
 @app.route('/get-surah-list')
 def get_surah_list():
