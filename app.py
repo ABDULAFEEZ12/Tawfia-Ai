@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-from openai import DeepAI, APIError, APIConnectionError
+from openai import OpenAI, APIError, APIConnectionError
 from dotenv import load_dotenv
 import os
 
@@ -11,8 +11,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Set up the DeepAI client securely
-client = DeepAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Set up the OpenAI client securely
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Load the Hadith file ONCE when the app starts
 hadith_data = {}
