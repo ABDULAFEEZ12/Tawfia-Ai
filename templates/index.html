@@ -22,7 +22,7 @@
             padding: 20px;
             width: 100%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-             position: relative; /* Needed for z-index to work correctly */
+             position: relative; /* Needed for z-index and positioning */
              z-index: 1; /* Ensure header content is above other elements */
         }
         header h1 {
@@ -175,17 +175,17 @@
 
         .toggle-btn {
             position: absolute;
-            top: 10px; /* Adjusted top position */
-            right: 10px; /* Adjusted right position */
-            padding: 6px 12px; /* Adjusted padding */
-            font-size: 13px; /* Adjusted font size */
+            top: 10px; /* Default top position (for larger screens) */
+            right: 10px; /* Default right position */
+            padding: 6px 12px;
+            font-size: 13px;
             cursor: pointer;
             border: none;
             border-radius: 5px;
             background-color: #4CAF50;
             color: white;
             transition: background-color 0.3s;
-             z-index: 10; /* Ensure button is above header content */
+             z-index: 10;
         }
         .toggle-btn:hover {
             background-color: #45a049;
@@ -250,7 +250,7 @@
         /* Media Query for smaller screens */
         @media (max-width: 600px) {
             header {
-                padding: 15px 10px; /* Adjusted header padding for mobile */
+                padding: 15px 10px;
             }
             header h1 {
                 font-size: 24px;
@@ -269,7 +269,7 @@
             .section {
                  padding: 15px;
                  height: 70vh;
-                 max-width: 95%; /* Use more width on smaller screens */
+                 max-width: 95%;
             }
              input[type="text"], select {
                  width: 95%;
@@ -307,7 +307,7 @@
              }
 
              .toggle-btn {
-                 top: 10px;
+                 top: 45px; /* Adjusted top position for mobile */
                  right: 10px;
                  padding: 6px 10px;
                  font-size: 12px;
@@ -319,7 +319,7 @@
 </head>
 <body class="light-mode">
 
-<button class="toggle-btn" onclick="toggleMode()">Toggle Mode</button> <!-- Changed text slightly -->
+<button class="toggle-btn" onclick="toggleMode()">Toggle Mode</button>
 
 <header>
     <h1>🌙 Tawfiq AI - Smart Islamic Companion 🌙</h1>
