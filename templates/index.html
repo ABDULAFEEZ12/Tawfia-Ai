@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Tawfiq AI - Smart Islamic Companion</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ Add this line for better mobile scaling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,6 +22,8 @@
             padding: 20px;
             width: 100%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+             position: relative; /* Needed for z-index to work correctly */
+             z-index: 1; /* Ensure header content is above other elements */
         }
         header h1 {
             margin: 0;
@@ -73,7 +75,7 @@
             overflow-y: auto;
             height: 65vh;
             animation: fadeIn 0.5s ease forwards;
-             box-sizing: border-box; /* ✅ Include padding in width */
+             box-sizing: border-box;
         }
         .section.active {
             display: flex;
@@ -86,7 +88,7 @@
             border-radius: 8px;
             font-size: 16px;
             outline: none;
-             box-sizing: border-box; /* ✅ Include padding in width */
+             box-sizing: border-box;
         }
         button {
             padding: 12px 25px;
@@ -122,67 +124,68 @@
             background: rgba(0, 150, 136, 0.2);
         }
 
-        /* ✅ Styles for structured Quran results */
+        /* Styles for structured Quran results */
         .quran-verse {
             border: 1px solid #eee;
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 10px;
-            background: rgba(0, 150, 136, 0.05); /* Light green background */
+            background: rgba(0, 150, 136, 0.05);
         }
         .quran-verse p {
-            margin: 5px 0; /* Adjust spacing between translation and arabic */
-            padding: 0; /* Remove default paragraph padding */
-             background: none; /* Remove background from inner paragraphs */
-             font-size: 1em; /* Use relative unit */
+            margin: 5px 0;
+            padding: 0;
+             background: none;
+             font-size: 1em;
         }
          .quran-verse p:first-child {
              font-weight: bold;
-             color: #00796b; /* Darker green for verse number */
-             font-size: 1em; /* Use relative unit */
+             color: #00796b;
+             font-size: 1em;
          }
          .quran-verse p:last-child {
-             font-size: 1.2em; /* Larger font for Arabic - relative to parent */
-             direction: rtl; /* Right-to-left */
+             font-size: 1.2em;
+             direction: rtl;
              text-align: right;
-             font-weight: normal; /* Adjust font weight for Arabic */
+             font-weight: normal;
          }
 
-        /* ✅ Styles for structured Hadith results */
+        /* Styles for structured Hadith results */
         .hadith-entry {
              border: 1px solid #eee;
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 10px;
-            background: rgba(255, 193, 7, 0.05); /* Light amber background */
+            background: rgba(255, 193, 7, 0.05);
         }
          .hadith-entry p {
              margin: 5px 0;
              padding: 0;
              background: none;
-             font-size: 1em; /* Use relative unit */
+             font-size: 1em;
          }
         .hadith-entry p:first-child {
-            font-size: 0.9em; /* Smaller font for info - relative to parent */
-            color: #ffa000; /* Darker amber for info */
+            font-size: 0.9em;
+            color: #ffa000;
         }
          .hadith-entry p:last-child {
-             font-size: 1em; /* Normal font for Hadith text - relative to parent */
+             font-size: 1em;
          }
 
 
         .toggle-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 8px 15px;
-            font-size: 14px;
+            top: 10px; /* Adjusted top position */
+            right: 10px; /* Adjusted right position */
+            padding: 6px 12px; /* Adjusted padding */
+            font-size: 13px; /* Adjusted font size */
             cursor: pointer;
             border: none;
             border-radius: 5px;
             background-color: #4CAF50;
             color: white;
             transition: background-color 0.3s;
+             z-index: 10; /* Ensure button is above header content */
         }
         .toggle-btn:hover {
             background-color: #45a049;
@@ -230,73 +233,77 @@
             background: rgba(255, 255, 255, 0.1);
         }
          body.dark-mode .quran-verse {
-             background: rgba(0, 150, 136, 0.15); /* Slightly darker green */
+             background: rgba(0, 150, 136, 0.15);
              border-color: #333;
         }
         body.dark-mode .hadith-entry {
-            background: rgba(255, 193, 7, 0.15); /* Slightly darker amber */
-             border-color: #333;
+            background: rgba(255, 193, 7, 0.15);
+            border-color: #333;
         }
         body.dark-mode .quran-verse p:first-child {
-             color: #4db6ac; /* Lighter green */
+             color: #4db6ac;
         }
          body.dark-mode .hadith-entry p:first-child {
-            color: #ffb300; /* Lighter amber */
+            color: #ffb300;
         }
 
-        /* ✅ Media Query for smaller screens */
+        /* Media Query for smaller screens */
         @media (max-width: 600px) {
+            header {
+                padding: 15px 10px; /* Adjusted header padding for mobile */
+            }
             header h1 {
-                font-size: 24px; /* Slightly smaller header on mobile */
+                font-size: 24px;
             }
             header h3 {
                 font-size: 14px;
             }
             .tabs {
-                margin: 10px 0; /* Less vertical margin */
-                border-radius: 15px; /* Smaller border radius */
+                margin: 10px 0;
+                border-radius: 15px;
             }
             .tab {
-                padding: 12px; /* Less padding in tabs */
+                padding: 12px;
                 font-size: 14px;
             }
             .section {
-                 padding: 15px; /* Less padding in sections */
-                 height: 70vh; /* Allow more height for scrolling content */
+                 padding: 15px;
+                 height: 70vh;
+                 max-width: 95%; /* Use more width on smaller screens */
             }
              input[type="text"], select {
-                 width: 95%; /* Use more width on mobile */
-                 margin: 10px 0; /* Less margin */
-                 padding: 10px; /* Less padding */
-                 font-size: 14px; /* Smaller font in inputs */
+                 width: 95%;
+                 margin: 10px 0;
+                 padding: 10px;
+                 font-size: 14px;
              }
              button {
-                 padding: 10px 20px; /* Smaller button padding */
-                 font-size: 14px; /* Smaller button font */
-                 margin-top: 5px; /* Less margin */
+                 padding: 10px 20px;
+                 font-size: 14px;
+                 margin-top: 5px;
              }
             .messages, .results {
-                margin-top: 15px; /* Less margin */
-                max-height: calc(70vh - 120px); /* Adjust max height */
+                margin-top: 15px;
+                max-height: calc(70vh - 120px);
             }
              .messages p,
              .results div {
-                 padding: 10px; /* Less padding in results */
-                 margin: 8px 0; /* Less margin between results */
-                 font-size: 1em; /* Base font size relative to body */
+                 padding: 10px;
+                 margin: 8px 0;
+                 font-size: 1em;
              }
              .quran-verse, .hadith-entry {
-                 padding: 10px; /* Less padding in structured results */
-                 margin-bottom: 10px; /* Less margin */
+                 padding: 10px;
+                 margin-bottom: 10px;
              }
              .quran-verse p, .hadith-entry p {
-                  font-size: 1em !important; /* Ensure normal font size for text */
+                  font-size: 1em !important;
              }
              .quran-verse p:last-child {
-                 font-size: 1.1em !important; /* Slightly larger for Arabic */
+                 font-size: 1.1em !important;
              }
              .hadith-entry p:first-child {
-                 font-size: 0.8em !important; /* Slightly smaller for info */
+                 font-size: 0.8em !important;
              }
 
              .toggle-btn {
@@ -312,7 +319,7 @@
 </head>
 <body class="light-mode">
 
-<button class="toggle-btn" onclick="toggleMode()">Toggle Light/Dark Mode</button>
+<button class="toggle-btn" onclick="toggleMode()">Toggle Mode</button> <!-- Changed text slightly -->
 
 <header>
     <h1>🌙 Tawfiq AI - Smart Islamic Companion 🌙</h1>
@@ -369,6 +376,13 @@ function switchTab(sectionId, event) {
 function toggleMode() {
     document.body.classList.toggle('light-mode');
     document.body.classList.toggle('dark-mode');
+    // Optionally change button text or icon here if needed
+    const toggleBtn = document.querySelector('.toggle-btn');
+    if (document.body.classList.contains('dark-mode')) {
+        toggleBtn.textContent = 'Toggle Light Mode';
+    } else {
+        toggleBtn.textContent = 'Toggle Dark Mode';
+    }
 }
 
 function sendQuestion() {
