@@ -1,64 +1,80 @@
 from flask import Flask, request, jsonify, render_template
-import json
 import requests
+import json
 from difflib import get_close_matches
-import openai
-from openai import APIError
-from dotenv import load_dotenv  # type: ignore
+# Removed DeepAI import: from openai import DeepAI, APIError, APIConnectionError
+from dotenv import load_dotenv # type: ignore
 import os
 
-# ✅ Load environment variables from .env file
+# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
 
-# ✅ Set up the OpenAI client securely
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Removed DeepAI client setup: client = DeepAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# ✅ Load the Hadith file ONCE when the app starts
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-hadith_path = os.path.join(BASE_DIR, 'DATA', 'sahih_bukhari_coded.json')
+# Get DeepAI API key from environment variables
+deepai_api_key = os.getenv("DEEPAAI_API_KEY") # Ensure this is correctly named in your .env
 
+# Load the Hadith file ONCE when the app starts
+hadith_data = {}
 try:
-    with open(hadith_path, 'r', encoding='utf-8') as f:
+    # First, try absolute path
+    json_path = r'C:\DATA\sahih_bukhari_coded.json'  # Ensure this is the correct path on your machine
+    print(f"Trying to load Hadith data from: {json_path}")
+    with open(json_path, 'r', encoding='utf-8') as f:
         hadith_data = json.load(f)
+    print(f"✅ Loaded Hadith data from {json_path}")
 except FileNotFoundError:
-    print(f"[ERROR] Hadith file not found at: {hadith_path}")
-    hadith_data = {}  # fallback so app doesn’t crash
+    # Fallback to relative path
+    json_path = os.path.join(os.path.dirname(__file__), 'DATA', 'sahih_bukhari_coded.json')
+    print(f"Trying to load Hadith data from fallback path: {json_path}")
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            hadith_data = json.load(f)
+        print(f"✅ Loaded Hadith data from {json_path}")
+    except FileNotFoundError as e:
+        print(f"File not found at fallback path: {e}")
+        print("❌ ERROR: Hadith data file not found in either location.")
 
-# ✅ Load basic Islamic knowledge from the JSON file
-def load_basic_knowledge():
-    knowledge_path = os.path.join(BASE_DIR, 'DATA', 'basic_islamic_knowledge.json')
+# Load Basic Islamic Knowledge JSON ONCE
+basic_knowledge_data = {}
+try:
+    knowledge_path = r'C:\DATA\basic_islamic_knowledge.json'
+    print(f"Trying to load Basic Islamic Knowledge data from: {knowledge_path}")
+    with open(knowledge_path, 'r', encoding='utf-8') as f:
+        basic_knowledge_data = json.load(f)
+    print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
+except FileNotFoundError:
+    # Add fallback for deployment
+    knowledge_path = os.path.join(os.path.dirname(__file__), 'DATA', 'basic_islamic_knowledge.json')
+    print(f"Trying to load Basic Islamic Knowledge data from fallback path: {knowledge_path}")
     try:
         with open(knowledge_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            basic_knowledge_data = json.load(f)
+        print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
     except FileNotFoundError:
-        print(f"[ERROR] Basic knowledge file not found at: {knowledge_path}")
-        return {}
+        print("❌ ERROR: Basic Islamic Knowledge file not found in either location.")
 
-# ✅ Function to get answer from local knowledge or fallback to OpenAI
-def get_answer(user_question):
-    basic_knowledge = load_basic_knowledge()
-
-    # Check if the question is in the local knowledge
-    if user_question in basic_knowledge:
-        return basic_knowledge[user_question]
-
-    # If not found, fallback to OpenAI
-    return query_openai(user_question)
-
-# ✅ Function to query OpenAI
-def query_openai(user_question):
+# Load Friendly Responses JSON ONCE
+friendly_responses_data = {}
+try:
+    friendly_path = r'C:\DATA\friendly_responses.json'
+    print(f"Trying to load Friendly Responses data from: {friendly_path}")
+    with open(friendly_path, 'r', encoding='utf-8') as f:
+        friendly_responses_data = json.load(f)
+    print(f"✅ Loaded Friendly Responses data from {friendly_path}")
+except FileNotFoundError:
+    # Add fallback for deployment
+    friendly_path = os.path.join(os.path.dirname(__file__), 'DATA', 'friendly_responses.json')
+    print(f"Trying to load Friendly Responses data from fallback path: {friendly_path}")
     try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=user_question,
-            max_tokens=150
-        )
-        return response.choices[0].text.strip()
-    except Exception as e:
-        print(f"Error querying OpenAI: {e}")
-        return "Error querying OpenAI. Please try again later."
+        with open(friendly_path, 'r', encoding='utf-8') as f:
+            friendly_responses_data = json.load(f)
+        print(f"✅ Loaded Friendly Responses data from {friendly_path}")
+    except FileNotFoundError:
+        print("❌ ERROR: Friendly Responses file not found in either location.")
+
 
 @app.route('/')
 def index():
@@ -68,42 +84,121 @@ def index():
 def ask():
     data = request.get_json()
     question = data.get('question', '').strip()
+    question_lower = question.lower() # Use lower case for matching
 
     if not question:
         return jsonify({'answer': 'Please type a question.'})
 
+    # --- Step 1: Check Friendly Responses ---
+    if friendly_responses_data:
+        # Check for exact matches first
+        if question_lower in friendly_responses_data:
+            print(f"✨ Found exact match in friendly_responses for: {question}")
+            return jsonify({'answer': friendly_responses_data[question_lower]})
+
+        # Check for close matches in friendly responses
+        close_friendly_matches = get_close_matches(question_lower, friendly_responses_data.keys(), n=1, cutoff=0.9) # Higher cutoff for friendly
+        if close_friendly_matches:
+             print(f"✨ Found close match in friendly_responses for: {question} -> {close_friendly_matches[0]}")
+             return jsonify({'answer': friendly_responses_data[close_friendly_matches[0]]})
+
+
+    # --- Step 2: Check Basic Islamic Knowledge ---
+    if basic_knowledge_data:
+        # Check for exact matches first
+        if question_lower in basic_knowledge_data:
+             print(f"📚 Found exact match in basic_knowledge for: {question}")
+             # Return structured data for basic knowledge (optional, but good practice)
+             return jsonify({'answer': basic_knowledge_data[question_lower]})
+
+        # Check for close matches in basic knowledge
+        close_knowledge_matches = get_close_matches(question_lower, basic_knowledge_data.keys(), n=1, cutoff=0.8) # Slightly lower cutoff for knowledge
+        if close_knowledge_matches:
+            best_match = close_knowledge_matches[0]
+            print(f"📚 Found close match in basic_knowledge for: {question} -> {best_match}")
+            # Return structured data for basic knowledge (optional, but good practice)
+            return jsonify({'answer': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
+
+
+    # --- Step 3: Fallback to DeepAI API with Islamic Prompt ---
+    print(f"☁️ No local match found for: {question}. Consulting DeepAI.")
+    if not deepai_api_key:
+         print("❌ ERROR: DeepAI API key not found in environment variables.")
+         return jsonify({'answer': 'Tawfiq AI is not configured correctly (API key missing). Please contact the admin.'})
+
     try:
-        # Get the answer (either from local knowledge or OpenAI)
-        answer = get_answer(question)
+        # Using DeepAI's text generation API (adjust model name and parameters as needed)
+        # Refer to DeepAI's text generation API documentation for details: https://deepai.org/machine-learning-models
+        # Example using the 'text-generation' endpoint
+        deepai_url = "https://api.deepai.org/api/text-generation"
+
+        # Craft the prompt to guide the AI
+        # This is the MOST IMPORTANT part for controlling the output
+        islamic_prompt = (
+            "You are Tawfiq AI, an Islamic assistant. Your purpose is to provide information strictly based on the Quran and authentic Hadith."
+            " Answer only questions related to Islam. If a question is not about Islam, politely decline to answer it and state that you can only answer Islamic questions."
+            " Do not provide opinions or information from other sources. Focus on factual Islamic knowledge."
+            f"\n\nUser Question: {question}"
+            "\n\nAI Answer:"
+        )
+
+        deepai_payload = {
+            'text': islamic_prompt,
+            # 'output_len': 500 # Example parameter - check documentation
+            # You might want to experiment with 'temperature' here. Lower values (closer to 0)
+            # can make the output more focused and less creative, which might be good
+            # for staying within a specific domain.
+        }
+
+        response = requests.post(
+            deepai_url,
+            headers={'api-key': deepai_api_key},
+            data=deepai_payload
+        )
+
+        response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
+
+        deepai_result = response.json()
+        answer = deepai_result.get('output', 'Could not generate response from DeepAI.')
+
+        # Basic check to see if the AI declined (imperfect)
+        # You can refine this based on typical decline phrases from the AI
+        declined_phrases = ["i cannot answer", "not related to islam", "i can only answer islamic questions"]
+        answer_lower = answer.lower()
+        if any(phrase in answer_lower for phrase in declined_phrases):
+             return jsonify({'answer': "I apologize, but I can only provide information related to Islam based on the Quran and authentic Hadith."})
+
+
+        # Optional: Add a disclaimer if the answer comes from the external AI
+        # answer = f"(AI generated) {answer}"
 
         return jsonify({'answer': answer})
 
+    except requests.RequestException as e:
+        print(f"DeepAI API Error: {e}")
+        return jsonify({'answer': 'Tawfiq AI is facing an issue with the external AI. Please try later.'})
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'Unexpected error. Try later.'})
 
-# ✅ Quran Sector (using Gading API)
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
     if not query:
-        return jsonify({'result': 'Please provide a Surah name.'})
+        return jsonify({'result': 'Please provide a Surah name.', 'results': []}) # Return empty list for frontend
 
     try:
-        # ✅ Get Surah list from Gading API
         response = requests.get('https://api.quran.gading.dev/surah')
         response.raise_for_status()
         surahs = response.json()['data']
 
-        # ✅ Map surah names to IDs
         surah_names = {surah['name']['transliteration']['en'].lower(): surah['number'] for surah in surahs}
         close_matches = get_close_matches(query, surah_names.keys(), n=1, cutoff=0.6)
 
         if close_matches:
             surah_number = surah_names[close_matches[0]]
-            # ✅ Fetch verses WITH translation
             verses_response = requests.get(
                 f'https://api.quran.gading.dev/surah/{surah_number}'
             )
@@ -111,50 +206,46 @@ def quran_search():
             surah_data = verses_response.json()['data']
 
             surah_title = f"{surah_data['name']['transliteration']['en']} ({surah_data['name']['short']})"
-            formatted_verses = []
+            # ✅ Prepare structured list of verses
+            structured_verses = []
 
             for v in surah_data['verses']:
-                ayah_num = v['number']['inSurah']
-                translation = v['translation']['en']
-                arabic_text = v['text']['arab']
+                structured_verses.append({
+                    'surah_name': surah_data['name']['transliteration']['en'],
+                    'surah_number': surah_number,
+                    'verse_number': v['number']['inSurah'],
+                    'translation': v['translation']['en'],
+                    'arabic_text': v['text']['arab']
+                })
 
-                formatted = (
-                    f"{surah_number}:{ayah_num} {translation}\n\n"
-                    f"{arabic_text}"
-                )
-                formatted_verses.append(formatted)
-
-            result = f"{surah_title}:\n\n" + "\n\n---\n\n".join(formatted_verses)
-            return jsonify({'result': result})
+            # ✅ Return structured data
+            return jsonify({'surah_title': surah_title, 'results': structured_verses})
 
         else:
-            return jsonify({'result': f'No Surah found for \"{query}\". Try a valid name.'})
+            return jsonify({'result': f'No Surah found for \"{query}\". Try a valid name.', 'results': []})
 
     except requests.RequestException as e:
         print(f"Quran API Error: {e}")
-        return jsonify({'result': 'Error fetching Quran data. Try again.'})
+        return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
-# ✅ Hadith Sector: Local JSON search
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
-    query = (
-        data.get('query', '')
-        .strip()
-        .lower()
-        .replace('hadith on ', '')
-        .replace('hadith by ', '')
-        .replace('hadith talking about ', '')
-    )
+    query = data.get('query', '').strip().lower()
 
     if not query:
-        return jsonify({'result': 'Please provide a Hadith search keyword.'})
+        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []}) # Return empty list
 
-    if not hadith_data:
-        return jsonify({'result': 'Hadith data not loaded properly. Please try again later.'})
+    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     try:
-        matches = []
+        if not hadith_data:
+            return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
+
+        # ✅ Prepare structured list of Hadith matches
+        structured_matches = []
+        count = 0 # Keep track of results to limit
+
         for volume in hadith_data.get('volumes', []):
             volume_number = volume.get('volume_number', 'N/A')
             for book in volume.get('books', []):
@@ -166,28 +257,65 @@ def hadith_search():
                     keywords = hadith.get('keywords', [])
 
                     if query in text or any(query in k.lower() for k in keywords):
-                        info = hadith.get('info', 'No info')
-                        narrator = hadith.get('by', 'Unknown narrator')
-                        hadith_text = hadith.get('text', 'No text')
+                        if count < 5: # Limit to 5 results
+                            structured_matches.append({
+                                'volume_number': volume_number,
+                                'book_number': book_number,
+                                'book_name': book_name,
+                                'hadith_info': hadith.get('info', f'Volume {volume_number}, Book {book_number}'),
+                                'narrator': hadith.get('by', 'Unknown narrator'),
+                                'text': hadith.get('text', 'No text')
+                            })
+                            count += 1
+                        else:
+                            break # Stop searching if we have 5 results
+                if count >= 5:
+                    break # Stop searching books if we have 5 results
+            if count >= 5:
+                break # Stop searching volumes if we have 5 results
 
-                        result_text = (
-                            f"Volume {volume_number}, Book {book_number}, Number {hadith.get('hadith_number', 'N/A')}\n"
-                            f"Narrated by: {narrator}\n"
-                            f"{hadith_text}\n"
-                            f"Book: {book_name} (Book {book_number}), Volume {volume_number}"
-                        )
-                        matches.append(result_text)
 
-        if matches:
-            return jsonify({'result': "\n\n---\n\n".join(matches[:5])})  # ✅ Limit to first 5 matches
+        if structured_matches:
+            # ✅ Return structured data
+            return jsonify({'results': structured_matches})
         else:
-            return jsonify({'result': f'No Hadith found for \"{query}\".'})
+            return jsonify({'result': f'No Hadith found for \"{query}\".', 'results': []})
 
     except Exception as e:
         print(f"Hadith Local Search Error: {e}")
-        return jsonify({'result': 'Error searching Hadith. Try again later.'})
+        return jsonify({'result': 'Error searching Hadith. Try again later.', 'results': []})
 
-# ✅ Return Surah list for dropdown
+# The original basic_knowledge route can remain, although the /ask route now also checks this data.
+# It might be useful if you want a dedicated 'Basic Knowledge' search feature later.
+# For now, the /ask route uses this data internally.
+# @app.route('/basic-knowledge', methods=['POST'])
+# def basic_knowledge_route():
+#     data = request.get_json()
+#     topic = data.get('topic', '').strip().lower()
+
+#     if not topic:
+#         return jsonify({'result': 'Please provide a topic to search.'})
+
+#     try:
+#         if not basic_knowledge_data:
+#             return jsonify({'result': 'Basic Islamic knowledge data is not loaded. Please contact the admin.'})
+
+#         result = basic_knowledge_data.get(topic)
+#         if result:
+#              return jsonify({'topic': topic, 'info': result})
+#         else:
+#             close_matches = get_close_matches(topic, basic_knowledge_data.keys(), n=1, cutoff=0.6)
+#             if close_matches:
+#                 best_match = close_matches[0]
+#                 return jsonify({'topic': best_match, 'info': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
+#             else:
+#                 return jsonify({'result': f'No information found for \"{topic}\".'})
+
+#     except Exception as e:
+#         print(f"Basic Knowledge Search Error: {e}")
+#         return jsonify({'result': 'Error searching basic knowledge. Try again later.'})
+
+
 @app.route('/get-surah-list')
 def get_surah_list():
     try:
