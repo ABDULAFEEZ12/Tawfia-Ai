@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-# Removed DeepAI import: from openai import DeepAI, APIError, APIConnectionError
 from dotenv import load_dotenv # type: ignore
 import os
 
@@ -11,69 +10,39 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Removed DeepAI client setup: client = DeepAI(api_key=os.getenv("OPENAI_API_KEY"))
-
 # Get DeepAI API key from environment variables
-deepai_api_key = os.getenv("DEEPAAI_API_KEY") # Ensure this is correctly named in your .env
+deepai_api_key = os.getenv("DEEPAI_API_KEY") # Ensure this is correctly named in your .env
 
-# Load the Hadith file ONCE when the app starts
-hadith_data = {}
-try:
-    # First, try absolute path
-    json_path = r'C:\DATA\sahih_bukhari_coded.json'  # Ensure this is the correct path on your machine
-    print(f"Trying to load Hadith data from: {json_path}")
-    with open(json_path, 'r', encoding='utf-8') as f:
-        hadith_data = json.load(f)
-    print(f"✅ Loaded Hadith data from {json_path}")
-except FileNotFoundError:
-    # Fallback to relative path
-    json_path = os.path.join(os.path.dirname(__file__), 'DATA', 'sahih_bukhari_coded.json')
-    print(f"Trying to load Hadith data from fallback path: {json_path}")
-    try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            hadith_data = json.load(f)
-        print(f"✅ Loaded Hadith data from {json_path}")
-    except FileNotFoundError as e:
-        print(f"File not found at fallback path: {e}")
-        print("❌ ERROR: Hadith data file not found in either location.")
+# --- Function to load JSON data with proper path handling ---
+def load_json_data(file_name, data_variable_name):
+    """Loads JSON data from the DATA directory relative to the app.py file."""
+    data = {}
+    # Construct the path using os.path.join for platform independence
+    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
+    print(f"Attempting to load {data_variable_name} data from: {file_path}")
 
-# Load Basic Islamic Knowledge JSON ONCE
-basic_knowledge_data = {}
-try:
-    knowledge_path = r'C:\DATA\basic_islamic_knowledge.json'
-    print(f"Trying to load Basic Islamic Knowledge data from: {knowledge_path}")
-    with open(knowledge_path, 'r', encoding='utf-8') as f:
-        basic_knowledge_data = json.load(f)
-    print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
-except FileNotFoundError:
-    # Add fallback for deployment
-    knowledge_path = os.path.join(os.path.dirname(__file__), 'DATA', 'basic_islamic_knowledge.json')
-    print(f"Trying to load Basic Islamic Knowledge data from fallback path: {knowledge_path}")
     try:
-        with open(knowledge_path, 'r', encoding='utf-8') as f:
-            basic_knowledge_data = json.load(f)
-        print(f"✅ Loaded Basic Islamic Knowledge data from {knowledge_path}")
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        print(f"✅ Successfully loaded {data_variable_name} data from {file_path}")
     except FileNotFoundError:
-        print("❌ ERROR: Basic Islamic Knowledge file not found in either location.")
+        print(f"❌ ERROR: {data_variable_name} data file not found at {file_path}")
+        # You might want to raise an exception here if the data is critical
+        # raise FileNotFoundError(f"{data_variable_name} data file not found")
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON Decode Error in {file_path}: {e}")
+        # You might want to raise an exception here as well
+        # raise json.JSONDecodeError(f"JSON Decode Error in {file_path}: {e}", e.doc, e.pos)
+    except Exception as e:
+        print(f"❌ An unexpected error occurred while loading {file_name}: {e}")
 
-# Load Friendly Responses JSON ONCE
-friendly_responses_data = {}
-try:
-    friendly_path = r'C:\DATA\friendly_responses.json'
-    print(f"Trying to load Friendly Responses data from: {friendly_path}")
-    with open(friendly_path, 'r', encoding='utf-8') as f:
-        friendly_responses_data = json.load(f)
-    print(f"✅ Loaded Friendly Responses data from {friendly_path}")
-except FileNotFoundError:
-    # Add fallback for deployment
-    friendly_path = os.path.join(os.path.dirname(__file__), 'DATA', 'friendly_responses.json')
-    print(f"Trying to load Friendly Responses data from fallback path: {friendly_path}")
-    try:
-        with open(friendly_path, 'r', encoding='utf-8') as f:
-            friendly_responses_data = json.load(f)
-        print(f"✅ Loaded Friendly Responses data from {friendly_path}")
-    except FileNotFoundError:
-        print("❌ ERROR: Friendly Responses file not found in either location.")
+
+    return data
+
+# Load the data using the new function
+hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
+basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
+friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
 
 
 @app.route('/')
