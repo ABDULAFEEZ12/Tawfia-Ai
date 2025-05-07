@@ -91,6 +91,7 @@
              box-sizing: border-box;
              background-color: inherit; /* Inherit background for dark mode */
              color: inherit; /* Inherit color for dark mode */
+
         }
         button {
             padding: 12px 25px;
@@ -178,13 +179,6 @@
              font-size: 1em;
          }
 
-        .loading-indicator {
-            font-style: italic;
-            color: #888;
-            margin-top: 10px;
-        }
-
-
         .toggle-btn {
             position: absolute;
             top: 10px; /* Default top position (for larger screens) */
@@ -223,6 +217,7 @@
          body.light-mode input[type="text"], body.light-mode select {
              border-color: #ccc;
          }
+
         body.light-mode .quran-verse {
              background: rgba(0, 150, 136, 0.05);
              border-color: #eee;
@@ -379,9 +374,15 @@
      <!-- You can populate this dropdown dynamically from backend if needed,
           but for now, a hardcoded list is used in loadHadithTopics() -->
     <select id="hadithDropdown">
+<<<<<<< HEAD
         <option value="">-- Or Select Hadith Topic --</option>
     </select>
     <button id="hadithSearchButton" onclick="searchHadith()">Search Hadith</button>
+=======
+        <option value="">-- Select Hadith Topic --</option>
+    </select>
+    <button onclick="searchHadith()">Search Hadith</button>
+>>>>>>> 57cbf9a28e802c344829fead07cf2d47554519ca
     <div class="results" id="hadithResult"></div>
 </div>
 
@@ -431,7 +432,8 @@ function sendQuestion() {
     // Disable button while fetching
     askButton.disabled = true;
 
-
+    // This fetch call will only work if you have a backend server running at '/ask'
+    // that handles the AI logic and returns a JSON response with an 'answer' field.
     fetch('/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -460,6 +462,7 @@ function sendQuestion() {
 }
 
 // ✅ searchQuran FUNCTION with loading indicator
+// ✅ MODIFIED searchQuran FUNCTION
 function searchQuran() {
     const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
     if (!query) return;
@@ -478,8 +481,6 @@ function searchQuran() {
 
      // Disable button while fetching
     quranSearchButton.disabled = true;
-
-
     fetch('/quran-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -487,8 +488,6 @@ function searchQuran() {
     }).then(res => res.json()).then(data => {
         // Clear previous results after getting data
          resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`; // Keep the searching message initially
-         // Remove loading indicator after clearing
-         // (It's better to remove it after creating the new content)
 
         if (data.surah_title && data.results && Array.isArray(data.results) && data.results.length > 0) {
             // Add Surah Title
@@ -559,8 +558,6 @@ function searchHadith() {
 
      // Disable button while fetching
     hadithSearchButton.disabled = true;
-
-
     fetch('/hadith-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -568,8 +565,6 @@ function searchHadith() {
     }).then(res => res.json()).then(data => {
         // Clear previous results after getting data
          resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`; // Keep the searching message initially
-         // Remove loading indicator after clearing
-         // (It's better to remove it after creating the new content)
 
         if (data.results && Array.isArray(data.results) && data.results.length > 0) {
             data.results.forEach(hadith => {
@@ -612,12 +607,6 @@ function searchHadith() {
     }).catch(error => {
         console.error('Error fetching Hadith search result:', error);
         resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
-    }).finally(() => {
-         // Remove loading indicator
-         const loading = resultDiv.querySelector('.loading-indicator');
-         if (loading) loading.remove();
-         // Re-enable button
-         hadithSearchButton.disabled = false;
     });
 }
 
@@ -629,7 +618,6 @@ function loadSurahList() {
         .then(data => {
             const select = document.getElementById("surahList");
             // Clear existing options except the default one
-            select.innerHTML = '<option value="">-- Or Select Surah --</option>';
             if (data.surahs && Array.isArray(data.surahs)) {
                 data.surahs.forEach(surah => {
                     const option = document.createElement("option");
@@ -670,7 +658,6 @@ function loadHardcodedSurahList() {
         "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
     ];
     const select = document.getElementById("surahList");
-     select.innerHTML = '<option value="">-- Or Select Surah --</option>'; // Clear before adding hardcoded list
     surahs.forEach(surah => {
         const option = document.createElement("option");
         option.value = surah;

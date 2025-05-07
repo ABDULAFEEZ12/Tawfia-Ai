@@ -1,40 +1,11 @@
 {
-    "greetings": [
-        "Hello! How can I assist you today? 😊",
-        "Hi there! What’s on your mind?",
-        "Assalamu Alaikum! How can I help?",
-        "Greetings! Need any assistance?",
-        "Hey! What’s up?"
-    ],
-    "farewells": [
-        "Goodbye! Take care! 🌟",
-        "See you later! Wishing you well! 👋",
-        "It was nice chatting! Bye for now!",
-        "Farewell! Hope to talk to you soon!",
-        "Catch you later! Stay safe!"
-    ],
-    "gratitudes": [
-        "You’re welcome! I'm here for you!",
-        "No problem! I’m glad to help!",
-        "Always happy to assist!",
-        "My pleasure! Let me know if you need anything else!",
-        "You're welcome! Feel free to ask me more!"
-    ],
-    "common_questions": {
-        "What is your name?": [
-            "I'm Tawfiq, your friendly AI assistant! 😊",
-            "You can call me Tawfiq! What about you?",
-            "I'm Tawfiq, your helpful companion!"
-        ],
-        "How are you?": [
-            "I'm just a program, but I'm here to help you!",
-            "Doing well, thanks! Ready to assist you!",
-            "As an AI, I don't have feelings, but I'm always ready to help!"
-        ],
-        "What can you do?": [
-            "I can assist with various topics and answer your questions!",
-            "I'm here to chat with you and help you find information!",
-            "I can help with greetings, questions, and more!"
-        ]
-    }
+    "salam alaikum": "Wa alaikum assalam! How can I help you today?",
+    "hello": "Hello there! How can I assist you?",
+    "how are you": "Alhamdulillah, I am functioning well. How may I help you?",
+    "thank you": "You're welcome! May Allah bless you.",
+    "jazakallah khair": "Wa iyyakum! May Allah reward you too.",
+    "bye": "Goodbye! May Allah be with you.",
+    "what is your name": "I am Tawfiq AI, your smart Islamic companion.",
+    "who created you": "I was created by a developer as an AI assistant.",
+    "tell me about yourself": "I am Tawfiq AI, designed to provide information about Islam based on the Quran and authentic Hadith."
 }
