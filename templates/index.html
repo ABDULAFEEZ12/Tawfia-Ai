@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Tawfiq AI - Smart Islamic Companion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ Add this line for better mobile scaling -->
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,6 +15,7 @@
             height: 100vh;
             overflow: hidden;
             transition: background 0.3s, color 0.3s;
+             font-size: 16px; /* Base font size */
         }
         header {
             text-align: center;
@@ -71,6 +73,7 @@
             overflow-y: auto;
             height: 65vh;
             animation: fadeIn 0.5s ease forwards;
+             box-sizing: border-box; /* ✅ Include padding in width */
         }
         .section.active {
             display: flex;
@@ -83,6 +86,7 @@
             border-radius: 8px;
             font-size: 16px;
             outline: none;
+             box-sizing: border-box; /* ✅ Include padding in width */
         }
         button {
             padding: 12px 25px;
@@ -112,6 +116,7 @@
             border-radius: 8px;
             margin: 10px 0;
             word-wrap: break-word;
+             font-size: 1em; /* Use relative unit */
         }
         .user-message {
             background: rgba(0, 150, 136, 0.2);
@@ -129,13 +134,15 @@
             margin: 5px 0; /* Adjust spacing between translation and arabic */
             padding: 0; /* Remove default paragraph padding */
              background: none; /* Remove background from inner paragraphs */
+             font-size: 1em; /* Use relative unit */
         }
          .quran-verse p:first-child {
              font-weight: bold;
              color: #00796b; /* Darker green for verse number */
+             font-size: 1em; /* Use relative unit */
          }
          .quran-verse p:last-child {
-             font-size: 1.2em; /* Larger font for Arabic */
+             font-size: 1.2em; /* Larger font for Arabic - relative to parent */
              direction: rtl; /* Right-to-left */
              text-align: right;
              font-weight: normal; /* Adjust font weight for Arabic */
@@ -153,13 +160,14 @@
              margin: 5px 0;
              padding: 0;
              background: none;
+             font-size: 1em; /* Use relative unit */
          }
         .hadith-entry p:first-child {
-            font-size: 0.9em; /* Smaller font for info */
+            font-size: 0.9em; /* Smaller font for info - relative to parent */
             color: #ffa000; /* Darker amber for info */
         }
          .hadith-entry p:last-child {
-             font-size: 1em; /* Normal font for Hadith text */
+             font-size: 1em; /* Normal font for Hadith text - relative to parent */
          }
 
 
@@ -234,6 +242,69 @@
         }
          body.dark-mode .hadith-entry p:first-child {
             color: #ffb300; /* Lighter amber */
+        }
+
+        /* ✅ Media Query for smaller screens */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 24px; /* Slightly smaller header on mobile */
+            }
+            header h3 {
+                font-size: 14px;
+            }
+            .tabs {
+                margin: 10px 0; /* Less vertical margin */
+                border-radius: 15px; /* Smaller border radius */
+            }
+            .tab {
+                padding: 12px; /* Less padding in tabs */
+                font-size: 14px;
+            }
+            .section {
+                 padding: 15px; /* Less padding in sections */
+                 height: 70vh; /* Allow more height for scrolling content */
+            }
+             input[type="text"], select {
+                 width: 95%; /* Use more width on mobile */
+                 margin: 10px 0; /* Less margin */
+                 padding: 10px; /* Less padding */
+                 font-size: 14px; /* Smaller font in inputs */
+             }
+             button {
+                 padding: 10px 20px; /* Smaller button padding */
+                 font-size: 14px; /* Smaller button font */
+                 margin-top: 5px; /* Less margin */
+             }
+            .messages, .results {
+                margin-top: 15px; /* Less margin */
+                max-height: calc(70vh - 120px); /* Adjust max height */
+            }
+             .messages p,
+             .results div {
+                 padding: 10px; /* Less padding in results */
+                 margin: 8px 0; /* Less margin between results */
+                 font-size: 1em; /* Base font size relative to body */
+             }
+             .quran-verse, .hadith-entry {
+                 padding: 10px; /* Less padding in structured results */
+                 margin-bottom: 10px; /* Less margin */
+             }
+             .quran-verse p, .hadith-entry p {
+                  font-size: 1em !important; /* Ensure normal font size for text */
+             }
+             .quran-verse p:last-child {
+                 font-size: 1.1em !important; /* Slightly larger for Arabic */
+             }
+             .hadith-entry p:first-child {
+                 font-size: 0.8em !important; /* Slightly smaller for info */
+             }
+
+             .toggle-btn {
+                 top: 10px;
+                 right: 10px;
+                 padding: 6px 10px;
+                 font-size: 12px;
+             }
         }
 
 
