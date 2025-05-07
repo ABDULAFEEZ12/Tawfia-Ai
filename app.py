@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-from openai import OpenAI, APIError, APIConnectionError
+from openai import DeepAI, APIError, APIConnectionError
 from dotenv import load_dotenv
 import os
 
@@ -11,8 +11,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# Set up the OpenAI client securely
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Set up the DeepAI client securely
+client = DeepAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Load the Hadith file ONCE when the app starts
 hadith_data = {}
@@ -54,6 +54,26 @@ except FileNotFoundError:
     except FileNotFoundError:
         print("❌ ERROR: Basic Islamic Knowledge file not found in either location.")
 
+# Load Friendly Responses JSON ONCE
+friendly_responses_data = {}
+try:
+    friendly_path = r'C:\DATA\friendly_responses.json'
+    print(f"Trying to load Friendly Responses data from: {friendly_path}")
+    with open(friendly_path, 'r', encoding='utf-8') as f:
+        friendly_responses_data = json.load(f)
+    print(f"✅ Loaded Friendly Responses data from {friendly_path}")
+except FileNotFoundError:
+    # Add fallback for deployment
+    friendly_path = os.path.join(os.path.dirname(__file__), 'DATA', 'friendly_responses.json')
+    print(f"Trying to load Friendly Responses data from fallback path: {friendly_path}")
+    try:
+        with open(friendly_path, 'r', encoding='utf-8') as f:
+            friendly_responses_data = json.load(f)
+        print(f"✅ Loaded Friendly Responses data from {friendly_path}")
+    except FileNotFoundError:
+        print("❌ ERROR: Friendly Responses file not found in either location.")
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -62,10 +82,44 @@ def index():
 def ask():
     data = request.get_json()
     question = data.get('question', '').strip()
+    question_lower = question.lower() # Use lower case for matching
 
     if not question:
         return jsonify({'answer': 'Please type a question.'})
 
+    # --- Step 1: Check Friendly Responses ---
+    if friendly_responses_data:
+        # Check for exact matches first
+        if question_lower in friendly_responses_data:
+            print(f"✨ Found exact match in friendly_responses for: {question}")
+            return jsonify({'answer': friendly_responses_data[question_lower]})
+
+        # Check for close matches in friendly responses
+        close_friendly_matches = get_close_matches(question_lower, friendly_responses_data.keys(), n=1, cutoff=0.9) # Higher cutoff for friendly
+        if close_friendly_matches:
+             print(f"✨ Found close match in friendly_responses for: {question} -> {close_friendly_matches[0]}")
+             return jsonify({'answer': friendly_responses_data[close_friendly_matches[0]]})
+
+
+    # --- Step 2: Check Basic Islamic Knowledge ---
+    if basic_knowledge_data:
+        # Check for exact matches first
+        if question_lower in basic_knowledge_data:
+             print(f"📚 Found exact match in basic_knowledge for: {question}")
+             # Return structured data for basic knowledge (optional, but good practice)
+             return jsonify({'answer': basic_knowledge_data[question_lower]})
+
+        # Check for close matches in basic knowledge
+        close_knowledge_matches = get_close_matches(question_lower, basic_knowledge_data.keys(), n=1, cutoff=0.8) # Slightly lower cutoff for knowledge
+        if close_knowledge_matches:
+            best_match = close_knowledge_matches[0]
+            print(f"📚 Found close match in basic_knowledge for: {question} -> {best_match}")
+            # Return structured data for basic knowledge (optional, but good practice)
+            return jsonify({'answer': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
+
+
+    # --- Step 3: Fallback to DeepAI API ---
+    print(f"☁️ No local match found for: {question}. Consulting DeepAI.")
     try:
         system_prompt = (
             "You are Tawfiq AI, an Islamic assistant. Answer strictly based on Quran and authentic Hadith."
@@ -196,34 +250,35 @@ def hadith_search():
         print(f"Hadith Local Search Error: {e}")
         return jsonify({'result': 'Error searching Hadith. Try again later.', 'results': []})
 
-@app.route('/basic-knowledge', methods=['POST'])
-def basic_knowledge():
-    data = request.get_json()
-    topic = data.get('topic', '').strip().lower()
+# The original basic_knowledge route can remain, although the /ask route now also checks this data.
+# It might be useful if you want a dedicated 'Basic Knowledge' search feature later.
+# For now, the /ask route uses this data internally.
+# @app.route('/basic-knowledge', methods=['POST'])
+# def basic_knowledge_route():
+#     data = request.get_json()
+#     topic = data.get('topic', '').strip().lower()
 
-    if not topic:
-        return jsonify({'result': 'Please provide a topic to search.'})
+#     if not topic:
+#         return jsonify({'result': 'Please provide a topic to search.'})
 
-    try:
-        if not basic_knowledge_data:
-            return jsonify({'result': 'Basic Islamic knowledge data is not loaded. Please contact the admin.'})
+#     try:
+#         if not basic_knowledge_data:
+#             return jsonify({'result': 'Basic Islamic knowledge data is not loaded. Please contact the admin.'})
 
-        result = basic_knowledge_data.get(topic)
-        if result:
-            # ✅ Return structured data for basic knowledge (optional, but good practice)
-             return jsonify({'topic': topic, 'info': result})
-        else:
-            close_matches = get_close_matches(topic, basic_knowledge_data.keys(), n=1, cutoff=0.6)
-            if close_matches:
-                best_match = close_matches[0]
-                # ✅ Return structured data for basic knowledge (optional, but good practice)
-                return jsonify({'topic': best_match, 'info': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
-            else:
-                return jsonify({'result': f'No information found for \"{topic}\".'})
+#         result = basic_knowledge_data.get(topic)
+#         if result:
+#              return jsonify({'topic': topic, 'info': result})
+#         else:
+#             close_matches = get_close_matches(topic, basic_knowledge_data.keys(), n=1, cutoff=0.6)
+#             if close_matches:
+#                 best_match = close_matches[0]
+#                 return jsonify({'topic': best_match, 'info': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
+#             else:
+#                 return jsonify({'result': f'No information found for \"{topic}\".'})
 
-    except Exception as e:
-        print(f"Basic Knowledge Search Error: {e}")
-        return jsonify({'result': 'Error searching basic knowledge. Try again later.'})
+#     except Exception as e:
+#         print(f"Basic Knowledge Search Error: {e}")
+#         return jsonify({'result': 'Error searching basic knowledge. Try again later.'})
 
 
 @app.route('/get-surah-list')
