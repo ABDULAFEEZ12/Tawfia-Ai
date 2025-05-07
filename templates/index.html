@@ -101,11 +101,12 @@
         .messages, .results {
             margin-top: 20px;
             width: 100%;
-            max-height: 400px;
+            max-height: calc(65vh - 150px); /* Adjust based on input/button height */
             overflow-y: auto;
             text-align: left;
         }
-        .messages p, .results div {
+        .messages p,
+        .results div { /* Basic styling for individual results */
             background: rgba(0, 0, 0, 0.05);
             padding: 12px;
             border-radius: 8px;
@@ -115,6 +116,53 @@
         .user-message {
             background: rgba(0, 150, 136, 0.2);
         }
+
+        /* ✅ Styles for structured Quran results */
+        .quran-verse {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: rgba(0, 150, 136, 0.05); /* Light green background */
+        }
+        .quran-verse p {
+            margin: 5px 0; /* Adjust spacing between translation and arabic */
+            padding: 0; /* Remove default paragraph padding */
+             background: none; /* Remove background from inner paragraphs */
+        }
+         .quran-verse p:first-child {
+             font-weight: bold;
+             color: #00796b; /* Darker green for verse number */
+         }
+         .quran-verse p:last-child {
+             font-size: 1.2em; /* Larger font for Arabic */
+             direction: rtl; /* Right-to-left */
+             text-align: right;
+             font-weight: normal; /* Adjust font weight for Arabic */
+         }
+
+        /* ✅ Styles for structured Hadith results */
+        .hadith-entry {
+             border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: rgba(255, 193, 7, 0.05); /* Light amber background */
+        }
+         .hadith-entry p {
+             margin: 5px 0;
+             padding: 0;
+             background: none;
+         }
+        .hadith-entry p:first-child {
+            font-size: 0.9em; /* Smaller font for info */
+            color: #ffa000; /* Darker amber for info */
+        }
+         .hadith-entry p:last-child {
+             font-size: 1em; /* Normal font for Hadith text */
+         }
+
+
         .toggle-btn {
             position: absolute;
             top: 20px;
@@ -149,6 +197,16 @@
         body.light-mode .results div {
             background: rgba(0, 0, 0, 0.05);
         }
+        body.light-mode .quran-verse {
+             background: rgba(0, 150, 136, 0.05);
+             border-color: #eee;
+        }
+        body.light-mode .hadith-entry {
+            background: rgba(255, 193, 7, 0.05);
+            border-color: #eee;
+        }
+
+
         body.dark-mode {
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             color: #fff;
@@ -163,6 +221,22 @@
         body.dark-mode .results div {
             background: rgba(255, 255, 255, 0.1);
         }
+         body.dark-mode .quran-verse {
+             background: rgba(0, 150, 136, 0.15); /* Slightly darker green */
+             border-color: #333;
+        }
+        body.dark-mode .hadith-entry {
+            background: rgba(255, 193, 7, 0.15); /* Slightly darker amber */
+             border-color: #333;
+        }
+        body.dark-mode .quran-verse p:first-child {
+             color: #4db6ac; /* Lighter green */
+        }
+         body.dark-mode .hadith-entry p:first-child {
+            color: #ffb300; /* Lighter amber */
+        }
+
+
     </style>
 </head>
 <body class="light-mode">
@@ -200,6 +274,8 @@
 <!-- Hadith Section -->
 <div class="section" id="hadithSection">
     <input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number...">
+     <!-- You can populate this dropdown dynamically from backend if needed,
+          but for now, a hardcoded list is used in loadHadithTopics() -->
     <select id="hadithDropdown">
         <option value="">-- Select Hadith Topic --</option>
     </select>
@@ -213,6 +289,10 @@ function switchTab(sectionId, event) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(sectionId).classList.add('active');
     event.target.classList.add('active');
+    // Clear results/messages when switching tabs (optional but good UX)
+     document.getElementById('messages').innerHTML = '';
+     document.getElementById('quranResult').innerHTML = '';
+     document.getElementById('hadithResult').innerHTML = '';
 }
 
 function toggleMode() {
@@ -249,46 +329,188 @@ function sendQuestion() {
     });
 }
 
+// ✅ MODIFIED searchQuran FUNCTION
 function searchQuran() {
     const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
     if (!query) return;
     const resultDiv = document.getElementById("quranResult");
+    // Clear previous results, but keep the searching message
     resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    // This fetch call will only work if you have a backend server running at '/quran-search'
-    // that handles the Quran search logic and returns a JSON response with a 'result' field.
+
     fetch('/quran-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
-        resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
+        // Clear previous results after getting data
+         resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`; // Keep the searching message initially
+
+        if (data.surah_title && data.results && Array.isArray(data.results) && data.results.length > 0) {
+            // Add Surah Title
+             const titleElement = document.createElement("div");
+             titleElement.innerHTML = `<strong>${data.surah_title}:</strong>`;
+             titleElement.style.fontWeight = 'bold';
+             titleElement.style.marginBottom = '10px';
+             resultDiv.appendChild(titleElement);
+
+
+            data.results.forEach(verse => {
+                const verseElement = document.createElement("div");
+                verseElement.classList.add("quran-verse"); // Add a class for styling
+
+                const verseInfo = document.createElement("p");
+                verseInfo.innerHTML = `<strong>${verse.surah_number}:${verse.verse_number}</strong>`; // Display Surah and Verse number
+                verseElement.appendChild(verseInfo);
+
+                const translation = document.createElement("p");
+                translation.textContent = verse.translation; // Display translation
+                verseElement.appendChild(translation);
+
+                const arabic = document.createElement("p");
+                arabic.textContent = verse.arabic_text; // Display Arabic text
+                arabic.style.textAlign = 'right'; // Arabic is right-to-left
+                arabic.style.fontWeight = 'bold';
+                arabic.style.marginTop = '5px';
+                arabic.style.direction = 'rtl'; // Explicitly set direction for Arabic
+                verseElement.appendChild(arabic);
+
+                resultDiv.appendChild(verseElement);
+            });
+        } else if (data.result) { // Handle cases where no results are found but a message is returned
+             resultDiv.innerHTML += `<div>${data.result}</div>`;
+        }
+        else {
+            resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
+        }
     }).catch(error => {
         console.error('Error fetching Quran search result:', error);
         resultDiv.innerHTML += `<div>Error searching Quran.</div>`;
     });
 }
 
+// ✅ MODIFIED searchHadith FUNCTION
 function searchHadith() {
     const inputQuery = document.getElementById("hadithInput").value.trim();
     const dropdownQuery = document.getElementById("hadithDropdown").value;
     const query = inputQuery || dropdownQuery;
     if (!query) return;
     const resultDiv = document.getElementById("hadithResult");
+    // Clear previous results, but keep the searching message
     resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    // This fetch call will only work if you have a backend server running at '/hadith-search'
-    // that handles the Hadith search logic and returns a JSON response with a 'result' field.
+
     fetch('/hadith-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
     }).then(res => res.json()).then(data => {
-        resultDiv.innerHTML += `<div>${data.result || "No result found."}</div>`;
+        // Clear previous results after getting data
+         resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`; // Keep the searching message initially
+
+        if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+            data.results.forEach(hadith => {
+                const hadithElement = document.createElement("div");
+                hadithElement.classList.add("hadith-entry"); // Add a class for styling
+
+                const hadithInfo = document.createElement("p");
+                let infoText = '';
+                // Construct the info string based on available data
+                if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
+                 else if (hadith.book_name && hadith.book_name !== 'Unknown Book') infoText += `<strong>Book:</strong> ${hadith.book_name}`;
+                 else if (hadith.book_number && hadith.book_number !== 'N/A') infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
+
+                if (hadith.volume_number && hadith.volume_number !== 'N/A') infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
+
+                 // Only add hadith_info if it's distinct and useful
+                if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A' && !infoText.includes(hadith.hadith_info)) {
+                     infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
+                }
+
+                if (hadith.narrator && hadith.narrator !== 'Unknown narrator') infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
+
+
+                hadithInfo.innerHTML = infoText;
+                hadithElement.appendChild(hadithInfo);
+
+                const hadithText = document.createElement("p");
+                hadithText.textContent = hadith.text; // Display Hadith text
+                hadithText.style.marginTop = '8px';
+                hadithElement.appendChild(hadithText);
+
+                resultDiv.appendChild(hadithElement);
+            });
+        } else if (data.result) { // Handle cases where no results are found but a message is returned
+             resultDiv.innerHTML += `<div>${data.result}</div>`;
+        }
+         else {
+            resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
+        }
     }).catch(error => {
         console.error('Error fetching Hadith search result:', error);
         resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
     });
 }
 
+
+// Function to load Surah list from backend
+function loadSurahList() {
+    fetch('/get-surah-list')
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById("surahList");
+            // Clear existing options except the default one
+            select.innerHTML = '<option value="">-- Select Surah --</option>';
+            if (data.surahs && Array.isArray(data.surahs)) {
+                data.surahs.forEach(surah => {
+                    const option = document.createElement("option");
+                    option.value = surah;
+                    option.textContent = surah;
+                    select.appendChild(option);
+                });
+            } else {
+                 console.warn("Could not load Surah list from backend.");
+                 // Fallback to hardcoded list if backend fails
+                 loadHardcodedSurahList();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading Surah list:', error);
+             // Fallback to hardcoded list on error
+            loadHardcodedSurahList();
+        });
+}
+
+// Fallback function for hardcoded Surah list
+function loadHardcodedSurahList() {
+     const surahs = [
+        "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-An'am", "Al-A'raf", "Al-Anfal",
+        "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
+        "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan",
+        "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab",
+        "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
+        "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
+        "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadila",
+        "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
+        "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil",
+        "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
+        "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la",
+        "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Layl", "Ad-Duhaa", "Ash-Sharh", "At-Tin",
+        "Al-Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'ah", "At-Takathur",
+        "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
+        "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+    ];
+    const select = document.getElementById("surahList");
+     select.innerHTML = '<option value="">-- Select Surah --</option>'; // Clear before adding hardcoded list
+    surahs.forEach(surah => {
+        const option = document.createElement("option");
+        option.value = surah;
+        option.textContent = surah;
+        select.appendChild(option);
+    });
+     console.log("Loaded hardcoded Surah list.");
+}
+
+
+// Load Hadith topics (using the existing hardcoded list)
 function loadHadithTopics() {
     const topics = [
         "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience", "Hadith on Gratitude",
@@ -323,37 +545,11 @@ function loadHadithTopics() {
     });
 }
 
-function loadSurahList() {
-    const surahs = [
-        "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-An'am", "Al-A'raf", "Al-Anfal",
-        "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
-        "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan",
-        "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab",
-        "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
-        "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
-        "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadila",
-        "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
-        "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil",
-        "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
-        "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la",
-        "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Layl", "Ad-Duhaa", "Ash-Sharh", "At-Tin",
-        "Al-Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'ah", "At-Takathur",
-        "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
-        "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
-    ];
-    const select = document.getElementById("surahList");
-    surahs.forEach(surah => {
-        const option = document.createElement("option");
-        option.value = surah;
-        option.textContent = surah;
-        select.appendChild(option);
-    });
-}
 
 // Initialize Hadith topics and Surah list on page load
 document.addEventListener("DOMContentLoaded", () => {
     loadHadithTopics();
-    loadSurahList();
+    loadSurahList(); // Load Surah list from backend or fallback
 });
 </script>
 
