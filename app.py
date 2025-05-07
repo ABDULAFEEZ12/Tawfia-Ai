@@ -145,7 +145,11 @@ def ask():
 
     except requests.RequestException as e:
         print(f"DeepAI API Error: {e}")
-        return jsonify({'answer': 'Tawfiq AI is facing an issue with the external AI. Please try later.'})
+        # Check if it's a 500 error specifically, though a general error is okay too
+        if isinstance(e, requests.exceptions.HTTPError) and e.response.status_code == 500:
+             return jsonify({'answer': 'Tawfiq AI is facing a temporary issue with the external AI (server error). Please try later.'})
+        else:
+             return jsonify({'answer': 'Tawfiq AI is facing an issue with the external AI. Please try later.'})
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'Unexpected error. Try later.'})
