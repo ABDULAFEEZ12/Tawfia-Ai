@@ -176,13 +176,18 @@ def hadith_search():
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
-    # Remove common prefixes
-    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
+    # Normalize query by removing common prefixes
+    prefixes = ['hadith on ', 'hadith by ', 'hadith talking about ']
+    for prefix in prefixes:
+        if query.startswith(prefix):
+            query = query[len(prefix):].strip()
+
+    # Defensive: ensure hadith_data is loaded
+    global hadith_data
+    if not hadith_data:
+        return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
 
     try:
-        if not hadith_data:
-            return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
-
         structured_matches = []
         count = 0
         for volume in hadith_data.get('volumes', []):
