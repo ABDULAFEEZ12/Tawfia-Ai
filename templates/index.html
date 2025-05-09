@@ -141,18 +141,21 @@
     margin: 5px 0;
     padding: 0;
     background: none;
-    font-size: 1em;
   }
   .quran-verse p:first-child {
     font-weight: bold;
     color: #00796b;
     font-size: 1em;
   }
-  .quran-verse p:last-child {
+  .quran-verse p:nth-child(2) {
+    font-size: 1em;
+  }
+  .quran-verse p:nth-child(3) {
     font-size: 1.2em;
     direction: rtl;
     text-align: right;
     font-weight: normal;
+    margin-top: 5px;
   }
   /* Hadith entry styling */
   .hadith-entry {
@@ -166,14 +169,10 @@
     margin: 5px 0;
     padding: 0;
     background: none;
-    font-size: 1em;
   }
   .hadith-entry p:first-child {
     font-size: 0.9em;
     color: #ffa000;
-  }
-  .hadith-entry p:last-child {
-    font-size: 1em;
   }
   /* Toggle button styles */
   .toggle-btn {
@@ -443,6 +442,7 @@ function searchQuran() {
   loading.textContent = "Searching Quran...";
   resultDiv.appendChild(loading);
   quranSearchBtn.disabled = true;
+
   fetch('/quran-search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -458,12 +458,15 @@ function searchQuran() {
       data.results.forEach(verse => {
         const verseEl = document.createElement("div");
         verseEl.className = "quran-verse";
+
         const info = document.createElement("p");
         info.innerHTML = `<strong>${verse.surah_number}:${verse.verse_number}</strong>`;
         verseEl.appendChild(info);
+
         const trans = document.createElement("p");
         trans.textContent = verse.translation;
         verseEl.appendChild(trans);
+
         const arabic = document.createElement("p");
         arabic.textContent = verse.arabic_text;
         arabic.style.textAlign = 'right';
@@ -471,6 +474,16 @@ function searchQuran() {
         arabic.style.marginTop = '5px';
         arabic.style.direction = 'rtl';
         verseEl.appendChild(arabic);
+
+        // Add transliteration if available
+        if (verse.transliteration) {
+          const translitPara = document.createElement("p");
+          translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
+          translitPara.style.marginTop = '5px';
+          translitPara.style.fontSize = '0.95em';
+          verseEl.appendChild(translitPara);
+        }
+
         resultDiv.appendChild(verseEl);
       });
     } else if (data.result) {
@@ -562,7 +575,6 @@ function searchHadith() {
     console.error('Error:', error);
     resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
   }).finally(() => {
-    // Re-enable button
     document.getElementById("hadithSearchButton").disabled = false;
   });
 }
@@ -573,7 +585,6 @@ function loadSurahList() {
     .then(res => res.json())
     .then(data => {
       const select = document.getElementById("surahList");
-      // Clear existing options except first
       select.innerHTML = '<option value="">-- Or Select Surah --</option>';
       if (data.surahs && Array.isArray(data.surahs)) {
         data.surahs.forEach(surah => {
@@ -594,8 +605,8 @@ function loadSurahList() {
 // Fallback Surah list
 function loadHardcodedSurahList() {
   const surahs = [
-    "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-An'am", "Al-A'raf", "Al-Anfal",
-    "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
+    "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf", "Al-Anfal",
+    "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
     "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun", "An-Nur", "Al-Furqan",
     "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajda", "Al-Ahzab",
     "Saba", "Fatr", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
@@ -603,10 +614,10 @@ function loadHardcodedSurahList() {
     "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila",
     "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
     "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil",
-    "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
+    "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
     "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-Ala",
-    "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Lail", "Ad-Duhaa", "Ash-Sharh", "At-Tin",
-    "Al-Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'ah", "At-Takathur",
+    "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin",
+    "Al-Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur",
     "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
     "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
   ];
