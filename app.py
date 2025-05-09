@@ -39,8 +39,8 @@ hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
 
-# --- Custom transliteration function ---
-def arabic_to_latin(arabic_text):
+# --- Function for phonetic transliteration into English syllables ---
+def arabic_to_english_syllables(arabic_text):
     translit_map = {
         'ا': 'a',
         'ب': 'b',
@@ -70,11 +70,32 @@ def arabic_to_latin(arabic_text):
         'ه': 'h',
         'و': 'w',
         'ي': 'y',
-        # Add more mappings as needed
+        'ء': "'",
+        'ئ': 'i',
+        'ؤ': 'u',
+        'ة': 'a',
+        # Add common combinations for better phonetics
+        'لا': 'la',
+        'مر': 'mar',
+        'حب': 'hub',
+        'سلام': 'salaam',
+        # Add more as needed for better accuracy
     }
+
     result = ''
-    for ch in arabic_text:
-        result += translit_map.get(ch, ch)
+    i = 0
+    while i < len(arabic_text):
+        # Check for digraphs (two-character combinations)
+        if i + 1 < len(arabic_text):
+            pair = arabic_text[i:i+2]
+            if pair in translit_map:
+                result += translit_map[pair]
+                i += 2
+                continue
+        # Single character fallback
+        ch = arabic_text[i]
+        result += translit_map.get(ch, ch)  # default to original if not found
+        i += 1
     return result
 
 @app.route('/')
@@ -182,8 +203,8 @@ def quran_search():
 
             for v in surah_data['verses']:
                 arabic_text = v['text']['arab']
-                # Generate transliteration to Latin script
-                transliteration_text = arabic_to_latin(arabic_text)
+                # Generate phonetic transliteration into English syllables
+                transliteration_text = arabic_to_english_syllables(arabic_text)
                 structured_verses.append({
                     'surah_name': surah_data['name']['transliteration']['en'],
                     'surah_number': surah_number,
