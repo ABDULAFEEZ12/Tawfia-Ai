@@ -4,7 +4,7 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv  # type: ignore
 import os
-from transliterate import translit  # Updated import for transliterate
+from transliterate import translit  # Keep if you still want to use transliterate elsewhere
 
 # Load environment variables from .env file
 load_dotenv()
@@ -38,6 +38,44 @@ def load_json_data(file_name, data_variable_name):
 hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
+
+# --- Custom transliteration function ---
+def arabic_to_latin(arabic_text):
+    translit_map = {
+        'ا': 'a',
+        'ب': 'b',
+        'ت': 't',
+        'ث': 'th',
+        'ج': 'j',
+        'ح': 'h',
+        'خ': 'kh',
+        'د': 'd',
+        'ذ': 'dh',
+        'ر': 'r',
+        'ز': 'z',
+        'س': 's',
+        'ش': 'sh',
+        'ص': 's',
+        'ض': 'd',
+        'ط': 't',
+        'ظ': 'z',
+        'ع': 'a',
+        'غ': 'gh',
+        'ف': 'f',
+        'ق': 'q',
+        'ك': 'k',
+        'ل': 'l',
+        'م': 'm',
+        'ن': 'n',
+        'ه': 'h',
+        'و': 'w',
+        'ي': 'y',
+        # Add more mappings as needed
+    }
+    result = ''
+    for ch in arabic_text:
+        result += translit_map.get(ch, ch)
+    return result
 
 @app.route('/')
 def index():
@@ -145,7 +183,7 @@ def quran_search():
             for v in surah_data['verses']:
                 arabic_text = v['text']['arab']
                 # Generate transliteration to Latin script
-                transliteration_text = translit(arabic_text, 'lat')  # 'lat' for Latin script
+                transliteration_text = arabic_to_latin(arabic_text)
                 structured_verses.append({
                     'surah_name': surah_data['name']['transliteration']['en'],
                     'surah_number': surah_number,
