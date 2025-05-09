@@ -4,7 +4,7 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv  # type: ignore
 import os
-from pyarabic.araby import transliterate  # Import transliterate function
+from transliterate import translit  # Updated import for transliterate
 
 # Load environment variables from .env file
 load_dotenv()
@@ -144,8 +144,8 @@ def quran_search():
 
             for v in surah_data['verses']:
                 arabic_text = v['text']['arab']
-                # Generate transliteration
-                transliteration_text = transliterate(arabic_text, 'lat')  # Latin script
+                # Generate transliteration to Latin script
+                transliteration_text = translit(arabic_text, 'lat')  # 'lat' for Latin script
                 structured_verses.append({
                     'surah_name': surah_data['name']['transliteration']['en'],
                     'surah_number': surah_number,
