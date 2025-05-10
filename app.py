@@ -15,6 +15,11 @@ hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 if not hf_token:
     print("❌ ERROR: Hugging Face API token not found. Please set HUGGINGFACE_API_TOKEN in your environment.")
 
+# Get OpenRouter API key from environment variables
+openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+if not openrouter_api_key:
+    print("❌ ERROR: OpenRouter API key not found. Please set OPENROUTER_API_KEY in your environment.")
+
 # --- Function to load JSON data with proper path handling ---
 def load_json_data(file_name, data_variable_name):
     """Loads JSON data from the DATA directory relative to the app.py file."""
@@ -75,48 +80,40 @@ def ask():
             print(f"📚 Found close match in basic_knowledge for: {question} -> {best_match}")
             return jsonify({'answer': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
 
-    # --- Step 3: Fallback to Hugging Face API with custom endpoint ---
-    print(f"☁️ No local match found for: {question}. Consulting Hugging Face.")
+    # --- Step 3: Fallback to OpenRouter.ai API ---
+    print(f"☁️ No local match found for: {question}. Consulting OpenRouter.")
 
-    if not hf_token:
-        print("❌ ERROR: Hugging Face API key not found in environment variables.")
+    if not openrouter_api_key:
+        print("❌ ERROR: OpenRouter API key not found in environment variables.")
         return jsonify({'answer': 'Tawfiq AI is not configured correctly (API key missing). Please contact the admin.'})
 
-    # Use the custom Hugging Face API endpoint
-    hf_api_url = "https://router.huggingface.co/novita/v3/openai/chat/completions"
+    openrouter_api_url = "https://api.openrouter.ai/v1/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {hf_token}",
+        "Authorization": f"Bearer {openrouter_api_key}",
         "Content-Type": "application/json"
     }
 
     # Construct the message payload
     messages = [
-        {
-            "role": "user",
-            "content": question
-        }
+        {"role": "user", "content": question}
     ]
 
     payload = {
+        "model": "your-model-name-here",  # Replace with your OpenRouter model
         "messages": messages,
-        "model": "deepseek/deepseek-prover-v2-671b",
         "stream": False
     }
 
     try:
-        hf_response = requests.post(hf_api_url, headers=headers, json=payload)
-        hf_response.raise_for_status()
-        result_json = hf_response.json()
+        response = requests.post(openrouter_api_url, headers=headers, json=payload)
+        response.raise_for_status()
+        result_json = response.json()
 
-        # Handle different response formats
+        # Parse response based on expected format
         answer = ""
         if 'choices' in result_json and isinstance(result_json['choices'], list) and len(result_json['choices']) > 0:
-            answer = result_json['choices'][0].get('text', '')
-        elif 'generated_text' in result_json:
-            answer = result_json['generated_text']
-        elif isinstance(result_json, list) and len(result_json) > 0:
-            answer = result_json[0].get('text', '')
+            answer = result_json['choices'][0].get('message', {}).get('content', '')
         else:
             answer = str(result_json)
 
@@ -128,7 +125,7 @@ def ask():
         return jsonify({'answer': answer})
 
     except requests.RequestException as e:
-        print(f"Hugging Face API Error: {e}")
+        print(f"OpenRouter API Error: {e}")
         return jsonify({'answer': 'Tawfiq AI is facing an issue with the external AI. Please try later.'})
     except Exception as e:
         print(f"Unexpected error: {e}")
