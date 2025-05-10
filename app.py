@@ -76,32 +76,32 @@ def ask():
             print(f"📚 Found close match in basic_knowledge for: {question} -> {best_match}")
             return jsonify({'answer': basic_knowledge_data[best_match], 'note': f"Showing result for '{best_match}':"})
 
-    # --- Step 3: Fallback to Hugging Face API with Islamic Prompt ---
+    # --- Step 3: Fallback to Hugging Face API with custom endpoint ---
     print(f"☁️ No local match found for: {question}. Consulting Hugging Face.")
 
     if not hf_token:
         print("❌ ERROR: Hugging Face API key not found in environment variables.")
         return jsonify({'answer': 'Tawfiq AI is not configured correctly (API key missing). Please contact the admin.'})
 
-    # Updated model URL to DialoGPT-medium
-    hf_api_url = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
+    hf_api_url = "https://router.huggingface.co/novita/v3/openai/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {hf_token}"
+        "Authorization": f"Bearer {hf_token}",
+        "Content-Type": "application/json"
     }
 
-    islamic_prompt = (
-        "You are Tawfiq AI, an Islamic assistant. Your purpose is to provide information strictly based on the Quran and authentic Hadith."
-        " Answer only questions related to Islam. If a question is not about Islam, politely decline to answer it and state that you can only answer Islamic questions."
-        " Do not provide opinions or information from other sources. Focus on factual Islamic knowledge."
-        f"\n\nUser Question: {question}"
-        "\n\nAI Answer:"
-    )
+    # Construct the message payload for the API
+    messages = [
+        {
+            "role": "user",
+            "content": question
+        }
+    ]
 
     payload = {
-        "inputs": islamic_prompt,
-        # Optional parameters:
-        # "parameters": {"max_length": 200, "temperature": 0.7}
+        "messages": messages,
+        "model": "deepseek/deepseek-prover-v2-671b",
+        "stream": False
     }
 
     try:
@@ -109,18 +109,20 @@ def ask():
         hf_response.raise_for_status()
         result_json = hf_response.json()
 
-        # Handle different response formats
-        if isinstance(result_json, list) and len(result_json) > 0:
-            answer = result_json[0].get('generated_text', '')
-        elif isinstance(result_json, dict):
+        # Handle different response formats depending on API response
+        answer = ""
+        if 'choices' in result_json and isinstance(result_json['choices'], list) and len(result_json['choices']) > 0:
+            answer = result_json['choices'][0].get('text', '')
+        elif 'generated_text' in result_json:
             answer = result_json.get('generated_text', '')
+        elif isinstance(result_json, list) and len(result_json) > 0:
+            answer = result_json[0].get('text', '')
         else:
             answer = str(result_json)
 
-        # Check for decline phrases
-        declined_phrases = ["i cannot answer", "not related to islam", "i can only answer islamic questions"]
-        answer_lower = answer.lower()
-        if any(phrase in answer_lower for phrase in declined_phrases):
+        # Optional: check for decline phrases
+        decline_phrases = ["i cannot answer", "not related to islam", "i can only answer islamic questions"]
+        if any(phrase in answer.lower() for phrase in decline_phrases):
             return jsonify({'answer': "I apologize, but I can only provide information related to Islam based on the Quran and authentic Hadith."})
 
         return jsonify({'answer': answer})
