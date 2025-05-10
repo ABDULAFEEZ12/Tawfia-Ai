@@ -14,7 +14,6 @@ app = Flask(__name__)
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 if not hf_token:
     print("❌ ERROR: Hugging Face API token not found. Please set HUGGINGFACE_API_TOKEN in your environment.")
-    # Optional: exit(1)
 
 # --- Function to load JSON data with proper path handling ---
 def load_json_data(file_name, data_variable_name):
@@ -83,6 +82,7 @@ def ask():
         print("❌ ERROR: Hugging Face API key not found in environment variables.")
         return jsonify({'answer': 'Tawfiq AI is not configured correctly (API key missing). Please contact the admin.'})
 
+    # Use the custom Hugging Face API endpoint
     hf_api_url = "https://router.huggingface.co/novita/v3/openai/chat/completions"
 
     headers = {
@@ -90,7 +90,7 @@ def ask():
         "Content-Type": "application/json"
     }
 
-    # Construct the message payload for the API
+    # Construct the message payload
     messages = [
         {
             "role": "user",
@@ -109,18 +109,18 @@ def ask():
         hf_response.raise_for_status()
         result_json = hf_response.json()
 
-        # Handle different response formats depending on API response
+        # Handle different response formats
         answer = ""
         if 'choices' in result_json and isinstance(result_json['choices'], list) and len(result_json['choices']) > 0:
             answer = result_json['choices'][0].get('text', '')
         elif 'generated_text' in result_json:
-            answer = result_json.get('generated_text', '')
+            answer = result_json['generated_text']
         elif isinstance(result_json, list) and len(result_json) > 0:
             answer = result_json[0].get('text', '')
         else:
             answer = str(result_json)
 
-        # Optional: check for decline phrases
+        # Check for decline phrases
         decline_phrases = ["i cannot answer", "not related to islam", "i can only answer islamic questions"]
         if any(phrase in answer.lower() for phrase in decline_phrases):
             return jsonify({'answer': "I apologize, but I can only provide information related to Islam based on the Quran and authentic Hadith."})
@@ -147,7 +147,7 @@ def quran_search():
         response.raise_for_status()
         surahs = response.json()['data']
 
-        surah_names = {surah['name']['transliteration']['en'].lower(): surah['number'] for surah in surahs}
+        surah_names = {s['name']['transliteration']['en'].lower(): s['number'] for s in surahs}
         close_matches = get_close_matches(query, surah_names.keys(), n=1, cutoff=0.6)
 
         if close_matches:
@@ -184,6 +184,7 @@ def hadith_search():
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
+    # Remove common prefixes
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     if not hadith_data:
