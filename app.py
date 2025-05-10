@@ -10,17 +10,6 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# --- 1. Define the system prompt for Tawfiq AI ---
-SYSTEM_PROMPT = {
-    "role": "system",
-    "content": (
-        "You are Tawfiq AI, a helpful Islamic assistant trained to answer based on the Quran, Sahih Hadith, "
-        "and verified Islamic scholarship. You follow Sunni teachings. Always clarify that you are a religious "
-        "assistant built for Muslims and those seeking Islamic guidance. Avoid saying you're neutral or don't "
-        "have a religious identity. If a question goes against Islam, politely explain why and decline to answer."
-    )
-)
-
 # Get Hugging Face API token from environment variables
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 if not hf_token:
@@ -33,7 +22,7 @@ if not openrouter_api_key:
 
 # --- Function to load JSON data with proper path handling ---
 def load_json_data(file_name, data_variable_name):
-    """Loads JSON data from the DATA directory relative to this script."""
+    """Loads JSON data from the DATA directory relative to the app.py file."""
     data = {}
     file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
@@ -105,17 +94,16 @@ def ask():
         "Content-Type": "application/json"
     }
 
-    # --- 2. Prepare messages with system prompt ---
+    # Construct the message payload
     messages = [
-        SYSTEM_PROMPT,
         {"role": "user", "content": question}
     ]
 
     payload = {
-        "model": "anthropic/claude-3-opus",  # <-- Update as needed
+        "model": "anthropic/claude-3-opus",  # <-- Updated model name
         "messages": messages,
         "stream": False
-        # Add max_tokens, response_format, etc., if needed
+        # You can add max_tokens, response_format, etc., if needed
     }
 
     try:
@@ -123,25 +111,17 @@ def ask():
         response.raise_for_status()
         result_json = response.json()
 
+        # Parse response based on expected format
         answer = ""
         if 'choices' in result_json and isinstance(result_json['choices'], list) and len(result_json['choices']) > 0:
             answer = result_json['choices'][0].get('message', {}).get('content', '')
+        else:
+            answer = str(result_json)
 
-        # --- 3. Ban Neutral Responses ---
-        neutral_phrases = [
-            "i cannot answer",
-            "not related to islam",
-            "i can only answer islamic questions",
-            "i don't have a religion",
-            "as an ai developed by",
-            "i can't say one religion is best"
-        ]
-
-        if any(phrase in answer.lower() for phrase in neutral_phrases):
-            answer = (
-                "As Tawfiq AI, I believe Islam is the final and complete religion revealed to mankind "
-                "through the Prophet Muhammad (peace be upon him), as taught in the Quran and authentic Hadith."
-            )
+        # Check for decline phrases
+        decline_phrases = ["i cannot answer", "not related to islam", "i can only answer islamic questions"]
+        if any(phrase in answer.lower() for phrase in decline_phrases):
+            return jsonify({'answer': "I apologize, but I can only provide information related to Islam based on the Quran and authentic Hadith."})
 
         return jsonify({'answer': answer})
 
