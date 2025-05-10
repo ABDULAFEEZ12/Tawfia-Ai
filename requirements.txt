@@ -5,3 +5,5 @@ requests
 python-dotenv
 python-dotenv
 transliterate
+transformers
+huggingface_hub
