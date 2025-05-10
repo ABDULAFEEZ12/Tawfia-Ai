@@ -87,7 +87,7 @@ def ask():
         print("❌ ERROR: OpenRouter API key not found in environment variables.")
         return jsonify({'answer': 'Tawfiq AI is not configured correctly (API key missing). Please contact the admin.'})
 
-    openrouter_api_url = "https://api.openrouter.ai/v1/chat/completions"
+    openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
 
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
@@ -100,9 +100,10 @@ def ask():
     ]
 
     payload = {
-        "model": "your-model-name-here",  # Replace with your OpenRouter model
+        "model": "your-model-name-here",  # <-- Replace with your actual OpenRouter model name
         "messages": messages,
         "stream": False
+        # Add other parameters if needed, e.g., response_format, max_tokens, etc.
     }
 
     try:
