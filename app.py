@@ -14,8 +14,7 @@ app = Flask(__name__)
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 if not hf_token:
     print("❌ ERROR: Hugging Face API token not found. Please set HUGGINGFACE_API_TOKEN in your environment.")
-    # Optionally, you could exit here if token is missing
-    # exit(1)
+    # Optional: exit(1)
 
 # --- Function to load JSON data with proper path handling ---
 def load_json_data(file_name, data_variable_name):
@@ -84,7 +83,8 @@ def ask():
         print("❌ ERROR: Hugging Face API key not found in environment variables.")
         return jsonify({'answer': 'Tawfiq AI is not configured correctly (API key missing). Please contact the admin.'})
 
-    hf_api_url = "https://api-inference.huggingface.co/models/EleutherAI/gpt-neo-2.7B"  # Change as needed
+    # Updated model URL to DialoGPT-medium
+    hf_api_url = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
 
     headers = {
         "Authorization": f"Bearer {hf_token}"
