@@ -100,10 +100,10 @@ def ask():
     ]
 
     payload = {
-        "model": "your-model-name-here",  # <-- Replace with your actual OpenRouter model name
+        "model": "anthropic/claude-3-opus",  # <-- Updated model name
         "messages": messages,
         "stream": False
-        # Add other parameters if needed, e.g., response_format, max_tokens, etc.
+        # You can add max_tokens, response_format, etc., if needed
     }
 
     try:
