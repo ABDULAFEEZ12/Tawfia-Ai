@@ -48,7 +48,7 @@ def ask():
     if not question:
         return jsonify({'answer': 'Please type a question.'})
 
-    # Step 1: Friendly Responses
+    # Step 1: Friendly Responses (check for exact + close match)
     if friendly_responses_data:
         if question_lower in friendly_responses_data:
             return jsonify({'answer': friendly_responses_data[question_lower]})
@@ -57,15 +57,10 @@ def ask():
         if close_matches:
             return jsonify({'answer': friendly_responses_data[close_matches[0]]})
 
-    # Step 2: Basic Islamic Knowledge
+    # Step 2: Basic Islamic Knowledge (check for exact match ONLY)
     if basic_knowledge_data:
         if question_lower in basic_knowledge_data:
             return jsonify({'answer': basic_knowledge_data[question_lower]})
-
-        close_matches = get_close_matches(question_lower, basic_knowledge_data.keys(), n=1, cutoff=0.8)
-        if close_matches:
-            match = close_matches[0]
-            return jsonify({'answer': basic_knowledge_data[match], 'note': f"Showing result for '{match}':"})
 
     # Step 3: General Islamic + World Knowledge via OpenRouter
     print(f"☁️ No local match found. Querying OpenRouter.")
