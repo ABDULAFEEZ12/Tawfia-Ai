@@ -1,3 +1,8 @@
+# Tawfiq AI
+# Created by: Tella Abdul Afeez Adewale
+# Launch Year: 2025
+# Purpose: To assist Muslims with Islamic and general knowledge in a trustworthy, kind, and clear way.
+
 from flask import Flask, request, jsonify, render_template
 import requests
 import json
@@ -40,6 +45,15 @@ friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Re
 def index():
     return render_template('index.html')
 
+@app.route('/about')
+def about():
+    return jsonify({
+        'name': 'Tawfiq AI',
+        'creator': 'Tella Abdul Afeez Adewale',
+        'year_created': 2025,
+        'description': 'Tawfiq AI is a wise, kind, and trustworthy Muslim assistant designed to help people with Islamic and general knowledge.'
+    })
+
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
@@ -49,7 +63,7 @@ def ask():
     if not question:
         return jsonify({'answer': 'Please type a question.'})
 
-    # Step 1: Friendly Responses (exact + close match)
+    # Step 1: Friendly Responses
     if friendly_responses_data:
         if question_lower in friendly_responses_data:
             return jsonify({'answer': friendly_responses_data[question_lower]})
@@ -58,7 +72,7 @@ def ask():
         if close_matches:
             return jsonify({'answer': friendly_responses_data[close_matches[0]]})
 
-    # Step 2: Basic Islamic Knowledge (exact match only)
+    # Step 2: Basic Islamic Knowledge
     if basic_knowledge_data and question_lower in basic_knowledge_data:
         return jsonify({'answer': basic_knowledge_data[question_lower]})
 
@@ -99,7 +113,6 @@ def ask():
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter out generic or neutral disclaimers
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -122,7 +135,7 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-# Quran search
+# Quran Search Route
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
@@ -165,7 +178,7 @@ def quran_search():
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
-# Hadith search
+# Hadith Search Route
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
