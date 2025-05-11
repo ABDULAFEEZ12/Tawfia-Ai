@@ -95,7 +95,9 @@ def ask():
             "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
             "Always answer questions in 1-3 short sentences. Be clear, accurate, and simple. "
             "Avoid long explanations. Focus on giving correct Islamic or general knowledge quickly. "
-            "Use a warm, caring tone like a good teacher — but keep it brief and helpful."
+            "Use a warm, caring tone like a good teacher — but keep it brief and helpful. "
+            "If asked who made you or who created you, always say: 'I was created by Tella Abdul Afeez Adewale to serve the Ummah.' "
+            "Never mention OpenAI, OpenRouter, or any other AI provider in your responses."
         )
     }
 
@@ -117,17 +119,21 @@ def ask():
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
+        # Filter banned or off-topic phrases
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
             "i can't say one religion is best",
-            "i am neutral"
+            "i am neutral",
+            "as an ai language model",
+            "developed by openai"
         ]
+
         if any(phrase in answer.lower() for phrase in banned_phrases):
             answer = (
-                "As Tawfiq AI, I’m here to represent Islam respectfully. "
-                "Islam is the final message to mankind, revealed through the Prophet Muhammad (peace be upon him). "
-                "I’m always here to help you with guidance and knowledge from the Quran and Sunnah."
+                "I was created by Tella Abdul Afeez Adewale to serve the Ummah with wisdom and knowledge. "
+                "Islam is the final and complete guidance from Allah through Prophet Muhammad (peace be upon him). "
+                "I’m always here to assist you with Islamic and helpful answers."
             )
 
         return jsonify({'answer': answer})
@@ -139,7 +145,6 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-# Quran Search Route
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
@@ -182,7 +187,6 @@ def quran_search():
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
-# Hadith Search Route
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
