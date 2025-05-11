@@ -1,8 +1,3 @@
-# Tawfiq AI
-# Created by: Tella Abdul Afeez Adewale
-# Launch Year: 2025
-# Purpose: To assist Muslims with Islamic and general knowledge in a trustworthy, kind, and clear way.
-
 from flask import Flask, request, jsonify, render_template
 import requests
 import json
@@ -76,7 +71,16 @@ def ask():
     if basic_knowledge_data and question_lower in basic_knowledge_data:
         return jsonify({'answer': basic_knowledge_data[question_lower]})
 
-    # Step 3: General Knowledge via OpenRouter GPT-4 Turbo
+    # Step 3: Hadith Data
+    if hadith_data:
+        for volume in hadith_data.get('volumes', []):
+            for book in volume.get('books', []):
+                for hadith in book.get('hadiths', []):
+                    text = hadith.get('text', '').lower()
+                    if question_lower in text:
+                        return jsonify({'answer': hadith.get('text', 'No match found in Hadith.')})
+
+    # Step 4: General Knowledge via OpenRouter GPT-4 Turbo
     print(f"☁️ No local match found. Querying OpenRouter (GPT-4 Turbo).")
 
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
