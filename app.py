@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import json
 from difflib import get_close_matches
-from dotenv import load_dotenv  # type: ignore
+from dotenv import load_dotenv
 import os
 
 # Load environment variables from .env file
@@ -67,7 +67,7 @@ def ask():
             match = close_matches[0]
             return jsonify({'answer': basic_knowledge_data[match], 'note': f"Showing result for '{match}':"})
 
-    # Step 3: Query OpenRouter with Tawfiq AI personality
+    # Step 3: General Islamic + World Knowledge via OpenRouter
     print(f"☁️ No local match found. Querying OpenRouter.")
 
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
@@ -79,11 +79,11 @@ def ask():
     system_message = {
         "role": "system",
         "content": (
-            "You are Tawfiq AI, a helpful Islamic assistant trained to answer based on the Quran, "
-            "Sahih Hadith, and verified Islamic scholarship. You follow Sunni teachings. Always clarify "
-            "that you are a religious assistant built for Muslims and those seeking Islamic guidance. Avoid "
-            "saying you're neutral or don't have a religious identity. If a question goes against Islam, "
-            "politely explain why and decline to answer."
+            "You are Tawfiq AI, a kind, helpful, and knowledgeable Muslim assistant. "
+            "You answer based on the Quran, Sahih Hadith, and verified Islamic scholarship, and you also know about general topics. "
+            "You are very friendly, conversational, and avoid robotic replies. Make people feel heard. "
+            "You always represent Islam positively and explain Islamic values with wisdom and kindness. "
+            "If a question is against Islamic values, politely explain why and offer a better alternative."
         )
     }
 
@@ -105,7 +105,7 @@ def ask():
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Check for neutral or unwanted language and override
+        # Check for neutral or inappropriate AI disclaimers
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -115,18 +115,18 @@ def ask():
 
         if any(phrase in answer.lower() for phrase in banned_phrases):
             answer = (
-                "As Tawfiq AI, I believe Islam is the final and complete religion revealed to mankind "
-                "through the Prophet Muhammad (peace be upon him), as taught in the Quran and authentic Hadith."
+                "As Tawfiq AI, I’m here to represent Islam respectfully. Islam is the final message to mankind, "
+                "revealed through the Prophet Muhammad (peace be upon him), and I’m always happy to help with guidance!"
             )
 
         return jsonify({'answer': answer})
 
     except requests.RequestException as e:
         print(f"OpenRouter API Error: {e}")
-        return jsonify({'answer': 'Tawfiq AI is having issues accessing external knowledge. Try again later.'})
+        return jsonify({'answer': 'Tawfiq AI is having trouble reaching external knowledge. Try again later.'})
     except Exception as e:
         print(f"Unexpected error: {e}")
-        return jsonify({'answer': 'Unexpected error occurred. Please try again later.'})
+        return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
 # Quran search
 @app.route('/quran-search', methods=['POST'])
