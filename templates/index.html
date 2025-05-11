@@ -129,15 +129,13 @@
   .user-message {
     background: rgba(0, 150, 136, 0.2);
   }
-  /* Quran verse styling */
+  /* Quran result styling */
   .quran-verse {
     border: 1px solid #eee;
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 10px;
     background: rgba(0, 150, 136, 0.05);
-    display: flex;
-    flex-direction: column;
   }
   .quran-verse p {
     margin: 5px 0;
@@ -369,9 +367,6 @@
 <div class="results" id="hadithResult"></div>
 </div>
 
-<!-- Hidden audio player for recitations -->
-<audio id="audioPlayer" controls style="display:none; width: 100%; max-width: 600px; margin-top:20px;"></audio>
-
 <script>
 function switchTab(sectionId, event) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -480,17 +475,14 @@ function searchQuran() {
         arabic.style.direction = 'rtl';
         verseEl.appendChild(arabic);
 
-        // Add recitation play button
-        const playBtn = document.createElement("button");
-        playBtn.textContent = "▶️ Play Recitation";
-        playBtn.style.marginTop = "10px";
-        playBtn.onclick = () => {
-          const audio = document.getElementById("audioPlayer");
-          audio.src = verse.recitation_url;
-          audio.style.display = "block"; // Show controls
-          audio.play();
-        };
-        verseEl.appendChild(playBtn);
+        // Add transliteration if available
+        if (verse.transliteration) {
+          const translitPara = document.createElement("p");
+          translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
+          translitPara.style.marginTop = '5px';
+          translitPara.style.fontSize = '0.95em';
+          verseEl.appendChild(translitPara);
+        }
 
         resultDiv.appendChild(verseEl);
       });
