@@ -156,13 +156,16 @@ def quran_search():
             structured_verses = []
 
             for v in surah_data['verses']:
+                # Add the recitation URL
+                audio_url = f"http://verses.quran.com/{'quran-simple'}/{surah_number}/{v['number']['inSurah']}"  # Recitation URL
+
                 structured_verses.append({
                     'surah_name': surah_data['name']['transliteration']['en'],
                     'surah_number': surah_number,
                     'verse_number': v['number']['inSurah'],
                     'translation': v['translation']['en'],
                     'arabic_text': v['text']['arab'],
-                    'audio_url': f"http://api.alquran.cloud/edition/{'quran-simple'}"  # Recitation URL added
+                    'audio_url': audio_url  # Corrected recitation URL
                 })
 
             return jsonify({'surah_title': surah_title, 'results': structured_verses})
