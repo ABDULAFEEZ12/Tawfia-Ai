@@ -170,11 +170,12 @@ def quran_search():
             surah_title = f"{surah_data['name']['transliteration']['en']} ({surah_data['name']['short']})"
             structured_verses = []
 
+            # Choose your reciter here; you can make this dynamic
+            reciter_name = "Mishary Rashid Alafasy"  # For example
+            reciter_folder = RECITER_FOLDER_MAP.get(reciter_name, "mishary_rashid_alafasy")
+
             for v in surah_data['verses']:
                 verse_number = v['number']['inSurah']
-                # For recitation URLs, select a reciter
-                reciter_name = 'mishary_rashid_alafasy'  # Change as needed
-                reciter_folder = RECITER_FOLDER_MAP.get("Mishary Rashid Alafasy", "mishary_rashid_alafasy")
                 recitation_url = generate_quranicaudio_url(reciter_folder, surah_number, verse_number)
 
                 structured_verses.append({
