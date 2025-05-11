@@ -35,6 +35,21 @@ hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
 
+def generate_quranicaudio_url(reciter_folder_name, surah_number, verse_number):
+    """
+    Generate a URL for Quranic verse recitation on quranicaudio.com.
+    """
+    surah_str = f"{surah_number:03d}"  # Zero-pad to 3 digits
+    verse_str = f"{verse_number:03d}"  # Zero-pad to 3 digits
+    url = f"https://downloads.quranicaudio.com/recitations/{reciter_folder_name}/{surah_str}/{verse_str}.mp3"
+    return url
+
+# Example mapping of reciter display names to folder names
+RECITER_FOLDER_MAP = {
+    "Mishary Rashid Alafasy": "mishary_rashid_alafasy",
+    # Add other reciters here as needed
+}
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -129,7 +144,7 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-# Quran search
+# Quran search route
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
@@ -156,12 +171,19 @@ def quran_search():
             structured_verses = []
 
             for v in surah_data['verses']:
+                verse_number = v['number']['inSurah']
+                # For recitation URLs, select a reciter
+                reciter_name = 'mishary_rashid_alafasy'  # Change as needed
+                reciter_folder = RECITER_FOLDER_MAP.get("Mishary Rashid Alafasy", "mishary_rashid_alafasy")
+                recitation_url = generate_quranicaudio_url(reciter_folder, surah_number, verse_number)
+
                 structured_verses.append({
                     'surah_name': surah_data['name']['transliteration']['en'],
                     'surah_number': surah_number,
-                    'verse_number': v['number']['inSurah'],
+                    'verse_number': verse_number,
                     'translation': v['translation']['en'],
-                    'arabic_text': v['text']['arab']
+                    'arabic_text': v['text']['arab'],
+                    'recitation_url': recitation_url
                 })
 
             return jsonify({'surah_title': surah_title, 'results': structured_verses})
@@ -172,7 +194,7 @@ def quran_search():
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
-# Hadith search
+# Hadith search route
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
