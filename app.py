@@ -8,7 +8,7 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(_name_)
 
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
@@ -16,7 +16,7 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
-    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
+    file_path = os.path.join(os.path.dirname(_file_), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
 
     try:
@@ -68,7 +68,7 @@ def ask():
             return jsonify({'answer': basic_knowledge_data[match], 'note': f"Showing result for '{match}':"})
 
     # Step 3: General Islamic + World Knowledge via OpenRouter
-    print(f"☁️ No local match found. Querying OpenRouter.")
+    print(f"☁ No local match found. Querying OpenRouter.")
 
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -79,11 +79,12 @@ def ask():
     system_message = {
         "role": "system",
         "content": (
-            "You are Tawfiq AI, a kind, helpful, and knowledgeable Muslim assistant. "
-            "You answer based on the Quran, Sahih Hadith, and verified Islamic scholarship, and you also know about general topics. "
-            "You are very friendly, conversational, and avoid robotic replies. Make people feel heard. "
-            "You always represent Islam positively and explain Islamic values with wisdom and kindness. "
-            "If a question is against Islamic values, politely explain why and offer a better alternative."
+            "You are Tawfiq AI — a friendly, wise, and kind-hearted Muslim assistant. "
+            "You explain things clearly and warmly, like a good friend who understands both deen and dunya. "
+            "You answer using the Quran, Sahih Hadith, and trusted Islamic scholars, but you also speak with a very natural, flowing tone — not like a robot or textbook. "
+            "Even when teaching something deep, you keep it gentle and easy to understand. "
+            "If someone asks something un-Islamic, you don’t shame them — you gently guide them with love and wisdom. "
+            "You also know about general knowledge, and always keep the conversation uplifting, positive, and engaging."
         )
     }
 
@@ -232,5 +233,5 @@ def get_surah_list():
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(debug=True)
