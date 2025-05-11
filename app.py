@@ -49,7 +49,7 @@ def ask():
     if not question:
         return jsonify({'answer': 'Please type a question.'})
 
-    # Step 1: Friendly Responses
+    # Step 1: Friendly Responses (exact + close match)
     if friendly_responses_data:
         if question_lower in friendly_responses_data:
             return jsonify({'answer': friendly_responses_data[question_lower]})
@@ -58,7 +58,7 @@ def ask():
         if close_matches:
             return jsonify({'answer': friendly_responses_data[close_matches[0]]})
 
-    # Step 2: Basic Islamic Knowledge
+    # Step 2: Basic Islamic Knowledge (exact match only)
     if basic_knowledge_data and question_lower in basic_knowledge_data:
         return jsonify({'answer': basic_knowledge_data[question_lower]})
 
@@ -97,15 +97,7 @@ def ask():
         response.raise_for_status()
         result = response.json()
 
-        raw_answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
-
-        # Basic formatting enhancements
-        formatted_answer = raw_answer.replace('\n\n', '<br><br>').replace('\n', '<br>')
-
-        # Bold common Islamic terms
-        bold_terms = ['Allah', 'Prophet Muhammad', 'Quran', 'Hadith', 'Islam', 'Muslim']
-        for term in bold_terms:
-            formatted_answer = formatted_answer.replace(term, f"<b>{term}</b>")
+        answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
         # Filter out generic or neutral disclaimers
         banned_phrases = [
@@ -114,14 +106,14 @@ def ask():
             "i can't say one religion is best",
             "i am neutral"
         ]
-        if any(phrase in raw_answer.lower() for phrase in banned_phrases):
-            formatted_answer = (
-                "<b>As Tawfiq AI</b>, I’m here to represent <b>Islam</b> respectfully.<br><br>"
-                "<b>Islam</b> is the final message to mankind, revealed through the <b>Prophet Muhammad</b> (peace be upon him). "
-                "I’m always here to help you with guidance and knowledge from the <b>Quran</b> and <b>Sunnah</b>."
+        if any(phrase in answer.lower() for phrase in banned_phrases):
+            answer = (
+                "As Tawfiq AI, I’m here to represent Islam respectfully. "
+                "Islam is the final message to mankind, revealed through the Prophet Muhammad (peace be upon him). "
+                "I’m always here to help you with guidance and knowledge from the Quran and Sunnah."
             )
 
-        return jsonify({'answer': formatted_answer})
+        return jsonify({'answer': answer})
 
     except requests.RequestException as e:
         print(f"OpenRouter API Error: {e}")
@@ -130,6 +122,7 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
+# Quran search
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
@@ -172,6 +165,7 @@ def quran_search():
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
+# Hadith search
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
