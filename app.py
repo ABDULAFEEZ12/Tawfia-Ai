@@ -5,7 +5,7 @@ from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -31,6 +31,7 @@ def load_json_data(file_name, data_variable_name):
         print(f"❌ Unexpected error while loading {file_name}: {e}")
     return data
 
+# Load local data
 hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
@@ -48,7 +49,7 @@ def ask():
     if not question:
         return jsonify({'answer': 'Please type a question.'})
 
-    # Step 1: Friendly Responses (check for exact + close match)
+    # Step 1: Friendly Responses (exact + close match)
     if friendly_responses_data:
         if question_lower in friendly_responses_data:
             return jsonify({'answer': friendly_responses_data[question_lower]})
@@ -57,13 +58,12 @@ def ask():
         if close_matches:
             return jsonify({'answer': friendly_responses_data[close_matches[0]]})
 
-    # Step 2: Basic Islamic Knowledge (check for exact match ONLY)
-    if basic_knowledge_data:
-        if question_lower in basic_knowledge_data:
-            return jsonify({'answer': basic_knowledge_data[question_lower]})
+    # Step 2: Basic Islamic Knowledge (exact match only)
+    if basic_knowledge_data and question_lower in basic_knowledge_data:
+        return jsonify({'answer': basic_knowledge_data[question_lower]})
 
-    # Step 3: General Islamic + World Knowledge via OpenRouter
-    print(f"☁️ No local match found. Querying OpenRouter.")
+    # Step 3: General Knowledge via OpenRouter GPT-4 Turbo
+    print(f"☁️ No local match found. Querying OpenRouter (GPT-4 Turbo).")
 
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -74,12 +74,10 @@ def ask():
     system_message = {
         "role": "system",
         "content": (
-            "You are Tawfiq AI — a friendly, wise, and kind-hearted Muslim assistant. "
-            "You explain things clearly and warmly, like a good friend who understands both deen and dunya. "
-            "You answer using the Quran, Sahih Hadith, and trusted Islamic scholars, but you also speak with a very natural, flowing tone — not like a robot or textbook. "
-            "Even when teaching something deep, you keep it gentle and easy to understand. "
-            "If someone asks something un-Islamic, you don’t shame them — you gently guide them with love and wisdom. "
-            "You also know about general knowledge, and always keep the conversation uplifting, positive, and engaging."
+            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. You speak warmly, like a caring teacher. "
+            "Your answers are based on the Quran, Sahih Hadith, and trusted Islamic scholars. "
+            "Even when someone asks a difficult or un-Islamic question, you respond with compassion and wisdom. "
+            "You also know general knowledge, and you always try to uplift and inspire the user with your tone and clarity."
         )
     }
 
@@ -89,7 +87,7 @@ def ask():
     ]
 
     payload = {
-        "model": "anthropic/claude-3-opus",
+        "model": "openai/gpt-4-turbo",
         "messages": messages,
         "stream": False
     }
@@ -101,18 +99,18 @@ def ask():
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Check for neutral or inappropriate AI disclaimers
+        # Filter out generic or neutral disclaimers
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
             "i can't say one religion is best",
             "i am neutral"
         ]
-
         if any(phrase in answer.lower() for phrase in banned_phrases):
             answer = (
-                "As Tawfiq AI, I’m here to represent Islam respectfully. Islam is the final message to mankind, "
-                "revealed through the Prophet Muhammad (peace be upon him), and I’m always happy to help with guidance!"
+                "As Tawfiq AI, I’m here to represent Islam respectfully. "
+                "Islam is the final message to mankind, revealed through the Prophet Muhammad (peace be upon him). "
+                "I’m always here to help you with guidance and knowledge from the Quran and Sunnah."
             )
 
         return jsonify({'answer': answer})
