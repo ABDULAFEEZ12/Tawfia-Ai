@@ -4,6 +4,7 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
+import random
 
 # Load environment variables
 load_dotenv()
@@ -52,23 +53,29 @@ def about():
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
-    # Expecting a 'history' array (list of message dicts) from frontend
     history = data.get('history', [])
-    
-    # System prompt defining the AI's personality and instructions
+
+    # Friendly curiosity prompts to encourage continued interaction
+    curiosity_hooks = [
+        "Wanna know more?",
+        "Shall I explain a bit deeper?",
+        "Curious about the next part?",
+        "Want a fun fact related to that?",
+        "Need a real-life example?",
+        "Let’s explore that further if you’d like!"
+    ]
+
     system_prompt = {
         "role": "system",
         "content": (
-            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
-            "Always speak respectfully, kindly, and with personality. "
-            "Build responses based on previous conversation context."
+            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant who speaks in a short, sweet, engaging, and friendly way. "
+            "Keep answers short and simple, under 40 words if possible. Speak warmly and clearly. "
+            "End with a curious or playful hook to keep the user asking more."
         )
     }
-    
-    # Compose full message list: system prompt + conversation history
+
     messages = [system_prompt] + history
 
-    # Call DeepAI API (using your OpenRouter endpoint)
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
@@ -88,7 +95,6 @@ def ask():
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter banned or off-topic phrases
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -102,8 +108,13 @@ def ask():
             answer = (
                 "I was created by Tella Abdul Afeez Adewale to serve the Ummah with wisdom and knowledge. "
                 "Islam is the final and complete guidance from Allah through Prophet Muhammad (peace be upon him). "
-                "I’m always here to assist you with Islamic and helpful answers."
+                "I'm here to help — always!"
             )
+        else:
+            # Add a random curiosity hook to the end of the answer
+            answer = answer.strip()
+            if not answer.endswith("?"):
+                answer += " " + random.choice(curiosity_hooks)
 
         return jsonify({'answer': answer})
 
@@ -113,8 +124,6 @@ def ask():
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
-
-# Existing routes for Quran and Hadith searches...
 
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
