@@ -117,8 +117,8 @@
     overflow-y: auto;
     text-align: left;
   }
-  .messages p,
-  .results div {
+  /* Chat bubbles for messages */
+  .messages p {
     background: rgba(0, 0, 0, 0.05);
     padding: 12px;
     border-radius: 8px;
@@ -128,6 +128,19 @@
   }
   .user-message {
     background: rgba(0, 150, 136, 0.2);
+    align-self: flex-end;
+  }
+  /* AI answer styling for clear display */
+  .ai-answer {
+    background: #e0f2f1;
+    border: 1px solid #009688;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    font-size: 1em;
   }
   /* Quran result styling */
   .quran-verse {
@@ -373,75 +386,89 @@ function switchTab(sectionId, event) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(sectionId).classList.add('active');
   event.target.classList.add('active');
-  // Clear results/messages when switching tabs
+  // Clear previous messages/results
   document.getElementById('messages').innerHTML = '';
   document.getElementById('quranResult').innerHTML = '';
   document.getElementById('hadithResult').innerHTML = '';
 }
 
+// Mode toggle
 function toggleMode() {
   document.body.classList.toggle('light-mode');
   document.body.classList.toggle('dark-mode');
-  const toggleBtn = document.querySelector('.toggle-btn');
+  const btn = document.querySelector('.toggle-btn');
   if (document.body.classList.contains('dark-mode')) {
-    toggleBtn.textContent = 'Toggle Light Mode';
+    btn.textContent = 'Toggle Light Mode';
   } else {
-    toggleBtn.textContent = 'Toggle Dark Mode';
+    btn.textContent = 'Toggle Dark Mode';
   }
 }
 
+// Send question to AI
 function sendQuestion() {
-  const input = document.getElementById("userInput").value.trim();
-  if (!input) return;
+  const inputEl = document.getElementById("userInput");
+  const question = inputEl.value.trim();
+  if (!question) return;
   const messagesDiv = document.getElementById("messages");
-  const askButton = document.getElementById("askButton");
+  const askBtn = document.getElementById("askButton");
+  
+  // User message
   const userMsg = document.createElement("p");
-  userMsg.classList.add("user-message");
-  userMsg.textContent = "You: " + input;
+  userMsg.className = "user-message";
+  userMsg.textContent = "You: " + question;
   messagesDiv.appendChild(userMsg);
-  document.getElementById("userInput").value = "";
-  // Add loading
+  
+  // Show loading
   const loadingMsg = document.createElement("p");
-  loadingMsg.classList.add("loading-indicator");
+  loadingMsg.className = "loading-indicator";
   loadingMsg.textContent = "Tawfiq AI is thinking...";
   messagesDiv.appendChild(loadingMsg);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  
   // Disable button
-  askButton.disabled = true;
+  askBtn.disabled = true;
+  inputEl.value = '';
+
   fetch('/ask', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question: input })
+    body: JSON.stringify({ question })
   }).then(res => res.json()).then(data => {
+    // Remove loading
     messagesDiv.removeChild(loadingMsg);
-    const aiMsg = document.createElement("p");
-    aiMsg.textContent = "Tawfiq AI: " + (data.answer || "Sorry, couldn't answer.");
-    messagesDiv.appendChild(aiMsg);
+    // Append AI answer with styling
+    const aiAnswerDiv = document.createElement("div");
+    aiAnswerDiv.className = "ai-answer";
+    aiAnswerDiv.innerHTML = "<strong>Tawfiq AI:</strong> " + (data.answer || "Sorry, couldn't answer.");
+    messagesDiv.appendChild(aiAnswerDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }).catch(error => {
     console.error('Error:', error);
     messagesDiv.removeChild(loadingMsg);
     const errorMsg = document.createElement("p");
-    errorMsg.textContent = "Tawfiq AI: Error getting response.";
+    errorMsg.className = "ai-answer";
+    errorMsg.innerHTML = "<strong>Tawfiq AI:</strong> Error getting response.";
     messagesDiv.appendChild(errorMsg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }).finally(() => {
-    askButton.disabled = false;
+    askBtn.disabled = false;
   });
 }
 
 // Search Quran
 function searchQuran() {
-  const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
+  const inputVal = document.getElementById("quranInput").value.trim();
+  const selectedSurah = document.getElementById("surahList").value;
+  const query = inputVal || selectedSurah;
   if (!query) return;
   const resultDiv = document.getElementById("quranResult");
-  const quranSearchBtn = document.getElementById("quranSearchButton");
+  const btn = document.getElementById("quranSearchButton");
   resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
   const loading = document.createElement("div");
   loading.className = "loading-indicator";
   loading.textContent = "Searching Quran...";
   resultDiv.appendChild(loading);
-  quranSearchBtn.disabled = true;
+  btn.disabled = true;
 
   fetch('/quran-search', {
     method: 'POST',
@@ -475,7 +502,7 @@ function searchQuran() {
         arabic.style.direction = 'rtl';
         verseEl.appendChild(arabic);
 
-        // Add transliteration if available
+        // Optional: transliteration if available
         if (verse.transliteration) {
           const translitPara = document.createElement("p");
           translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
@@ -497,43 +524,35 @@ function searchQuran() {
   }).finally(() => {
     const loadingEl = resultDiv.querySelector('.loading-indicator');
     if (loadingEl) loadingEl.remove();
-    quranSearchBtn.disabled = false;
+    btn.disabled = false;
   });
 }
 
 // Search Hadith
 function searchHadith() {
-  const inputQuery = document.getElementById("hadithInput").value.trim();
-  const dropdownQuery = document.getElementById("hadithDropdown").value;
-  const query = inputQuery || dropdownQuery;
+  const inputVal = document.getElementById("hadithInput").value.trim();
+  const dropdownVal = document.getElementById("hadithDropdown").value;
+  const query = inputVal || dropdownVal;
   if (!query) return;
-
   const resultDiv = document.getElementById("hadithResult");
-  const hadithBtn = document.getElementById("hadithSearchButton");
-
-  // Show searching message
+  const btn = document.getElementById("hadithSearchButton");
   resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-
-  // Add loading indicator
   const loading = document.createElement("div");
   loading.className = "loading-indicator";
   loading.textContent = "Searching Hadith...";
   resultDiv.appendChild(loading);
-
-  // Disable button
-  hadithBtn.disabled = true;
+  btn.disabled = true;
 
   fetch('/hadith-search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query })
   }).then(res => res.json()).then(data => {
-    // Clear previous loading
     resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
     if (data.results && Array.isArray(data.results) && data.results.length > 0) {
       data.results.forEach(hadith => {
-        const hadithEl = document.createElement("div");
-        hadithEl.className = "hadith-entry";
+        const hadithDiv = document.createElement("div");
+        hadithDiv.className = "hadith-entry";
 
         // Build info text
         let infoText = '';
@@ -557,14 +576,14 @@ function searchHadith() {
 
         const infoPara = document.createElement("p");
         infoPara.innerHTML = infoText;
-        hadithEl.appendChild(infoPara);
+        hadithDiv.appendChild(infoPara);
 
         const textPara = document.createElement("p");
         textPara.textContent = hadith.text;
         textPara.style.marginTop = '8px';
-        hadithEl.appendChild(textPara);
+        hadithDiv.appendChild(textPara);
 
-        resultDiv.appendChild(hadithEl);
+        resultDiv.appendChild(hadithDiv);
       });
     } else if (data.result) {
       resultDiv.innerHTML += `<div>${data.result}</div>`;
@@ -579,7 +598,7 @@ function searchHadith() {
   });
 }
 
-// Load Surah list from backend
+// Load Surah list
 function loadSurahList() {
   fetch('/get-surah-list')
     .then(res => res.json())
@@ -609,7 +628,7 @@ function loadHardcodedSurahList() {
     "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
     "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun", "An-Nur", "Al-Furqan",
     "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajda", "Al-Ahzab",
-    "Saba", "Fatr", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
+    "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
     "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
     "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila",
     "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
@@ -634,27 +653,33 @@ function loadHardcodedSurahList() {
 // Load Hadith topics
 function loadHadithTopics() {
   const topics = [
-    "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience", "Hadith on Gratitude",
-    "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj", "Hadith on Honesty", "Hadith on Forgiveness",
-    "Hadith on Parents", "Hadith on Children", "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood",
-    "Hadith on Modesty", "Hadith on Repentance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
-    "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran", "Hadith on Sunnah",
-    "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting", "Hadith on Lying", "Hadith on Trust",
-    "Hadith on Trade", "Hadith on Wealth", "Hadith on Poverty", "Hadith on Oppression", "Hadith on Manners",
-    "Hadith on Sincerity", "Hadith on Innovation", "Hadith on Angels", "Hadith on Jinn", "Hadith on Death",
-    "Hadith on Resurrection", "Hadith on Signs of Day of Judgment", "Hadith on Health", "Hadith on Cleanliness",
-    "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip", "Hadith on Leadership", "Hadith on Love",
-    "Hadith on Peace", "Hadith on Prayer at Night", "Hadith on Ablution", "Hadith on Sadaqah", "Hadith on Zakat",
-    "Hadith on Seeking Knowledge", "Hadith on Good Deeds", "Hadith on Evil Deeds", "Hadith on Hypocrisy",
-    "Hadith on Arrogance", "Hadith on Tawheed", "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth",
-    "Hadith on Orphans", "Hadith on Widows", "Hadith on Modesty in Dressing", "Hadith on Halal and Haram",
-    "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling", "Hadith on Good Speech", "Hadith on Contentment",
-    "Hadith on Worldly Life", "Hadith on Akhirah", "Hadith on Thankfulness", "Hadith on Seeking Forgiveness",
-    "Hadith on Trials", "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves", "Hadith on Trust in Allah",
-    "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage", "Hadith on Sin", "Hadith on Purification",
-    "Hadith on Eid", "Hadith on Sacrifice", "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam",
-    "Hadith on Reciting Quran", "Hadith on Betrayal", "Hadith on Contentment", "Hadith on Piety", "Hadith on Remembrance of Allah",
-    "Hadith on Friday Prayer", "Hadith on Allah’s Mercy", "Hadith on Night of Qadr", "Hadith on Family Ties"
+    "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
+    "Hadith on Gratitude", "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj",
+    "Hadith on Honesty", "Hadith on Forgiveness", "Hadith on Parents", "Hadith on Children",
+    "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood", "Hadith on Modesty",
+    "Hadith on Repentance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
+    "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran",
+    "Hadith on Sunnah", "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting",
+    "Hadith on Lying", "Hadith on Trust", "Hadith on Trade", "Hadith on Wealth", "Hadith on Poverty",
+    "Hadith on Oppression", "Hadith on Manners", "Hadith on Sincerity", "Hadith on Innovation",
+    "Hadith on Angels", "Hadith on Jinn", "Hadith on Death", "Hadith on Resurrection",
+    "Hadith on Signs of Day of Judgment", "Hadith on Health", "Hadith on Cleanliness",
+    "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip", "Hadith on Leadership",
+    "Hadith on Love", "Hadith on Peace", "Hadith on Prayer at Night", "Hadith on Ablution",
+    "Hadith on Sadaqah", "Hadith on Zakat", "Hadith on Seeking Knowledge", "Hadith on Good Deeds",
+    "Hadith on Evil Deeds", "Hadith on Hypocrisy", "Hadith on Arrogance", "Hadith on Tawheed",
+    "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth", "Hadith on Orphans",
+    "Hadith on Widows", "Hadith on Modesty in Dressing", "Hadith on Halal and Haram",
+    "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling", "Hadith on Good Speech",
+    "Hadith on Contentment", "Hadith on Worldly Life", "Hadith on Akhirah",
+    "Hadith on Thankfulness", "Hadith on Seeking Forgiveness", "Hadith on Trials",
+    "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves", "Hadith on Trust in Allah",
+    "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage", "Hadith on Sin",
+    "Hadith on Purification", "Hadith on Eid", "Hadith on Sacrifice",
+    "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam",
+    "Hadith on Reciting Quran", "Hadith on Betrayal", "Hadith on Contentment",
+    "Hadith on Piety", "Hadith on Remembrance of Allah", "Hadith on Friday Prayer",
+    "Hadith on Allah’s Mercy", "Hadith on Night of Qadr", "Hadith on Family Ties"
   ];
   const dropdown = document.getElementById("hadithDropdown");
   topics.forEach(topic => {
@@ -665,7 +690,7 @@ function loadHadithTopics() {
   });
 }
 
-// Initialize on DOMContentLoaded
+// Initialize lists on page load
 document.addEventListener("DOMContentLoaded", () => {
   loadHadithTopics();
   loadSurahList();
