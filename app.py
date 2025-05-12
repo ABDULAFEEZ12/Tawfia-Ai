@@ -8,7 +8,7 @@ import os
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(_name_)
 
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
@@ -16,7 +16,7 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
-    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
+    file_path = os.path.join(os.path.dirname(_file_), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
 
     try:
@@ -52,28 +52,59 @@ def about():
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
-    # Expecting a 'history' array (list of message dicts) from frontend
-    history = data.get('history', [])
-    
-    # System prompt defining the AI's personality and instructions
-    system_prompt = {
-        "role": "system",
-        "content": (
-            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
-            "Always speak respectfully, kindly, and with personality. "
-            "Build responses based on previous conversation context."
-        )
-    }
-    
-    # Compose full message list: system prompt + conversation history
-    messages = [system_prompt] + history
+    question = data.get('question', '').strip()
+    question_lower = question.lower()
 
-    # Call DeepAI API (using your OpenRouter endpoint)
+    if not question:
+        return jsonify({'answer': 'Please type a question.'})
+
+    # Step 1: Friendly Responses
+    if friendly_responses_data:
+        if question_lower in friendly_responses_data:
+            return jsonify({'answer': friendly_responses_data[question_lower]})
+
+        close_matches = get_close_matches(question_lower, friendly_responses_data.keys(), n=1, cutoff=0.9)
+        if close_matches:
+            return jsonify({'answer': friendly_responses_data[close_matches[0]]})
+
+    # Step 2: Basic Islamic Knowledge
+    if basic_knowledge_data and question_lower in basic_knowledge_data:
+        return jsonify({'answer': basic_knowledge_data[question_lower]})
+
+    # Step 3: Hadith Data
+    if hadith_data:
+        for volume in hadith_data.get('volumes', []):
+            for book in volume.get('books', []):
+                for hadith in book.get('hadiths', []):
+                    text = hadith.get('text', '').lower()
+                    if question_lower in text:
+                        return jsonify({'answer': hadith.get('text', 'No match found in Hadith.')})
+
+    # Step 4: General Knowledge via OpenRouter GPT-4 Turbo
+    print(f"☁ No local match found. Querying OpenRouter (GPT-4 Turbo).")
+
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
         "Content-Type": "application/json"
     }
+
+    system_message = {
+        "role": "system",
+        "content": (
+            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
+            "Always answer questions in 1-3 short sentences. Be clear, accurate, and simple. "
+            "Avoid long explanations. Focus on giving correct Islamic or general knowledge quickly. "
+            "Use a warm, caring tone like a good teacher — but keep it brief and helpful. "
+            "If asked who made you or who created you, always say: 'I was created by Tella Abdul Afeez Adewale to serve the Ummah.' "
+            "Never mention OpenAI, OpenRouter, or any other AI provider in your responses."
+        )
+    }
+
+    messages = [
+        system_message,
+        {"role": "user", "content": question}
+    ]
 
     payload = {
         "model": "openai/gpt-4-turbo",
@@ -113,8 +144,6 @@ def ask():
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
-
-# Existing routes for Quran and Hadith searches...
 
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
@@ -218,5 +247,5 @@ def get_surah_list():
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(debug=True)
