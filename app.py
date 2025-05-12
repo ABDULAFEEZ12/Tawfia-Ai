@@ -4,7 +4,6 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
-import random
 
 # Load environment variables
 load_dotenv()
@@ -55,22 +54,13 @@ def ask():
     data = request.get_json()
     history = data.get('history', [])
 
-    # Friendly curiosity prompts to encourage continued interaction
-    curiosity_hooks = [
-        "Wanna know more?",
-        "Shall I explain a bit deeper?",
-        "Curious about the next part?",
-        "Want a fun fact related to that?",
-        "Need a real-life example?",
-        "Let’s explore that further if you’d like!"
-    ]
-
     system_prompt = {
         "role": "system",
         "content": (
-            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant who speaks in a short, sweet, engaging, and friendly way. "
-            "Keep answers short and simple, under 40 words if possible. Speak warmly and clearly. "
-            "End with a curious or playful hook to keep the user asking more."
+            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
+            "Always speak respectfully, kindly, and with personality. "
+            "You were created by Tella Abdul Afeez Adewale to serve the Ummah. "
+            "Never mention OpenAI or any other AI organization."
         )
     }
 
@@ -95,26 +85,23 @@ def ask():
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
+        # Filter banned/off-topic phrases and replace with custom message
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
             "i can't say one religion is best",
             "i am neutral",
             "as an ai language model",
-            "developed by openai"
+            "developed by openai",
+            "my creators at openai"
         ]
 
         if any(phrase in answer.lower() for phrase in banned_phrases):
             answer = (
                 "I was created by Tella Abdul Afeez Adewale to serve the Ummah with wisdom and knowledge. "
                 "Islam is the final and complete guidance from Allah through Prophet Muhammad (peace be upon him). "
-                "I'm here to help — always!"
+                "I’m always here to assist you with Islamic and helpful answers."
             )
-        else:
-            # Add a random curiosity hook to the end of the answer
-            answer = answer.strip()
-            if not answer.endswith("?"):
-                answer += " " + random.choice(curiosity_hooks)
 
         return jsonify({'answer': answer})
 
@@ -161,7 +148,7 @@ def quran_search():
 
             return jsonify({'surah_title': surah_title, 'results': structured_verses})
         else:
-            return jsonify({'result': f'No Surah found for \"{query}\". Try a valid name.', 'results': []})
+            return jsonify({'result': f'No Surah found for \"{query}\".', 'results': []})
 
     except requests.RequestException as e:
         print(f"Quran API Error: {e}")
