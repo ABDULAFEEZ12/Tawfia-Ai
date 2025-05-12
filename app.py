@@ -8,7 +8,7 @@ import os
 # Load environment variables
 load_dotenv()
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
@@ -16,7 +16,7 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
-    file_path = os.path.join(os.path.dirname(_file_), 'DATA', file_name)
+    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
 
     try:
@@ -81,7 +81,7 @@ def ask():
                         return jsonify({'answer': hadith.get('text', 'No match found in Hadith.')})
 
     # Step 4: General Knowledge via OpenRouter GPT-4 Turbo
-    print(f"☁ No local match found. Querying OpenRouter (GPT-4 Turbo).")
+    print(f"☁️ No local match found. Querying OpenRouter (GPT-4 Turbo).")
 
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -247,5 +247,5 @@ def get_surah_list():
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(debug=True)
