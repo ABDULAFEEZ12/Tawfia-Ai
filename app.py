@@ -4,6 +4,7 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
+import random
 
 # Load environment variables
 load_dotenv()
@@ -52,59 +53,34 @@ def about():
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
-    question = data.get('question', '').strip()
-    question_lower = question.lower()
+    history = data.get('history', [])
 
-    if not question:
-        return jsonify({'answer': 'Please type a question.'})
+    # Friendly curiosity prompts to encourage continued interaction
+    curiosity_hooks = [
+        "Wanna know more?",
+        "Shall I explain a bit deeper?",
+        "Curious about the next part?",
+        "Want a fun fact related to that?",
+        "Need a real-life example?",
+        "Let’s explore that further if you’d like!"
+    ]
 
-    # Step 1: Friendly Responses
-    if friendly_responses_data:
-        if question_lower in friendly_responses_data:
-            return jsonify({'answer': friendly_responses_data[question_lower]})
+    system_prompt = {
+        "role": "system",
+        "content": (
+            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant who speaks in a short, sweet, engaging, and friendly way. "
+            "Keep answers short and simple, under 40 words if possible. Speak warmly and clearly. "
+            "End with a curious or playful hook to keep the user asking more."
+        )
+    }
 
-        close_matches = get_close_matches(question_lower, friendly_responses_data.keys(), n=1, cutoff=0.9)
-        if close_matches:
-            return jsonify({'answer': friendly_responses_data[close_matches[0]]})
-
-    # Step 2: Basic Islamic Knowledge
-    if basic_knowledge_data and question_lower in basic_knowledge_data:
-        return jsonify({'answer': basic_knowledge_data[question_lower]})
-
-    # Step 3: Hadith Data
-    if hadith_data:
-        for volume in hadith_data.get('volumes', []):
-            for book in volume.get('books', []):
-                for hadith in book.get('hadiths', []):
-                    text = hadith.get('text', '').lower()
-                    if question_lower in text:
-                        return jsonify({'answer': hadith.get('text', 'No match found in Hadith.')})
-
-    # Step 4: General Knowledge via OpenRouter GPT-4 Turbo
-    print(f"☁️ No local match found. Querying OpenRouter (GPT-4 Turbo).")
+    messages = [system_prompt] + history
 
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
         "Content-Type": "application/json"
     }
-
-    system_message = {
-        "role": "system",
-        "content": (
-            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
-            "Always answer questions in 1-3 short sentences. Be clear, accurate, and simple. "
-            "Avoid long explanations. Focus on giving correct Islamic or general knowledge quickly. "
-            "Use a warm, caring tone like a good teacher — but keep it brief and helpful. "
-            "If asked who made you or who created you, always say: 'I was created by Tella Abdul Afeez Adewale to serve the Ummah.' "
-            "Never mention OpenAI, OpenRouter, or any other AI provider in your responses."
-        )
-    }
-
-    messages = [
-        system_message,
-        {"role": "user", "content": question}
-    ]
 
     payload = {
         "model": "openai/gpt-4-turbo",
@@ -119,7 +95,6 @@ def ask():
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter banned or off-topic phrases
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -133,8 +108,13 @@ def ask():
             answer = (
                 "I was created by Tella Abdul Afeez Adewale to serve the Ummah with wisdom and knowledge. "
                 "Islam is the final and complete guidance from Allah through Prophet Muhammad (peace be upon him). "
-                "I’m always here to assist you with Islamic and helpful answers."
+                "I'm here to help — always!"
             )
+        else:
+            # Add a random curiosity hook to the end of the answer
+            answer = answer.strip()
+            if not answer.endswith("?"):
+                answer += " " + random.choice(curiosity_hooks)
 
         return jsonify({'answer': answer})
 
