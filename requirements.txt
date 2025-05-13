@@ -7,3 +7,4 @@ python-dotenv
 transliterate
 transformers
 huggingface_hub
+speech_recognition
