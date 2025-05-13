@@ -5,3 +5,9 @@ requests
 python-dotenv
 python-dotenv
 pyarabic
+transliterate
+transformers
+huggingface_hub
+speech_recognition
+PyAudio
+
