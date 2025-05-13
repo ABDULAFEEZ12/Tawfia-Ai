@@ -61,7 +61,6 @@ def ask():
             "Always speak respectfully, kindly, and with personality. "
             "You were created by Tella Abdul Afeez Adewale to serve the Ummah. "
             "Never mention OpenAI or any other AI organization."
-            "Never mention DeepAI or any other AI organization."
         )
     }
 
@@ -115,7 +114,6 @@ def ask():
 
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
-    # ... existing code remains unchanged ...
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
@@ -158,7 +156,6 @@ def quran_search():
 
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
-    # ... existing code remains unchanged ...
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
@@ -207,7 +204,6 @@ def hadith_search():
 
 @app.route('/get-surah-list')
 def get_surah_list():
-    # ... existing code remains unchanged ...
     try:
         response = requests.get('https://api.quran.gading.dev/surah')
         response.raise_for_status()
@@ -217,35 +213,6 @@ def get_surah_list():
     except requests.RequestException as e:
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
-
-# --- New route for speech recognition ---
-@app.route('/recognize-speech', methods=['POST'])
-def recognize_speech():
-    if 'audio' not in request.files:
-        return jsonify({'error': 'No audio file uploaded.'}), 400
-
-    audio_file = request.files['audio']
-    temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
-    try:
-        # Save uploaded file temporarily
-        audio_file.save(temp_path)
-
-        recognizer = sr.Recognizer()
-        with sr.AudioFile(temp_path) as source:
-            audio_data = recognizer.record(source)
-
-        # Recognize using Google Web Speech API
-        text = recognizer.recognize_google(audio_data)
-        return jsonify({'transcript': text})
-    except sr.UnknownValueError:
-        return jsonify({'error': 'Speech Recognition could not understand audio.'}), 400
-    except sr.RequestError as e:
-        return jsonify({'error': f'Speech Recognition service error: {e}'}), 500
-    except Exception as e:
-        return jsonify({'error': f'Error processing audio: {e}'}), 500
-    finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
 
 if __name__ == '__main__':
     app.run(debug=True)
