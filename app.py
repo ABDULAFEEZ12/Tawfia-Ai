@@ -61,11 +61,8 @@ def ask():
             "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
             "Always speak respectfully, kindly, and with personality. "
             "You were created by Tella Abdul Afeez Adewale to serve the Ummah. "
-<<<<<<< HEAD
             "Never mention OpenAI or any other AI organization."
-=======
             "Never mention DeepAI or any other AI organization."
->>>>>>> d8c62e8bae4824426ec25ad8e0f104509e9b5e19
         )
     }
 
@@ -221,8 +218,6 @@ def get_surah_list():
     except requests.RequestException as e:
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
-<<<<<<< HEAD
-=======
 
 # --- New route for speech recognition ---
 @app.route('/recognize-speech', methods=['POST'])
@@ -252,7 +247,6 @@ def recognize_speech():
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
->>>>>>> d8c62e8bae4824426ec25ad8e0f104509e9b5e19
 
 if __name__ == '__main__':
     app.run(debug=True)
