@@ -80,7 +80,7 @@
   .section.active {
     display: flex;
   }
-  input[type="text"], select {
+  input[type="text"] {
     width: 80%;
     padding: 12px;
     margin: 15px 0;
@@ -282,7 +282,7 @@
       height: 70vh;
       max-width: 95%;
     }
-    input[type="text"], select {
+    input[type="text"] {
       width: 95%;
       margin: 10px 0;
       padding: 10px;
@@ -352,7 +352,7 @@
 <input type="text" id="quranInput" placeholder="Enter Surah name or keyword..."/>
 <!-- Replace select with a container for buttons -->
 <div id="surahButtonsContainer" style="margin-top:10px; max-height:200px; overflow-y:auto; width:100%; display:flex; flex-wrap:wrap; gap:5px; justify-content: center;"></div>
-<button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
+<button id="quranSearchButton" onclick="searchQuran()">Open Surah Page</button>
 <div class="results" id="quranResult"></div>
 </div>
 
@@ -426,9 +426,9 @@
       // Remove loading
       messagesDiv.removeChild(loadingMsg);
       const answerText = data.answer || "Sorry, couldn't answer.";
-      // Append AI reply to chat history
+      // Append AI reply to chat
       chatHistory.push({ role: "assistant", content: answerText });
-      // Display AI reply
+      // Display reply
       const aiMsg = document.createElement("p");
       aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
       messagesDiv.appendChild(aiMsg);
@@ -464,22 +464,27 @@
     "Al-Masad", "Al-Ikhlas", "Al-Falaq", "Al-Nas"
   ];
 
-  // Function to generate buttons
+  // Generate ordered Surah buttons
   function generateSurahButtons() {
     const container = document.getElementById('surahButtonsContainer');
-    container.innerHTML = ''; // Clear existing
-    surahs.forEach(surah => {
+    container.innerHTML = '';
+    // Optional: sort alphabetically
+    const sortedSurahs = [...surahs].sort();
+    sortedSurahs.forEach(surah => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.textContent = surah;
+      // When clicked, open the Surah page in new tab
       btn.onclick = () => {
-        document.getElementById('quranInput').value = surah;
-        searchQuran();
+        // Replace with your URL pattern
+        const urlSurah = encodeURIComponent(surah);
+        window.open(`/surah/${urlSurah}`, '_blank');
       };
       container.appendChild(btn);
     });
   }
 
+  // Search for specific Surah (if user inputs)
   function searchQuran() {
     const query = document.getElementById("quranInput").value.trim();
     if (!query) return;
@@ -549,85 +554,14 @@
     });
   }
 
-  // =================== Hadith Search Logic (unchanged) ===================
-  function searchHadith() {
-    const inputQuery = document.getElementById("hadithInput").value.trim();
-    const dropdownQuery = document.getElementById("hadithDropdown").value;
-    const query = inputQuery || dropdownQuery;
-    if (!query) return;
-    const resultDiv = document.getElementById("hadithResult");
-    const hadithBtn = document.getElementById("hadithSearchButton");
-    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    const loading = document.createElement("div");
-    loading.className = "loading-indicator";
-    loading.textContent = "Searching Hadith...";
-    resultDiv.appendChild(loading);
-    hadithBtn.disabled = true;
-
-    fetch('/hadith-search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query })
-    }).then(res => res.json()).then(data => {
-      resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-      if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-        data.results.forEach(hadith => {
-          const hadithEl = document.createElement("div");
-          hadithEl.className = "hadith-entry";
-
-          let infoText = '';
-          if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
-            infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
-          } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
-            infoText += `<strong>Book:</strong> ${hadith.book_name}`;
-          } else if (hadith.book_number && hadith.book_number !== 'N/A') {
-            infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
-          }
-          if (hadith.volume_number && hadith.volume_number !== 'N/A') {
-            infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
-          }
-          if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
-            if (!infoText.includes(hadith.hadith_info))
-              infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
-          }
-          if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
-            infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
-          }
-
-          const infoPara = document.createElement("p");
-          infoPara.innerHTML = infoText;
-          hadithEl.appendChild(infoPara);
-
-          const textPara = document.createElement("p");
-          textPara.textContent = hadith.text;
-          textPara.style.marginTop = '8px';
-          hadithEl.appendChild(textPara);
-
-          resultDiv.appendChild(hadithEl);
-        });
-      } else if (data.result) {
-        resultDiv.innerHTML += `<div>${data.result}</div>`;
-      } else {
-        resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
-      }
-    }).catch(error => {
-      console.error('Error:', error);
-      resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
-    }).finally(() => {
-      document.getElementById("hadithSearchButton").disabled = false;
-    });
-  }
-
-  // Load Surah list from backend or use hardcoded
+  // Load Surah list on page load
   function loadSurahList() {
     fetch('/get-surah-list')
       .then(res => res.json())
       .then(data => {
         if (data.surahs && Array.isArray(data.surahs)) {
-          // Use fetched list
           populateSurahButtons(data.surahs);
         } else {
-          // fallback to hardcoded
           populateSurahButtons(surahs);
         }
       }).catch(error => {
@@ -639,13 +573,16 @@
   function populateSurahButtons(surahList) {
     const container = document.getElementById('surahButtonsContainer');
     container.innerHTML = '';
-    surahList.forEach(surah => {
+    // Sort alphabetically
+    const sortedSurahs = [...surahList].sort();
+    sortedSurahs.forEach(surah => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.textContent = surah;
+      // Open Surah page in new tab
       btn.onclick = () => {
-        document.getElementById('quranInput').value = surah;
-        searchQuran();
+        const urlSurah = encodeURIComponent(surah);
+        window.open(`/surah/${urlSurah}`, '_blank');
       };
       container.appendChild(btn);
     });
@@ -685,10 +622,10 @@
     });
   }
 
-  // Initialize on DOMContentLoaded
+  // Initialize on page load
   document.addEventListener("DOMContentLoaded", () => {
     loadHadithTopics();
-    loadSurahList(); // Load Surah buttons
+    loadSurahList(); // Generate ordered Surah buttons
   });
 </script>
 </body>
