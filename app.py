@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template, render_template_string
 import requests
 import json
 import os
@@ -17,7 +17,7 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
-    file_path = os.path.join(os.path.dirname(_file_), 'DATA', file_name)
+    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
 
     try:
@@ -62,11 +62,11 @@ def ask():
         question_entry = {'question': user_question, 'timestamp': timestamp}
 
         questions_file = 'user_questions.json'
+        all_questions = []
+
         if os.path.exists(questions_file):
             with open(questions_file, 'r', encoding='utf-8') as f:
                 all_questions = json.load(f)
-        else:
-            all_questions = []
 
         all_questions.append(question_entry)
 
@@ -133,7 +133,6 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-
 # --- Admin Questions Viewer ---
 @app.route('/admin-questions')
 def admin_questions():
@@ -181,33 +180,27 @@ def admin_questions():
     """
     return render_template_string(html_template, questions=questions)
 
-
-# (Other routes below remain unchanged...)
-
+# --- Stub Endpoints (Optional Implementation Later) ---
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
-    # No changes here...
-    pass
+    return jsonify({'message': 'Quran search not implemented yet.'})
 
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
-    # No changes here...
-    pass
+    return jsonify({'message': 'Hadith search not implemented yet.'})
 
 @app.route('/basic-knowledge', methods=['POST'])
 def basic_knowledge():
-    # No changes here...
-    pass
+    return jsonify({'message': 'Basic Islamic knowledge search not implemented yet.'})
 
 @app.route('/friendly-response', methods=['POST'])
 def friendly_response():
-    # No changes here...
-    pass
+    return jsonify({'message': 'Friendly response not implemented yet.'})
 
 @app.route('/get-surah-list')
 def get_surah_list():
-    # No changes here...
-    pass
+    return jsonify({'message': 'Surah list not implemented yet.'})
 
+# --- Run the App ---
 if __name__ == '__main__':
     app.run(debug=True)
