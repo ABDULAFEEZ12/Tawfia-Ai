@@ -9,7 +9,7 @@ from datetime import datetime
 # Load environment variables
 load_dotenv()
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
