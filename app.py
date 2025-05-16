@@ -4,6 +4,8 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
+from datetime import datetime
+import speech_recognition as sr  # assuming you want this for speech recognition
 
 # Load environment variables
 load_dotenv()
@@ -79,6 +81,35 @@ def ask():
         "stream": False
     }
 
+    # Save user question to file
+    try:
+        user_question = history[-1]['content'] if history else ''
+        timestamp = datetime.utcnow().isoformat()
+        question_entry = {'question': user_question, 'timestamp': timestamp}
+
+        # Ensure data folder exists
+        data_folder = os.path.join(os.path.dirname(__file__), 'data')
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
+
+        questions_file = os.path.join(data_folder, 'user_questions.json')
+
+        all_questions = []
+        if os.path.exists(questions_file):
+            with open(questions_file, 'r', encoding='utf-8') as f:
+                all_questions = json.load(f)
+
+        all_questions.append(question_entry)
+
+        with open(questions_file, 'w', encoding='utf-8') as f:
+            json.dump(all_questions, f, ensure_ascii=False, indent=2)
+
+        print(f"[User Question] {timestamp} - {user_question} saved to {questions_file}")
+
+    except Exception as e:
+        print(f"❌ Error saving question: {e}")
+
+    # Call OpenRouter API
     try:
         response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
@@ -112,6 +143,28 @@ def ask():
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
+
+@app.route('/admin-questions')
+def admin_questions():
+    password = request.args.get('password')
+    if password != "tellapass":
+        return "Unauthorized Access", 401
+
+    data_folder = os.path.join(os.path.dirname(__file__), 'data')
+    questions_file = os.path.join(data_folder, 'user_questions.json')
+
+    try:
+        with open(questions_file, 'r', encoding='utf-8') as f:
+            questions = json.load(f)
+    except FileNotFoundError:
+        questions = []
+    except Exception as e:
+        print(f"Error loading questions file: {e}")
+        questions = []
+
+    # You can render a template here or return JSON
+    # For simplicity, returning JSON list of questions
+    return jsonify(questions)
 
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
@@ -177,72 +230,93 @@ def hadith_search():
                 for hadith in book.get('hadiths', []):
                     text = hadith.get('text', '').lower()
                     keywords = hadith.get('keywords', [])
-                    if query in text or any(query in k.lower() for k in keywords):
-                        if count < 5:
-                            matches.append({
-                                'volume_number': volume.get('volume_number', 'N/A'),
-                                'book_number': book.get('book_number', 'N/A'),
-                                'book_name': book.get('book_name', 'Unknown Book'),
-                                'hadith_info': hadith.get('info', 'Info'),
-                                'narrator': hadith.get('by', 'Unknown narrator'),
-                                'text': hadith.get('text', 'No text found')
-                            })
-                            count += 1
-                        else:
+                    if (query in text) or any(query in kw.lower() for kw in keywords):
+                        matches.append({
+                            'volume': volume.get('name', ''),
+                            'book': book.get('name', ''),
+                            'hadith_number': hadith.get('number', ''),
+                            'text': hadith.get('text', '')
+                        })
+                        count += 1
+                        if count >= 6:
                             break
-                if count >= 5:
+                if count >= 6:
                     break
-            if count >= 5:
+            if count >= 6:
                 break
 
         if matches:
-            return jsonify({'results': matches})
+            return jsonify({'result': f'Found {len(matches)} hadith(s) related to \"{query}\".', 'results': matches})
         else:
-            return jsonify({'result': f'No Hadith found for \"{query}\".', 'results': []})
+            return jsonify({'result': 'No hadith found for your query.', 'results': []})
+
     except Exception as e:
-        print(f"Hadith Search Error: {e}")
-        return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
+        print(f"Hadith search error: {e}")
+        return jsonify({'result': 'An error occurred while searching hadith.', 'results': []})
 
-@app.route('/get-surah-list')
-def get_surah_list():
+@app.route('/basic-knowledge-search', methods=['POST'])
+def basic_knowledge_search():
+    data = request.get_json()
+    query = data.get('query', '').strip().lower()
+
+    if not query:
+        return jsonify({'result': 'Please provide a search query.', 'results': []})
+
+    if not basic_knowledge_data:
+        return jsonify({'result': 'Basic knowledge data is not loaded.', 'results': []})
+
     try:
-        response = requests.get('https://api.quran.gading.dev/surah')
-        response.raise_for_status()
-        surahs = response.json()['data']
-        names = [s['name']['transliteration']['en'] for s in surahs]
-        return jsonify({'surah_list': names})
-    except requests.RequestException as e:
-        print(f"Surah List API Error: {e}")
-        return jsonify({'surah_list': []})
+        matches = []
+        count = 0
 
-# --- New route for speech recognition ---
-@app.route('/recognize-speech', methods=['POST'])
-def recognize_speech():
+        for item in basic_knowledge_data.get('items', []):
+            if query in item.get('title', '').lower() or query in item.get('content', '').lower():
+                matches.append(item)
+                count += 1
+                if count >= 6:
+                    break
+
+        if matches:
+            return jsonify({'result': f'Found {len(matches)} entries related to \"{query}\".', 'results': matches})
+        else:
+            return jsonify({'result': 'No entries found for your query.', 'results': []})
+
+    except Exception as e:
+        print(f"Basic knowledge search error: {e}")
+        return jsonify({'result': 'An error occurred while searching.', 'results': []})
+
+@app.route('/friendly-response', methods=['POST'])
+def friendly_response():
+    data = request.get_json()
+    query = data.get('query', '').strip().lower()
+
+    if not friendly_responses_data:
+        return jsonify({'response': "Sorry, I don't have any friendly responses available."})
+
+    for item in friendly_responses_data.get('responses', []):
+        if query in item.get('trigger', '').lower():
+            return jsonify({'response': item.get('response', '...')})
+
+    return jsonify({'response': "I'm here if you want to talk or need help."})
+
+@app.route('/speech-to-text', methods=['POST'])
+def speech_to_text():
+    # Assuming you are sending audio as a file in the request
     if 'audio' not in request.files:
-        return jsonify({'error': 'No audio file uploaded.'}), 400
+        return jsonify({'error': 'No audio file part'}), 400
 
     audio_file = request.files['audio']
-    temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
+    recognizer = sr.Recognizer()
+
     try:
-        # Save uploaded file temporarily
-        audio_file.save(temp_path)
-
-        recognizer = sr.Recognizer()
-        with sr.AudioFile(temp_path) as source:
-            audio_data = recognizer.record(source)
-
-        # Recognize using Google Web Speech API
-        text = recognizer.recognize_google(audio_data)
+        with sr.AudioFile(audio_file) as source:
+            audio = recognizer.record(source)
+        text = recognizer.recognize_google(audio)
         return jsonify({'transcript': text})
-    except sr.UnknownValueError:
-        return jsonify({'error': 'Speech Recognition could not understand audio.'}), 400
-    except sr.RequestError as e:
-        return jsonify({'error': f'Speech Recognition service error: {e}'}), 500
     except Exception as e:
-        return jsonify({'error': f'Error processing audio: {e}'}), 500
-    finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
+        print(f"Speech recognition error: {e}")
+        return jsonify({'error': 'Could not process audio'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
