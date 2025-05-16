@@ -61,9 +61,13 @@ def ask():
         timestamp = datetime.utcnow().isoformat()
         question_entry = {'question': user_question, 'timestamp': timestamp}
 
-        questions_file = 'user_questions.json'
-        all_questions = []
+        data_folder = os.path.join(os.path.dirname(__file__), 'data')
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
 
+        questions_file = os.path.join(data_folder, 'user_questions.json')
+
+        all_questions = []
         if os.path.exists(questions_file):
             with open(questions_file, 'r', encoding='utf-8') as f:
                 all_questions = json.load(f)
@@ -73,8 +77,7 @@ def ask():
         with open(questions_file, 'w', encoding='utf-8') as f:
             json.dump(all_questions, f, ensure_ascii=False, indent=2)
 
-        # --- Log question to Render logs ---
-        print(f"[User Question] {timestamp} - {user_question}")
+        print(f"[User Question] {timestamp} - {user_question} saved to {questions_file}")
 
     except Exception as e:
         print(f"❌ Error saving question: {e}")
@@ -143,8 +146,11 @@ def admin_questions():
     if password != "tellapass":
         return "Unauthorized Access", 401
 
+    data_folder = os.path.join(os.path.dirname(__file__), 'data')
+    questions_file = os.path.join(data_folder, 'user_questions.json')
+
     try:
-        with open('user_questions.json', 'r', encoding='utf-8') as f:
+        with open(questions_file, 'r', encoding='utf-8') as f:
             questions = json.load(f)
     except FileNotFoundError:
         questions = []
@@ -171,7 +177,7 @@ def admin_questions():
         </style>
     </head>
     <body>
-        <h1>User Questions</h1>
+        <h1>User Questions (Total: {{ questions|length }})</h1>
         {% for q in questions %}
             <div class="question-box">
                 <div>{{ q['question'] }}</div>
