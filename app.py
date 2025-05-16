@@ -231,26 +231,44 @@ def hadith_search():
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
-    if not query:
-        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
+    # Debug: Log received query
+    print("Received Hadith search query:", query)
 
     # Remove common prefixes
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
+    # Debug: Check cleaned query
+    print("Cleaned query:", query)
+
     if not hadith_data:
+        print("Hadith data not loaded properly.")
         return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
+
+    # Debug: Log structure of hadith_data
+    print("Hadith data keys:", hadith_data.keys())
 
     try:
         matches = []
         count = 0
 
+        # Debug: Track total number of hadiths in dataset
+        total_hadiths = 0
         for volume in hadith_data.get('volumes', []):
+            total_hadiths += len(volume.get('books', []))
+        print(f"Total volumes in dataset: {len(hadith_data.get('volumes', []))}")
+        print(f"Total hadiths in dataset: {total_hadiths}")
+
+        for volume in hadith_data.get('volumes', []):
+            print("Processing volume:", volume.get('name'))
             for book in volume.get('books', []):
+                print("Processing book:", book.get('name'))
                 for hadith in book.get('hadiths', []):
                     text = hadith.get('text', '').lower()
                     keywords = hadith.get('keywords', [])
+                    print("Hadith text preview:", text[:50])  # print first 50 chars
+                    print("Keywords:", keywords)
                     if (query in text) or any(query in kw.lower() for kw in keywords):
-                        # Use the formatter here
+                        print("Match found!")
                         formatted = format_hadith_response({
                             'volume': volume.get('name', ''),
                             'book': book.get('name', ''),
@@ -267,14 +285,15 @@ def hadith_search():
                 break
 
         if matches:
-            # Return the formatted Hadiths
             results = [m['formatted'] for m in matches]
-            return jsonify({'result': f'Found {len(results)} hadith(s) related to \"{query}\".', 'results': results})
+            print(f"Found {len(results)} hadith(s).")
+            return jsonify({'result': f'Found {len(results)}} hadith(s).', 'results': results})
         else:
+            print("No matching hadiths found.")
             return jsonify({'result': 'No hadith found for your query.', 'results': []})
 
     except Exception as e:
-        print(f"Hadith search error: {e}")
+        print("Error during hadith search:", e)
         return jsonify({'result': 'An error occurred while searching hadith.', 'results': []})
 
 @app.route('/basic-knowledge-search', methods=['POST'])
