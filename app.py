@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime
 
+
 # Load environment variables
 load_dotenv()
 
@@ -19,6 +20,7 @@ def load_json_data(file_name, data_variable_name):
     data = {}
     file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
+
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -49,23 +51,6 @@ def about():
         'description': 'Tawfiq AI is a wise, kind, and trustworthy Muslim assistant designed to help people with Islamic and general knowledge.'
     })
 
-# Helper function to format Hadith responses
-def format_hadith_response(hadith):
-    volume = hadith.get('volume', 'Unknown Volume')
-    book = hadith.get('book', 'Unknown Book')
-    hadith_number = hadith.get('hadith_number', 'N/A')
-    text = hadith.get('text', '')
-
-    response = (
-        f"🌙 **Hadith Reference**:\n"
-        f"• Volume: {volume}\n"
-        f"• Book: {book}\n"
-        f"• Hadith Number: {hadith_number}\n\n"
-        f"**Text of the Hadith:**\n{text}\n\n"
-        "May Allah grant us understanding and guide us to practice these teachings."
-    )
-    return response
-
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
@@ -77,7 +62,7 @@ def ask():
             "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
             "Always speak respectfully, kindly, and with personality. "
             "You were created by Tella Abdul Afeez Adewale to serve the Ummah. "
-            "Never mention DeepAI or any other AI organization."
+            "Never mention OpenAI or any other AI organization."
             "Never mention DeepAI or any other AI organization."
         )
     }
@@ -100,18 +85,27 @@ def ask():
     try:
         user_question = history[-1]['content'] if history else ''
         timestamp = datetime.utcnow().isoformat()
+        question_entry = {'question': user_question, 'timestamp': timestamp}
+
+        # Ensure data folder exists
         data_folder = os.path.join(os.path.dirname(__file__), 'data')
         if not os.path.exists(data_folder):
             os.makedirs(data_folder)
+
         questions_file = os.path.join(data_folder, 'user_questions.json')
+
         all_questions = []
         if os.path.exists(questions_file):
             with open(questions_file, 'r', encoding='utf-8') as f:
                 all_questions = json.load(f)
-        all_questions.append({'question': user_question, 'timestamp': timestamp})
+
+        all_questions.append(question_entry)
+
         with open(questions_file, 'w', encoding='utf-8') as f:
             json.dump(all_questions, f, ensure_ascii=False, indent=2)
-        print(f"[User Question] {timestamp} - {user_question} saved.")
+
+        print(f"[User Question] {timestamp} - {user_question} saved to {questions_file}")
+
     except Exception as e:
         print(f"❌ Error saving question: {e}")
 
@@ -120,9 +114,10 @@ def ask():
         response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
+
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter banned/off-topic phrases
+        # Filter banned/off-topic phrases and replace with custom message
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -167,6 +162,8 @@ def admin_questions():
         print(f"Error loading questions file: {e}")
         questions = []
 
+    # You can render a template here or return JSON
+    # For simplicity, returning JSON list of questions
     return jsonify(questions)
 
 @app.route('/quran-search', methods=['POST'])
@@ -216,47 +213,30 @@ def hadith_search():
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
-    # Debug: log the received query
-    print("Received Hadith search query:", query)
+    if not query:
+        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
-    # Remove common prefixes
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
-    # Debug: log cleaned query
-    print("Cleaned query:", query)
-
-    # Debug: print structure of hadith_data
-    print("Hadith data structure:", json.dumps(hadith_data, indent=2))
-
     if not hadith_data:
-        print("Hadith data not loaded properly.")
         return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
 
     try:
         matches = []
         count = 0
 
-        # Adjust iteration based on actual data structure
-        # Example: if hadith_data['collection'] is a list of volumes
-        for volume in hadith_data.get('collection', []):
-            print("Processing volume:", volume.get('name', ''))
+        for volume in hadith_data.get('volumes', []):
             for book in volume.get('books', []):
-                print("Processing book:", book.get('name', ''))
                 for hadith in book.get('hadiths', []):
                     text = hadith.get('text', '').lower()
                     keywords = hadith.get('keywords', [])
-                    # Debug
-                    print("Hadith text preview:", text[:50])
-                    print("Keywords:", keywords)
                     if (query in text) or any(query in kw.lower() for kw in keywords):
-                        print("Match found!")
-                        formatted = format_hadith_response({
+                        matches.append({
                             'volume': volume.get('name', ''),
                             'book': book.get('name', ''),
                             'hadith_number': hadith.get('number', ''),
                             'text': hadith.get('text', '')
                         })
-                        matches.append({'formatted': formatted})
                         count += 1
                         if count >= 6:
                             break
@@ -266,15 +246,12 @@ def hadith_search():
                 break
 
         if matches:
-            results = [m['formatted'] for m in matches]
-            print(f"Found {len(results)} hadith(s).")
-            return jsonify({'result': f'Found {len(results)} hadith(s).', 'results': results})
+            return jsonify({'result': f'Found {len(matches)} hadith(s) related to \"{query}\".', 'results': matches})
         else:
-            print("No matching hadiths found.")
             return jsonify({'result': 'No hadith found for your query.', 'results': []})
 
     except Exception as e:
-        print("Error during hadith search:", e)
+        print(f"Hadith search error: {e}")
         return jsonify({'result': 'An error occurred while searching hadith.', 'results': []})
 
 @app.route('/basic-knowledge-search', methods=['POST'])
@@ -322,7 +299,24 @@ def friendly_response():
 
     return jsonify({'response': "I'm here if you want to talk or need help."})
 
-# Note: The speech-to-text endpoint is omitted here for brevity and because it requires audio processing setup.
+@app.route('/speech-to-text', methods=['POST'])
+def speech_to_text():
+    # Assuming you are sending audio as a file in the request
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file part'}), 400
+
+    audio_file = request.files['audio']
+    recognizer = sr.Recognizer()
+
+    try:
+        with sr.AudioFile(audio_file) as source:
+            audio = recognizer.record(source)
+        text = recognizer.recognize_google(audio)
+        return jsonify({'transcript': text})
+    except Exception as e:
+        print(f"Speech recognition error: {e}")
+        return jsonify({'error': 'Could not process audio'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
