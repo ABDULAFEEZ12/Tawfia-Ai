@@ -4,7 +4,6 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
-import speech_recognition as sr  # For speech recognition
 
 # Load environment variables
 load_dotenv()
