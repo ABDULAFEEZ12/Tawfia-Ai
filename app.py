@@ -240,14 +240,8 @@ def hadith_search():
         matches = []
         count = 0
 
-        # Debug: Track total number of hadiths in dataset
-        total_hadiths = 0
-        for volume in hadith_data.get('volumes', []):
-            total_hadiths += len(volume.get('books', []))
-        print(f"Total volumes in dataset: {len(hadith_data.get('volumes', []))}")
-        print(f"Total hadiths in dataset: {total_hadiths}")
-
-        for volume in hadith_data.get('volumes', []):
+        # Adjusted for your structure: hadiths are inside 'collection' -> 'volumes'
+        for volume in hadith_data.get('collection', {}).get('volumes', []):
             print("Processing volume:", volume.get('name'))
             for book in volume.get('books', []):
                 print("Processing book:", book.get('name'))
