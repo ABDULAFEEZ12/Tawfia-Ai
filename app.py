@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify, render_template, render_template_string
+from flask import Flask, request, jsonify, render_template
 import requests
 import json
-import os
 from difflib import get_close_matches
 from dotenv import load_dotenv
-from datetime import datetime
+import os
+import speech_recognition as sr  # For speech recognition
 
 # Load environment variables
 load_dotenv()
@@ -37,27 +37,6 @@ hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
 
-# --- Helper function for searching JSON data by keyword ---
-def search_data_by_keyword(data_list, keyword, key_to_search, max_results=5):
-    """
-    Search through a list of dictionaries for items where the key_to_search contains the keyword.
-    Returns a list of best matches.
-    """
-    # Extract all texts to search from the data
-    texts = [entry.get(key_to_search, '') for entry in data_list]
-    matches = get_close_matches(keyword, texts, n=max_results, cutoff=0.4)  # cutoff can be tuned
-
-    # Return the entries that match
-    results = []
-    for match in matches:
-        for entry in data_list:
-            if entry.get(key_to_search, '') == match:
-                results.append(entry)
-                break
-    return results
-
-# --- Routes ---
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -76,34 +55,6 @@ def ask():
     data = request.get_json()
     history = data.get('history', [])
 
-    # --- Save the user question ---
-    try:
-        user_question = history[-1]['content'] if history else ''
-        timestamp = datetime.utcnow().isoformat()
-        question_entry = {'question': user_question, 'timestamp': timestamp}
-
-        data_folder = os.path.join(os.path.dirname(__file__), 'data')
-        if not os.path.exists(data_folder):
-            os.makedirs(data_folder)
-
-        questions_file = os.path.join(data_folder, 'user_questions.json')
-
-        all_questions = []
-        if os.path.exists(questions_file):
-            with open(questions_file, 'r', encoding='utf-8') as f:
-                all_questions = json.load(f)
-
-        all_questions.append(question_entry)
-
-        with open(questions_file, 'w', encoding='utf-8') as f:
-            json.dump(all_questions, f, ensure_ascii=False, indent=2)
-
-        print(f"[User Question] {timestamp} - {user_question} saved to {questions_file}")
-
-    except Exception as e:
-        print(f"❌ Error saving question: {e}")
-
-    # --- Call the model API ---
     system_prompt = {
         "role": "system",
         "content": (
@@ -111,11 +62,13 @@ def ask():
             "Always speak respectfully, kindly, and with personality. "
             "You were created by Tella Abdul Afeez Adewale to serve the Ummah. "
             "Never mention OpenAI or any other AI organization."
+            "Never mention DeepAI or any other AI organization."
         )
     }
 
     messages = [system_prompt] + history
 
+    openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
         "Content-Type": "application/json"
@@ -128,12 +81,13 @@ def ask():
     }
 
     try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+        response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
+        # Filter banned/off-topic phrases and replace with custom message
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -160,157 +114,136 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-# --- Admin Questions Viewer ---
-@app.route('/admin-questions')
-def admin_questions():
-    password = request.args.get('password')
-    if password != "tellapass":
-        return "Unauthorized Access", 401
-
-    data_folder = os.path.join(os.path.dirname(__file__), 'data')
-    questions_file = os.path.join(data_folder, 'user_questions.json')
-
-    try:
-        with open(questions_file, 'r', encoding='utf-8') as f:
-            questions = json.load(f)
-    except FileNotFoundError:
-        questions = []
-
-    html_template = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Admin Questions</title>
-        <style>
-            body { font-family: Arial, sans-serif; padding: 30px; background: #f7f7f7; }
-            h1 { color: #333; }
-            .question-box {
-                background: white;
-                border: 1px solid #ccc;
-                padding: 15px;
-                margin-bottom: 10px;
-                border-radius: 6px;
-            }
-            .timestamp {
-                font-size: 12px;
-                color: #777;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>User Questions (Total: {{ questions|length }})</h1>
-        {% for q in questions %}
-            <div class="question-box">
-                <div>{{ q['question'] }}</div>
-                <div class="timestamp">{{ q['timestamp'] }}</div>
-            </div>
-        {% endfor %}
-    </body>
-    </html>
-    """
-    return render_template_string(html_template, questions=questions)
-
-# --- Implement Quran Search ---
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
-    query = data.get('query', '').strip()
+    query = data.get('query', '').strip().lower()
+
     if not query:
-        return jsonify({'error': 'No query provided.'}), 400
+        return jsonify({'result': 'Please provide a Surah name.', 'results': []})
 
-    # Assuming you have a Quran JSON with 'text' or 'verse' keys to search
-    # For this example, let's assume hadith_data contains Quran verses too; if not, load a Quran dataset
-    # Adjust below for your actual Quran JSON structure.
+    try:
+        response = requests.get('https://api.quran.gading.dev/surah')
+        response.raise_for_status()
+        surahs = response.json()['data']
 
-    # Example structure: [{'surah': 'Al-Fatiha', 'ayah': 1, 'text': 'In the name of Allah...'}, ...]
+        surah_names = {s['name']['transliteration']['en'].lower(): s['number'] for s in surahs}
+        close_matches = get_close_matches(query, surah_names.keys(), n=1, cutoff=0.6)
 
-    # Let's say you have quran_data loaded (you need to load Quran JSON similar to hadith_data)
-    # For now, let's reuse hadith_data but this should be replaced with your Quran dataset loaded
+        if close_matches:
+            surah_number = surah_names[close_matches[0]]
+            verses_response = requests.get(f'https://api.quran.gading.dev/surah/{surah_number}')
+            verses_response.raise_for_status()
+            surah_data = verses_response.json()['data']
 
-    # You must load quran_data before usage
-    quran_data = load_json_data('quran.json', 'Quran')  # Make sure to have 'quran.json' in your DATA folder
+            surah_title = f"{surah_data['name']['transliteration']['en']} ({surah_data['name']['short']})"
+            structured_verses = []
 
-    if not quran_data:
-        return jsonify({'error': 'Quran data not available.'}), 500
+            for v in surah_data['verses']:
+                structured_verses.append({
+                    'surah_name': surah_data['name']['transliteration']['en'],
+                    'surah_number': surah_number,
+                    'verse_number': v['number']['inSurah'],
+                    'translation': v['translation']['en'],
+                    'arabic_text': v['text']['arab']
+                })
 
-    # Search Quran verses by 'text' key
-    results = search_data_by_keyword(quran_data, query, 'text')
+            return jsonify({'surah_title': surah_title, 'results': structured_verses})
+        else:
+            return jsonify({'result': f'No Surah found for \"{query}\".', 'results': []})
 
-    if not results:
-        return jsonify({'message': 'No matching Quran verses found.'})
+    except requests.RequestException as e:
+        print(f"Quran API Error: {e}")
+        return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
-    # Return relevant verses
-    return jsonify({'results': results})
-
-# --- Implement Hadith Search ---
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
-    query = data.get('query', '').strip()
+    query = data.get('query', '').strip().lower()
+
     if not query:
-        return jsonify({'error': 'No query provided.'}), 400
+        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
+
+    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     if not hadith_data:
-        return jsonify({'error': 'Hadith data not available.'}), 500
+        return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
 
-    # Search Hadith by 'text' key or whichever key has the hadith content in your JSON
-    results = search_data_by_keyword(hadith_data, query, 'text')
+    try:
+        matches = []
+        count = 0
 
-    if not results:
-        return jsonify({'message': 'No matching Hadith found.'})
+        for volume in hadith_data.get('volumes', []):
+            for book in volume.get('books', []):
+                for hadith in book.get('hadiths', []):
+                    text = hadith.get('text', '').lower()
+                    keywords = hadith.get('keywords', [])
+                    if query in text or any(query in k.lower() for k in keywords):
+                        if count < 5:
+                            matches.append({
+                                'volume_number': volume.get('volume_number', 'N/A'),
+                                'book_number': book.get('book_number', 'N/A'),
+                                'book_name': book.get('book_name', 'Unknown Book'),
+                                'hadith_info': hadith.get('info', 'Info'),
+                                'narrator': hadith.get('by', 'Unknown narrator'),
+                                'text': hadith.get('text', 'No text found')
+                            })
+                            count += 1
+                        else:
+                            break
+                if count >= 5:
+                    break
+            if count >= 5:
+                break
 
-    return jsonify({'results': results})
+        if matches:
+            return jsonify({'results': matches})
+        else:
+            return jsonify({'result': f'No Hadith found for \"{query}\".', 'results': []})
+    except Exception as e:
+        print(f"Hadith Search Error: {e}")
+        return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
 
-# --- Implement Basic Knowledge Search ---
-@app.route('/basic-knowledge', methods=['POST'])
-def basic_knowledge():
-    data = request.get_json()
-    query = data.get('query', '').strip()
-    if not query:
-        return jsonify({'error': 'No query provided.'}), 400
-
-    if not basic_knowledge_data:
-        return jsonify({'error': 'Basic knowledge data not available.'}), 500
-
-    # Search basic knowledge by 'question' or 'topic' or appropriate key
-    results = search_data_by_keyword(basic_knowledge_data, query, 'question')
-
-    if not results:
-        return jsonify({'message': 'No matching basic Islamic knowledge found.'})
-
-    return jsonify({'results': results})
-
-# --- Implement Friendly Response ---
-@app.route('/friendly-response', methods=['POST'])
-def friendly_response():
-    data = request.get_json()
-    query = data.get('query', '').strip()
-    if not query:
-        return jsonify({'error': 'No query provided.'}), 400
-
-    if not friendly_responses_data:
-        return jsonify({'error': 'Friendly responses data not available.'}), 500
-
-    # Search friendly responses by 'trigger' or 'keyword' or appropriate key
-    results = search_data_by_keyword(friendly_responses_data, query, 'trigger')
-
-    if not results:
-        return jsonify({'message': 'No matching friendly response found.'})
-
-    return jsonify({'results': results})
-
-# --- Surah List Endpoint Stub ---
 @app.route('/get-surah-list')
 def get_surah_list():
-    # You should provide a Quran surah list JSON or hardcoded data here
-    surah_list = [
-        {"number": 1, "name": "Al-Fatiha"},
-        {"number": 2, "name": "Al-Baqarah"},
-        {"number": 3, "name": "Al-Imran"},
-        # Add all 114 surahs here or load from a JSON file
-    ]
-    return jsonify({'surah_list': surah_list})
+    try:
+        response = requests.get('https://api.quran.gading.dev/surah')
+        response.raise_for_status()
+        surahs = response.json()['data']
+        names = [s['name']['transliteration']['en'] for s in surahs]
+        return jsonify({'surah_list': names})
+    except requests.RequestException as e:
+        print(f"Surah List API Error: {e}")
+        return jsonify({'surah_list': []})
 
-# --- Run the App ---
+# --- New route for speech recognition ---
+@app.route('/recognize-speech', methods=['POST'])
+def recognize_speech():
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file uploaded.'}), 400
+
+    audio_file = request.files['audio']
+    temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
+    try:
+        # Save uploaded file temporarily
+        audio_file.save(temp_path)
+
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(temp_path) as source:
+            audio_data = recognizer.record(source)
+
+        # Recognize using Google Web Speech API
+        text = recognizer.recognize_google(audio_data)
+        return jsonify({'transcript': text})
+    except sr.UnknownValueError:
+        return jsonify({'error': 'Speech Recognition could not understand audio.'}), 400
+    except sr.RequestError as e:
+        return jsonify({'error': f'Speech Recognition service error: {e}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error processing audio: {e}'}), 500
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
 if __name__ == '__main__':
     app.run(debug=True)
