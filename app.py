@@ -5,7 +5,7 @@ from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
 from datetime import datetime
-import speech_recognition as sr  # assuming you want this for speech recognition
+
 
 # Load environment variables
 load_dotenv()
