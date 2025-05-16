@@ -4,6 +4,7 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -79,13 +80,36 @@ def ask():
     }
 
     try:
+        # Save user question for admin view
+        user_question = history[-1]['content'] if history else ''
+        timestamp = datetime.utcnow().isoformat()
+        question_entry = {'question': user_question, 'timestamp': timestamp}
+
+        data_folder = os.path.join(os.path.dirname(__file__), 'data')
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
+
+        questions_file = os.path.join(data_folder, 'user_questions.json')
+
+        all_questions = []
+        if os.path.exists(questions_file):
+            with open(questions_file, 'r', encoding='utf-8') as f:
+                all_questions = json.load(f)
+
+        all_questions.append(question_entry)
+
+        with open(questions_file, 'w', encoding='utf-8') as f:
+            json.dump(all_questions, f, ensure_ascii=False, indent=2)
+
+        print(f"[User Question] {timestamp} - {user_question} saved to {questions_file}")
+
+        # Process AI response
         response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter banned/off-topic phrases and replace with custom message
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -111,6 +135,23 @@ def ask():
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
+
+@app.route('/admin-questions')
+def admin_questions():
+    password = request.args.get('password')
+    if password != "tellapass":
+        return "Unauthorized Access", 401
+
+    data_folder = os.path.join(os.path.dirname(__file__), 'data')
+    questions_file = os.path.join(data_folder, 'user_questions.json')
+
+    try:
+        with open(questions_file, 'r', encoding='utf-8') as f:
+            questions = json.load(f)
+    except FileNotFoundError:
+        questions = []
+
+    return render_template('admin_questions.html', questions=questions)
 
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
@@ -159,60 +200,16 @@ def hadith_search():
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
-    if not query:
-        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
+    results = []
+    for key, value in hadith_data.items():
+        if query in value['text'].lower() or query in value['book'].lower():
+            results.append({
+                'hadith_id': key,
+                'book': value['book'],
+                'text': value['text']
+            })
 
-    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
-
-    if not hadith_data:
-        return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
-
-    try:
-        matches = []
-        count = 0
-
-        for volume in hadith_data.get('volumes', []):
-            for book in volume.get('books', []):
-                for hadith in book.get('hadiths', []):
-                    text = hadith.get('text', '').lower()
-                    keywords = hadith.get('keywords', [])
-                    if query in text or any(query in k.lower() for k in keywords):
-                        if count < 5:
-                            matches.append({
-                                'volume_number': volume.get('volume_number', 'N/A'),
-                                'book_number': book.get('book_number', 'N/A'),
-                                'book_name': book.get('book_name', 'Unknown Book'),
-                                'hadith_info': hadith.get('info', 'Info'),
-                                'narrator': hadith.get('by', 'Unknown narrator'),
-                                'text': hadith.get('text', 'No text found')
-                            })
-                            count += 1
-                        else:
-                            break
-                if count >= 5:
-                    break
-            if count >= 5:
-                break
-
-        if matches:
-            return jsonify({'results': matches})
-        else:
-            return jsonify({'result': f'No Hadith found for \"{query}\".', 'results': []})
-    except Exception as e:
-        print(f"Hadith Search Error: {e}")
-        return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
-
-@app.route('/get-surah-list')
-def get_surah_list():
-    try:
-        response = requests.get('https://api.quran.gading.dev/surah')
-        response.raise_for_status()
-        surahs = response.json()['data']
-        names = [s['name']['transliteration']['en'] for s in surahs]
-        return jsonify({'surah_list': names})
-    except requests.RequestException as e:
-        print(f"Surah List API Error: {e}")
-        return jsonify({'surah_list': []})
+    return jsonify({'query': query, 'results': results})
 
 if __name__ == '__main__':
     app.run(debug=True)
