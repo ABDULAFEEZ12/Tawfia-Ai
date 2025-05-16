@@ -37,6 +37,27 @@ hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
 
+# --- Helper function for searching JSON data by keyword ---
+def search_data_by_keyword(data_list, keyword, key_to_search, max_results=5):
+    """
+    Search through a list of dictionaries for items where the key_to_search contains the keyword.
+    Returns a list of best matches.
+    """
+    # Extract all texts to search from the data
+    texts = [entry.get(key_to_search, '') for entry in data_list]
+    matches = get_close_matches(keyword, texts, n=max_results, cutoff=0.4)  # cutoff can be tuned
+
+    # Return the entries that match
+    results = []
+    for match in matches:
+        for entry in data_list:
+            if entry.get(key_to_search, '') == match:
+                results.append(entry)
+                break
+    return results
+
+# --- Routes ---
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -189,26 +210,106 @@ def admin_questions():
     """
     return render_template_string(html_template, questions=questions)
 
-# --- Stub Endpoints (Optional Implementation Later) ---
+# --- Implement Quran Search ---
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
-    return jsonify({'message': 'Quran search not implemented yet.'})
+    data = request.get_json()
+    query = data.get('query', '').strip()
+    if not query:
+        return jsonify({'error': 'No query provided.'}), 400
 
+    # Assuming you have a Quran JSON with 'text' or 'verse' keys to search
+    # For this example, let's assume hadith_data contains Quran verses too; if not, load a Quran dataset
+    # Adjust below for your actual Quran JSON structure.
+
+    # Example structure: [{'surah': 'Al-Fatiha', 'ayah': 1, 'text': 'In the name of Allah...'}, ...]
+
+    # Let's say you have quran_data loaded (you need to load Quran JSON similar to hadith_data)
+    # For now, let's reuse hadith_data but this should be replaced with your Quran dataset loaded
+
+    # You must load quran_data before usage
+    quran_data = load_json_data('quran.json', 'Quran')  # Make sure to have 'quran.json' in your DATA folder
+
+    if not quran_data:
+        return jsonify({'error': 'Quran data not available.'}), 500
+
+    # Search Quran verses by 'text' key
+    results = search_data_by_keyword(quran_data, query, 'text')
+
+    if not results:
+        return jsonify({'message': 'No matching Quran verses found.'})
+
+    # Return relevant verses
+    return jsonify({'results': results})
+
+# --- Implement Hadith Search ---
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
-    return jsonify({'message': 'Hadith search not implemented yet.'})
+    data = request.get_json()
+    query = data.get('query', '').strip()
+    if not query:
+        return jsonify({'error': 'No query provided.'}), 400
 
+    if not hadith_data:
+        return jsonify({'error': 'Hadith data not available.'}), 500
+
+    # Search Hadith by 'text' key or whichever key has the hadith content in your JSON
+    results = search_data_by_keyword(hadith_data, query, 'text')
+
+    if not results:
+        return jsonify({'message': 'No matching Hadith found.'})
+
+    return jsonify({'results': results})
+
+# --- Implement Basic Knowledge Search ---
 @app.route('/basic-knowledge', methods=['POST'])
 def basic_knowledge():
-    return jsonify({'message': 'Basic Islamic knowledge search not implemented yet.'})
+    data = request.get_json()
+    query = data.get('query', '').strip()
+    if not query:
+        return jsonify({'error': 'No query provided.'}), 400
 
+    if not basic_knowledge_data:
+        return jsonify({'error': 'Basic knowledge data not available.'}), 500
+
+    # Search basic knowledge by 'question' or 'topic' or appropriate key
+    results = search_data_by_keyword(basic_knowledge_data, query, 'question')
+
+    if not results:
+        return jsonify({'message': 'No matching basic Islamic knowledge found.'})
+
+    return jsonify({'results': results})
+
+# --- Implement Friendly Response ---
 @app.route('/friendly-response', methods=['POST'])
 def friendly_response():
-    return jsonify({'message': 'Friendly response not implemented yet.'})
+    data = request.get_json()
+    query = data.get('query', '').strip()
+    if not query:
+        return jsonify({'error': 'No query provided.'}), 400
 
+    if not friendly_responses_data:
+        return jsonify({'error': 'Friendly responses data not available.'}), 500
+
+    # Search friendly responses by 'trigger' or 'keyword' or appropriate key
+    results = search_data_by_keyword(friendly_responses_data, query, 'trigger')
+
+    if not results:
+        return jsonify({'message': 'No matching friendly response found.'})
+
+    return jsonify({'results': results})
+
+# --- Surah List Endpoint Stub ---
 @app.route('/get-surah-list')
 def get_surah_list():
-    return jsonify({'message': 'Surah list not implemented yet.'})
+    # You should provide a Quran surah list JSON or hardcoded data here
+    surah_list = [
+        {"number": 1, "name": "Al-Fatiha"},
+        {"number": 2, "name": "Al-Baqarah"},
+        {"number": 3, "name": "Al-Imran"},
+        # Add all 114 surahs here or load from a JSON file
+    ]
+    return jsonify({'surah_list': surah_list})
 
 # --- Run the App ---
 if __name__ == '__main__':
