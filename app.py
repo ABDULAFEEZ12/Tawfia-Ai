@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template_string, render_template
 import requests
 import json
 import os
@@ -9,7 +9,7 @@ from datetime import datetime
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)  # ✅ Corrected __name__
+app = Flask(__name__)
 
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
@@ -17,7 +17,7 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
-    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)  # ✅ Corrected __file__
+    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
 
     try:
@@ -39,7 +39,7 @@ friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Re
 
 @app.route('/')
 def index():
-    return render_template_string("<h1>Welcome to Tawfiq AI</h1>")
+    return render_template('index.html')
 
 @app.route('/about')
 def about():
@@ -55,7 +55,7 @@ def ask():
     data = request.get_json()
     history = data.get('history', [])
 
-    # Save user question
+    # --- Save the user question ---
     try:
         user_question = history[-1]['content'] if history else ''
         timestamp = datetime.utcnow().isoformat()
@@ -76,7 +76,7 @@ def ask():
     except Exception as e:
         print(f"❌ Error saving question: {e}")
 
-    # Call the model API
+    # --- Call the model API ---
     system_prompt = {
         "role": "system",
         "content": (
@@ -133,7 +133,7 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-# Admin-only access to user questions
+# --- Admin Questions Viewer ---
 @app.route('/admin-questions')
 def admin_questions():
     password = request.args.get('password')
@@ -180,27 +180,26 @@ def admin_questions():
     """
     return render_template_string(html_template, questions=questions)
 
-# Placeholder routes
+# Placeholder routes (still to be implemented)
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
-    return jsonify({'result': 'Not implemented yet.'})
+    pass
 
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
-    return jsonify({'result': 'Not implemented yet.'})
+    pass
 
 @app.route('/basic-knowledge', methods=['POST'])
 def basic_knowledge():
-    return jsonify({'info': 'Not implemented yet.'})
+    pass
 
 @app.route('/friendly-response', methods=['POST'])
 def friendly_response():
-    return jsonify({'answer': 'Not implemented yet.'})
+    pass
 
 @app.route('/get-surah-list')
 def get_surah_list():
-    return jsonify({'surahs': 'Not implemented yet.'})
+    pass
 
-# Start the server
 if __name__ == '__main__':
-    app.run(debug=True)  # ✅ Fixed: added missing parenthesis
+    app.run(debug=True)
