@@ -104,27 +104,18 @@ def ask():
     try:
         user_question = history[-1]['content'] if history else ''
         timestamp = datetime.utcnow().isoformat()
-        question_entry = {'question': user_question, 'timestamp': timestamp}
-
-        # Ensure data folder exists
         data_folder = os.path.join(os.path.dirname(__file__), 'data')
         if not os.path.exists(data_folder):
             os.makedirs(data_folder)
-
         questions_file = os.path.join(data_folder, 'user_questions.json')
-
         all_questions = []
         if os.path.exists(questions_file):
             with open(questions_file, 'r', encoding='utf-8') as f:
                 all_questions = json.load(f)
-
-        all_questions.append(question_entry)
-
+        all_questions.append({'question': user_question, 'timestamp': timestamp})
         with open(questions_file, 'w', encoding='utf-8') as f:
             json.dump(all_questions, f, ensure_ascii=False, indent=2)
-
-        print(f"[User Question] {timestamp} - {user_question} saved to {questions_file}")
-
+        print(f"[User Question] {timestamp} - {user_question} saved.")
     except Exception as e:
         print(f"❌ Error saving question: {e}")
 
@@ -133,10 +124,9 @@ def ask():
         response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
-
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter banned/off-topic phrases and replace with custom message
+        # Filter banned/off-topic phrases
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -181,7 +171,6 @@ def admin_questions():
         print(f"Error loading questions file: {e}")
         questions = []
 
-    # Returning JSON list of questions
     return jsonify(questions)
 
 @app.route('/quran-search', methods=['POST'])
@@ -265,7 +254,7 @@ def hadith_search():
                 for hadith in book.get('hadiths', []):
                     text = hadith.get('text', '').lower()
                     keywords = hadith.get('keywords', [])
-                    print("Hadith text preview:", text[:50])  # print first 50 chars
+                    print("Hadith text preview:", text[:50])  # first 50 chars
                     print("Keywords:", keywords)
                     if (query in text) or any(query in kw.lower() for kw in keywords):
                         print("Match found!")
@@ -287,7 +276,7 @@ def hadith_search():
         if matches:
             results = [m['formatted'] for m in matches]
             print(f"Found {len(results)} hadith(s).")
-            return jsonify({'result': f'Found {len(results)}} hadith(s).', 'results': results})
+            return jsonify({'result': f'Found {len(results)} hadith(s).', 'results': results})
         else:
             print("No matching hadiths found.")
             return jsonify({'result': 'No hadith found for your query.', 'results': []})
