@@ -8,5 +8,3 @@ pyarabic
 transliterate
 transformers
 huggingface_hub
-speech_recognition
-
