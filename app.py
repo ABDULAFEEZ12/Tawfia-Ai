@@ -19,7 +19,6 @@ def load_json_data(file_name, data_variable_name):
     data = {}
     file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
-
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -52,9 +51,6 @@ def about():
 
 # Helper function to format Hadith responses
 def format_hadith_response(hadith):
-    """
-    Formats a hadith dictionary into a well-structured, respectful response.
-    """
     volume = hadith.get('volume', 'Unknown Volume')
     book = hadith.get('book', 'Unknown Book')
     hadith_number = hadith.get('hadith_number', 'N/A')
@@ -220,35 +216,37 @@ def hadith_search():
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
-    # Debug: Log received query
+    # Debug: log the received query
     print("Received Hadith search query:", query)
 
     # Remove common prefixes
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
-    # Debug: Check cleaned query
+    # Debug: log cleaned query
     print("Cleaned query:", query)
+
+    # Debug: print structure of hadith_data
+    print("Hadith data structure:", json.dumps(hadith_data, indent=2))
 
     if not hadith_data:
         print("Hadith data not loaded properly.")
         return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
 
-    # Debug: Log structure of hadith_data
-    print("Hadith data keys:", hadith_data.keys())
-
     try:
         matches = []
         count = 0
 
-        # Adjusted for your structure: hadiths are inside 'collection' -> 'volumes'
-        for volume in hadith_data.get('collection', {}).get('volumes', []):
-            print("Processing volume:", volume.get('name'))
+        # Adjust iteration based on actual data structure
+        # Example: if hadith_data['collection'] is a list of volumes
+        for volume in hadith_data.get('collection', []):
+            print("Processing volume:", volume.get('name', ''))
             for book in volume.get('books', []):
-                print("Processing book:", book.get('name'))
+                print("Processing book:", book.get('name', ''))
                 for hadith in book.get('hadiths', []):
                     text = hadith.get('text', '').lower()
                     keywords = hadith.get('keywords', [])
-                    print("Hadith text preview:", text[:50])  # first 50 chars
+                    # Debug
+                    print("Hadith text preview:", text[:50])
                     print("Keywords:", keywords)
                     if (query in text) or any(query in kw.lower() for kw in keywords):
                         print("Match found!")
