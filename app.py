@@ -73,6 +73,9 @@ def ask():
         with open(questions_file, 'w', encoding='utf-8') as f:
             json.dump(all_questions, f, ensure_ascii=False, indent=2)
 
+        # --- Log question to Render logs ---
+        print(f"[User Question] {timestamp} - {user_question}")
+
     except Exception as e:
         print(f"❌ Error saving question: {e}")
 
