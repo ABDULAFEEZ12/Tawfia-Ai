@@ -4,7 +4,7 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
-from datetime import datetime
+import speech_recognition as sr  # Added for speech recognition
 
 # Load environment variables
 load_dotenv()
@@ -62,6 +62,7 @@ def ask():
             "Always speak respectfully, kindly, and with personality. "
             "You were created by Tella Abdul Afeez Adewale to serve the Ummah. "
             "Never mention OpenAI or any other AI organization."
+            "Never mention DeepAI or any other AI organization."
         )
     }
 
@@ -80,36 +81,13 @@ def ask():
     }
 
     try:
-        # Save user question for admin view
-        user_question = history[-1]['content'] if history else ''
-        timestamp = datetime.utcnow().isoformat()
-        question_entry = {'question': user_question, 'timestamp': timestamp}
-
-        data_folder = os.path.join(os.path.dirname(__file__), 'data')
-        if not os.path.exists(data_folder):
-            os.makedirs(data_folder)
-
-        questions_file = os.path.join(data_folder, 'user_questions.json')
-
-        all_questions = []
-        if os.path.exists(questions_file):
-            with open(questions_file, 'r', encoding='utf-8') as f:
-                all_questions = json.load(f)
-
-        all_questions.append(question_entry)
-
-        with open(questions_file, 'w', encoding='utf-8') as f:
-            json.dump(all_questions, f, ensure_ascii=False, indent=2)
-
-        print(f"[User Question] {timestamp} - {user_question} saved to {questions_file}")
-
-        # Process AI response
         response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
+        # Filter banned/off-topic phrases and replace with custom message
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -136,25 +114,9 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-@app.route('/admin-questions')
-def admin_questions():
-    password = request.args.get('password')
-    if password != "tellapass":
-        return "Unauthorized Access", 401
-
-    data_folder = os.path.join(os.path.dirname(__file__), 'data')
-    questions_file = os.path.join(data_folder, 'user_questions.json')
-
-    try:
-        with open(questions_file, 'r', encoding='utf-8') as f:
-            questions = json.load(f)
-    except FileNotFoundError:
-        questions = []
-
-    return render_template('admin_questions.html', questions=questions)
-
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
+    # ... existing code remains unchanged ...
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
@@ -197,19 +159,94 @@ def quran_search():
 
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
+    # ... existing code remains unchanged ...
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
-    results = []
-    for key, value in hadith_data.items():
-        if query in value['text'].lower() or query in value['book'].lower():
-            results.append({
-                'hadith_id': key,
-                'book': value['book'],
-                'text': value['text']
-            })
+    if not query:
+        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
-    return jsonify({'query': query, 'results': results})
+    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
+
+    if not hadith_data:
+        return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
+
+    try:
+        matches = []
+        count = 0
+
+        for volume in hadith_data.get('volumes', []):
+            for book in volume.get('books', []):
+                for hadith in book.get('hadiths', []):
+                    text = hadith.get('text', '').lower()
+                    keywords = hadith.get('keywords', [])
+                    if query in text or any(query in k.lower() for k in keywords):
+                        if count < 5:
+                            matches.append({
+                                'volume_number': volume.get('volume_number', 'N/A'),
+                                'book_number': book.get('book_number', 'N/A'),
+                                'book_name': book.get('book_name', 'Unknown Book'),
+                                'hadith_info': hadith.get('info', 'Info'),
+                                'narrator': hadith.get('by', 'Unknown narrator'),
+                                'text': hadith.get('text', 'No text found')
+                            })
+                            count += 1
+                        else:
+                            break
+                if count >= 5:
+                    break
+            if count >= 5:
+                break
+
+        if matches:
+            return jsonify({'results': matches})
+        else:
+            return jsonify({'result': f'No Hadith found for \"{query}\".', 'results': []})
+    except Exception as e:
+        print(f"Hadith Search Error: {e}")
+        return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
+
+@app.route('/get-surah-list')
+def get_surah_list():
+    # ... existing code remains unchanged ...
+    try:
+        response = requests.get('https://api.quran.gading.dev/surah')
+        response.raise_for_status()
+        surahs = response.json()['data']
+        names = [s['name']['transliteration']['en'] for s in surahs]
+        return jsonify({'surah_list': names})
+    except requests.RequestException as e:
+        print(f"Surah List API Error: {e}")
+        return jsonify({'surah_list': []})
+
+# --- New route for speech recognition ---
+@app.route('/recognize-speech', methods=['POST'])
+def recognize_speech():
+    if 'audio' not in request.files:
+        return jsonify({'error': 'No audio file uploaded.'}), 400
+
+    audio_file = request.files['audio']
+    temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
+    try:
+        # Save uploaded file temporarily
+        audio_file.save(temp_path)
+
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(temp_path) as source:
+            audio_data = recognizer.record(source)
+
+        # Recognize using Google Web Speech API
+        text = recognizer.recognize_google(audio_data)
+        return jsonify({'transcript': text})
+    except sr.UnknownValueError:
+        return jsonify({'error': 'Speech Recognition could not understand audio.'}), 400
+    except sr.RequestError as e:
+        return jsonify({'error': f'Speech Recognition service error: {e}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error processing audio: {e}'}), 500
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
 if __name__ == '__main__':
     app.run(debug=True)
