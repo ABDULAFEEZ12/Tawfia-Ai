@@ -6,16 +6,13 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-
-if not openrouter_api_key:
-    print("⚠️ WARNING: OPENROUTER_API_KEY environment variable is not set.")
 
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
@@ -53,6 +50,26 @@ def about():
         'description': 'Tawfiq AI is a wise, kind, and trustworthy Muslim assistant designed to help people with Islamic and general knowledge.'
     })
 
+# Helper function to format Hadith responses
+def format_hadith_response(hadith):
+    """
+    Formats a hadith dictionary into a well-structured, respectful response.
+    """
+    volume = hadith.get('volume', 'Unknown Volume')
+    book = hadith.get('book', 'Unknown Book')
+    hadith_number = hadith.get('hadith_number', 'N/A')
+    text = hadith.get('text', '')
+
+    response = (
+        f"🌙 **Hadith Reference**:\n"
+        f"• Volume: {volume}\n"
+        f"• Book: {book}\n"
+        f"• Hadith Number: {hadith_number}\n\n"
+        f"**Text of the Hadith:**\n{text}\n\n"
+        "May Allah grant us understanding and guide us to practice these teachings."
+    )
+    return response
+
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
@@ -64,7 +81,7 @@ def ask():
             "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
             "Always speak respectfully, kindly, and with personality. "
             "You were created by Tella Abdul Afeez Adewale to serve the Ummah. "
-            "Never mention OpenAI or any other AI organization. "
+            "Never mention DeepAI or any other AI organization."
             "Never mention DeepAI or any other AI organization."
         )
     }
@@ -89,8 +106,10 @@ def ask():
         timestamp = datetime.utcnow().isoformat()
         question_entry = {'question': user_question, 'timestamp': timestamp}
 
+        # Ensure data folder exists
         data_folder = os.path.join(os.path.dirname(__file__), 'data')
-        os.makedirs(data_folder, exist_ok=True)
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
 
         questions_file = os.path.join(data_folder, 'user_questions.json')
 
@@ -162,6 +181,7 @@ def admin_questions():
         print(f"Error loading questions file: {e}")
         questions = []
 
+    # Returning JSON list of questions
     return jsonify(questions)
 
 @app.route('/quran-search', methods=['POST'])
@@ -200,7 +220,7 @@ def quran_search():
 
             return jsonify({'surah_title': surah_title, 'results': structured_verses})
         else:
-            return jsonify({'result': f'No Surah found for "{query}".', 'results': []})
+            return jsonify({'result': f'No Surah found for \"{query}\".', 'results': []})
 
     except requests.RequestException as e:
         print(f"Quran API Error: {e}")
@@ -212,10 +232,13 @@ def hadith_search():
     query = data.get('query', '').strip().lower()
 
     if not query:
-        return jsonify({'result': 'Please provide a search query.', 'results': []})
+        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
+
+    # Remove common prefixes
+    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     if not hadith_data:
-        return jsonify({'result': 'Hadith data is not loaded.', 'results': []})
+        return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
 
     try:
         matches = []
@@ -224,54 +247,82 @@ def hadith_search():
         for volume in hadith_data.get('volumes', []):
             for book in volume.get('books', []):
                 for hadith in book.get('hadiths', []):
-                    text = hadith.get('text', '').strip()
-                    if query in text.lower():
-                        matches.append({
-                            'number': count + 1,
-                            'hadith_number': hadith.get('number', 'N/A'),
-                            'volume_name': volume.get('name', 'N/A'),
-                            'book_name': book.get('name', 'N/A'),
-                            'text': text
+                    text = hadith.get('text', '').lower()
+                    keywords = hadith.get('keywords', [])
+                    if (query in text) or any(query in kw.lower() for kw in keywords):
+                        # Use the formatter here
+                        formatted = format_hadith_response({
+                            'volume': volume.get('name', ''),
+                            'book': book.get('name', ''),
+                            'hadith_number': hadith.get('number', ''),
+                            'text': hadith.get('text', '')
                         })
+                        matches.append({'formatted': formatted})
                         count += 1
-                        if count >= 50:
+                        if count >= 6:
                             break
-                if count >= 50:
+                if count >= 6:
                     break
-            if count >= 50:
+            if count >= 6:
                 break
 
         if matches:
-            return jsonify({'result': f'{len(matches)} Hadith(s) found.', 'results': matches})
+            # Return the formatted Hadiths
+            results = [m['formatted'] for m in matches]
+            return jsonify({'result': f'Found {len(results)} hadith(s) related to \"{query}\".', 'results': results})
         else:
-            return jsonify({'result': 'No matching Hadiths found.', 'results': []})
+            return jsonify({'result': 'No hadith found for your query.', 'results': []})
 
     except Exception as e:
-        print(f"Error during Hadith search: {e}")
-        return jsonify({'result': 'An error occurred during search.', 'results': []})
+        print(f"Hadith search error: {e}")
+        return jsonify({'result': 'An error occurred while searching hadith.', 'results': []})
+
+@app.route('/basic-knowledge-search', methods=['POST'])
+def basic_knowledge_search():
+    data = request.get_json()
+    query = data.get('query', '').strip().lower()
+
+    if not query:
+        return jsonify({'result': 'Please provide a search query.', 'results': []})
+
+    if not basic_knowledge_data:
+        return jsonify({'result': 'Basic knowledge data is not loaded.', 'results': []})
+
+    try:
+        matches = []
+        count = 0
+
+        for item in basic_knowledge_data.get('items', []):
+            if query in item.get('title', '').lower() or query in item.get('content', '').lower():
+                matches.append(item)
+                count += 1
+                if count >= 6:
+                    break
+
+        if matches:
+            return jsonify({'result': f'Found {len(matches)} entries related to \"{query}\".', 'results': matches})
+        else:
+            return jsonify({'result': 'No entries found for your query.', 'results': []})
+
+    except Exception as e:
+        print(f"Basic knowledge search error: {e}")
+        return jsonify({'result': 'An error occurred while searching.', 'results': []})
 
 @app.route('/friendly-response', methods=['POST'])
 def friendly_response():
     data = request.get_json()
-    question = data.get('question', '').lower()
+    query = data.get('query', '').strip().lower()
 
-    for entry in friendly_responses_data.get('responses', []):
-        for keyword in entry.get('keywords', []):
-            if keyword in question:
-                return jsonify({'answer': entry.get('answer', '')})
+    if not friendly_responses_data:
+        return jsonify({'response': "Sorry, I don't have any friendly responses available."})
 
-    return jsonify({'answer': 'Sorry, I do not have a friendly response for that question.'})
+    for item in friendly_responses_data.get('responses', []):
+        if query in item.get('trigger', '').lower():
+            return jsonify({'response': item.get('response', '...')})
 
-@app.route('/basic-knowledge', methods=['POST'])
-def basic_knowledge():
-    data = request.get_json()
-    topic = data.get('topic', '').lower()
+    return jsonify({'response': "I'm here if you want to talk or need help."})
 
-    for entry in basic_knowledge_data.get('topics', []):
-        if topic == entry.get('name', '').lower():
-            return jsonify({'info': entry.get('info', '')})
-
-    return jsonify({'info': 'Topic not found in basic Islamic knowledge.'})
+# Note: The speech-to-text endpoint is omitted here for brevity and because it requires audio processing setup.
 
 if __name__ == '__main__':
     app.run(debug=True)
