@@ -9,7 +9,7 @@ from datetime import datetime
 # Load environment variables
 load_dotenv()
 
-app = Flask(_name_)
+app = Flask(__name__)  # ✅ Corrected __name__
 
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
@@ -17,7 +17,7 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
-    file_path = os.path.join(os.path.dirname(_file_), 'DATA', file_name)
+    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)  # ✅ Corrected __file__
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
 
     try:
@@ -39,7 +39,7 @@ friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Re
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template_string("<h1>Welcome to Tawfiq AI</h1>")
 
 @app.route('/about')
 def about():
@@ -55,7 +55,7 @@ def ask():
     data = request.get_json()
     history = data.get('history', [])
 
-    # --- Save the user question ---
+    # Save user question
     try:
         user_question = history[-1]['content'] if history else ''
         timestamp = datetime.utcnow().isoformat()
@@ -76,7 +76,7 @@ def ask():
     except Exception as e:
         print(f"❌ Error saving question: {e}")
 
-    # --- Call the model API ---
+    # Call the model API
     system_prompt = {
         "role": "system",
         "content": (
@@ -133,8 +133,7 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-
-# --- Admin Questions Viewer ---
+# Admin-only access to user questions
 @app.route('/admin-questions')
 def admin_questions():
     password = request.args.get('password')
@@ -181,33 +180,27 @@ def admin_questions():
     """
     return render_template_string(html_template, questions=questions)
 
-
-# (Other routes below remain unchanged...)
-
+# Placeholder routes
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
-    # No changes here...
-    pass
+    return jsonify({'result': 'Not implemented yet.'})
 
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
-    # No changes here...
-    pass
+    return jsonify({'result': 'Not implemented yet.'})
 
 @app.route('/basic-knowledge', methods=['POST'])
 def basic_knowledge():
-    # No changes here...
-    pass
+    return jsonify({'info': 'Not implemented yet.'})
 
 @app.route('/friendly-response', methods=['POST'])
 def friendly_response():
-    # No changes here...
-    pass
+    return jsonify({'answer': 'Not implemented yet.'})
 
 @app.route('/get-surah-list')
 def get_surah_list():
-    # No changes here...
-    pass
+    return jsonify({'surahs': 'Not implemented yet.'})
 
+# Start the server
 if __name__ == '__main__':
-    app.run(debug=True
+    app.run(debug=True)  # ✅ Fixed: added missing parenthesis
