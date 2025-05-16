@@ -5,7 +5,7 @@ from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
 from datetime import datetime
-
+import speech_recognition as sr  # if you use speech-to-text
 
 # Load environment variables
 load_dotenv()
@@ -20,7 +20,6 @@ def load_json_data(file_name, data_variable_name):
     data = {}
     file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
-
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -62,7 +61,7 @@ def ask():
             "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant. "
             "Always speak respectfully, kindly, and with personality. "
             "You were created by Tella Abdul Afeez Adewale to serve the Ummah. "
-            "Never mention OpenAI or any other AI organization."
+            "Never mention DeepAI or any other AI organization."
             "Never mention DeepAI or any other AI organization."
         )
     }
@@ -81,13 +80,11 @@ def ask():
         "stream": False
     }
 
-    # Save user question to file
+    # Save user question to file with proper path and folder creation
     try:
         user_question = history[-1]['content'] if history else ''
         timestamp = datetime.utcnow().isoformat()
-        question_entry = {'question': user_question, 'timestamp': timestamp}
 
-        # Ensure data folder exists
         data_folder = os.path.join(os.path.dirname(__file__), 'data')
         if not os.path.exists(data_folder):
             os.makedirs(data_folder)
@@ -99,17 +96,16 @@ def ask():
             with open(questions_file, 'r', encoding='utf-8') as f:
                 all_questions = json.load(f)
 
-        all_questions.append(question_entry)
+        all_questions.append({'question': user_question, 'timestamp': timestamp})
 
         with open(questions_file, 'w', encoding='utf-8') as f:
             json.dump(all_questions, f, ensure_ascii=False, indent=2)
 
         print(f"[User Question] {timestamp} - {user_question} saved to {questions_file}")
-
     except Exception as e:
         print(f"❌ Error saving question: {e}")
 
-    # Call OpenRouter API
+    # Call the external API
     try:
         response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
@@ -117,7 +113,7 @@ def ask():
 
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter banned/off-topic phrases and replace with custom message
+        # Filter banned/off-topic phrases
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -127,16 +123,13 @@ def ask():
             "developed by openai",
             "my creators at openai"
         ]
-
         if any(phrase in answer.lower() for phrase in banned_phrases):
             answer = (
                 "I was created by Tella Abdul Afeez Adewale to serve the Ummah with wisdom and knowledge. "
                 "Islam is the final and complete guidance from Allah through Prophet Muhammad (peace be upon him). "
                 "I’m always here to assist you with Islamic and helpful answers."
             )
-
         return jsonify({'answer': answer})
-
     except requests.RequestException as e:
         print(f"OpenRouter API Error: {e}")
         return jsonify({'answer': 'Tawfiq AI is having trouble reaching external knowledge. Try again later.'})
@@ -162,8 +155,6 @@ def admin_questions():
         print(f"Error loading questions file: {e}")
         questions = []
 
-    # You can render a template here or return JSON
-    # For simplicity, returning JSON list of questions
     return jsonify(questions)
 
 @app.route('/quran-search', methods=['POST'])
@@ -203,7 +194,6 @@ def quran_search():
             return jsonify({'surah_title': surah_title, 'results': structured_verses})
         else:
             return jsonify({'result': f'No Surah found for \"{query}\".', 'results': []})
-
     except requests.RequestException as e:
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
@@ -216,6 +206,7 @@ def hadith_search():
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
+    # Remove common prefixes to focus the query
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     if not hadith_data:
@@ -224,7 +215,7 @@ def hadith_search():
     try:
         matches = []
         count = 0
-
+        # Adjusted to your dataset's structure
         for volume in hadith_data.get('volumes', []):
             for book in volume.get('books', []):
                 for hadith in book.get('hadiths', []):
@@ -244,12 +235,10 @@ def hadith_search():
                     break
             if count >= 6:
                 break
-
         if matches:
             return jsonify({'result': f'Found {len(matches)} hadith(s) related to \"{query}\".', 'results': matches})
         else:
             return jsonify({'result': 'No hadith found for your query.', 'results': []})
-
     except Exception as e:
         print(f"Hadith search error: {e}")
         return jsonify({'result': 'An error occurred while searching hadith.', 'results': []})
@@ -268,19 +257,16 @@ def basic_knowledge_search():
     try:
         matches = []
         count = 0
-
         for item in basic_knowledge_data.get('items', []):
             if query in item.get('title', '').lower() or query in item.get('content', '').lower():
                 matches.append(item)
                 count += 1
                 if count >= 6:
                     break
-
         if matches:
             return jsonify({'result': f'Found {len(matches)} entries related to \"{query}\".', 'results': matches})
         else:
             return jsonify({'result': 'No entries found for your query.', 'results': []})
-
     except Exception as e:
         print(f"Basic knowledge search error: {e}")
         return jsonify({'result': 'An error occurred while searching.', 'results': []})
@@ -299,15 +285,13 @@ def friendly_response():
 
     return jsonify({'response': "I'm here if you want to talk or need help."})
 
+# Optional: Speech-to-text endpoint
 @app.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
-    # Assuming you are sending audio as a file in the request
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file part'}), 400
-
     audio_file = request.files['audio']
     recognizer = sr.Recognizer()
-
     try:
         with sr.AudioFile(audio_file) as source:
             audio = recognizer.record(source)
@@ -316,7 +300,6 @@ def speech_to_text():
     except Exception as e:
         print(f"Speech recognition error: {e}")
         return jsonify({'error': 'Could not process audio'}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True)
