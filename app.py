@@ -5,7 +5,6 @@ from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
 from hashlib import sha256
-import speech_recognition as sr
 
 # Load environment variables
 load_dotenv()
