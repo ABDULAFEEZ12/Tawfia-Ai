@@ -4,21 +4,38 @@ import json
 from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
+from hashlib import sha256
+import speech_recognition as sr
 
 # Load environment variables
 load_dotenv()
 
+# Create Flask app
 app = Flask(__name__)
 
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+
+# --- File-Based Cache ---
+CACHE_FILE = "tawfiq_cache.json"
+
+# Load cache from file
+if os.path.exists(CACHE_FILE):
+    with open(CACHE_FILE, "r", encoding="utf-8") as f:
+        question_cache = json.load(f)
+else:
+    question_cache = {}
+
+# Save cache to file
+def save_cache():
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump(question_cache, f, indent=2, ensure_ascii=False)
 
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
     file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
-
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -55,21 +72,25 @@ def ask():
     history = data.get('history', [])
 
     system_prompt = {
-    "role": "system",
-    "content": (
-        "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant created by Tella Abdul Afeez Adewale. "
-        "You speak like a trusted companion: firm, clear, honest, and motivating without sugarcoating the truth. "
-        "Your tone balances kindness with wisdom; you never avoid the truth but always deliver it respectfully. "
-        "Always uphold the finality and perfection of Islam as the complete guidance from Allah through Prophet Muhammad (peace be upon him). "
-        "Avoid vague or neutral language about core Islamic beliefs; be confident and assertive on matters of faith. "
-        "You match the user's energy — when they are excited, respond with cheerful hype; when calm, respond gently but still firmly. "
-        "Always stay within the boundaries of Islamic adab and wisdom, using warm and human-like responses. "
-        "Never sound robotic, dry, or evasive. "
-        "Never mention OpenAI, DeepAI, or any other AI company — you only represent Tawfiq AI, here to serve the Ummah with halal knowledge and good character."
-    )
-}
+        "role": "system",
+        "content": (
+            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant created by Tella Abdul Afeez Adewale. "
+            "You speak like a trusted companion: firm, clear, honest, and motivating without sugarcoating the truth. "
+            "Your tone balances kindness with wisdom; you never avoid the truth but always deliver it respectfully. "
+            "Always uphold the finality and perfection of Islam as the complete guidance from Allah through Prophet Muhammad (peace be upon him). "
+            "Avoid vague or neutral language about core Islamic beliefs; be confident and assertive on matters of faith. "
+            "You match the user's energy — when they are excited, respond with cheerful hype; when calm, respond gently but still firmly. "
+            "Always stay within the boundaries of Islamic adab and wisdom, using warm and human-like responses. "
+            "Never sound robotic, dry, or evasive. "
+            "Never mention OpenAI, DeepAI, or any other AI company — you only represent Tawfiq AI, here to serve the Ummah with halal knowledge and good character."
+        )
+    }
 
     messages = [system_prompt] + history
+    cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
+
+    if cache_key in question_cache:
+        return jsonify({'answer': question_cache[cache_key]})
 
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -87,10 +108,8 @@ def ask():
         response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
-
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter banned/off-topic phrases and replace with custom message
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -108,6 +127,8 @@ def ask():
                 "I’m always here to assist you with Islamic and helpful answers."
             )
 
+        question_cache[cache_key] = answer
+        save_cache()
         return jsonify({'answer': answer})
 
     except requests.RequestException as e:
@@ -119,7 +140,6 @@ def ask():
 
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
-    # ... existing code remains unchanged ...
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
@@ -141,28 +161,23 @@ def quran_search():
             surah_data = verses_response.json()['data']
 
             surah_title = f"{surah_data['name']['transliteration']['en']} ({surah_data['name']['short']})"
-            structured_verses = []
-
-            for v in surah_data['verses']:
-                structured_verses.append({
-                    'surah_name': surah_data['name']['transliteration']['en'],
-                    'surah_number': surah_number,
-                    'verse_number': v['number']['inSurah'],
-                    'translation': v['translation']['en'],
-                    'arabic_text': v['text']['arab']
-                })
+            structured_verses = [{
+                'surah_name': surah_data['name']['transliteration']['en'],
+                'surah_number': surah_number,
+                'verse_number': v['number']['inSurah'],
+                'translation': v['translation']['en'],
+                'arabic_text': v['text']['arab']
+            } for v in surah_data['verses']]
 
             return jsonify({'surah_title': surah_title, 'results': structured_verses})
         else:
-            return jsonify({'result': f'No Surah found for \"{query}\".', 'results': []})
-
+            return jsonify({'result': f'No Surah found for "{query}".', 'results': []})
     except requests.RequestException as e:
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
-    # ... existing code remains unchanged ...
     data = request.get_json()
     query = data.get('query', '').strip().lower()
 
@@ -177,7 +192,6 @@ def hadith_search():
     try:
         matches = []
         count = 0
-
         for volume in hadith_data.get('volumes', []):
             for book in volume.get('books', []):
                 for hadith in book.get('hadiths', []):
@@ -200,18 +214,13 @@ def hadith_search():
                     break
             if count >= 5:
                 break
-
-        if matches:
-            return jsonify({'results': matches})
-        else:
-            return jsonify({'result': f'No Hadith found for \"{query}\".', 'results': []})
+        return jsonify({'results': matches}) if matches else jsonify({'result': f'No Hadith found for "{query}".', 'results': []})
     except Exception as e:
         print(f"Hadith Search Error: {e}")
         return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
 
 @app.route('/get-surah-list')
 def get_surah_list():
-    # ... existing code remains unchanged ...
     try:
         response = requests.get('https://api.quran.gading.dev/surah')
         response.raise_for_status()
@@ -222,7 +231,6 @@ def get_surah_list():
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
 
-# --- New route for speech recognition ---
 @app.route('/recognize-speech', methods=['POST'])
 def recognize_speech():
     if 'audio' not in request.files:
@@ -230,15 +238,12 @@ def recognize_speech():
 
     audio_file = request.files['audio']
     temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
-    try:
-        # Save uploaded file temporarily
-        audio_file.save(temp_path)
 
+    try:
+        audio_file.save(temp_path)
         recognizer = sr.Recognizer()
         with sr.AudioFile(temp_path) as source:
             audio_data = recognizer.record(source)
-
-        # Recognize using Google Web Speech API
         text = recognizer.recognize_google(audio_data)
         return jsonify({'transcript': text})
     except sr.UnknownValueError:
