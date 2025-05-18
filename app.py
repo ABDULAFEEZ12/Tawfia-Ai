@@ -5,6 +5,7 @@ from difflib import get_close_matches
 from dotenv import load_dotenv
 import os
 from hashlib import sha256
+import redis
 
 # Load environment variables
 load_dotenv()
@@ -15,20 +16,11 @@ app = Flask(__name__)
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 
-# --- File-Based Cache ---
-CACHE_FILE = "tawfiq_cache.json"
+# Redis setup
+redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+redis_client = redis.from_url(redis_url)
 
-# Load cache from file
-if os.path.exists(CACHE_FILE):
-    with open(CACHE_FILE, "r", encoding="utf-8") as f:
-        question_cache = json.load(f)
-else:
-    question_cache = {}
-
-# Save cache to file
-def save_cache():
-    with open(CACHE_FILE, "w", encoding="utf-8") as f:
-        json.dump(question_cache, f, indent=2, ensure_ascii=False)
+CACHE_EXPIRATION_SECONDS = 60 * 60 * 24  # Cache expiry set to 1 day
 
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
@@ -88,8 +80,9 @@ def ask():
     messages = [system_prompt] + history
     cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
 
-    if cache_key in question_cache:
-        return jsonify({'answer': question_cache[cache_key]})
+    cached_answer = redis_client.get(cache_key)
+    if cached_answer:
+        return jsonify({'answer': cached_answer.decode('utf-8')})
 
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -126,8 +119,9 @@ def ask():
                 "I’m always here to assist you with Islamic and helpful answers."
             )
 
-        question_cache[cache_key] = answer
-        save_cache()
+        # Save answer in Redis cache
+        redis_client.setex(cache_key, CACHE_EXPIRATION_SECONDS, answer)
+
         return jsonify({'answer': answer})
 
     except requests.RequestException as e:
@@ -232,6 +226,8 @@ def get_surah_list():
 
 @app.route('/recognize-speech', methods=['POST'])
 def recognize_speech():
+    import speech_recognition as sr  # Import here to avoid errors if not used
+
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file uploaded.'}), 400
 
