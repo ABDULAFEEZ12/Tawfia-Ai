@@ -11,12 +11,9 @@ from datetime import datetime
 # Load environment variables
 load_dotenv()
 
-hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 
 # Check for essential environment variables
-if not hf_token:
-    raise RuntimeError("HUGGINGFACE_API_TOKEN environment variable not set.")
 if not openrouter_api_key:
     raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
