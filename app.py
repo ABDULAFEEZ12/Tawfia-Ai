@@ -6,15 +6,20 @@ from dotenv import load_dotenv
 import os
 from hashlib import sha256
 import redis
+import speech_recognition as sr  # Added import
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
 
-# Create Flask app
-app = Flask(__name__)
-
 hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+
+# Check for essential environment variables
+if not hf_token:
+    raise RuntimeError("HUGGINGFACE_API_TOKEN environment variable not set.")
+if not openrouter_api_key:
+    raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
 # --- Redis Cache Setup ---
 redis_host = os.getenv("REDIS_HOST", "localhost")
@@ -27,10 +32,13 @@ r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_pa
 # --- File-Based Cache ---
 CACHE_FILE = "tawfiq_cache.json"
 
-# Load cache from file
+# Load cache from file with error handling
 if os.path.exists(CACHE_FILE):
-    with open(CACHE_FILE, "r", encoding="utf-8") as f:
-        question_cache = json.load(f)
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            question_cache = json.load(f)
+    except json.JSONDecodeError:
+        question_cache = {}
 else:
     question_cache = {}
 
@@ -56,11 +64,13 @@ def load_json_data(file_name, data_variable_name):
         print(f"❌ Unexpected error while loading {file_name}: {e}")
     return data
 
-# Load local data
+# Load local datasets
 hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
 daily_duas = load_json_data('daily_duas.json', 'Daily Duas')
+
+app = Flask(__name__)
 
 @app.route('/')
 def index():
@@ -91,7 +101,7 @@ def ask():
             "You match the user's energy — when they are excited, respond with cheerful hype; when calm, respond gently but still firmly. "
             "Always stay within the boundaries of Islamic adab and wisdom, using warm and human-like responses. "
             "Never sound robotic, dry, or evasive. "
-            "Never mention OpenAI, DeepAI, or any other AI company — you only represent Tawfiq AI, here to serve the Ummah with halal knowledge and good character."
+            "Never mention DeepAI, DeepAI, or any other AI company — you only represent Tawfiq AI, here to serve the Ummah with halal knowledge and good character."
         )
     }
 
@@ -158,7 +168,7 @@ def quran_search():
     try:
         response = requests.get('https://api.quran.gading.dev/surah')
         response.raise_for_status()
-        surahs = response.json()['data']
+        surahs = response.json().get('data', [])
 
         surah_names = {s['name']['transliteration']['en'].lower(): s['number'] for s in surahs}
         close_matches = get_close_matches(query, surah_names.keys(), n=1, cutoff=0.6)
@@ -167,7 +177,7 @@ def quran_search():
             surah_number = surah_names[close_matches[0]]
             verses_response = requests.get(f'https://api.quran.gading.dev/surah/{surah_number}')
             verses_response.raise_for_status()
-            surah_data = verses_response.json()['data']
+            surah_data = verses_response.json().get('data', [])
 
             surah_title = f"{surah_data['name']['transliteration']['en']} ({surah_data['name']['short']})"
             structured_verses = [{
@@ -193,6 +203,7 @@ def hadith_search():
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
+    # Normalize query
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     if not hadith_data:
@@ -231,8 +242,6 @@ def hadith_search():
         print(f"Hadith Search Error: {e}")
         return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
 
-from datetime import datetime
-
 @app.route('/daily-dua')
 def daily_dua():
     try:
@@ -247,13 +256,12 @@ def daily_dua():
         print(f"Daily Dua Error: {e}")
         return jsonify({'error': 'Failed to fetch daily dua.'}), 500
 
-
 @app.route('/get-surah-list')
 def get_surah_list():
     try:
         response = requests.get('https://api.quran.gading.dev/surah')
         response.raise_for_status()
-        surahs = response.json()['data']
+        surahs = response.json().get('data', [])
         names = [s['name']['transliteration']['en'] for s in surahs]
         return jsonify({'surah_list': names})
     except requests.RequestException as e:
@@ -269,7 +277,10 @@ def recognize_speech():
     temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
 
     try:
+        # Save uploaded audio temporarily
         audio_file.save(temp_path)
+
+        # Recognize speech
         recognizer = sr.Recognizer()
         with sr.AudioFile(temp_path) as source:
             audio_data = recognizer.record(source)
