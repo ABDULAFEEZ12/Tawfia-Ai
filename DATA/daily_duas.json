@@ -1,0 +1,17 @@
+{
+  "duas": [
+    {
+      "day": 1,
+      "title": "Dua for the Beginning of the Day",
+      "arabic": "اللّهُـمَّ بِكَ أَصْبَـحْنا وَبِكَ أَمْسَـينا",
+      "translation": "O Allah, by You we enter the morning and by You we enter the evening."
+    },
+    {
+      "day": 2,
+      "title": "Dua for Protection",
+      "arabic": "اللّهُـمَّ إِنِّي أَعـوذُ بِكَ مِنَ الْهَـمِّ وَالْـحَزَنِ",
+      "translation": "O Allah, I seek refuge in You from anxiety and sorrow."
+    }
+    // Add more as needed (up to 30 or 365 etc.)
+  ]
+}
