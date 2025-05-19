@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import os
 from hashlib import sha256
 import redis
-import speech_recognition as sr  # Added import
 from datetime import datetime
 
 # Load environment variables
