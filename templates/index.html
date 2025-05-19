@@ -310,11 +310,8 @@
     .quran-verse p, .hadith-entry p {
       font-size: 1em !important;
     }
-    .quran-verse p:last-child {
+    .quran-verse p:last-child, .hadith-entry p:first-child {
       font-size: 1.1em !important;
-    }
-    .hadith-entry p:first-child {
-      font-size: 0.8em !important;
     }
     .toggle-btn {
       top: 45px;
@@ -335,41 +332,47 @@
 </header>
 
 <div class="tabs">
-<div class="tab active" onclick="switchTab('aiSection', event)">🤖 AI</div>
-<div class="tab" onclick="switchTab('quranSection', event)">📖 Quran</div>
-<div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
+  <div class="tab active" onclick="switchTab('aiSection', event)">🤖 AI</div>
+  <div class="tab" onclick="switchTab('quranSection', event)">📖 Quran</div>
+  <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
 <!-- AI Section -->
 <div class="section active" id="aiSection">
-<input type="text" id="userInput" placeholder="Ask a question about Islam..."/>
-<button id="askButton" onclick="sendQuestion()">Ask</button>
-<div class="messages" id="messages"></div>
+  <input type="text" id="userInput" placeholder="Ask a question about Islam..."/>
+  <button id="askButton" onclick="sendQuestion()">Ask</button>
+  <div class="messages" id="messages"></div>
 </div>
 
 <!-- Quran Section -->
 <div class="section" id="quranSection">
-<input type="text" id="quranInput" placeholder="Enter Surah name or keyword..."/>
-<select id="surahList">
-<option value="">-- Or Select Surah --</option>
-</select>
-<button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
-<div class="results" id="quranResult"></div>
+  <input type="text" id="quranInput" placeholder="Enter Surah name or keyword..."/>
+  <select id="surahList">
+    <option value="">-- Or Select Surah --</option>
+  </select>
+  <button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
+  <div class="results" id="quranResult"></div>
 </div>
 
 <!-- Hadith Section -->
 <div class="section" id="hadithSection">
-<input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number..."/>
-<select id="hadithDropdown">
-<option value="">-- Or Select Hadith Topic --</option>
-</select>
-<button id="hadithSearchButton" onclick="searchHadith()">Search Hadith</button>
-<div class="results" id="hadithResult"></div>
+  <input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number..."/>
+  <select id="hadithDropdown">
+    <option value="">-- Or Select Hadith Topic --</option>
+  </select>
+  <button id="hadithSearchButton" onclick="searchHadith()">Search Hadith</button>
+  <div class="results" id="hadithResult"></div>
 </div>
 
 <script>
   // Initialize conversation history array
   let chatHistory = [];
+
+  // Load topics and surah list on DOM load
+  document.addEventListener("DOMContentLoaded", () => {
+    loadHadithTopics();
+    loadSurahList();
+  });
 
   function switchTab(sectionId, event) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -398,7 +401,6 @@
     const question = inputEl.value.trim();
     if (!question) return;
 
-    // Show user's message
     const messagesDiv = document.getElementById("messages");
     const userMsg = document.createElement("p");
     userMsg.className = "user-message";
@@ -407,10 +409,8 @@
     inputEl.value = "";
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-    // Add user message to chat history
     chatHistory.push({ role: "user", content: question });
 
-    // Show loading
     const loadingMsg = document.createElement("p");
     loadingMsg.className = "loading-indicator";
     loadingMsg.textContent = "Tawfiq AI is thinking...";
@@ -424,12 +424,9 @@
         body: JSON.stringify({ history: chatHistory })
       });
       const data = await response.json();
-      // Remove loading
       messagesDiv.removeChild(loadingMsg);
       const answerText = data.answer || "Sorry, couldn't answer.";
-      // Add AI's reply to history
       chatHistory.push({ role: "assistant", content: answerText });
-      // Display answer
       const aiMsg = document.createElement("p");
       aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
       messagesDiv.appendChild(aiMsg);
@@ -444,7 +441,7 @@
     }
   }
 
-  // Quran search logic remains unchanged...
+  // Search Quran
   function searchQuran() {
     const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
     if (!query) return;
@@ -514,76 +511,7 @@
     });
   }
 
-  // Hadith search logic remains unchanged...
-  function searchHadith() {
-    const inputQuery = document.getElementById("hadithInput").value.trim();
-    const dropdownQuery = document.getElementById("hadithDropdown").value;
-    const query = inputQuery || dropdownQuery;
-    if (!query) return;
-    const resultDiv = document.getElementById("hadithResult");
-    const hadithBtn = document.getElementById("hadithSearchButton");
-    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    const loading = document.createElement("div");
-    loading.className = "loading-indicator";
-    loading.textContent = "Searching Hadith...";
-    resultDiv.appendChild(loading);
-    hadithBtn.disabled = true;
-
-    fetch('/hadith-search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query })
-    }).then(res => res.json()).then(data => {
-      resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-      if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-        data.results.forEach(hadith => {
-          const hadithEl = document.createElement("div");
-          hadithEl.className = "hadith-entry";
-
-          let infoText = '';
-          if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
-            infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
-          } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
-            infoText += `<strong>Book:</strong> ${hadith.book_name}`;
-          } else if (hadith.book_number && hadith.book_number !== 'N/A') {
-            infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
-          }
-          if (hadith.volume_number && hadith.volume_number !== 'N/A') {
-            infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
-          }
-          if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
-            if (!infoText.includes(hadith.hadith_info))
-              infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
-          }
-          if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
-            infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
-          }
-
-          const infoPara = document.createElement("p");
-          infoPara.innerHTML = infoText;
-          hadithEl.appendChild(infoPara);
-
-          const textPara = document.createElement("p");
-          textPara.textContent = hadith.text;
-          textPara.style.marginTop = '8px';
-          hadithEl.appendChild(textPara);
-
-          resultDiv.appendChild(hadithEl);
-        });
-      } else if (data.result) {
-        resultDiv.innerHTML += `<div>${data.result}</div>`;
-      } else {
-        resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
-      }
-    }).catch(error => {
-      console.error('Error:', error);
-      resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
-    }).finally(() => {
-      document.getElementById("hadithSearchButton").disabled = false;
-    });
-  }
-
-  // Load Surah list from backend...
+  // Load Surah list from backend
   function loadSurahList() {
     fetch('/get-surah-list')
       .then(res => res.json())
@@ -633,7 +561,7 @@
     });
   }
 
-  // Load Hadith topics...
+  // Load Hadith topics
   function loadHadithTopics() {
     const topics = [
       "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience", "Hadith on Gratitude",
@@ -667,68 +595,55 @@
     });
   }
 
-  // Initialize on DOMContentLoaded
-  document.addEventListener("DOMContentLoaded", () => {
-    loadHadithTopics();
-    loadSurahList();
-  });
+  // Call loading functions
+  // They are called on DOMContentLoaded
 </script>
 <script>
   // Function to send user question with conversation history
-  async function sendQuestion() {
-    const inputEl = document.getElementById("userInput");
-    const question = inputEl.value.trim();
-    if (!question) return;
+async function sendQuestion() {
+  const inputEl = document.getElementById("userInput");
+  const question = inputEl.value.trim();
+  if (!question) return;
 
-    // Show user's message
-    const messagesDiv = document.getElementById("messages");
-    const userMsg = document.createElement("p");
-    userMsg.className = "user-message";
-    userMsg.textContent = "You: " + question;
-    messagesDiv.appendChild(userMsg);
-    inputEl.value = "";
+  const messagesDiv = document.getElementById("messages");
+  const userMsg = document.createElement("p");
+  userMsg.className = "user-message";
+  userMsg.textContent = "You: " + question;
+  messagesDiv.appendChild(userMsg);
+  inputEl.value = "";
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  chatHistory.push({ role: "user", content: question });
+
+  const loadingMsg = document.createElement("p");
+  loadingMsg.className = "loading-indicator";
+  loadingMsg.textContent = "Tawfiq AI is thinking...";
+  messagesDiv.appendChild(loadingMsg);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  try {
+    const response = await fetch('/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ history: chatHistory })
+    });
+    const data = await response.json();
+    messagesDiv.removeChild(loadingMsg);
+    const answerText = data.answer || "Sorry, couldn't answer.";
+    chatHistory.push({ role: "assistant", content: answerText });
+    const aiMsg = document.createElement("p");
+    aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
+    messagesDiv.appendChild(aiMsg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    // Add user's message to chat history
-    chatHistory.push({ role: "user", content: question });
-
-    // Show loading indicator
-    const loadingMsg = document.createElement("p");
-    loadingMsg.className = "loading-indicator";
-    loadingMsg.textContent = "Tawfiq AI is thinking...";
-    messagesDiv.appendChild(loadingMsg);
+  } catch (error) {
+    console.error('Error:', error);
+    messagesDiv.removeChild(loadingMsg);
+    const errorMsg = document.createElement("p");
+    errorMsg.textContent = "Tawfiq AI: Error getting response.";
+    messagesDiv.appendChild(errorMsg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    try {
-      const response = await fetch('/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history: chatHistory })
-      });
-      const data = await response.json();
-      // Remove loading
-      messagesDiv.removeChild(loadingMsg);
-      const answerText = data.answer || "Sorry, couldn't answer.";
-      // Append AI reply to chat history
-      chatHistory.push({ role: "assistant", content: answerText });
-      // Display AI reply
-      const aiMsg = document.createElement("p");
-      aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
-      messagesDiv.appendChild(aiMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    } catch (error) {
-      console.error('Error:', error);
-      messagesDiv.removeChild(loadingMsg);
-      const errorMsg = document.createElement("p");
-      errorMsg.textContent = "Tawfiq AI: Error getting response.";
-      messagesDiv.appendChild(errorMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
   }
-
-  // The rest of your existing functions (searchQuran, searchHadith, etc.) stay unchanged...
-  // (They do not use the conversation history, so no changes needed there.)
+}
 </script>
-
 </body>
 </html>
