@@ -60,6 +60,7 @@ def load_json_data(file_name, data_variable_name):
 hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
+daily_duas = load_json_data('daily_duas.json', 'Daily Duas')
 
 @app.route('/')
 def index():
@@ -229,6 +230,23 @@ def hadith_search():
     except Exception as e:
         print(f"Hadith Search Error: {e}")
         return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
+
+from datetime import datetime
+
+@app.route('/daily-dua')
+def daily_dua():
+    try:
+        if not daily_duas or 'duas' not in daily_duas:
+            return jsonify({'error': 'Dua data not available.'}), 500
+
+        day_of_year = datetime.now().timetuple().tm_yday
+        index = day_of_year % len(daily_duas['duas'])  # rotate through duas
+        dua = daily_duas['duas'][index]
+        return jsonify({'dua': dua})
+    except Exception as e:
+        print(f"Daily Dua Error: {e}")
+        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
+
 
 @app.route('/get-surah-list')
 def get_surah_list():
