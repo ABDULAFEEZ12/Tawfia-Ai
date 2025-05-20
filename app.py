@@ -267,6 +267,7 @@ def get_surah_list():
         
         @app.route('/islamic-motivation')
 def get_islamic_motivation():
+    # your code here
     try:
         if not islamic_motivation or 'quotes' not in islamic_motivation:
             return jsonify({'error': 'Motivational quotes not available.'}), 500
