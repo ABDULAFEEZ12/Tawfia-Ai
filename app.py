@@ -65,6 +65,7 @@ hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
 daily_duas = load_json_data('daily_duas.json', 'Daily Duas')
+islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivation')
 
 app = Flask(__name__)
 
@@ -263,6 +264,21 @@ def get_surah_list():
     except requests.RequestException as e:
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
+        
+        @app.route('/islamic-motivation')
+def get_islamic_motivation():
+    try:
+        if not islamic_motivation or 'quotes' not in islamic_motivation:
+            return jsonify({'error': 'Motivational quotes not available.'}), 500
+
+        day_of_year = datetime.now().timetuple().tm_yday
+        index = day_of_year % len(islamic_motivation['quotes'])  # rotate based on day
+        quote = islamic_motivation['quotes'][index]
+        return jsonify({'quote': quote})
+    except Exception as e:
+        print(f"Islamic Motivation Error: {e}")
+        return jsonify({'error': 'Failed to fetch motivational quote.'}), 500
+
 
 @app.route('/recognize-speech', methods=['POST'])
 def recognize_speech():
