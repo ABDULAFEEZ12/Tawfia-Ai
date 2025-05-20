@@ -322,27 +322,28 @@
       padding: 6px 10px;
       font-size: 12px;
     }
+    /* Make sure the Dua section is styled for prominence */
     #dailyDuaSection {
-  margin-top: 20px;
-  padding: 20px;
-  border: 3px solid #4CAF50;
-  border-radius: 15px;
-  background-color: #e0ffe0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-#dailyDuaSection h2 {
-  font-size: 1.8em;
-  text-align: center;
-  color: #1b5e20;
-}
-
-#dailyDuaContent {
-  font-size: 1.4em;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 10px;
-}
+      margin-top: 20px;
+      padding: 20px;
+      border: 3px solid #4CAF50;
+      border-radius: 15px;
+      background-color: #e0ffe0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 700px;
+    }
+    #dailyDuaSection h2 {
+      font-size: 1.8em;
+      text-align: center;
+      color: #1b5e20;
+    }
+    #dailyDuaContent {
+      font-size: 1.4em;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
   }
 </style>
 </head>
@@ -388,16 +389,18 @@
 <div class="results" id="hadithResult"></div>
 </div>
 
-  <!-- Dua Section -->
+<!-- Dua Section -->
 <div class="section" id="duaSection">
   <h3>Today's Dua</h3>
   <div id="duaText">Loading Dua...</div>
-  <div id="dailyDuaSection" style="margin-top: 20px; padding: 15px; border: 2px solid #4CAF50; border-radius: 10px; background-color: #f0fff0;">
-  <h2 style="text-align: center; color: #2E7D32;">🕌 Daily Dua 📿</h2>
-  <div id="dailyDuaContent" style="font-size: 1.2em; padding: 10px; text-align: center;"></div>
+  <!-- The prominent Daily Dua box -->
+  <div id="dailyDuaSection">
+    <h2>🕌 Daily Dua 📿</h2>
+    <div id="dailyDuaContent" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
+  </div>
 </div>
 
-  <!-- Motivation Section -->
+<!-- Motivation Section -->
 <div class="section" id="motivationSection">
   <h3>Daily Motivation</h3>
   <div id="motivationText">Loading Motivation...</div>
@@ -446,7 +449,7 @@
     // Add user message to chat history
     chatHistory.push({ role: "user", content: question });
 
-    // Show loading
+    // Show loading indicator
     const loadingMsg = document.createElement("p");
     loadingMsg.className = "loading-indicator";
     loadingMsg.textContent = "Tawfiq AI is thinking...";
@@ -463,9 +466,9 @@
       // Remove loading
       messagesDiv.removeChild(loadingMsg);
       const answerText = data.answer || "Sorry, couldn't answer.";
-      // Add AI's reply to history
+      // Append AI reply to chat history
       chatHistory.push({ role: "assistant", content: answerText });
-      // Display answer
+      // Display AI reply
       const aiMsg = document.createElement("p");
       aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
       messagesDiv.appendChild(aiMsg);
@@ -480,7 +483,7 @@
     }
   }
 
-  // Quran search logic remains unchanged...
+  // Quran search logic
   function searchQuran() {
     const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
     if (!query) return;
@@ -550,7 +553,7 @@
     });
   }
 
-  // Hadith search logic remains unchanged...
+  // Hadith search logic
   function searchHadith() {
     const inputQuery = document.getElementById("hadithInput").value.trim();
     const dropdownQuery = document.getElementById("hadithDropdown").value;
@@ -619,7 +622,7 @@
     });
   }
 
-  // Load Surah list from backend...
+  // Load Surah list from backend
   function loadSurahList() {
     fetch('/get-surah-list')
       .then(res => res.json())
@@ -669,7 +672,7 @@
     });
   }
 
-  // Load Hadith topics...
+  // Load Hadith topics
   function loadHadithTopics() {
     const topics = [
       "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience", "Hadith on Gratitude",
@@ -725,7 +728,7 @@
     inputEl.value = "";
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-    // Add user's message to chat history
+    // Add user message to chat history
     chatHistory.push({ role: "user", content: question });
 
     // Show loading indicator
@@ -761,20 +764,27 @@
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
   }
-  function fetchDailyDua() {
-  fetch('/daily-dua')
-    .then(res => res.json())
-    .then(data => {
-      const duaDiv = document.getElementById('dailyDuaContent');
-      duaDiv.innerHTML = `<p>"${data.dua}"</p>`;
-    })
-    .catch(error => {
-      document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-    });
-}
 
   // The rest of your existing functions (searchQuran, searchHadith, etc.) stay unchanged...
   // (They do not use the conversation history, so no changes needed there.)
+
+  // Fetch and display the Dua
+  function fetchDailyDua() {
+    fetch('/daily-dua')
+      .then(res => res.json())
+      .then(data => {
+        const duaDiv = document.getElementById('dailyDuaContent');
+        duaDiv.innerHTML = `<p>"${data.dua}"</p>`;
+      })
+      .catch(error => {
+        document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
+      });
+  }
+
+  // Call fetchDailyDua on page load
+  window.onload = () => {
+    fetchDailyDua();
+  };
 </script>
 
 </body>
