@@ -391,19 +391,19 @@
 
 <!-- Dua Section -->
 <div class="section" id="duaSection">
-  <h3>Today's Dua</h3>
-  <div id="duaText">Loading Dua...</div>
-  <!-- The prominent Daily Dua box -->
-  <div id="dailyDuaSection">
-    <h2>🕌 Daily Dua 📿</h2>
-    <div id="dailyDuaContent" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
-  </div>
+<h3>Today's Dua</h3>
+<div id="duaText">Loading Dua...</div>
+<!-- The prominent Daily Dua box -->
+<div id="dailyDuaSection">
+<h2>🕌 Daily Dua 📿</h2>
+<div id="dailyDuaContent" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
+</div>
 </div>
 
 <!-- Motivation Section -->
 <div class="section" id="motivationSection">
-  <h3>Daily Motivation</h3>
-  <div id="motivationText">Loading Motivation...</div>
+<h3>Daily Motivation</h3>
+<div id="motivationText">Loading Motivation...</div>
 </div>
 
 <script>
@@ -706,10 +706,26 @@
     });
   }
 
+  // Fetch and load the daily dua from JSON file
+  function loadDailyDuaFromJSON() {
+    fetch('data/daily_duas.json')
+      .then(res => res.json())
+      .then(data => {
+        // Expect data to be an object with a "dua" key
+        const duaText = data.dua || "No Dua available.";
+        document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
+      })
+      .catch(error => {
+        document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
+        console.error('Error loading daily_duas.json:', error);
+      });
+  }
+
   // Initialize on DOMContentLoaded
   document.addEventListener("DOMContentLoaded", () => {
     loadHadithTopics();
     loadSurahList();
+    loadDailyDuaFromJSON(); // Load the Dua from JSON on page load
   });
 </script>
 <script>
@@ -764,27 +780,7 @@
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
   }
-
-  // The rest of your existing functions (searchQuran, searchHadith, etc.) stay unchanged...
-  // (They do not use the conversation history, so no changes needed there.)
-
-  // Fetch and display the Dua
-  function fetchDailyDua() {
-    fetch('/daily-dua')
-      .then(res => res.json())
-      .then(data => {
-        const duaDiv = document.getElementById('dailyDuaContent');
-        duaDiv.innerHTML = `<p>"${data.dua}"</p>`;
-      })
-      .catch(error => {
-        document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-      });
-  }
-
-  // Call fetchDailyDua on page load
-  window.onload = () => {
-    fetchDailyDua();
-  };
+  // (Other functions like searchQuran, searchHadith are unchanged and included above)
 </script>
 
 </body>
