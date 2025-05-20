@@ -5,7 +5,6 @@
 <title>Tawfiq AI - Smart Islamic Companion</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
-  /* Reset and basic styles */
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -18,95 +17,69 @@
     transition: background 0.3s, color 0.3s;
     font-size: 16px;
   }
-
-  /* Header with logo and toggles */
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  header {
+    text-align: center;
+    padding: 20px;
     width: 100%;
-    padding: 10px 20px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     position: relative;
-    background-color: #fff;
     z-index: 1;
   }
-
-  .logo {
-    font-size: 24px;
-    font-weight: bold;
+  header h1 {
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: 1px;
   }
-
-  /* Toggle switches container */
-  .toggles {
-    display: flex;
-    gap: 10px;
+  header h3 {
+    margin: 5px 0 0;
+    font-weight: normal;
+    font-size: 16px;
+    opacity: 0.8;
   }
-
-  /* Button styles for toggle switches */
-  .toggle-btn {
-    padding: 6px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background-color: #4CAF50;
-    color: white;
-    transition: background-color 0.3s;
-  }
-  .toggle-btn:hover {
-    background-color: #45a049;
-  }
-
-  /* Navigation tabs underneath header */
-  .nav-tabs {
+  .tabs {
     display: flex;
     justify-content: center;
-    margin: 10px 0;
+    margin: 20px 0;
     width: 100%;
-    max-width: 800px;
     background: rgba(0,0,0,0.05);
     border-radius: 30px;
     overflow: hidden;
+    max-width: 600px;
   }
-
-  .nav-tab {
+  .tab {
     flex: 1;
     text-align: center;
     padding: 15px;
     cursor: pointer;
-    transition: background 0.3s, font-weight 0.3s;
+    transition: background 0.3s, color 0.3s;
     font-size: 16px;
   }
-  .nav-tab:hover {
+  .tab:hover {
     background: rgba(0,0,0,0.1);
   }
-  .nav-tab.active {
+  .tab.active {
     background: #009688;
-    color: #fff;
     font-weight: bold;
+    color: #fff;
   }
-
-  /* Sections styling */
   .section {
     display: none;
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 900px;
+    max-width: 700px;
     padding: 20px;
     background: rgba(0,0,0,0.05);
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(0,0,0,0.1);
     overflow-y: auto;
     height: 65vh;
-    transition: opacity 0.3s;
+    animation: fadeIn 0.5s ease forwards;
+    box-sizing: border-box;
   }
   .section.active {
     display: flex;
   }
-
-  /* Input, select, button styles */
   input[type="text"], select {
     width: 80%;
     padding: 12px;
@@ -114,8 +87,11 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+    background-color: inherit;
+    color: inherit;
   }
-
   button {
     padding: 12px 25px;
     border: none;
@@ -134,8 +110,6 @@
     background: #ccc;
     cursor: not-allowed;
   }
-
-  /* Messages and results area styles */
   .messages, .results {
     margin-top: 20px;
     width: 100%;
@@ -155,8 +129,7 @@
   .user-message {
     background: rgba(0, 150, 136, 0.2);
   }
-
-  /* Quran styling */
+  /* Quran result styling */
   .quran-verse {
     border: 1px solid #eee;
     padding: 15px;
@@ -167,19 +140,24 @@
   .quran-verse p {
     margin: 5px 0;
     padding: 0;
+    background: none;
   }
   .quran-verse p:first-child {
     font-weight: bold;
     color: #00796b;
+    font-size: 1em;
+  }
+  .quran-verse p:nth-child(2) {
+    font-size: 1em;
   }
   .quran-verse p:nth-child(3) {
     font-size: 1.2em;
     direction: rtl;
     text-align: right;
+    font-weight: normal;
     margin-top: 5px;
   }
-
-  /* Hadith styling */
+  /* Hadith entry styling */
   .hadith-entry {
     border: 1px solid #eee;
     padding: 15px;
@@ -187,123 +165,487 @@
     border-radius: 10px;
     background: rgba(255, 193, 7, 0.05);
   }
+  .hadith-entry p {
+    margin: 5px 0;
+    padding: 0;
+    background: none;
+  }
   .hadith-entry p:first-child {
     font-size: 0.9em;
     color: #ffa000;
   }
-
+  /* Toggle button styles */
+  .toggle-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s;
+    z-index: 10;
+  }
+  .toggle-btn:hover {
+    background-color: #45a049;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  body.light-mode {
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2, #80deea);
+    color: #000;
+  }
+  body.light-mode .tabs {
+    background: rgba(255,255,255,0.7);
+  }
+  body.light-mode .section {
+    background: rgba(255,255,255,0.9);
+  }
+  body.light-mode .messages p,
+  body.light-mode .results div {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  body.light-mode input[type="text"], body.light-mode select {
+    border-color: #ccc;
+  }
+  body.light-mode .quran-verse {
+    background: rgba(0, 150, 136, 0.05);
+    border-color: #eee;
+  }
+  body.light-mode .hadith-entry {
+    background: rgba(255, 193, 7, 0.05);
+    border-color: #eee;
+  }
+  body.dark-mode {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+  }
+  body.dark-mode .tabs {
+    background: rgba(255,255,255,0.1);
+  }
+  body.dark-mode .section {
+    background: rgba(0,0,0,0.3);
+  }
+  body.dark-mode .messages p,
+  body.dark-mode .results div {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  body.dark-mode input[type="text"], body.dark-mode select {
+    border-color: #555;
+    background-color: rgba(255,255,255,0.05);
+    color: #fff;
+  }
+  body.dark-mode select option {
+    background: #2c5364;
+    color: #fff;
+  }
+  body.dark-mode .quran-verse {
+    background: rgba(0, 150, 136, 0.15);
+    border-color: #333;
+  }
+  body.dark-mode .hadith-entry {
+    background: rgba(255, 193, 7, 0.15);
+    border-color: #333;
+  }
+  body.dark-mode .quran-verse p:first-child {
+    color: #4db6ac;
+  }
+  body.dark-mode .hadith-entry p:first-child {
+    color: #ffb300;
+  }
   /* Responsive adjustments */
-  @media(max-width: 600px) {
-    header, .nav-tabs {
-      flex-direction: column;
+  @media (max-width: 600px) {
+    header {
+      padding: 15px 10px;
     }
-    .logo {
-      font-size: 20px;
+    header h1 {
+      font-size: 24px;
     }
-    .nav-tab {
+    header h3 {
+      font-size: 14px;
+    }
+    .tabs {
+      margin: 10px 0;
+      border-radius: 15px;
+    }
+    .tab {
       padding: 12px;
+      font-size: 14px;
+    }
+    .section {
+      padding: 15px;
+      height: 70vh;
+      max-width: 95%;
     }
     input[type="text"], select {
       width: 95%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    .messages, .results {
+      margin-top: 15px;
+      max-height: calc(70vh - 120px);
+    }
+    .messages p,
+    .results div {
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 1em;
+    }
+    .quran-verse, .hadith-entry {
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .quran-verse p, .hadith-entry p {
+      font-size: 1em !important;
+    }
+    .quran-verse p:last-child {
+      font-size: 1.1em !important;
+    }
+    .hadith-entry p:first-child {
+      font-size: 0.8em !important;
+    }
+    .toggle-btn {
+      top: 45px;
+      right: 10px;
+      padding: 6px 10px;
+      font-size: 12px;
     }
   }
 </style>
 </head>
-<body>
+<body class="light-mode">
 
-<!-- Top bar with logo and toggles -->
-<div class="header-top">
-  <div class="logo">🌙 Tawfiq AI</div>
-  <div class="toggles">
-    <button class="toggle-btn" onclick="toggleMode()">Light | Dark</button>
-    <button class="toggle-btn" onclick="toggleNasheed()">Nasheed ON/OFF</button>
-  </div>
+<button class="toggle-btn" onclick="toggleMode()">Toggle Mode</button>
+
+<header>
+<h1>🌙 Tawfiq AI - Smart Islamic Companion 🌙</h1>
+<h3>✨ Ask me anything about Islam ✨</h3>
+</header>
+
+<div class="tabs">
+<div class="tab active" onclick="switchTab('aiSection', event)">🤖 AI</div>
+<div class="tab" onclick="switchTab('quranSection', event)">📖 Quran</div>
+<div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- Navigation tabs -->
-<div class="nav-tabs">
-  <div class="nav-tab active" onclick="switchSection('aiSection', event)">🤖 AI</div>
-  <div class="nav-tab" onclick="switchSection('quranSection', event)">📖 Quran</div>
-  <div class="nav-tab" onclick="switchSection('hadithSection', event)">📜 Hadith</div>
-  <div class="nav-tab" onclick="switchSection('motivationSection', event)">💡 Motivation</div>
-  <div class="nav-tab" onclick="switchSection('duaSection', event)">🕋 Dua</div>
-</div>
-
-<!-- Sections start here -->
 <!-- AI Section -->
 <div class="section active" id="aiSection">
-  <input type="text" id="userInput" placeholder="Ask about Islam..." />
-  <button id="askButton" onclick="sendQuestion()">Ask</button>
-  <div class="messages" id="messages"></div>
+<input type="text" id="userInput" placeholder="Ask a question about Islam..."/>
+<button id="askButton" onclick="sendQuestion()">Ask</button>
+<div class="messages" id="messages"></div>
 </div>
 
 <!-- Quran Section -->
 <div class="section" id="quranSection">
-  <input type="text" id="quranInput" placeholder="Enter Surah name or keyword..." />
-  <select id="surahList">
-    <option value="">-- Or Select Surah --</option>
-  </select>
-  <button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
-  <div class="results" id="quranResult"></div>
+<input type="text" id="quranInput" placeholder="Enter Surah name or keyword..."/>
+<select id="surahList">
+<option value="">-- Or Select Surah --</option>
+</select>
+<button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
+<div class="results" id="quranResult"></div>
 </div>
 
 <!-- Hadith Section -->
 <div class="section" id="hadithSection">
-  <input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number..." />
-  <select id="hadithDropdown">
-    <option value="">-- Or Select Hadith Topic --</option>
-  </select>
-  <button id="hadithSearchButton" onclick="searchHadith()">Search Hadith</button>
-  <div class="results" id="hadithResult"></div>
+<input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number..."/>
+<select id="hadithDropdown">
+<option value="">-- Or Select Hadith Topic --</option>
+</select>
+<button id="hadithSearchButton" onclick="searchHadith()">Search Hadith</button>
+<div class="results" id="hadithResult"></div>
 </div>
 
-<!-- Motivation Section -->
-<div class="section" id="motivationSection">
-  <h3>Daily Motivation</h3>
-  <div id="motivationText">Loading Motivation...</div>
-</div>
-
-<!-- Dua Section -->
+  <!-- Dua Section -->
 <div class="section" id="duaSection">
   <h3>Today's Dua</h3>
   <div id="duaText">Loading Dua...</div>
 </div>
 
-<!-- Scripts -->
+  <!-- Motivation Section -->
+<div class="section" id="motivationSection">
+  <h3>Daily Motivation</h3>
+  <div id="motivationText">Loading Motivation...</div>
+</div>
+
 <script>
-  // Toggle between light/dark mode
+  // Initialize conversation history array
+  let chatHistory = [];
+
+  function switchTab(sectionId, event) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    event.target.classList.add('active');
+    // Clear previous messages/results
+    document.getElementById('messages').innerHTML = '';
+    document.getElementById('quranResult').innerHTML = '';
+    document.getElementById('hadithResult').innerHTML = '';
+  }
+
   function toggleMode() {
     document.body.classList.toggle('light-mode');
     document.body.classList.toggle('dark-mode');
+    const toggleBtn = document.querySelector('.toggle-btn');
+    if (document.body.classList.contains('dark-mode')) {
+      toggleBtn.textContent = 'Toggle Light Mode';
+    } else {
+      toggleBtn.textContent = 'Toggle Dark Mode';
+    }
   }
 
-  // Switch section visibility
-  function switchSection(sectionId, event) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    event.target.classList.add('active');
+  async function sendQuestion() {
+    const inputEl = document.getElementById("userInput");
+    const question = inputEl.value.trim();
+    if (!question) return;
 
-    // Clear previous results/messages
-    if(sectionId==='aiSection') document.getElementById('messages').innerHTML = '';
-    if(sectionId==='quranSection') document.getElementById('quranResult').innerHTML = '';
-    if(sectionId==='hadithSection') document.getElementById('hadithResult').innerHTML = '';
+    // Show user's message
+    const messagesDiv = document.getElementById("messages");
+    const userMsg = document.createElement("p");
+    userMsg.className = "user-message";
+    userMsg.textContent = "You: " + question;
+    messagesDiv.appendChild(userMsg);
+    inputEl.value = "";
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Add user message to chat history
+    chatHistory.push({ role: "user", content: question });
+
+    // Show loading
+    const loadingMsg = document.createElement("p");
+    loadingMsg.className = "loading-indicator";
+    loadingMsg.textContent = "Tawfiq AI is thinking...";
+    messagesDiv.appendChild(loadingMsg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+      const response = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history: chatHistory })
+      });
+      const data = await response.json();
+      // Remove loading
+      messagesDiv.removeChild(loadingMsg);
+      const answerText = data.answer || "Sorry, couldn't answer.";
+      // Add AI's reply to history
+      chatHistory.push({ role: "assistant", content: answerText });
+      // Display answer
+      const aiMsg = document.createElement("p");
+      aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
+      messagesDiv.appendChild(aiMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } catch (error) {
+      console.error('Error:', error);
+      messagesDiv.removeChild(loadingMsg);
+      const errorMsg = document.createElement("p");
+      errorMsg.textContent = "Tawfiq AI: Error getting response.";
+      messagesDiv.appendChild(errorMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
   }
 
-  // Load Surah list
+  // Quran search logic remains unchanged...
+  function searchQuran() {
+    const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
+    if (!query) return;
+    const resultDiv = document.getElementById("quranResult");
+    const quranSearchBtn = document.getElementById("quranSearchButton");
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+    const loading = document.createElement("div");
+    loading.className = "loading-indicator";
+    loading.textContent = "Searching Quran...";
+    resultDiv.appendChild(loading);
+    quranSearchBtn.disabled = true;
+
+    fetch('/quran-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    }).then(res => res.json()).then(data => {
+      resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+      if (data.surah_title && data.results && Array.isArray(data.results) && data.results.length > 0) {
+        const titleEl = document.createElement("div");
+        titleEl.innerHTML = `<strong>${data.surah_title}:</strong>`;
+        titleEl.style.fontWeight = 'bold';
+        titleEl.style.marginBottom = '10px';
+        resultDiv.appendChild(titleEl);
+        data.results.forEach(verse => {
+          const verseEl = document.createElement("div");
+          verseEl.className = "quran-verse";
+
+          const info = document.createElement("p");
+          info.innerHTML = `<strong>${verse.surah_number}:${verse.verse_number}</strong>`;
+          verseEl.appendChild(info);
+
+          const trans = document.createElement("p");
+          trans.textContent = verse.translation;
+          verseEl.appendChild(trans);
+
+          const arabic = document.createElement("p");
+          arabic.textContent = verse.arabic_text;
+          arabic.style.textAlign = 'right';
+          arabic.style.fontWeight = 'bold';
+          arabic.style.marginTop = '5px';
+          arabic.style.direction = 'rtl';
+          verseEl.appendChild(arabic);
+
+          if (verse.transliteration) {
+            const translitPara = document.createElement("p");
+            translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
+            translitPara.style.marginTop = '5px';
+            translitPara.style.fontSize = '0.95em';
+            verseEl.appendChild(translitPara);
+          }
+
+          resultDiv.appendChild(verseEl);
+        });
+      } else if (data.result) {
+        resultDiv.innerHTML += `<div>${data.result}</div>`;
+      } else {
+        resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
+      }
+    }).catch(error => {
+      console.error('Error:', error);
+      resultDiv.innerHTML += `<div>Error searching Quran.</div>`;
+    }).finally(() => {
+      const loadingEl = resultDiv.querySelector('.loading-indicator');
+      if (loadingEl) loadingEl.remove();
+      quranSearchBtn.disabled = false;
+    });
+  }
+
+  // Hadith search logic remains unchanged...
+  function searchHadith() {
+    const inputQuery = document.getElementById("hadithInput").value.trim();
+    const dropdownQuery = document.getElementById("hadithDropdown").value;
+    const query = inputQuery || dropdownQuery;
+    if (!query) return;
+    const resultDiv = document.getElementById("hadithResult");
+    const hadithBtn = document.getElementById("hadithSearchButton");
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+    const loading = document.createElement("div");
+    loading.className = "loading-indicator";
+    loading.textContent = "Searching Hadith...";
+    resultDiv.appendChild(loading);
+    hadithBtn.disabled = true;
+
+    fetch('/hadith-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    }).then(res => res.json()).then(data => {
+      resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+      if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+        data.results.forEach(hadith => {
+          const hadithEl = document.createElement("div");
+          hadithEl.className = "hadith-entry";
+
+          let infoText = '';
+          if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
+            infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
+          } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
+            infoText += `<strong>Book:</strong> ${hadith.book_name}`;
+          } else if (hadith.book_number && hadith.book_number !== 'N/A') {
+            infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
+          }
+          if (hadith.volume_number && hadith.volume_number !== 'N/A') {
+            infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
+          }
+          if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
+            if (!infoText.includes(hadith.hadith_info))
+              infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
+          }
+          if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
+            infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
+          }
+
+          const infoPara = document.createElement("p");
+          infoPara.innerHTML = infoText;
+          hadithEl.appendChild(infoPara);
+
+          const textPara = document.createElement("p");
+          textPara.textContent = hadith.text;
+          textPara.style.marginTop = '8px';
+          hadithEl.appendChild(textPara);
+
+          resultDiv.appendChild(hadithEl);
+        });
+      } else if (data.result) {
+        resultDiv.innerHTML += `<div>${data.result}</div>`;
+      } else {
+        resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
+      }
+    }).catch(error => {
+      console.error('Error:', error);
+      resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
+    }).finally(() => {
+      document.getElementById("hadithSearchButton").disabled = false;
+    });
+  }
+
+  // Load Surah list from backend...
   function loadSurahList() {
-    // Replace with your fetch if backend available
-    const surahs = ["Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf", "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun", "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatr", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas", "Al-Falaq", "Al-Nas"];
+    fetch('/get-surah-list')
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById("surahList");
+        select.innerHTML = '<option value="">-- Or Select Surah --</option>';
+        if (data.surahs && Array.isArray(data.surahs)) {
+          data.surahs.forEach(surah => {
+            const option = document.createElement("option");
+            option.value = surah;
+            option.textContent = surah;
+            select.appendChild(option);
+          });
+        } else {
+          loadHardcodedSurahList();
+        }
+      }).catch(error => {
+        console.error('Error loading Surah list:', error);
+        loadHardcodedSurahList();
+      });
+  }
+
+  function loadHardcodedSurahList() {
+    const surahs = [
+      "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf", "Al-Anfal",
+      "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
+      "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun", "An-Nur", "Al-Furqan",
+      "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajda", "Al-Ahzab",
+      "Saba", "Fatr", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
+      "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
+      "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila",
+      "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
+      "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil",
+      "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
+      "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-Ala",
+      "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin",
+      "Al-Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur",
+      "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
+      "Al-Masad", "Al-Ikhlas", "Al-Falaq", "Al-Nas"
+    ];
     const select = document.getElementById("surahList");
-    surahs.forEach(s => {
+    surahs.forEach(surah => {
       const option = document.createElement("option");
-      option.value = s;
-      option.textContent = s;
+      option.value = surah;
+      option.textContent = surah;
       select.appendChild(option);
     });
   }
 
-  // Load Hadith topics
+  // Load Hadith topics...
   function loadHadithTopics() {
     const topics = [
       "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience", "Hadith on Gratitude",
@@ -337,32 +679,68 @@
     });
   }
 
-  // Placeholder for your sendQuestion() and search functions
-  // You should include your existing functions here
-  // For brevity, only the structure is shown
-
-  // Example: Send question in AI
-  async function sendQuestion() {
-    // your existing code...
-  }
-
-  // Example: searchQuran
-  function searchQuran() {
-    // your existing code...
-  }
-
-  // Example: searchHadith
-  function searchHadith() {
-    // your existing code...
-  }
-
-  // Load lists on DOMContentLoaded
-  document.addEventListener('DOMContentLoaded', () => {
-    loadSurahList();
+  // Initialize on DOMContentLoaded
+  document.addEventListener("DOMContentLoaded", () => {
     loadHadithTopics();
-    // loadMotivation(); // if you have
-    // loadDua(); // if you have
+    loadSurahList();
   });
 </script>
+<script>
+  // Function to send user question with conversation history
+  async function sendQuestion() {
+    const inputEl = document.getElementById("userInput");
+    const question = inputEl.value.trim();
+    if (!question) return;
+
+    // Show user's message
+    const messagesDiv = document.getElementById("messages");
+    const userMsg = document.createElement("p");
+    userMsg.className = "user-message";
+    userMsg.textContent = "You: " + question;
+    messagesDiv.appendChild(userMsg);
+    inputEl.value = "";
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Add user's message to chat history
+    chatHistory.push({ role: "user", content: question });
+
+    // Show loading indicator
+    const loadingMsg = document.createElement("p");
+    loadingMsg.className = "loading-indicator";
+    loadingMsg.textContent = "Tawfiq AI is thinking...";
+    messagesDiv.appendChild(loadingMsg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+      const response = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history: chatHistory })
+      });
+      const data = await response.json();
+      // Remove loading
+      messagesDiv.removeChild(loadingMsg);
+      const answerText = data.answer || "Sorry, couldn't answer.";
+      // Append AI reply to chat history
+      chatHistory.push({ role: "assistant", content: answerText });
+      // Display AI reply
+      const aiMsg = document.createElement("p");
+      aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
+      messagesDiv.appendChild(aiMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } catch (error) {
+      console.error('Error:', error);
+      messagesDiv.removeChild(loadingMsg);
+      const errorMsg = document.createElement("p");
+      errorMsg.textContent = "Tawfiq AI: Error getting response.";
+      messagesDiv.appendChild(errorMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+  }
+
+  // The rest of your existing functions (searchQuran, searchHadith, etc.) stay unchanged...
+  // (They do not use the conversation history, so no changes needed there.)
+</script>
+
 </body>
 </html>
