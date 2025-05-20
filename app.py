@@ -264,23 +264,23 @@ def get_surah_list():
     except requests.RequestException as e:
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
-        
-        @app.route('/islamic-motivation')
+
+# Correct indentation for the route
+@app.route('/islamic-motivation')
 def get_islamic_motivation():
-    # your code here
     try:
         if not islamic_motivation or 'quotes' not in islamic_motivation:
             return jsonify({'error': 'Motivational quotes not available.'}), 500
 
         day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(islamic_motivation['quotes'])  # rotate based on day
+        index = day_of_year % len(islamic_motivation['quotes'])
         quote = islamic_motivation['quotes'][index]
         return jsonify({'quote': quote})
     except Exception as e:
         print(f"Islamic Motivation Error: {e}")
         return jsonify({'error': 'Failed to fetch motivational quote.'}), 500
 
-
+# Speech recognition route
 @app.route('/recognize-speech', methods=['POST'])
 def recognize_speech():
     if 'audio' not in request.files:
@@ -294,6 +294,7 @@ def recognize_speech():
         audio_file.save(temp_path)
 
         # Recognize speech
+        import speech_recognition as sr
         recognizer = sr.Recognizer()
         with sr.AudioFile(temp_path) as source:
             audio_data = recognizer.record(source)
