@@ -1,17 +1,152 @@
-{
-  "duas": [
-    {
-      "day": 1,
-      "title": "Dua for the Beginning of the Day",
-      "arabic": "اللّهُـمَّ بِكَ أَصْبَـحْنا وَبِكَ أَمْسَـينا",
-      "translation": "O Allah, by You we enter the morning and by You we enter the evening."
-    },
-    {
-      "day": 2,
-      "title": "Dua for Protection",
-      "arabic": "اللّهُـمَّ إِنِّي أَعـوذُ بِكَ مِنَ الْهَـمِّ وَالْـحَزَنِ",
-      "translation": "O Allah, I seek refuge in You from anxiety and sorrow."
-    }
-    // Add more as needed (up to 30 or 365 etc.)
-  ]
-}
+[
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا",
+    "transliteration": "Allahumma inni as’aluka ‘ilman naafi’an",
+    "meaning": "O Allah, I ask You for beneficial knowledge."
+  },
+  {
+    "arabic": "اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ",
+    "transliteration": "Allahumma aj‘alni mina at-tawwabeen waj‘alni minal-mutatahhireen",
+    "meaning": "O Allah, make me among those who constantly repent and purify themselves."
+  },
+  {
+    "arabic": "رَبِّ زِدْنِي عِلْمًا",
+    "transliteration": "Rabbi zidni ‘ilma",
+    "meaning": "My Lord, increase me in knowledge."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ الْهَمِّ وَالْحَزَنِ",
+    "transliteration": "Allahumma inni a‘udhu bika minal-hammi wal-hazan",
+    "meaning": "O Allah, I seek refuge with You from worry and grief."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ",
+    "transliteration": "Allahumma inni as’aluka al-‘afwa wal-‘aafiyah",
+    "meaning": "O Allah, I ask You for pardon and well-being."
+  },
+  {
+    "arabic": "اللَّهُمَّ اهْدِنِي وَسَدِّدْنِي",
+    "transliteration": "Allahumma ihdini wa saddidni",
+    "meaning": "O Allah, guide me and keep me steadfast."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ رِضَاكَ وَالْجَنَّةَ",
+    "transliteration": "Allahumma inni as’aluka ridhaaka wal-jannah",
+    "meaning": "O Allah, I ask You for Your pleasure and Paradise."
+  },
+  {
+    "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا",
+    "transliteration": "Rabbana la tuzigh quloobana ba‘da idh hadaytana",
+    "meaning": "Our Lord, do not let our hearts deviate after You have guided us."
+  },
+  {
+    "arabic": "اللَّهُمَّ بَارِكْ لِي فِي رِزْقِي",
+    "transliteration": "Allahumma barik li fi rizqi",
+    "meaning": "O Allah, bless me in my provision."
+  },
+  {
+    "arabic": "اللَّهُمَّ ثَبِّتْ قَلْبِي عَلَى دِينِكَ",
+    "transliteration": "Allahumma thabbit qalbi ‘ala deenik",
+    "meaning": "O Allah, keep my heart firm upon Your religion."
+  },
+  {
+    "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ",
+    "transliteration": "Rabbi ighfir li waliwalidayya",
+    "meaning": "My Lord, forgive me and my parents."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ زَوَالِ نِعْمَتِكَ",
+    "transliteration": "Allahumma inni a‘udhu bika min zawali ni‘matik",
+    "meaning": "O Allah, I seek refuge with You from the loss of Your blessings."
+  },
+  {
+    "arabic": "رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ",
+    "transliteration": "Rabbi aj‘alni muqima as-salah",
+    "meaning": "My Lord, make me an establisher of prayer."
+  },
+  {
+    "arabic": "اللَّهُمَّ رَبِّ أَعِنِّي وَلَا تُعِنْ عَلَيَّ",
+    "transliteration": "Allahumma rabbi a‘inni wa la tu‘in ‘alayya",
+    "meaning": "O Allah, my Lord, help me and do not help against me."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ جَهْدِ الْبَلَاءِ",
+    "transliteration": "Allahumma inni a‘udhu bika min jahdil-bala’",
+    "meaning": "O Allah, I seek refuge with You from the severity of trials."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ التَّوْفِيقَ وَالسَّدَادَ",
+    "transliteration": "Allahumma inni as’aluka at-tawfeeqa was-sadaad",
+    "meaning": "O Allah, I ask You for success and correctness."
+  },
+  {
+    "arabic": "رَبِّ إِنِّي لِمَا أَنْزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ",
+    "transliteration": "Rabbi inni lima anzalta ilayya min khayrin faqeer",
+    "meaning": "My Lord, I am truly in need of whatever good You send down to me."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ حُسْنَ الْخَاتِمَةِ",
+    "transliteration": "Allahumma inni as’aluka husna al-khatimah",
+    "meaning": "O Allah, I ask You for a good ending."
+  },
+  {
+    "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا فَاغْفِرْ لَنَا",
+    "transliteration": "Rabbana zalamna anfusana faghfir lana",
+    "meaning": "Our Lord, we have wronged ourselves, so forgive us."
+  },
+  {
+    "arabic": "اللَّهُمَّ اجْعَلْنِي خَيْرًا مِمَّا يَظُنُّونَ",
+    "transliteration": "Allahumma aj‘alni khayran mimma yadhunnoon",
+    "meaning": "O Allah, make me better than what they think of me."
+  },
+  {
+    "arabic": "رَبِّ لَا تَذَرْنِي فَرْدًا وَأَنتَ خَيْرُ الْوَارِثِينَ",
+    "transliteration": "Rabbi la tadharni fardan wa anta khayru al-waritheen",
+    "meaning": "My Lord, do not leave me alone, and You are the best of inheritors."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْكَسَلِ",
+    "transliteration": "Allahumma inni a‘udhu bika minal-hammi wal-kasal",
+    "meaning": "O Allah, I seek refuge in You from worry and laziness."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ قَلْبًا سَلِيمًا",
+    "transliteration": "Allahumma inni as’aluka qalban saleeman",
+    "meaning": "O Allah, I ask You for a sound heart."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ حُبَّكَ",
+    "transliteration": "Allahumma inni as’aluka hubbaka",
+    "meaning": "O Allah, I ask You for Your love."
+  },
+  {
+    "arabic": "رَبِّ اجْعَلْنِي مِنَ الصَّالِحِينَ",
+    "transliteration": "Rabbi aj‘alni mina as-saliheen",
+    "meaning": "My Lord, make me among the righteous."
+  },
+  {
+    "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ",
+    "transliteration": "Allahumma inni a‘udhu bika min ghalabatid-dayn",
+    "meaning": "O Allah, I seek refuge with You from being overpowered by debt."
+  },
+  {
+    "arabic": "اللَّهُمَّ اجْعَلْنِي هَادِيًا مَهْدِيًّا",
+    "transliteration": "Allahumma aj‘alni haadiyan mahdiyya",
+    "meaning": "O Allah, make me a guide and one who is guided."
+  },
+  {
+    "arabic": "اللَّهُمَّ اجْعَلْنِي لَكَ شَكَّارًا",
+    "transliteration": "Allahumma aj‘alni laka shakkaaran",
+    "meaning": "O Allah, make me greatly thankful to You."
+  },
+  {
+    "arabic": "اللَّهُمَّ اجْعَلْنِي مِنْ أَهْلِ الْقُرْآنِ",
+    "transliteration": "Allahumma aj‘alni min ahlil-Qur’an",
+    "meaning": "O Allah, make me among the people of the Qur’an."
+  },
+  {
+    "arabic": "اللَّهُمَّ بَلِّغْنَا رَمَضَان",
+    "transliteration": "Allahumma ballighna Ramadan",
+    "meaning": "O Allah, allow us to reach Ramadan."
+  }
+]
