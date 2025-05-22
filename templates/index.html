@@ -4,348 +4,10 @@
 <meta charset="UTF-8" />
 <title>Tawfiq AI - Smart Islamic Companion</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-    transition: background 0.3s, color 0.3s;
-    font-size: 16px;
-  }
-  header {
-    text-align: center;
-    padding: 20px;
-    width: 100%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    position: relative;
-    z-index: 1;
-  }
-  header h1 {
-    margin: 0;
-    font-size: 28px;
-    letter-spacing: 1px;
-  }
-  header h3 {
-    margin: 5px 0 0;
-    font-weight: normal;
-    font-size: 16px;
-    opacity: 0.8;
-  }
-  .tabs {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-    width: 100%;
-    background: rgba(0,0,0,0.05);
-    border-radius: 30px;
-    overflow: hidden;
-    max-width: 600px;
-  }
-  .tab {
-    flex: 1;
-    text-align: center;
-    padding: 15px;
-    cursor: pointer;
-    transition: background 0.3s, color 0.3s;
-    font-size: 16px;
-  }
-  .tab:hover {
-    background: rgba(0,0,0,0.1);
-  }
-  .tab.active {
-    background: #009688;
-    font-weight: bold;
-    color: #fff;
-  }
-  .section {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    max-width: 700px;
-    padding: 20px;
-    background: rgba(0,0,0,0.05);
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    overflow-y: auto;
-    height: 65vh;
-    animation: fadeIn 0.5s ease forwards;
-    box-sizing: border-box;
-  }
-  .section.active {
-    display: flex;
-  }
-  input[type="text"], select {
-    width: 80%;
-    padding: 12px;
-    margin: 15px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-    box-sizing: border-box;
-    background-color: inherit;
-    color: inherit;
-  }
-  button {
-    padding: 12px 25px;
-    border: none;
-    background: #009688;
-    color: #fff;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
-    transition: background 0.3s;
-  }
-  button:hover {
-    background: #00796b;
-  }
-  button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-  .messages, .results {
-    margin-top: 20px;
-    width: 100%;
-    max-height: calc(65vh - 150px);
-    overflow-y: auto;
-    text-align: left;
-  }
-  .messages p,
-  .results div {
-    background: rgba(0, 0, 0, 0.05);
-    padding: 12px;
-    border-radius: 8px;
-    margin: 10px 0;
-    word-wrap: break-word;
-    font-size: 1em;
-  }
-  .user-message {
-    background: rgba(0, 150, 136, 0.2);
-  }
-  /* Quran result styling */
-  .quran-verse {
-    border: 1px solid #eee;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    background: rgba(0, 150, 136, 0.05);
-  }
-  .quran-verse p {
-    margin: 5px 0;
-    padding: 0;
-    background: none;
-  }
-  .quran-verse p:first-child {
-    font-weight: bold;
-    color: #00796b;
-    font-size: 1em;
-  }
-  .quran-verse p:nth-child(2) {
-    font-size: 1em;
-  }
-  .quran-verse p:nth-child(3) {
-    font-size: 1.2em;
-    direction: rtl;
-    text-align: right;
-    font-weight: normal;
-    margin-top: 5px;
-  }
-  /* Hadith entry styling */
-  .hadith-entry {
-    border: 1px solid #eee;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    background: rgba(255, 193, 7, 0.05);
-  }
-  .hadith-entry p {
-    margin: 5px 0;
-    padding: 0;
-    background: none;
-  }
-  .hadith-entry p:first-child {
-    font-size: 0.9em;
-    color: #ffa000;
-  }
-  /* Toggle button styles */
-  .toggle-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 6px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background-color: #4CAF50;
-    color: white;
-    transition: background-color 0.3s;
-    z-index: 10;
-  }
-  .toggle-btn:hover {
-    background-color: #45a049;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  body.light-mode {
-    background: linear-gradient(135deg, #e0f7fa, #b2ebf2, #80deea);
-    color: #000;
-  }
-  body.light-mode .tabs {
-    background: rgba(255,255,255,0.7);
-  }
-  body.light-mode .section {
-    background: rgba(255,255,255,0.9);
-  }
-  body.light-mode .messages p,
-  body.light-mode .results div {
-    background: rgba(0, 0, 0, 0.05);
-  }
-  body.light-mode input[type="text"], body.light-mode select {
-    border-color: #ccc;
-  }
-  body.light-mode .quran-verse {
-    background: rgba(0, 150, 136, 0.05);
-    border-color: #eee;
-  }
-  body.light-mode .hadith-entry {
-    background: rgba(255, 193, 7, 0.05);
-    border-color: #eee;
-  }
-  body.dark-mode {
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: #fff;
-  }
-  body.dark-mode .tabs {
-    background: rgba(255,255,255,0.1);
-  }
-  body.dark-mode .section {
-    background: rgba(0,0,0,0.3);
-  }
-  body.dark-mode .messages p,
-  body.dark-mode .results div {
-    background: rgba(255, 255, 255, 0.1);
-  }
-  body.dark-mode input[type="text"], body.dark-mode select {
-    border-color: #555;
-    background-color: rgba(255,255,255,0.05);
-    color: #fff;
-  }
-  body.dark-mode select option {
-    background: #2c5364;
-    color: #fff;
-  }
-  body.dark-mode .quran-verse {
-    background: rgba(0, 150, 136, 0.15);
-    border-color: #333;
-  }
-  body.dark-mode .hadith-entry {
-    background: rgba(255, 193, 7, 0.15);
-    border-color: #333;
-  }
-  body.dark-mode .quran-verse p:first-child {
-    color: #4db6ac;
-  }
-  body.dark-mode .hadith-entry p:first-child {
-    color: #ffb300;
-  }
-  /* Responsive adjustments */
-  @media (max-width: 600px) {
-    header {
-      padding: 15px 10px;
-    }
-    header h1 {
-      font-size: 24px;
-    }
-    header h3 {
-      font-size: 14px;
-    }
-    .tabs {
-      margin: 10px 0;
-      border-radius: 15px;
-    }
-    .tab {
-      padding: 12px;
-      font-size: 14px;
-    }
-    .section {
-      padding: 15px;
-      height: 70vh;
-      max-width: 95%;
-    }
-    input[type="text"], select {
-      width: 95%;
-      margin: 10px 0;
-      padding: 10px;
-      font-size: 14px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 14px;
-      margin-top: 5px;
-    }
-    .messages, .results {
-      margin-top: 15px;
-      max-height: calc(70vh - 120px);
-    }
-    .messages p,
-    .results div {
-      padding: 10px;
-      margin: 8px 0;
-      font-size: 1em;
-    }
-    .quran-verse, .hadith-entry {
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    .quran-verse p, .hadith-entry p {
-      font-size: 1em !important;
-    }
-    .quran-verse p:last-child {
-      font-size: 1.1em !important;
-    }
-    .hadith-entry p:first-child {
-      font-size: 0.8em !important;
-    }
-    .toggle-btn {
-      top: 45px;
-      right: 10px;
-      padding: 6px 10px;
-      font-size: 12px;
-    }
-    /* Make sure the Dua section is styled for prominence */
-    #dailyDuaSection {
-      margin-top: 20px;
-      padding: 20px;
-      border: 3px solid #4CAF50;
-      border-radius: 15px;
-      background-color: #e0ffe0;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 700px;
-    }
-    #dailyDuaSection h2 {
-      font-size: 1.8em;
-      text-align: center;
-      color: #1b5e20;
-    }
-    #dailyDuaContent {
-      font-size: 1.4em;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 10px;
-    }
-  }
-</style>
+
+<!-- Link to external CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 <body class="light-mode">
 
@@ -647,21 +309,23 @@
 
   function loadHardcodedSurahList() {
     const surahs = [
-      "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf", "Al-Anfal",
-      "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra",
-      "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun", "An-Nur", "Al-Furqan",
-      "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajda", "Al-Ahzab",
-      "Saba", "Fatr", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura",
-      "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
-      "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila",
-      "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
-      "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn", "Al-Muzzammil",
-      "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
-      "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-Ala",
-      "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin",
-      "Al-Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur",
-      "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
-      "Al-Masad", "Al-Ikhlas", "Al-Falaq", "Al-Nas"
+      "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf",
+      "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr",
+      "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun",
+      "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
+      "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatr", "Ya-Sin", "As-Saffat", "Sad",
+      "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya",
+      "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur",
+      "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr",
+      "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
+      "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
+      "Al-Muzzammil", "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba",
+      "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq",
+      "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams",
+      "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina",
+      "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humazah",
+      "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad",
+      "Al-Ikhlas", "Al-Falaq", "An-Nas"
     ];
     const select = document.getElementById("surahList");
     surahs.forEach(surah => {
@@ -675,27 +339,33 @@
   // Load Hadith topics
   function loadHadithTopics() {
     const topics = [
-      "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience", "Hadith on Gratitude",
-      "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj", "Hadith on Honesty", "Hadith on Forgiveness",
-      "Hadith on Parents", "Hadith on Children", "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood",
-      "Hadith on Modesty", "Hadith on Repenance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
-      "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran", "Hadith on Sunnah",
-      "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting", "Hadith on Lying", "Hadith on Trust",
-      "Hadith on Trade", "Hadith on Wealth", "Hadith on Poverty", "Hadith on Oppression", "Hadith on Manners",
-      "Hadith on Sincerity", "Hadith on Innovation", "Hadith on Angels", "Hadith on Jinn", "Hadith on Death",
-      "Hadith on Resurrection", "Hadith on Signs of Day of Judgment", "Hadith on Health", "Hadith on Cleanliness",
-      "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip", "Hadith on Leadership", "Hadith on Love",
-      "Hadith on Peace", "Hadith on Prayer at Night", "Hadith on Ablution", "Hadith on Sadaqah", "Hadith on Zakat",
-      "Hadith on Seeking Knowledge", "Hadith on Good Deeds", "Hadith on Evil Deeds", "Hadith on Hypocrisy",
-      "Hadith on Arrogance", "Hadith on Tawheed", "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth",
-      "Hadith on Orphans", "Hadith on Widows", "Hadith on Modesty in Dressing", "Hadith on Halal and Haram",
-      "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling", "Hadith on Good Speech", "Hadith on Contentment",
-      "Hadith on Worldly Life", "Hadith on Akhirah", "Hadith on Thankfulness", "Hadith on Seeking Forgiveness",
-      "Hadith on Trials", "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves", "Hadith on Trust in Allah",
-      "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage", "Hadith on Sin", "Hadith on Purification",
-      "Hadith on Eid", "Hadith on Sacrifice", "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam",
-      "Hadith on Reciting Quran", "Hadith on Betrayal", "Hadith on Contentment", "Hadith on Piety", "Hadith on Remembrance of Allah",
-      "Hadith on Friday Prayer", "Hadith on Allah’s Mercy", "Hadith on Night of Qadr", "Hadith on Family Ties"
+      "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
+      "Hadith on Gratitude", "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj",
+      "Hadith on Honesty", "Hadith on Forgiveness", "Hadith on Parents", "Hadith on Children",
+      "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood", "Hadith on Modesty",
+      "Hadith on Repenance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
+      "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran",
+      "Hadith on Sunnah", "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting",
+      "Hadith on Lying", "Hadith on Trust", "Hadith on Trade", "Hadith on Wealth",
+      "Hadith on Poverty", "Hadith on Oppression", "Hadith on Manners", "Hadith on Sincerity",
+      "Hadith on Innovation", "Hadith on Angels", "Hadith on Jinn", "Hadith on Death",
+      "Hadith on Resurrection", "Hadith on Signs of Day of Judgment", "Hadith on Health",
+      "Hadith on Cleanliness", "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip",
+      "Hadith on Leadership", "Hadith on Love", "Hadith on Peace", "Hadith on Prayer at Night",
+      "Hadith on Ablution", "Hadith on Sadaqah", "Hadith on Zakat", "Hadith on Seeking Knowledge",
+      "Hadith on Good Deeds", "Hadith on Evil Deeds", "Hadith on Hypocrisy", "Hadith on Arrogance",
+      "Hadith on Tawheed", "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth",
+      "Hadith on Orphans", "Hadith on Widows", "Hadith on Modesty in Dressing",
+      "Hadith on Halal and Haram", "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling",
+      "Hadith on Good Speech", "Hadith on Contentment", "Hadith on Worldly Life",
+      "Hadith on Akhirah", "Hadith on Thankfulness", "Hadith on Seeking Forgiveness",
+      "Hadith on Trials", "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves",
+      "Hadith on Trust in Allah", "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage",
+      "Hadith on Sin", "Hadith on Purification", "Hadith on Eid", "Hadith on Sacrifice",
+      "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam", "Hadith on Reciting Quran",
+      "Hadith on Betrayal", "Hadith on Contentment", "Hadith on Piety", "Hadith on Remembrance of Allah",
+      "Hadith on Friday Prayer", "Hadith on Allah’s Mercy", "Hadith on Night of Qadr",
+      "Hadith on Family Ties"
     ];
     const dropdown = document.getElementById("hadithDropdown");
     topics.forEach(topic => {
@@ -711,7 +381,6 @@
     fetch('data/daily_duas.json')
       .then(res => res.json())
       .then(data => {
-        // Expect data to be an object with a "dua" key
         const duaText = data.dua || "No Dua available.";
         document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
       })
@@ -728,59 +397,11 @@
     loadDailyDuaFromJSON(); // Load the Dua from JSON on page load
   });
 </script>
+
+<!-- Your existing script functions like sendQuestion, searchQuran, etc., go here, or include below as needed -->
 <script>
-  // Function to send user question with conversation history
-  async function sendQuestion() {
-    const inputEl = document.getElementById("userInput");
-    const question = inputEl.value.trim();
-    if (!question) return;
-
-    // Show user's message
-    const messagesDiv = document.getElementById("messages");
-    const userMsg = document.createElement("p");
-    userMsg.className = "user-message";
-    userMsg.textContent = "You: " + question;
-    messagesDiv.appendChild(userMsg);
-    inputEl.value = "";
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    // Add user message to chat history
-    chatHistory.push({ role: "user", content: question });
-
-    // Show loading indicator
-    const loadingMsg = document.createElement("p");
-    loadingMsg.className = "loading-indicator";
-    loadingMsg.textContent = "Tawfiq AI is thinking...";
-    messagesDiv.appendChild(loadingMsg);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    try {
-      const response = await fetch('/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history: chatHistory })
-      });
-      const data = await response.json();
-      // Remove loading
-      messagesDiv.removeChild(loadingMsg);
-      const answerText = data.answer || "Sorry, couldn't answer.";
-      // Append AI reply to chat history
-      chatHistory.push({ role: "assistant", content: answerText });
-      // Display AI reply
-      const aiMsg = document.createElement("p");
-      aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
-      messagesDiv.appendChild(aiMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    } catch (error) {
-      console.error('Error:', error);
-      messagesDiv.removeChild(loadingMsg);
-      const errorMsg = document.createElement("p");
-      errorMsg.textContent = "Tawfiq AI: Error getting response.";
-      messagesDiv.appendChild(errorMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-  }
-  // (Other functions like searchQuran, searchHadith are unchanged and included above)
+  // Your functions (sendQuestion, searchQuran, searchHadith, etc.) should be included here if not already defined above.
+  // To avoid duplication, ensure they are only defined once.
 </script>
 
 </body>
