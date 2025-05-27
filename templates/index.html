@@ -5,19 +5,23 @@
 <title>Tawfiq AI - Smart Islamic Companion</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- External CSS (Optional: you can embed your style instead) -->
-<!-- <link rel="stylesheet" href="style.css"> -->
+<!-- External CSS -->
+<!-- Replace this with your actual stylesheet if needed -->
+<!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
 
+<!-- Internal Style for aesthetics -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-html, body {
-  height: 100%;
+body {
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  font-family: 'Poppins', sans-serif;
   background-color: #f4f4f4;
-  overflow: hidden; /* prevent overall scrolling, handle within containers */
+  color: #333;
+  line-height: 1.6;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 /* Header styles */
@@ -68,6 +72,7 @@ header h3 {
   overflow-y: auto;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
 }
 #side-menu.hidden {
   left: -280px;
@@ -114,7 +119,7 @@ header h3 {
 
 /* Sections styling */
 .section {
-  display: none; /* hide all by default */
+  display: none;
   padding: 20px;
   max-width: 700px;
   margin: 0 auto;
@@ -122,16 +127,17 @@ header h3 {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-top: 20px;
+  width: 100%; /* responsive full width */
 }
 .section.active {
   display: block;
 }
 
-/* Specific styles for AI chat section */
+/* Chat container styles */
 #aiSection {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 80px); /* fill almost the entire viewport height */
+  height: calc(100vh - 80px); /* fill viewport height minus space for header/buttons */
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
@@ -139,40 +145,37 @@ header h3 {
   width: 100%;
   max-width: 700px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
 }
 
-/* Messages container takes most space */
-#messages-container {
+/* Chat messages area (scrollable) */
+#messages {
   flex: 1;
-  overflow-y: auto;
   padding: 10px;
-  margin-bottom: 70px; /* space for input */
+  overflow-y: auto;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
 }
-#messages-container::-webkit-scrollbar {
+#messages::-webkit-scrollbar {
   width: 8px;
 }
-#messages-container::-webkit-scrollbar-thumb {
+#messages::-webkit-scrollbar-thumb {
   background-color: rgba(0,0,0,0.2);
   border-radius: 4px;
 }
-#messages-container::-webkit-scrollbar-thumb:hover {
+#messages::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0,0,0,0.4);
 }
 
-/* Input container fixed at bottom inside #aiSection */
+/* Chat input area (fixed at top within AI section) */
 #aiInputContainer {
+  display: flex;
   padding: 10px;
   background-color: #fff;
-  display: flex;
-  align-items: center;
+  border-top: 1px solid #ccc;
   gap: 8px;
-  margin-top: 10px; /* optional, space above input */
-  /* Keep it sticky or just fixed at bottom within flex container */
 }
-#aiInputContainer input[type="text"] {
+#userInput {
   flex: 1;
   padding: 12px 15px;
   border-radius: 8px;
@@ -190,38 +193,51 @@ header h3 {
   font-size: 1em;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.2s;
 }
 #askButton:hover {
   background-color: #0056b3;
   transform: scale(1.02);
 }
 
-/* Other sections (Quran, Hadith, etc.) styles */
+/* Message styles */
+.message {
+  margin-bottom: 10px;
+}
+.message.user {
+  font-weight: 600;
+  color: #222;
+}
+.message.ai {
+  color: #444;
+}
+.message .reply {
+  margin-left: 10px;
+  display: inline-block;
+}
+.loading-indicator {
+  font-style: italic;
+  color: #555;
+}
+
+/* Results styles for Quran / Hadith etc. */
 .results {
   margin-top: 20px;
-  background-color: #fff;
+  background-color: #f9f9f9;
   padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   max-height: 300px;
   overflow-y: auto;
 }
-
-/* Scrollbar styles for WebKit browsers */
-::-webkit-scrollbar {
+.results::-webkit-scrollbar {
   width: 8px;
 }
-::-webkit-scrollbar-thumb {
+.results::-webkit-scrollbar-thumb {
   background-color: rgba(0,0,0,0.2);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
+.results::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0,0,0,0.4);
-}
-
-body {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,0.2) transparent;
 }
 
 /* Responsive adjustments */
@@ -286,21 +302,23 @@ body {
   <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- AI Section: fill viewport, with message scroll and ample space -->
+<!-- AI Section: chat input at the top, messages below -->
 <div class="section active" id="aiSection">
-  <!-- Messages container -->
-  <div id="messages-container"></div>
-  <!-- Input bar fixed at bottom inside #aiSection -->
+  <!-- Input & Ask button at the top -->
   <div id="aiInputContainer">
     <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
     <button id="askButton" onclick="sendQuestion()">Ask</button>
   </div>
+  <!-- Messages container below -->
+  <div id="messages"></div>
 </div>
 
 <!-- Quran Section -->
 <div class="section" id="quranSection">
   <input type="text" id="quranInput" placeholder="Enter Surah name or keyword..."/>
-  <select id="surahList"></select>
+  <select id="surahList">
+    <option value="">-- Or Select Surah --</option>
+  </select>
   <button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
   <div class="results" id="quranResult"></div>
 </div>
@@ -308,7 +326,9 @@ body {
 <!-- Hadith Section -->
 <div class="section" id="hadithSection">
   <input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number..."/>
-  <select id="hadithDropdown"></select>
+  <select id="hadithDropdown">
+    <option value="">-- Or Select Hadith Topic --</option>
+  </select>
   <button id="hadithSearchButton" onclick="searchHadith()">Search Hadith</button>
   <div class="results" id="hadithResult"></div>
 </div>
@@ -317,6 +337,7 @@ body {
 <div class="section" id="duaSection">
   <h3>Today's Dua</h3>
   <div id="duaText">Loading Dua...</div>
+  <!-- Daily Dua display -->
   <div id="dailyDuaSection">
     <h2>🕌 Daily Dua 📿</h2>
     <div id="dailyDuaContent" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
@@ -337,17 +358,51 @@ body {
   </div>
 </div>
 
-<!-- Daily Dua Menu -->
+<!-- Daily Dua menu for navigation -->
 <div class="section" id="dailyDuaMenu" style="display:none;">
   <h3>🕌 Daily Dua 📿</h3>
   <div id="dailyDuaContentMenu" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
 </div>
 
+<!-- Scripts -->
 <script>
-  // Initialize chat history
   let chatHistory = [];
 
-  // Load Daily Dua and Topics on page load
+  // Switch tab sections
+  function switchTab(sectionId, event) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    event.target.classList.add('active');
+
+    if (sectionId === 'prayerTimes') {
+      loadPrayerTimes();
+    }
+  }
+
+  function toggleMenu() {
+    document.getElementById('side-menu').classList.toggle('hidden');
+  }
+
+  function toggleMode() {
+    document.body.classList.toggle('light-mode');
+    document.body.classList.toggle('dark-mode');
+    const toggleBtn = document.querySelector('.toggle-btn');
+    toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+  }
+
+  function goTo(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.style.display='none');
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.style.display='block';
+      if (sectionId==='prayerTimes') {
+        loadPrayerTimes();
+      }
+    }
+  }
+
+  // Load daily Dua for main and menu
   function loadDailyDua() {
     fetch('data/daily_duas.json')
       .then(res => res.json())
@@ -363,7 +418,6 @@ body {
       });
   }
 
-  // Load prayer times
   function loadPrayerTimes() {
     fetch('/get-prayer-times')
       .then(res => res.json())
@@ -381,12 +435,11 @@ body {
         }
       })
       .catch(error => {
-        console.error('Error loading prayer times:', error);
+        console.error('Error fetching prayer times:', error);
         document.getElementById('prayerTimesContent').innerHTML = '<p>Error loading prayer times.</p>';
       });
   }
 
-  // Load Surah list
   function loadSurahList() {
     fetch('/get-surah-list')
       .then(res => res.json())
@@ -439,7 +492,6 @@ body {
     });
   }
 
-  // Load Hadith topics
   function loadHadithTopics() {
     const topics = [
       "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
@@ -479,7 +531,7 @@ body {
     });
   }
 
-  // Load Daily Dua into main and menu sections on page load
+  // Load Daily Dua for main and menu sections
   function loadDailyDua() {
     fetch('data/daily_duas.json')
       .then(res => res.json())
@@ -495,28 +547,28 @@ body {
       });
   }
 
-  // DOM load
+  // Initialize on DOM load
   document.addEventListener("DOMContentLoaded", () => {
     loadDailyDua();
     loadHadithTopics();
     loadSurahList();
   });
 
-  // Switch Tab
+  // Toggle sections
   function switchTab(sectionId, event) {
-    document.querySelectorAll('.section').forEach(s => s.style.display='none');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(sectionId).style.display='block';
+    document.getElementById(sectionId).classList.add('active');
     event.target.classList.add('active');
-    if(sectionId==='prayerTimes') loadPrayerTimes();
+    if (sectionId==='prayerTimes') {
+      loadPrayerTimes();
+    }
   }
 
-  // Menu toggle
   function toggleMenu() {
     document.getElementById('side-menu').classList.toggle('hidden');
   }
 
-  // Mode toggle
   function toggleMode() {
     document.body.classList.toggle('light-mode');
     document.body.classList.toggle('dark-mode');
@@ -530,17 +582,17 @@ async function sendQuestion() {
   const question = inputEl.value.trim();
   if (!question) return;
 
-  const container = document.getElementById("messages-container");
-  const userMsg = document.createElement("p");
-  userMsg.className = "user-message";
+  const container = document.getElementById("messages");
+  const userMsg = document.createElement("div");
+  userMsg.className = "message user";
   userMsg.innerHTML = "<strong>You:</strong> " + question;
   container.appendChild(userMsg);
   inputEl.value = "";
   container.scrollTop = container.scrollHeight;
 
   chatHistory.push({ role: "user", content: question });
-  const loadingMsg = document.createElement("p");
-  loadingMsg.className = "loading-indicator";
+  const loadingMsg = document.createElement("div");
+  loadingMsg.className = "message ai loading-indicator";
   loadingMsg.innerText = "Tawfiq AI is thinking...";
   container.appendChild(loadingMsg);
   container.scrollTop = container.scrollHeight;
@@ -555,21 +607,23 @@ async function sendQuestion() {
     container.removeChild(loadingMsg);
     const answer = data.answer || "Sorry, couldn't answer.";
     chatHistory.push({ role: "assistant", content: answer });
-    const aiMsg = document.createElement("p");
+    const aiMsg = document.createElement("div");
+    aiMsg.className = "message ai";
     aiMsg.innerHTML = "Tawfiq AI: " + answer.replace(/\n/g, '<br>');
     container.appendChild(aiMsg);
     container.scrollTop = container.scrollHeight;
   } catch (err) {
     console.error(err);
     container.removeChild(loadingMsg);
-    const errorMsg = document.createElement("p");
+    const errorMsg = document.createElement("div");
+    errorMsg.className = "message ai";
     errorMsg.innerText = "Tawfiq AI: Error getting response.";
     container.appendChild(errorMsg);
     container.scrollTop = container.scrollHeight;
   }
 }
 
-  // Search Quran
+// Search Quran
 function searchQuran() {
   const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
   if (!query) return;
@@ -602,11 +656,11 @@ function searchQuran() {
         verseEl.appendChild(info);
 
         const trans = document.createElement("p");
-        trans.innerText = verse.translation;
+        trans.textContent = verse.translation;
         verseEl.appendChild(trans);
 
         const arabic = document.createElement("p");
-        arabic.innerText = verse.arabic_text;
+        arabic.textContent = verse.arabic_text;
         arabic.style.textAlign = 'right';
         arabic.style.fontWeight = 'bold';
         arabic.style.marginTop = '5px';
@@ -638,7 +692,7 @@ function searchQuran() {
   });
 }
 
-  // Search Hadith
+// Search Hadith
 function searchHadith() {
   const inputQuery = document.getElementById("hadithInput").value.trim();
   const dropdownQuery = document.getElementById("hadithDropdown").value;
@@ -687,7 +741,7 @@ function searchHadith() {
         hadithEl.appendChild(infoPara);
 
         const textPara = document.createElement("p");
-        textPara.innerText = hadith.text;
+        textPara.textContent = hadith.text;
         textPara.style.marginTop = '8px';
         hadithEl.appendChild(textPara);
 
@@ -706,6 +760,5 @@ function searchHadith() {
   });
 }
 </script>
-
 </body>
 </html>
