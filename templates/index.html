@@ -8,7 +8,7 @@
 <!-- External CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-<!-- Updated and Enhanced CSS for Mobile & Aesthetics -->
+<!-- Enhanced CSS for proper layout -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
@@ -20,9 +20,6 @@ html, body {
   font-family: 'Poppins', sans-serif;
   background-color: #f4f4f4;
   color: #333;
-  line-height: 1.6;
-  scroll-behavior: smooth;
-  overflow-x: hidden;
 }
 
 /* Header styles */
@@ -133,25 +130,24 @@ header h3 {
   display: block;
 }
 
-/* AI Chat Section: fill viewport, with message scroll and sticky input */
+/* --- Start of chat layout styles --- */
+
+/* Make #aiSection fill the viewport and be a flex container */
 #aiSection {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 80px); /* adjust for header/margin if needed */
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
-  position: relative;
 }
 
-/* Make message container fill remaining space and scroll */
+/* Message container takes remaining space and scrolls */
 #messages-container {
   flex: 1;
   overflow-y: auto;
   padding: 10px;
   background: #fff;
-  display: flex;
-  flex-direction: column;
 }
 #messages-container::-webkit-scrollbar {
   width: 8px;
@@ -163,12 +159,8 @@ header h3 {
 #messages-container::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0,0,0,0.4);
 }
-body {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,0.2) transparent;
-}
 
-/* Input container sticky at bottom for seamless connection */
+/* Input container fixed/sticky at bottom inside #aiSection */
 #aiInputContainer {
   padding: 10px;
   background-color: #fff;
@@ -188,7 +180,6 @@ body {
   font-family: 'Poppins', sans-serif;
   font-size: 1em;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-  transition: border-color 0.2s;
 }
 #aiInputContainer input[type="text"]:focus {
   border-color: #007bff;
@@ -203,14 +194,14 @@ body {
   font-size: 1em;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background 0.3s, transform 0.2s;
 }
 #askButton:hover {
   background-color: #0056b3;
   transform: scale(1.02);
 }
 
-/* Messages styling */
+/* --- End of chat layout styles --- */
+
 .messages, .results {
   margin-top: 20px;
   background-color: #fff;
@@ -243,13 +234,12 @@ body {
   background-color: rgba(0,0,0,0.4);
 }
 
-/* Firefox scrollbar */
 body {
   scrollbar-width: thin;
   scrollbar-color: rgba(0,0,0,0.2) transparent;
 }
 
-/* Responsive adjustments */
+/* Responsive font adjustments */
 @media(max-width: 600px) {
   body {
     font-size: 0.95em;
@@ -275,7 +265,7 @@ body {
 }
 </style>
 </head>
-<body class="light-mode">
+<body>
 
 <!-- MENU TOGGLE BUTTON -->
 <div id="menu-toggle" onclick="toggleMenu()">☰</div>
@@ -311,11 +301,11 @@ body {
   <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- AI Section: fill screen, message scroll, sticky input -->
+<!-- AI Section: fill viewport, with message scroll and sticky input -->
 <div class="section active" id="aiSection" style="display:flex; flex-direction:column; height:100vh; background:#fff; border-radius:12px;">
   <!-- Messages container -->
   <div id="messages-container"></div>
-  <!-- Input bar fixed at bottom -->
+  <!-- Input bar fixed/sticky at bottom inside #aiSection -->
   <div id="aiInputContainer">
     <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
     <button id="askButton" onclick="sendQuestion()">Ask</button>
@@ -381,9 +371,9 @@ body {
     fetch('data/daily_duas.json')
       .then(res => res.json())
       .then(data => {
-        const duaText = data.dua || "No Dua available.";
-        document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
-        document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
+        const dua = data.dua || "No Dua available.";
+        document.getElementById('dailyDuaContent').innerHTML = `<p>"${dua}"</p>`;
+        document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${dua}"</p>`;
       })
       .catch(error => {
         document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
@@ -449,7 +439,7 @@ body {
       "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya",
       "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur",
       "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr",
-      "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
+      "Al-Mumtahanah", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
       "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
       "Al-Muzzammil", "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba",
       "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq",
