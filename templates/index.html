@@ -8,8 +8,76 @@
 <!-- Link to external CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
+<style>
+/* MENU BUTTON */
+#menu-toggle {
+  font-size: 30px;
+  cursor: pointer;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* SIDEBAR MENU */
+#side-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 270px;
+  height: 100%;
+  background-color: #121212;
+  color: white;
+  padding-top: 60px;
+  transition: 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+#side-menu.hidden {
+  left: -270px;
+}
+
+#side-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#side-menu li {
+  padding: 16px 20px;
+  border-bottom: 1px solid #2e2e2e;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#side-menu li:hover {
+  background-color: #1e1e1e;
+}
+</style>
 </head>
 <body class="light-mode">
+
+<!-- MENU TOGGLE BUTTON -->
+<div id="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<!-- SIDEBAR MENU -->
+<div id="side-menu" class="hidden">
+  <ul>
+    <li onclick="goTo('profile')">👤 Profile</li>
+    <li onclick="goTo('reminder')">📅 Daily Reminder</li>
+    <li onclick="goTo('motivation')">✨ Islamic Motivation</li>
+    <li onclick="goTo('sheikh')">🔥 Savage Sheikh Uncle</li>
+    <li onclick="goTo('settings')">⚙️ Settings</li>
+    <li onclick="goTo('privacy')">🔒 Privacy & Policy</li>
+    <li onclick="goTo('about')">ℹ️ About Tawfiq AI</li>
+    <li onclick="goTo('feedback')">📢 Feedback / Report</li>
+  </ul>
+</div>
 
 <button class="toggle-btn" onclick="toggleMode()">Toggle Mode</button>
 
@@ -18,6 +86,7 @@
 <h3>✨ Ask me anything about Islam ✨</h3>
 </header>
 
+<!-- TABS -->
 <div class="tabs">
 <div class="tab active" onclick="switchTab('aiSection', event)">🤖 AI</div>
 <div class="tab" onclick="switchTab('quranSection', event)">📖 Quran</div>
@@ -390,18 +459,33 @@
       });
   }
 
+  // Toggle sidebar menu
+  function toggleMenu() {
+    const menu = document.getElementById('side-menu');
+    menu.classList.toggle('hidden');
+  }
+
+  function goTo(section) {
+    // Placeholder function: You can later link this to section IDs or pages
+    alert("Navigating to: " + section);
+    toggleMenu();
+  }
+
   // Initialize on DOMContentLoaded
   document.addEventListener("DOMContentLoaded", () => {
     loadHadithTopics();
     loadSurahList();
     loadDailyDuaFromJSON(); // Load the Dua from JSON on page load
   });
+
+  // Your existing functions (sendQuestion, searchQuran, searchHadith, etc.) go here
+  // For brevity, assuming they are the same as provided above and are included in the script block
 </script>
 
-<!-- Your existing script functions like sendQuestion, searchQuran, etc., go here, or include below as needed -->
+<!-- Your existing script functions like sendQuestion, searchQuran, etc., should be included here as needed -->
 <script>
-  // Your functions (sendQuestion, searchQuran, searchHadith, etc.) should be included here if not already defined above.
-  // To avoid duplication, ensure they are only defined once.
+  // Place all other functions here (sendQuestion, searchQuran, searchHadith, etc.)
+  // For brevity, they are omitted in this snippet, but should be included in your final code.
 </script>
 
 </body>
