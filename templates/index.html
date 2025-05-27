@@ -5,145 +5,79 @@
 <title>Tawfiq AI - Smart Islamic Companion</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- Internal CSS for styling -->
+<!-- Internal CSS -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
 body {
-  font-family: 'Poppins', sans-serif;
   margin: 0;
-  padding: 0;
+  font-family: 'Poppins', sans-serif;
   background-color: #f4f4f4;
-  color: #333;
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Full viewport height for layout */
+  height: 100vh;
   overflow: hidden;
 }
 
-/* Header styles */
-h1, h3 {
+/* Header */
+h1 {
   text-align: center;
-  margin: 20px 10px;
-  font-weight: 600;
-}
-header h1 {
   font-size: 1.8em;
-  color: #222;
+  margin: 20px 10px;
 }
-header h3 {
+h3 {
+  text-align: center;
   font-size: 1.2em;
-  color: #555;
+  margin-bottom: 20px;
 }
 
-/* Menu toggle button */
-#menu-toggle {
-  font-size: 28px;
-  cursor: pointer;
-  position: fixed;
-  top: 20px;
-  left: 15px;
-  z-index: 1001;
-  background: #fff;
-  padding: 8px 12px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-}
-#menu-toggle:hover {
-  background: #eee;
-  transform: scale(1.05);
-}
-
-/* Sidebar menu styles */
-#side-menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 280px;
-  height: 100%;
-  background-color: #121212;
-  color: #fff;
-  padding-top: 70px;
-  transition: all 0.3s ease;
-  z-index: 1000;
-  overflow-y: auto;
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-#side-menu.hidden {
-  left: -280px;
-}
-#side-menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-#side-menu li {
-  padding: 16px 20px;
-  border-bottom: 1px solid #333;
-  cursor: pointer;
-  font-size: 1em;
-  transition: background 0.2s, transform 0.1s;
-}
-#side-menu li:hover {
-  background-color: #333;
-  transform: translateX(2px);
-}
-
-/* Tabs styles */
-.tabs {
-  margin-top: 100px;
+/* Top buttons for sections */
+#sectionButtons {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
+  margin: 10px;
 }
-.tab {
+.section-btn {
   padding: 10px 20px;
   border-radius: 25px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  cursor: pointer;
+  background-color: #ccc;
+  border: none;
   font-weight: 600;
-  font-size: 1em;
-  transition: background 0.3s, transform 0.2s;
+  cursor: pointer;
+  transition: background 0.3s;
 }
-.tab.active, .tab:hover {
-  background-color: #ddd;
-  transform: scale(1.02);
+.section-btn.active, .section-btn:hover {
+  background-color: #999;
 }
 
-/* Sections styling */
+/* Sections container */
+#contentContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+/* Sections styles (hidden/shown) */
 .section {
   display: none;
-  padding: 20px;
-  max-width: 700px;
-  margin: 20px auto;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  width: 100%;
 }
 .section.active {
   display: block;
 }
 
-/* AI chat container: full height, flex column */
-#aiSection {
+/* Chat/messages area for AI */
+#aiChat {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
-  margin: 20px;
+  height: calc(100vh - 250px);
 }
-
-/* Messages area: scrollable, above input */
 #messages {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
   background: #fff;
   border-radius: 8px;
-  margin-bottom: 10px;
+  padding: 10px;
 }
 #messages::-webkit-scrollbar {
   width: 8px;
@@ -156,13 +90,12 @@ header h3 {
   background-color: rgba(0,0,0,0.4);
 }
 
-/* Input container fixed at bottom of AI section */
-#aiInputContainer {
+/* Input area fixed at bottom */
+#inputArea {
   display: flex;
   padding: 10px;
   background-color: #fff;
   border-top: 1px solid #ccc;
-  align-items: center;
 }
 #userInput {
   flex: 1;
@@ -171,9 +104,8 @@ header h3 {
   border: 1px solid #ccc;
   font-family: 'Poppins', sans-serif;
   font-size: 1em;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
-#askButton {
+#askBtn {
   margin-left: 8px;
   padding: 12px 20px;
   border: none;
@@ -182,23 +114,13 @@ header h3 {
   color: #fff;
   font-size: 1em;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  transition: background 0.3s, transform 0.2s;
+  transition: background 0.3s;
 }
-#askButton:hover {
+#askBtn:hover {
   background-color: #0056b3;
-  transform: scale(1.02);
 }
 
-/* Styles for other sections like Quran and Hadith */
-#quranSection, #hadithSection {
-  display: none;
-}
-#quranSection.active, #hadithSection.active {
-  display: block;
-}
-
-/* Dropdown styles */
+/* Dropdown styles for Quran and Hadith sections */
 select {
   width: 100%;
   padding: 12px 15px;
@@ -207,132 +129,94 @@ select {
   border: 1px solid #ccc;
   font-family: 'Poppins', sans-serif;
   font-size: 1em;
-  background-color: #fff;
 }
 
-/* Results styling */
+/* Results display */
 .results {
   margin-top: 20px;
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 10px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-.results::-webkit-scrollbar {
-  width: 8px;
-}
-.results::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.2);
-  border-radius: 4px;
-}
-.results::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0,0,0,0.4);
-}
-
-/* Responsive adjustments */
-@media(max-width: 600px) {
-  body {
-    font-size: 0.95em;
-  }
-  header h1 {
-    font-size: 1.4em;
-  }
-  header h3 {
-    font-size: 1em;
-  }
-  #menu-toggle {
-    font-size: 24px;
-    padding: 6px 10px;
-  }
-  .tab {
-    padding: 8px 16px;
-    font-size: 0.95em;
-  }
-  button {
-    padding: 10px 16px;
-    font-size: 0.95em;
-  }
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
 }
 </style>
 </head>
 <body>
 
-<!-- MENU TOGGLE BUTTON -->
-<div id="menu-toggle" onclick="toggleMenu()">☰</div>
-
-<!-- SIDEBAR MENU -->
-<div id="side-menu" class="hidden">
-  <ul>
-    <li onclick="goTo('profile')">👤 Profile</li>
-    <li onclick="goTo('prayerTimes')">🕌 Prayer Times</li>
-    <li onclick="goTo('dailyDuaMenu')">🕌 Daily Dua</li>
-    <li onclick="goTo('reminder')">📅 Daily Reminder</li>
-    <li onclick="goTo('motivation')">✨ Islamic Motivation</li>
-    <li onclick="goTo('settings')">⚙️ Settings</li>
-    <li onclick="goTo('privacy')">🔒 Privacy & Policy</li>
-    <li onclick="goTo('about')">ℹ️ About Tawfiq AI</li>
-    <li onclick="goTo('feedback')">📢 Feedback / Report</li>
-  </ul>
-</div>
-
-<!-- Toggle Mode Button -->
-<button class="toggle-btn" onclick="toggleMode()">Toggle Mode</button>
-
-<!-- Main Header -->
-<header>
+<!-- Header -->
 <h1>🌙 Tawfiq AI - Smart Islamic Companion 🌙</h1>
 <h3>✨ Ask me anything about Islam ✨</h3>
-</header>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('aiSection', event)">🤖 AI</div>
-  <div class="tab" onclick="switchTab('quranSection', event)">📖 Quran</div>
-  <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
+<!-- Buttons to toggle sections -->
+<div id="sectionButtons">
+  <button class="section-btn active" onclick="showSection('ai')">🤖 AI</button>
+  <button class="section-btn" onclick="showSection('quran')">📖 Quran</button>
+  <button class="section-btn" onclick="showSection('hadith')">📜 Hadith</button>
 </div>
 
-<!-- AI Chat Section with input fixed at bottom -->
-<div class="section active" id="aiSection" style="display:flex; flex-direction:column; height: calc(100vh - 180px);">
-  <!-- Messages container -->
-  <div id="messages" style="flex:1; overflow-y:auto; padding:10px; background:#fff; border-radius:8px;">
-    <!-- Chat messages will appear here -->
+<!-- Main Content Container -->
+<div id="contentContainer">
+
+  <!-- AI Section -->
+  <div id="ai" class="section active" style="display:flex; flex-direction:column; height: calc(100vh - 250px);">
+    <!-- Messages display -->
+    <div id="messages"></div>
+    <!-- Input area -->
+    <div id="inputArea">
+      <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
+      <button id="askBtn" onclick="sendQuestion()">Ask</button>
+    </div>
   </div>
-  <!-- Input fixed at bottom -->
-  <div id="aiInputContainer" style="display:flex; padding:10px; background:#fff; border-top:1px solid #ccc;">
-    <input type="text" id="userInput" placeholder="Ask a question about Islam..." style="flex:1; padding:12px 15px; border-radius:8px; border:1px solid #ccc; font-family:'Poppins',sans-serif; font-size:1em; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);"/>
-    <button id="askButton" onclick="sendQuestion()" style="margin-left:8px; padding:12px 20px; border:none; border-radius:8px; background-color:#007bff; color:#fff; font-size:1em; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition:background 0.3s, transform 0.2s;">Ask</button>
+
+  <!-- Quran Section -->
+  <div id="quran" class="section" style="display:none;">
+    <h3>Quran - Select Surah</h3>
+    <select id="surahDropdown" onchange="searchQuran()">
+      <option value="">-- Select Surah --</option>
+    </select>
+    <div class="results" id="quranResults"></div>
   </div>
-</div>
 
-<!-- Quran Section -->
-<div class="section" id="quranSection">
-  <h3>Quran - Select Surah</h3>
-  <select id="surahDropdown" onchange="searchQuran()">
-    <option value="">-- Select Surah --</option>
-  </select>
-  <div class="results" id="quranResult"></div>
-</div>
+  <!-- Hadith Section -->
+  <div id="hadith" class="section" style="display:none;">
+    <h3>Hadith - Select Topic</h3>
+    <select id="hadithDropdown" onchange="searchHadith()">
+      <option value="">-- Select Hadith Topic --</option>
+    </select>
+    <div class="results" id="hadithResults"></div>
+  </div>
 
-<!-- Hadith Section -->
-<div class="section" id="hadithSection">
-  <h3>Hadith - Select Topic</h3>
-  <select id="hadithDropdown" onchange="searchHadith()">
-    <option value="">-- Select Hadith Topic --</option>
-  </select>
-  <div class="results" id="hadithResult"></div>
 </div>
 
 <!-- Scripts -->
 <script>
-  let chatHistory = [];
+  // Toggle sections
+  function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.style.display='none');
+    document.querySelectorAll('.section-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(sectionId).style.display='block';
+    document.querySelector(`button[onclick="showSection('${sectionId}')"]`).classList.add('active');
+  }
 
-  // Load Surah list into Quran dropdown
+  // Load sample surah list
   function loadSurahList() {
     const surahs = [
       "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam",
-      // ... add all surahs as needed
-      "Al-Nas"
+      "Al-Araf", "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Ra’d",
+      "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha",
+      "Al-Anbiya", "Al-Hajj", "Al-Muminun", "An-Nur", "Al-Furqan", "Ash-Shuara",
+      "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajda",
+      "Al-Ahzab", "Saba", "Fatir", "Yaseen", "As-Saffat", "Sad", "Az-Zariyat",
+      "Al-Hadid", "Al-Mujadila", "Al-Hashr", "Al-Mumtahanah", "As-Saff",
+      "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim",
+      "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
+      "Al-Muzzammil", "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat",
+      "An-Naba", "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin",
+      "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghashiyah",
+      "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Lail", "Ad-Duha", "Al-Inshirah",
+      "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina", "Az-Zalzalah", "Al-Adiyat",
+      "Al-Qari'ah", "At-Takathur", "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh",
+      "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas",
+      "Al-Falaq", "An-Nas"
     ];
     const select = document.getElementById('surahDropdown');
     surahs.forEach(surah => {
@@ -343,12 +227,11 @@ select {
     });
   }
 
-  // Load Hadith Topics
+  // Load sample hadith topics
   function loadHadithTopics() {
     const topics = [
-      "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
-      // ... add more topics as needed
-      "Family Ties"
+      "Prayer", "Faith", "Charity", "Patience", "Islamic Manners", "Family",
+      "Honesty", "Forgiveness", "Respect", "Knowledge", "Good Character"
     ];
     const select = document.getElementById('hadithDropdown');
     topics.forEach(topic => {
@@ -359,101 +242,61 @@ select {
     });
   }
 
-  // Switch tabs
-  function switchTab(sectionId, event) {
-    document.querySelectorAll('.section').forEach(s => s.style.display='none');
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(sectionId).style.display='block';
-    event.target.classList.add('active');
+  // Search Quran when selecting surah
+  function searchQuran() {
+    const select = document.getElementById('surahDropdown');
+    const surah = select.value;
+    const container = document.getElementById('quranResults');
+    if (!surah) return;
+    container.innerHTML = `<p>Display content for <strong>${surah}</strong>.</p>`;
   }
 
-  function toggleMenu() {
-    document.getElementById('side-menu').classList.toggle('hidden');
+  // Search Hadith when selecting topic
+  function searchHadith() {
+    const select = document.getElementById('hadithDropdown');
+    const topic = select.value;
+    const container = document.getElementById('hadithResults');
+    if (!topic) return;
+    container.innerHTML = `<p>Display Hadiths about <strong>${topic}</strong>.</p>`;
   }
 
-  function toggleMode() {
-    document.body.classList.toggle('light-mode');
-    document.body.classList.toggle('dark-mode');
-    const toggleBtn = document.querySelector('.toggle-btn');
-    toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-  }
+  // Send question in AI tab
+  async function sendQuestion() {
+    const input = document.getElementById('userInput');
+    const question = input.value.trim();
+    if (!question) return;
+    const container = document.getElementById('messages');
 
-  // Send question
-async function sendQuestion() {
-  const inputEl = document.getElementById("userInput");
-  const question = inputEl.value.trim();
-  if (!question) return;
+    // User message
+    const userMsg = document.createElement('div');
+    userMsg.innerHTML = `<strong>You:</strong> ${question}`;
+    container.appendChild(userMsg);
 
-  const container = document.getElementById("messages");
-  const userMsg = document.createElement("div");
-  userMsg.className = "message user";
-  userMsg.innerHTML = "<strong>You:</strong> " + question;
-  container.appendChild(userMsg);
-  inputEl.value = "";
-  container.scrollTop = container.scrollHeight;
+    // Clear input
+    input.value = '';
 
-  chatHistory.push({ role: "user", content: question });
-  const loadingMsg = document.createElement("div");
-  loadingMsg.className = "message ai loading-indicator";
-  loadingMsg.innerText = "Tawfiq AI is thinking...";
-  container.appendChild(loadingMsg);
-  container.scrollTop = container.scrollHeight;
-
-  try {
-    const response = await fetch('/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history: chatHistory })
-    });
-    const data = await response.json();
-    container.removeChild(loadingMsg);
-    const answer = data.answer || "Sorry, couldn't answer.";
-    chatHistory.push({ role: "assistant", content: answer });
-    const aiMsg = document.createElement("div");
-    aiMsg.className = "message ai";
-    aiMsg.innerHTML = "Tawfiq AI: " + answer.replace(/\n/g, '<br>');
-    container.appendChild(aiMsg);
+    // Show loading
+    const loadingMsg = document.createElement('div');
+    loadingMsg.innerHTML = 'Tawfiq AI is thinking...';
+    container.appendChild(loadingMsg);
     container.scrollTop = container.scrollHeight;
-  } catch (err) {
-    console.error(err);
-    container.removeChild(loadingMsg);
-    const errorMsg = document.createElement("div");
-    errorMsg.className = "message ai";
-    errorMsg.innerText = "Tawfiq AI: Error getting response.";
-    container.appendChild(errorMsg);
-    container.scrollTop = container.scrollHeight;
+
+    // Simulate response
+    setTimeout(() => {
+      container.removeChild(loadingMsg);
+      const answerDiv = document.createElement('div');
+      answerDiv.innerHTML = `<strong>Tawfiq AI:</strong> This is a mock response.`;
+      container.appendChild(answerDiv);
+      container.scrollTop = container.scrollHeight;
+    }, 1500);
   }
-}
 
-// Quran search when selecting a surah
-function searchQuran() {
-  const surahSelect = document.getElementById("surahDropdown");
-  const selectedSurah = surahSelect.value;
-  const resultDiv = document.getElementById("quranResult");
-  if (!selectedSurah) return;
-  resultDiv.innerHTML = `<div class="user-message">Searching Surah: ${selectedSurah}</div>`;
-  // Fetch or display content related to selected surah
-  // For demo, just show the surah name
-  resultDiv.innerHTML += `<div>Display content for ${selectedSurah} here.</div>`;
-}
-
-// Hadith search when selecting topic
-function searchHadith() {
-  const topicSelect = document.getElementById("hadithDropdown");
-  const selectedTopic = topicSelect.value;
-  const resultDiv = document.getElementById("hadithResult");
-  if (!selectedTopic) return;
-  resultDiv.innerHTML = `<div class="user-message">Searching Hadith: ${selectedTopic}</div>`;
-  // Fetch or display content related to selected topic
-  // For demo, just show the topic name
-  resultDiv.innerHTML += `<div>Display Hadiths about ${selectedTopic} here.</div>`;
-}
-
-// Load lists on page load
-document.addEventListener("DOMContentLoaded", () => {
-  loadSurahList();
-  loadHadithTopics();
-});
+  // Initialize lists
+  document.addEventListener('DOMContentLoaded', () => {
+    loadSurahList();
+    loadHadithTopics();
+  });
 </script>
+
 </body>
 </html>
