@@ -5,7 +5,7 @@
 <title>Tawfiq AI - Smart Islamic Companion</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- Internal Style for aesthetics -->
+<!-- Internal CSS for styling -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
@@ -15,11 +15,10 @@ body {
   padding: 0;
   background-color: #f4f4f4;
   color: #333;
-  line-height: 1.6;
-  overflow-x: hidden;
-  height: 100vh; /* full viewport height for layout */
   display: flex;
   flex-direction: column;
+  height: 100vh; /* Full viewport height for layout */
+  overflow: hidden;
 }
 
 /* Header styles */
@@ -37,7 +36,7 @@ header h3 {
   color: #555;
 }
 
-/* Menu toggle button style */
+/* Menu toggle button */
 #menu-toggle {
   font-size: 28px;
   cursor: pointer;
@@ -70,7 +69,6 @@ header h3 {
   overflow-y: auto;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
 }
 #side-menu.hidden {
   left: -280px;
@@ -130,20 +128,22 @@ header h3 {
   display: block;
 }
 
-/* AI chat container with message area and input at bottom */
+/* AI chat container: full height, flex column */
 #aiSection {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px); /* full height minus header, tabs, and some margin */
-  /* Additional margin for header and tabs */
+  height: calc(100vh - 180px);
+  margin: 20px;
 }
 
+/* Messages area: scrollable, above input */
 #messages {
   flex: 1;
   overflow-y: auto;
   padding: 10px;
   background: #fff;
   border-radius: 8px;
+  margin-bottom: 10px;
 }
 #messages::-webkit-scrollbar {
   width: 8px;
@@ -162,8 +162,7 @@ header h3 {
   padding: 10px;
   background-color: #fff;
   border-top: 1px solid #ccc;
-  gap: 8px;
-  margin-top: 10px;
+  align-items: center;
 }
 #userInput {
   flex: 1;
@@ -175,6 +174,7 @@ header h3 {
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 #askButton {
+  margin-left: 8px;
   padding: 12px 20px;
   border: none;
   border-radius: 8px;
@@ -190,27 +190,27 @@ header h3 {
   transform: scale(1.02);
 }
 
-/* Message styles */
-.message {
-  margin-bottom: 10px;
+/* Styles for other sections like Quran and Hadith */
+#quranSection, #hadithSection {
+  display: none;
 }
-.message.user {
-  font-weight: 600;
-  color: #222;
-}
-.message.ai {
-  color: #444;
-}
-.message .reply {
-  margin-left: 10px;
-  display: inline-block;
-}
-.loading-indicator {
-  font-style: italic;
-  color: #555;
+#quranSection.active, #hadithSection.active {
+  display: block;
 }
 
-/* Results styles for Quran / Hadith etc. */
+/* Dropdown styles */
+select {
+  width: 100%;
+  padding: 12px 15px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1em;
+  background-color: #fff;
+}
+
+/* Results styling */
 .results {
   margin-top: 20px;
   background-color: #f9f9f9;
@@ -292,13 +292,13 @@ header h3 {
   <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- AI Section: Chat with input at bottom -->
+<!-- AI Chat Section with input fixed at bottom -->
 <div class="section active" id="aiSection" style="display:flex; flex-direction:column; height: calc(100vh - 180px);">
-  <!-- Messages container (scrollable) -->
-  <div id="messages" style="flex:1; overflow-y:auto; padding:10px; background:#fff; border-radius:8px; margin-bottom:10px;">
-    <!-- Messages will appear here -->
+  <!-- Messages container -->
+  <div id="messages" style="flex:1; overflow-y:auto; padding:10px; background:#fff; border-radius:8px;">
+    <!-- Chat messages will appear here -->
   </div>
-  <!-- Input area at bottom -->
+  <!-- Input fixed at bottom -->
   <div id="aiInputContainer" style="display:flex; padding:10px; background:#fff; border-top:1px solid #ccc;">
     <input type="text" id="userInput" placeholder="Ask a question about Islam..." style="flex:1; padding:12px 15px; border-radius:8px; border:1px solid #ccc; font-family:'Poppins',sans-serif; font-size:1em; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);"/>
     <button id="askButton" onclick="sendQuestion()" style="margin-left:8px; padding:12px 20px; border:none; border-radius:8px; background-color:#007bff; color:#fff; font-size:1em; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition:background 0.3s, transform 0.2s;">Ask</button>
@@ -306,166 +306,35 @@ header h3 {
 </div>
 
 <!-- Quran Section -->
-<div class="section" id="quranSection" style="display:none;">
-  <input type="text" id="quranInput" placeholder="Enter Surah name or keyword..." style="width:100%; padding:12px 15px; margin-top:10px; border-radius:8px; border:1px solid #ccc; font-family:'Poppins',sans-serif; font-size:1em; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);"/>
-  <select id="surahList" style="width:100%; padding:12px 15px; margin-top:10px; border-radius:8px; border:1px solid #ccc; font-family:'Poppins',sans-serif; font-size:1em;">
-    <option value="">-- Or Select Surah --</option>
+<div class="section" id="quranSection">
+  <h3>Quran - Select Surah</h3>
+  <select id="surahDropdown" onchange="searchQuran()">
+    <option value="">-- Select Surah --</option>
   </select>
-  <button id="quranSearchButton" onclick="searchQuran()" style="margin-top:10px; padding:12px 20px; border:none; border-radius:8px; background-color:#007bff; color:#fff; font-size:1em; cursor:pointer;">Search Surah</button>
-  <div class="results" id="quranResult" style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:10px; max-height:300px; overflow-y:auto;"></div>
+  <div class="results" id="quranResult"></div>
 </div>
 
 <!-- Hadith Section -->
-<div class="section" id="hadithSection" style="display:none;">
-  <input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number..." style="width:100%; padding:12px 15px; margin-top:10px; border-radius:8px; border:1px solid #ccc; font-family:'Poppins',sans-serif; font-size:1em; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);"/>
-  <select id="hadithDropdown" style="width:100%; padding:12px 15px; margin-top:10px; border-radius:8px; border:1px solid #ccc; font-family:'Poppins',sans-serif; font-size:1em;">
-    <option value="">-- Or Select Hadith Topic --</option>
+<div class="section" id="hadithSection">
+  <h3>Hadith - Select Topic</h3>
+  <select id="hadithDropdown" onchange="searchHadith()">
+    <option value="">-- Select Hadith Topic --</option>
   </select>
-  <button id="hadithSearchButton" onclick="searchHadith()" style="margin-top:10px; padding:12px 20px; border:none; border-radius:8px; background-color:#007bff; color:#fff; font-size:1em; cursor:pointer;">Search Hadith</button>
-  <div class="results" id="hadithResult" style="margin-top:20px; background:#f9f9f9; padding:15px; border-radius:10px; max-height:300px; overflow-y:auto;"></div>
-</div>
-
-<!-- Dua Section -->
-<div class="section" id="duaSection" style="display:none;">
-  <h3 style="text-align:center;">Today's Dua</h3>
-  <div id="duaText" style="text-align:center;">Loading Dua...</div>
-  <div id="dailyDuaSection" style="margin-top:20px;">
-    <h2 style="text-align:center;">🕌 Daily Dua 📿</h2>
-    <div id="dailyDuaContent" style="font-size:1.2em; padding:10px; text-align:center;">Loading the Dua of the Day...</div>
-  </div>
-</div>
-
-<!-- Motivation Section -->
-<div class="section" id="motivationSection" style="display:none;">
-  <h3 style="text-align:center;">Daily Motivation</h3>
-  <div id="motivationText" style="text-align:center;">Loading Motivation...</div>
-</div>
-
-<!-- Prayer Times -->
-<div class="section" id="prayerTimes" style="display:none;">
-  <h3 style="text-align:center;">🕌 Prayer Times</h3>
-  <div id="prayerTimesContent" style="padding:10px; text-align:center;">
-    <p>Loading prayer times...</p>
-  </div>
-</div>
-
-<!-- Daily Dua Menu (for menu navigation) -->
-<div class="section" id="dailyDuaMenu" style="display:none;">
-  <h3 style="text-align:center;">🕌 Daily Dua 📿</h3>
-  <div id="dailyDuaContentMenu" style="font-size:1.2em; padding:10px; text-align:center;">Loading the Dua of the Day...</div>
+  <div class="results" id="hadithResult"></div>
 </div>
 
 <!-- Scripts -->
 <script>
   let chatHistory = [];
 
-  function switchTab(sectionId, event) {
-    document.querySelectorAll('.section').forEach(s => s.style.display='none');
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(sectionId).style.display='block';
-    event.target.classList.add('active');
-    if (sectionId==='prayerTimes') loadPrayerTimes();
-  }
-
-  function toggleMenu() {
-    document.getElementById('side-menu').classList.toggle('hidden');
-  }
-
-  function toggleMode() {
-    document.body.classList.toggle('light-mode');
-    document.body.classList.toggle('dark-mode');
-    const toggleBtn = document.querySelector('.toggle-btn');
-    toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-  }
-
-  function goTo(sectionId) {
-    document.querySelectorAll('.section').forEach(s => s.style.display='none');
-    document.getElementById(sectionId).style.display='block';
-    if (sectionId==='prayerTimes') loadPrayerTimes();
-  }
-
-  // Load daily Dua for main and menu
-  function loadDailyDua() {
-    fetch('data/daily_duas.json')
-      .then(res => res.json())
-      .then(data => {
-        const dua = data.dua || "No Dua available.";
-        document.getElementById('dailyDuaContent').innerHTML = `<p>"${dua}"</p>`;
-        document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${dua}"</p>`;
-      })
-      .catch(error => {
-        document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-        document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
-        console.error('Error loading daily_duas.json:', error);
-      });
-  }
-
-  function loadPrayerTimes() {
-    fetch('/get-prayer-times')
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('prayerTimesContent');
-        if (data && data.prayer_times) {
-          container.innerHTML = '';
-          for (const [name, time] of Object.entries(data.prayer_times)) {
-            const p = document.createElement('p');
-            p.innerHTML = `<strong>${name}:</strong> ${time}`;
-            container.appendChild(p);
-          }
-        } else {
-          container.innerHTML = '<p>Prayer times data unavailable.</p>';
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching prayer times:', error);
-        document.getElementById('prayerTimesContent').innerHTML = '<p>Error loading prayer times.</p>';
-      });
-  }
-
+  // Load Surah list into Quran dropdown
   function loadSurahList() {
-    fetch('/get-surah-list')
-      .then(res => res.json())
-      .then(data => {
-        const select = document.getElementById('surahList');
-        select.innerHTML = '<option value="">-- Or Select Surah --</option>';
-        if (data && data.surahs && Array.isArray(data.surahs)) {
-          data.surahs.forEach(surah => {
-            const option = document.createElement('option');
-            option.value = surah;
-            option.textContent = surah;
-            select.appendChild(option);
-          });
-        } else {
-          loadHardcodedSurahList();
-        }
-      })
-      .catch(error => {
-        console.error('Error loading Surah list:', error);
-        loadHardcodedSurahList();
-      });
-  }
-
-  function loadHardcodedSurahList() {
     const surahs = [
-      "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf",
-      "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr",
-      "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun",
-      "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
-      "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatr", "Ya-Sin", "As-Saffat", "Sad",
-      "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya",
-      "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur",
-      "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr",
-      "Al-Mumtahanah", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
-      "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
-      "Al-Muzzammil", "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba",
-      "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq",
-      "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams",
-      "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina",
-      "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humazah",
-      "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad",
-      "Al-Ikhlas", "Al-Falaq", "An-Nas"
+      "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam",
+      // ... add all surahs as needed
+      "Al-Nas"
     ];
-    const select = document.getElementById('surahList');
+    const select = document.getElementById('surahDropdown');
     surahs.forEach(surah => {
       const option = document.createElement('option');
       option.value = surah;
@@ -474,72 +343,28 @@ header h3 {
     });
   }
 
+  // Load Hadith Topics
   function loadHadithTopics() {
     const topics = [
       "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
-      "Hadith on Gratitude", "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj",
-      "Hadith on Honesty", "Hadith on Forgiveness", "Hadith on Parents", "Hadith on Children",
-      "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood", "Hadith on Modesty",
-      "Hadith on Repenance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
-      "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran",
-      "Hadith on Sunnah", "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting",
-      "Hadith on Lying", "Hadith on Trust", "Hadith on Trade", "Hadith on Wealth",
-      "Hadith on Poverty", "Hadith on Oppression", "Hadith on Manners", "Hadith on Sincerity",
-      "Hadith on Innovation", "Hadith on Angels", "Hadith on Jinn", "Hadith on Death",
-      "Hadith on Resurrection", "Hadith on Signs of Day of Judgment", "Hadith on Health",
-      "Hadith on Cleanliness", "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip",
-      "Hadith on Leadership", "Hadith on Love", "Hadith on Peace", "Hadith on Prayer at Night",
-      "Hadith on Ablution", "Hadith on Sadaqah", "Hadith on Zakat", "Hadith on Seeking Knowledge",
-      "Hadith on Good Deeds", "Hadith on Evil Deeds", "Hadith on Hypocrisy", "Hadith on Arrogance",
-      "Hadith on Tawheed", "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth",
-      "Hadith on Orphans", "Hadith on Widows", "Hadith on Modesty in Dressing",
-      "Hadith on Halal and Haram", "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling",
-      "Hadith on Good Speech", "Hadith on Contentment", "Hadith on Worldly Life",
-      "Hadith on Akhirah", "Hadith on Thankfulness", "Hadith on Seeking Forgiveness",
-      "Hadith on Trials", "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves",
-      "Hadith on Trust in Allah", "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage",
-      "Hadith on Sin", "Hadith on Purification", "Hadith on Eid", "Hadith on Sacrifice",
-      "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam", "Hadith on Reciting Quran",
-      "Hadith on Betrayal", "Hadith on Contentment", "Hadith on Piety", "Hadith on Remembrance of Allah",
-      "Hadith on Friday Prayer", "Hadith on Allah’s Mercy", "Hadith on Night of Qadr",
-      "Hadith on Family Ties"
+      // ... add more topics as needed
+      "Family Ties"
     ];
-    const dropdown = document.getElementById('hadithDropdown');
+    const select = document.getElementById('hadithDropdown');
     topics.forEach(topic => {
       const option = document.createElement('option');
       option.value = topic;
       option.textContent = topic;
-      dropdown.appendChild(option);
+      select.appendChild(option);
     });
   }
 
-  // Load Daily Dua into main and menu sections on page load
-  function loadDailyDua() {
-    fetch('data/daily_duas.json')
-      .then(res => res.json())
-      .then(data => {
-        const dua = data.dua || "No Dua available.";
-        document.getElementById('dailyDuaContent').innerHTML = `<p>"${dua}"</p>`;
-        document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${dua}"</p>`;
-      })
-      .catch(error => {
-        document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-        document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
-        console.error('Error loading daily_duas.json:', error);
-      });
-  }
-
-  // Initialize on DOM load
-  document.addEventListener("DOMContentLoaded", () => {
-    loadDailyDua();
-    loadHadithTopics();
-    loadSurahList();
-  });
-
-  function goTo(sectionId) {
+  // Switch tabs
+  function switchTab(sectionId, event) {
     document.querySelectorAll('.section').forEach(s => s.style.display='none');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(sectionId).style.display='block';
-    if (sectionId==='prayerTimes') loadPrayerTimes();
+    event.target.classList.add('active');
   }
 
   function toggleMenu() {
@@ -553,14 +378,13 @@ header h3 {
     toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
   }
 
-  // Chat Functionality
+  // Send question
 async function sendQuestion() {
   const inputEl = document.getElementById("userInput");
   const question = inputEl.value.trim();
   if (!question) return;
 
   const container = document.getElementById("messages");
-  // Append user message
   const userMsg = document.createElement("div");
   userMsg.className = "message user";
   userMsg.innerHTML = "<strong>You:</strong> " + question;
@@ -569,7 +393,6 @@ async function sendQuestion() {
   container.scrollTop = container.scrollHeight;
 
   chatHistory.push({ role: "user", content: question });
-  // Append loading indicator
   const loadingMsg = document.createElement("div");
   loadingMsg.className = "message ai loading-indicator";
   loadingMsg.innerText = "Tawfiq AI is thinking...";
@@ -583,7 +406,6 @@ async function sendQuestion() {
       body: JSON.stringify({ history: chatHistory })
     });
     const data = await response.json();
-    // Remove loading
     container.removeChild(loadingMsg);
     const answer = data.answer || "Sorry, couldn't answer.";
     chatHistory.push({ role: "assistant", content: answer });
@@ -603,142 +425,35 @@ async function sendQuestion() {
   }
 }
 
-// Quran Search
+// Quran search when selecting a surah
 function searchQuran() {
-  const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
-  if (!query) return;
+  const surahSelect = document.getElementById("surahDropdown");
+  const selectedSurah = surahSelect.value;
   const resultDiv = document.getElementById("quranResult");
-  resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-  const loading = document.createElement("div");
-  loading.className = "loading-indicator";
-  loading.innerText = "Searching Quran...";
-  resultDiv.appendChild(loading);
-  document.getElementById("quranSearchButton").disabled = true;
-
-  fetch('/quran-search', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query })
-  }).then(res => res.json()).then(data => {
-    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    if (data.surah_title && data.results && Array.isArray(data.results) && data.results.length > 0) {
-      const titleEl = document.createElement("div");
-      titleEl.innerHTML = `<strong>${data.surah_title}:</strong>`;
-      titleEl.style.fontWeight = 'bold';
-      titleEl.style.marginBottom = '10px';
-      resultDiv.appendChild(titleEl);
-      data.results.forEach(verse => {
-        const verseEl = document.createElement("div");
-        verseEl.className = "quran-verse";
-
-        const info = document.createElement("p");
-        info.innerHTML = `<strong>${verse.surah_number}:${verse.verse_number}</strong>`;
-        verseEl.appendChild(info);
-
-        const trans = document.createElement("p");
-        trans.textContent = verse.translation;
-        verseEl.appendChild(trans);
-
-        const arabic = document.createElement("p");
-        arabic.textContent = verse.arabic_text;
-        arabic.style.textAlign = 'right';
-        arabic.style.fontWeight = 'bold';
-        arabic.style.marginTop = '5px';
-        arabic.style.direction = 'rtl';
-        verseEl.appendChild(arabic);
-
-        if (verse.transliteration) {
-          const translitPara = document.createElement("p");
-          translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
-          translitPara.style.marginTop = '5px';
-          translitPara.style.fontSize = '0.95em';
-          verseEl.appendChild(translitPara);
-        }
-
-        resultDiv.appendChild(verseEl);
-      });
-    } else if (data.result) {
-      resultDiv.innerHTML += `<div>${data.result}</div>`;
-    } else {
-      resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
-    }
-  }).catch(error => {
-    console.error('Error:', error);
-    resultDiv.innerHTML += `<div>Error searching Quran.</div>`;
-  }).finally(() => {
-    const loadingEl = resultDiv.querySelector('.loading-indicator');
-    if (loadingEl) loadingEl.remove();
-    document.getElementById("quranSearchButton").disabled = false;
-  });
+  if (!selectedSurah) return;
+  resultDiv.innerHTML = `<div class="user-message">Searching Surah: ${selectedSurah}</div>`;
+  // Fetch or display content related to selected surah
+  // For demo, just show the surah name
+  resultDiv.innerHTML += `<div>Display content for ${selectedSurah} here.</div>`;
 }
 
-// Hadith Search
+// Hadith search when selecting topic
 function searchHadith() {
-  const inputQuery = document.getElementById("hadithInput").value.trim();
-  const dropdownQuery = document.getElementById("hadithDropdown").value;
-  const query = inputQuery || dropdownQuery;
-  if (!query) return;
+  const topicSelect = document.getElementById("hadithDropdown");
+  const selectedTopic = topicSelect.value;
   const resultDiv = document.getElementById("hadithResult");
-  resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-  const loading = document.createElement("div");
-  loading.className = "loading-indicator";
-  loading.innerText = "Searching Hadith...";
-  resultDiv.appendChild(loading);
-  document.getElementById("hadithSearchButton").disabled = true;
-
-  fetch('/hadith-search', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query })
-  }).then(res => res.json()).then(data => {
-    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-      data.results.forEach(hadith => {
-        const hadithEl = document.createElement("div");
-        hadithEl.className = "hadith-entry";
-
-        let infoText = '';
-        if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
-          infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
-        } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
-          infoText += `<strong>Book:</strong> ${hadith.book_name}`;
-        } else if (hadith.book_number && hadith.book_number !== 'N/A') {
-          infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
-        }
-        if (hadith.volume_number && hadith.volume_number !== 'N/A') {
-          infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
-        }
-        if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
-          if (!infoText.includes(hadith.hadith_info))
-            infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
-        }
-        if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
-          infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
-        }
-
-        const infoPara = document.createElement("p");
-        infoPara.innerHTML = infoText;
-        hadithEl.appendChild(infoPara);
-
-        const textPara = document.createElement("p");
-        textPara.textContent = hadith.text;
-        textPara.style.marginTop = '8px';
-        hadithEl.appendChild(textPara);
-
-        resultDiv.appendChild(hadithEl);
-      });
-    } else if (data.result) {
-      resultDiv.innerHTML += `<div>${data.result}</div>`;
-    } else {
-      resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
-    }
-  }).catch(error => {
-    console.error('Error:', error);
-    resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
-  }).finally(() => {
-    document.getElementById("hadithSearchButton").disabled = false;
-  });
+  if (!selectedTopic) return;
+  resultDiv.innerHTML = `<div class="user-message">Searching Hadith: ${selectedTopic}</div>`;
+  // Fetch or display content related to selected topic
+  // For demo, just show the topic name
+  resultDiv.innerHTML += `<div>Display Hadiths about ${selectedTopic} here.</div>`;
 }
+
+// Load lists on page load
+document.addEventListener("DOMContentLoaded", () => {
+  loadSurahList();
+  loadHadithTopics();
+});
 </script>
 </body>
 </html>
