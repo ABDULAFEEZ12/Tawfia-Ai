@@ -304,14 +304,16 @@ body {
   <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- AI Section with Reversed Chat Layout -->
-<div class="section active" id="aiSection">
-  <!-- Messages container (scrollable, grows) -->
-  <div id="messages-container"></div>
-  <!-- Input bar fixed at bottom -->
-  <div id="aiInputContainer">
-    <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
-    <button id="askButton" onclick="sendQuestion()">Ask</button>
+<!-- AI Section with seamless connected message area and input bar -->
+<div class="section active" id="aiSection" style="display:flex; flex-direction:column; height:100vh; background:#fff; border-radius:12px;">
+  <!-- Messages container -->
+  <div id="messages-container" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; background:#fff; border-radius:12px 12px 0 0;">
+    <!-- Chat messages will be appended here -->
+  </div>
+  <!-- Input bar (connected without space) -->
+  <div id="aiInputContainer" style="border-top:1px solid #ccc; padding:10px; background:#fff; display:flex; align-items:center; gap:8px;">
+    <input type="text" id="userInput" placeholder="Ask a question about Islam..." style="flex:1; padding:12px 15px; border-radius:8px; border:1px solid #ccc; font-family:'Poppins',sans-serif; font-size:1em; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); transition:border-color 0.2s;" />
+    <button id="askButton" onclick="sendQuestion()" style="padding:12px 20px; border:none; border-radius:8px; background-color:#007bff; color:#fff; font-size:1em; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition:background 0.3s, transform 0.2s;">Ask</button>
   </div>
 </div>
 
