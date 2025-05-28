@@ -13,7 +13,6 @@ load_dotenv()
 
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 
-# Check for essential environment variables
 if not openrouter_api_key:
     raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
@@ -28,7 +27,7 @@ r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_pa
 # --- File-Based Cache ---
 CACHE_FILE = "tawfiq_cache.json"
 
-# Load cache from file with error handling
+# Load cache from file
 if os.path.exists(CACHE_FILE):
     try:
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
@@ -38,7 +37,6 @@ if os.path.exists(CACHE_FILE):
 else:
     question_cache = {}
 
-# Save cache to file
 def save_cache():
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(question_cache, f, indent=2, ensure_ascii=False)
@@ -60,7 +58,7 @@ def load_json_data(file_name, data_variable_name):
         print(f"❌ Unexpected error while loading {file_name}: {e}")
     return data
 
-# Load local datasets
+# Load datasets
 hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
 basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
 friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
@@ -71,9 +69,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
+    # Main page (home) - placed directly in templates/
     return render_template('index.html')
 
-# --- Page Routes ---
+# --- Page Routes - all templates inside 'templates/pages/' ---
 @app.route('/profile')
 def profile():
     return render_template('pages/profile.html')
@@ -122,14 +121,14 @@ def privacy():
 
 @app.route('/about')
 def about():
-    # Render the about page instead of returning JSON
+    # About page - in templates/pages/about.html
     return render_template('pages/about.html')
 
 @app.route('/feedback')
 def feedback():
     return render_template('pages/feedback.html')
 
-# --- Existing API Endpoints ---
+# --- Ask API endpoint ---
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
@@ -202,6 +201,7 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
+# --- Quran Search ---
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
@@ -240,6 +240,7 @@ def quran_search():
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
+# --- Hadith Search ---
 @app.route('/hadith-search', methods=['POST'])
 def hadith_search():
     data = request.get_json()
@@ -287,6 +288,7 @@ def hadith_search():
         print(f"Hadith Search Error: {e}")
         return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
 
+# --- Get Surah List ---
 @app.route('/get-surah-list')
 def get_surah_list():
     try:
@@ -299,7 +301,7 @@ def get_surah_list():
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
 
-# --- Additional API Endpoints ---
+# --- Additional API: Islamic Motivation ---
 @app.route('/islamic-motivation')
 def get_islamic_motivation():
     try:
