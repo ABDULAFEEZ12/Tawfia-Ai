@@ -80,6 +80,16 @@ def prayer_times():
 @app.route('/api/daily-dua')
 def get_daily_dua():
     # Return the JSON data
+    if not daily_duas or 'duas' not in daily_duas:
+        return jsonify({'error': 'Dua data not available.'}), 500
+    try:
+        day_of_year = datetime.now().timetuple().tm_yday
+        index = day_of_year % len(daily_duas['duas'])
+        dua = daily_duas['duas'][index]
+        return jsonify({'dua': dua})
+    except Exception as e:
+        print(f"Error fetching daily duas: {e}")
+        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
 
 @app.route('/reminder')
 def reminder():
