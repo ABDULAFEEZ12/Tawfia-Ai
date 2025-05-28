@@ -11,74 +11,62 @@
       max-width: 600px;
       margin: auto;
     }
-    input[type="text"] {
-      width: 80%;
-      padding: 10px;
-      font-size: 1em;
-    }
-    button {
-      padding: 10px 20px;
-      margin-left: 10px;
-      font-size: 1em;
-    }
-    .response {
+    #dua-container {
       margin-top: 20px;
       padding: 15px;
       background-color: #f0f0f0;
       border-radius: 8px;
     }
+    h2 {
+      margin-top: 0;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Daily Dua Assistant</h1>
-  <p>Ask a question about Dua, Taqwa, or anything else.</p>
+  <h1>Daily Dua</h1>
+  <button id="showDuaBtn">Show Today's Dua</button>
 
-  <div>
-    <input type="text" v-model="question" placeholder="Type your question here" />
-    <button @click="sendQuestion">Ask</button>
+  <div id="dua-container" style="display:none;">
+    <h2>Arabic</h2>
+    <p id="arabic"></p>
+
+    <h2>English</h2>
+    <p id="english"></p>
+
+    <h2>Transliteration</h2>
+    <p id="transliteration"></p>
   </div>
 
-  <div v-if="reply" class="response">
-    <h2>Response:</h2>
-    <p>{{ reply }}</p>
-  </div>
-
-  <!-- Include Vue.js from CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
   <script>
-    const { createApp } = Vue;
-
-    createApp({
-      data() {
-        return {
-          question: '',
-          reply: ''
-        }
-      },
-      methods: {
-        async sendQuestion() {
-          if (!this.question.trim()) {
-            alert('Please enter a question.');
+    document.getElementById('showDuaBtn').addEventListener('click', () => {
+      fetch('DATA/daily_duas.json')
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return res.json();
+        })
+        .then(data => {
+          const duas = data.duas;
+          if (!duas || duas.length === 0) {
+            alert('No duas available.');
             return;
           }
-          try {
-            const response = await fetch('http://localhost:5000/api/tawfiq', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ message: this.question })
-            });
-            const data = await response.json();
-            this.reply = data.reply;
-          } catch (error) {
-            console.error('Error:', error);
-            this.reply = 'Sorry, there was an error connecting to the server.';
-          }
-        }
-      }
-    }).mount('body');
+          const randomIndex = Math.floor(Math.random() * duas.length);
+          const dua = duas[randomIndex];
+
+          document.getElementById('arabic').innerText = dua.arabic;
+          document.getElementById('english').innerText = dua.english;
+          document.getElementById('transliteration').innerText = dua.transliteration;
+
+          document.getElementById('dua-container').style.display = 'block';
+        })
+        .catch(error => {
+          console.error('Error fetching JSON:', error);
+          alert('Failed to load daily dua. Please try again later.');
+        });
+    });
   </script>
 </body>
 </html>
