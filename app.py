@@ -73,6 +73,62 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+# --- Page Routes ---
+@app.route('/profile')
+def profile():
+    return render_template('pages/profile.html')
+
+@app.route('/prayer-times')
+def prayer_times():
+    return render_template('pages/prayer-times.html')
+
+@app.route('/daily-dua')
+def daily_dua():
+    try:
+        if not daily_duas or 'duas' not in daily_duas:
+            return jsonify({'error': 'Dua data not available.'}), 500
+        day_of_year = datetime.now().timetuple().tm_yday
+        index = day_of_year % len(daily_duas['duas'])
+        dua = daily_duas['duas'][index]
+        return jsonify({'dua': dua})
+    except Exception as e:
+        print(f"Daily Dua Error: {e}")
+        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
+
+@app.route('/reminder')
+def reminder():
+    return render_template('pages/reminder.html')
+
+@app.route('/motivation')
+def motivation():
+    try:
+        if not islamic_motivation or 'quotes' not in islamic_motivation:
+            return jsonify({'error': 'Motivational quotes not available.'}), 500
+        day_of_year = datetime.now().timetuple().tm_yday
+        index = day_of_year % len(islamic_motivation['quotes'])
+        quote = islamic_motivation['quotes'][index]
+        return jsonify({'quote': quote})
+    except Exception as e:
+        print(f"Islamic Motivation Error: {e}")
+        return jsonify({'error': 'Failed to fetch motivational quote.'}), 500
+
+@app.route('/settings')
+def settings():
+    return render_template('pages/settings.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('pages/privacy.html')
+
+@app.route('/about')
+def about():
+    return render_template('pages/about.html')
+
+@app.route('/feedback')
+def feedback():
+    return render_template('pages/feedback.html')
+
+# --- Existing API Endpoints ---
 @app.route('/about')
 def about():
     return jsonify({
@@ -239,20 +295,6 @@ def hadith_search():
         print(f"Hadith Search Error: {e}")
         return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
 
-@app.route('/daily-dua')
-def daily_dua():
-    try:
-        if not daily_duas or 'duas' not in daily_duas:
-            return jsonify({'error': 'Dua data not available.'}), 500
-
-        day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(daily_duas['duas'])  # rotate through duas
-        dua = daily_duas['duas'][index]
-        return jsonify({'dua': dua})
-    except Exception as e:
-        print(f"Daily Dua Error: {e}")
-        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
-
 @app.route('/get-surah-list')
 def get_surah_list():
     try:
@@ -265,7 +307,7 @@ def get_surah_list():
         print(f"Surah List API Error: {e}")
         return jsonify({'surah_list': []})
 
-# Correct indentation for the route
+# --- Additional API Endpoints ---
 @app.route('/islamic-motivation')
 def get_islamic_motivation():
     try:
@@ -280,7 +322,7 @@ def get_islamic_motivation():
         print(f"Islamic Motivation Error: {e}")
         return jsonify({'error': 'Failed to fetch motivational quote.'}), 500
 
-# Speech recognition route
+# --- Speech Recognition ---
 @app.route('/recognize-speech', methods=['POST'])
 def recognize_speech():
     if 'audio' not in request.files:
