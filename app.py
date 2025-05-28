@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import requests
 import json
 from difflib import get_close_matches
@@ -12,7 +12,6 @@ from datetime import datetime
 load_dotenv()
 
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-
 if not openrouter_api_key:
     raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
@@ -26,8 +25,6 @@ r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_pa
 
 # --- File-Based Cache ---
 CACHE_FILE = "tawfiq_cache.json"
-
-# Load cache from file
 if os.path.exists(CACHE_FILE):
     try:
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
@@ -69,10 +66,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # Main page (home) - placed directly in templates/
     return render_template('index.html')
 
-# --- Page Routes - all templates inside 'templates/pages/' ---
+# --- Page Routes ---
 @app.route('/profile')
 def profile():
     return render_template('pages/profile.html')
@@ -83,16 +79,8 @@ def prayer_times():
 
 @app.route('/daily-dua')
 def daily_dua():
-    try:
-        if not daily_duas or 'duas' not in daily_duas:
-            return jsonify({'error': 'Dua data not available.'}), 500
-        day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(daily_duas['duas'])
-        dua = daily_duas['duas'][index]
-        return jsonify({'dua': dua})
-    except Exception as e:
-        print(f"Daily Dua Error: {e}")
-        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
+    # This route can serve a template or just redirect; your front end fetches data
+    return render_template('pages/daily-dua.html')
 
 @app.route('/reminder')
 def reminder():
@@ -121,12 +109,25 @@ def privacy():
 
 @app.route('/about')
 def about():
-    # About page - in templates/pages/about.html
     return render_template('pages/about.html')
 
 @app.route('/feedback')
 def feedback():
     return render_template('pages/feedback.html')
+
+# --- API Endpoint for Daily Duas ---
+@app.route('/api/daily-duas')
+def api_daily_duas():
+    if not daily_duas or 'duas' not in daily_duas:
+        return jsonify({'error': 'Dua data not available.'}), 500
+    try:
+        day_of_year = datetime.now().timetuple().tm_yday
+        index = day_of_year % len(daily_duas['duas'])
+        dua = daily_duas['duas'][index]
+        return jsonify({'dua': dua})
+    except Exception as e:
+        print(f"Error fetching daily duas: {e}")
+        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
 
 # --- Ask API endpoint ---
 @app.route('/ask', methods=['POST'])
@@ -307,7 +308,6 @@ def get_islamic_motivation():
     try:
         if not islamic_motivation or 'quotes' not in islamic_motivation:
             return jsonify({'error': 'Motivational quotes not available.'}), 500
-
         day_of_year = datetime.now().timetuple().tm_yday
         index = day_of_year % len(islamic_motivation['quotes'])
         quote = islamic_motivation['quotes'][index]
@@ -321,10 +321,8 @@ def get_islamic_motivation():
 def recognize_speech():
     if 'audio' not in request.files:
         return jsonify({'error': 'No audio file uploaded.'}), 400
-
     audio_file = request.files['audio']
     temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
-
     try:
         # Save uploaded audio temporarily
         audio_file.save(temp_path)
