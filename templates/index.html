@@ -5,10 +5,11 @@
 <title>Tawfiq AI - Smart Islamic Companion</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- Internal Style for aesthetics -->
+<!-- Internal Style for aesthetics and layout adjustments -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
+/* Basic body styling */
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
@@ -123,12 +124,11 @@ header h3 {
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  width: 100%;
 }
 .section.active {
   display: flex;
   flex-direction: column;
-  height: auto; /* changed from calc(100vh - 180px) to auto */
+  height: auto;
 }
 
 /* AI chat container with message area and input fixed at bottom */
@@ -136,17 +136,17 @@ header h3 {
   display: flex;
   flex-direction: column;
   flex: 1; /* fill available space */
-  height: calc(100vh - 160px); /* reduced from 180px to 160px for more space */
+  height: calc(100vh - 160px); /* reduced from 180px for more space */
 }
 
-/* Make #messages fill space and be scrollable without scrollbar, reduce margin-bottom */
+/* Messages styling with reduced margin-bottom */
 #messages {
-  flex-grow: 1; /* fill remaining space */
+  flex-grow: 1;
   padding: 10px;
   background: #fff;
   border-radius: 8px;
-  margin-bottom: 5px; /* reduced from 10px to 5px */
-  overflow-y: auto; /* allow scrolling if needed, hidden scrollbar via CSS below */
+  margin-bottom: 5px; /* tighter spacing */
+  overflow-y: auto;
 }
 #messages::-webkit-scrollbar {
   display: none; /* hide scrollbar for WebKit browsers */
@@ -155,7 +155,7 @@ header h3 {
   scrollbar-width: none; /* hide scrollbar for Firefox */
 }
 
-/* Input container fixed at bottom of AI section, reduced padding for tightness */
+/* Ask bar styling with smaller padding for tighter layout */
 #aiInputContainer {
   display: flex;
   padding: 5px; /* reduced from 10px to 5px */
@@ -187,9 +187,9 @@ header h3 {
   transform: scale(1.02);
 }
 
-/* Message styles */
+/* Message styles with reduced spacing for compactness */
 .message {
-  margin-bottom: 5px; /* reduced from 10px to 5px for tighter spacing */
+  margin-bottom: 5px; /* tighter spacing */
 }
 .message.user {
   font-weight: 600;
@@ -207,20 +207,25 @@ header h3 {
   color: #555;
 }
 
-/* Results styles for Quran / Hadith etc., hide scrollbar and reduce top margin */
+/* Results styles for Quran / Hadith, with adjusted padding to bring closer to ask bar */
 .results {
-  margin-top: 20px; /* unchanged, you can reduce if needed */
+  margin-top: 20px; /* unchanged, can be adjusted further if needed */
   background-color: #f9f9f9;
   padding: 15px;
   border-radius: 10px;
   max-height: 300px;
-  overflow-y: auto; /* or hidden if you prefer no scrollbar */
+  overflow-y: auto;
 }
 .results::-webkit-scrollbar {
   display: none;
 }
 .results {
   scrollbar-width: none;
+}
+
+/* Updated padding for .results to bring it closer to the ask bar */
+.results {
+  @apply flex-1 px-4 pb-2 pt-4 overflow-y-auto space-y-4;
 }
 
 /* Responsive adjustments */
@@ -285,10 +290,10 @@ header h3 {
   <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- AI Chat with more compact spacing -->
+<!-- AI Chat with compact spacing -->
 <div class="section active" id="aiSection" style="display:flex; flex-direction:column; flex:1;">
   <div id="messages"></div>
-  <div id="aiInputContainer">
+  <div id="aiInputContainer" class="ask-bar">
     <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
     <button id="askButton" onclick="sendQuestion()">Ask</button>
   </div>
@@ -335,12 +340,6 @@ header h3 {
     document.body.classList.toggle('dark-mode');
     const toggleBtn = document.querySelector('.toggle-btn');
     toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
-  }
-
-  function goTo(sectionId) {
-    document.querySelectorAll('.section').forEach(s => s.style.display='none');
-    document.getElementById(sectionId).style.display='block';
-    if (sectionId==='prayerTimes') loadPrayerTimes();
   }
 
   // Load daily Dua for main and menu
