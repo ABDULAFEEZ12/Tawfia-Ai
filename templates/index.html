@@ -70,7 +70,6 @@ header h3 {
   overflow-y: auto;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
 }
 #side-menu.hidden {
   left: -280px;
@@ -137,17 +136,17 @@ header h3 {
   display: flex;
   flex-direction: column;
   flex: 1; /* fill available space */
-  height: auto; /* no fixed height */
+  height: calc(100vh - 160px); /* reduced from 180px to 160px for more space */
 }
 
-/* Make #messages fill space and be scrollable without scrollbar */
+/* Make #messages fill space and be scrollable without scrollbar, reduce margin-bottom */
 #messages {
   flex-grow: 1; /* fill remaining space */
   padding: 10px;
   background: #fff;
   border-radius: 8px;
-  margin-bottom: 10px;
-  overflow-y: auto; /* allow scrolling if needed */
+  margin-bottom: 5px; /* reduced from 10px to 5px */
+  overflow-y: auto; /* allow scrolling if needed, hidden scrollbar via CSS below */
 }
 #messages::-webkit-scrollbar {
   display: none; /* hide scrollbar for WebKit browsers */
@@ -156,10 +155,10 @@ header h3 {
   scrollbar-width: none; /* hide scrollbar for Firefox */
 }
 
-/* Input container fixed at bottom of AI section */
+/* Input container fixed at bottom of AI section, reduced padding for tightness */
 #aiInputContainer {
   display: flex;
-  padding: 10px;
+  padding: 5px; /* reduced from 10px to 5px */
   background-color: #fff;
   border-top: 1px solid #ccc;
   gap: 8px;
@@ -190,7 +189,7 @@ header h3 {
 
 /* Message styles */
 .message {
-  margin-bottom: 10px;
+  margin-bottom: 5px; /* reduced from 10px to 5px for tighter spacing */
 }
 .message.user {
   font-weight: 600;
@@ -208,9 +207,9 @@ header h3 {
   color: #555;
 }
 
-/* Results styles for Quran / Hadith etc., hide scrollbar */
+/* Results styles for Quran / Hadith etc., hide scrollbar and reduce top margin */
 .results {
-  margin-top: 20px;
+  margin-top: 20px; /* unchanged, you can reduce if needed */
   background-color: #f9f9f9;
   padding: 15px;
   border-radius: 10px;
@@ -286,7 +285,7 @@ header h3 {
   <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- AI Chat with scrollable message area -->
+<!-- AI Chat with more compact spacing -->
 <div class="section active" id="aiSection" style="display:flex; flex-direction:column; flex:1;">
   <div id="messages"></div>
   <div id="aiInputContainer">
