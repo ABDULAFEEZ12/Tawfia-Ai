@@ -1,16 +1,15 @@
-<div id="daily-dua"></div>
-
-<script>
-  const dua = {
-    arabic: "اللهم اغفر لي وارحمني واهدني وارزقني",
-    english: "O Allah, forgive me, have mercy on me, guide me, and provide for me.",
-    transliteration: "Allahumma ighfir li warhamni wahdini warzuqni"
-  };
-
-  document.getElementById("daily-dua").innerHTML = `
-    <h3>🕋 Daily Dua</h3>
-    <p><strong>Arabic:</strong> ${dua.arabic}</p>
-    <p><strong>English:</strong> ${dua.english}</p>
-    <p><strong>Transliteration:</strong> ${dua.transliteration}</p>
-  `;
-</script>
+{
+  "duas": [
+    {
+      "arabic": "اللهم اغفر لي وارحمني واهدني وارزقني",
+      "english": "O Allah, forgive me, have mercy on me, guide me, and provide for me.",
+      "transliteration": "Allahumma ighfir li warhamni wahdini warzuqni"
+    },
+    {
+      "arabic": "اللهم إني أسألك العفو والعافية",
+      "english": "O Allah, I ask You for forgiveness and well-being.",
+      "transliteration": "Allahumma inni as'aluka al-‘afwa wal-‘aafiyah"
+    }
+    // You can add more duas like this
+  ]
+}
