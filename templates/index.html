@@ -238,6 +238,81 @@ body {
 </head>
 <body class="light-mode">
 
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Dua</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    #dua-container {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f0f0f0;
+      border-radius: 8px;
+      display: none; /* Hidden initially */
+    }
+    h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Daily Dua</h1>
+<button id="showDuaBtn">Show Today's Dua</button>
+
+<div id="dua-container">
+  <h2>Arabic</h2>
+  <p id="arabic"></p>
+
+  <h2>English</h2>
+  <p id="english"></p>
+
+  <h2>Transliteration</h2>
+  <p id="transliteration"></p>
+</div>
+
+<script>
+  document.getElementById('showDuaBtn').addEventListener('click', () => {
+    fetch('DATA/daily_duas.json') // make sure this path is correct
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
+      })
+      .then(data => {
+        const duas = data.duas;
+        if (!duas || duas.length === 0) {
+          alert('No duas available.');
+          return;
+        }
+        const randomIndex = Math.floor(Math.random() * duas.length);
+        const dua = duas[randomIndex];
+
+        document.getElementById('arabic').innerText = dua.arabic;
+        document.getElementById('english').innerText = dua.english;
+        document.getElementById('transliteration').innerText = dua.transliteration;
+
+        document.getElementById('dua-container').style.display = 'block';
+      })
+      .catch(error => {
+        console.error('Error fetching JSON:', error);
+        alert('Failed to load daily dua. Please try again later.');
+      });
+  });
+</script>
+
+</body>
+</html>
+
 <!-- MENU TOGGLE BUTTON -->
 <div id="menu-toggle" onclick="toggleMenu()">☰</div>
 
