@@ -8,7 +8,7 @@
 <!-- External CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-<!-- Enhanced CSS for WhatsApp-style chat -->
+<!-- Enhanced CSS for chat styling -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
@@ -130,7 +130,6 @@ header h3 {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-top: 20px;
-  width: 100%;
 }
 .section.active {
   display: block;
@@ -171,17 +170,23 @@ button:hover {
   transform: scale(1.02);
 }
 
-/* Chat message container styles for WhatsApp-like look */
+/* Chat message container styles for left/right alignment */
 .message-container {
   display: flex;
   margin-bottom: 10px;
 }
+
+/* User message: left aligned */
 .user-message {
   justify-content: flex-start;
 }
+
+/* Tawfiq AI message: right aligned */
 .ai-message {
   justify-content: flex-end;
 }
+
+/* Chat bubbles */
 .message-bubble {
   max-width: 70%;
   padding: 10px 15px;
@@ -191,13 +196,18 @@ button:hover {
   line-height: 1.4;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
+
+/* User bubble style (light green) */
 .user-bubble {
-  background-color: #DCF8C6; /* WhatsApp light green for user */
+  background-color: #DCF8C6; /* WhatsApp light green */
   align-self: flex-start;
 }
+
+/* Tawfiq AI bubble style (white) with bold answers */
 .ai-bubble {
-  background-color: #FFFFFF; /* White for AI responses */
+  background-color: #FFFFFF; /* White */
   align-self: flex-end;
+  font-weight: bold; /* Make AI answers bold */
 }
 
 /* Messages and results styles */
@@ -239,7 +249,7 @@ body {
   scrollbar-color: rgba(0,0,0,0.2) transparent;
 }
 
-/* Responsive font sizes and layout adjustments for small screens */
+/* Responsive adjustments */
 @media(max-width: 600px) {
   body {
     font-size: 0.95em;
@@ -393,11 +403,6 @@ body {
         loadPrayerTimes();
       }
     }
-  }
-
-  // Function to toggle menu visibility
-  function toggleMenu() {
-    document.getElementById('side-menu').classList.toggle('hidden');
   }
 
   // Load Daily Dua into main section and menu on page load
@@ -555,24 +560,15 @@ body {
     loadSurahList();
   });
 
-  // Function to handle navigation
-  function goTo(sectionId) {
-    document.querySelectorAll('.section').forEach(s => s.style.display='none');
-    const section = document.getElementById(sectionId);
-    if(section) {
-      section.style.display='block';
-      if(sectionId==='prayerTimes') {
-        loadPrayerTimes();
-      }
-    }
+  // Function to handle tab switching
+  function switchTab(sectionId, event) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    event.target.classList.add('active');
   }
 
-  // Toggle menu
-  function toggleMenu() {
-    document.getElementById('side-menu').classList.toggle('hidden');
-  }
-
-  // Toggle Mode
+  // Toggle light/dark mode
   function toggleMode() {
     document.body.classList.toggle('light-mode');
     document.body.classList.toggle('dark-mode');
@@ -584,7 +580,12 @@ body {
     }
   }
 
-  // Send question to AI
+  // Toggle menu
+  function toggleMenu() {
+    document.getElementById('side-menu').classList.toggle('hidden');
+  }
+
+  // Main function to send question and display chat
 async function sendQuestion() {
   const inputEl = document.getElementById("userInput");
   const question = inputEl.value.trim();
@@ -592,7 +593,7 @@ async function sendQuestion() {
 
   const messagesDiv = document.getElementById("messages");
 
-  // User message bubble (styled like WhatsApp)
+  // User message (left aligned)
   const userMsgContainer = document.createElement('div');
   userMsgContainer.className = 'message-container user-message';
 
@@ -624,13 +625,13 @@ async function sendQuestion() {
     messagesDiv.removeChild(loadingMsg);
     const answerText = data.answer || "Sorry, couldn't answer.";
 
-    // AI message bubble (styled like WhatsApp)
+    // AI response (right aligned, bold)
     const aiMsgContainer = document.createElement('div');
     aiMsgContainer.className = 'message-container ai-message';
 
     const aiBubble = document.createElement('div');
     aiBubble.className = 'message-bubble ai-bubble';
-    aiBubble.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
+    aiBubble.innerHTML = "Tawfiq AI: <b>" + answerText.replace(/\n/g, '<br>') + "</b>";
 
     aiMsgContainer.appendChild(aiBubble);
     messagesDiv.appendChild(aiMsgContainer);
@@ -640,7 +641,7 @@ async function sendQuestion() {
   } catch (error) {
     console.error('Error:', error);
     const errorMsg = document.createElement("div");
-    errorMsg.className = "message-container ai-message";
+    errorMsg.className = 'message-container ai-message';
 
     const errorBubble = document.createElement('div');
     errorBubble.className = 'message-bubble ai-bubble';
@@ -652,12 +653,12 @@ async function sendQuestion() {
   }
 }
 
-// Search functions (unchanged, but you can style results separately if needed)
+// The search functions remain unchanged...
 function searchQuran() {
-  // ... existing code ...
+  // Your existing code...
 }
 function searchHadith() {
-  // ... existing code ...
+  // Your existing code...
 }
 </script>
 </body>
