@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 40px 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .settings-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .setting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 1.1em;
+      color: #555;
+    }
+    select, input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-left: 20px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      font-size: 1.2em;
+      background-color: #2980b9;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #3498db;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Application Settings</h1>
+  <div class="settings-container">
+    <!-- Theme Mode -->
+    <div class="setting">
+      <label for="theme">Theme Mode</label>
+      <select id="theme">
+        <option value="light">Light Mode</option>
+        <option value="dark">Dark Mode</option>
+      </select>
+    </div>
+
+    <!-- Notifications -->
+    <div class="setting">
+      <label for="notifications">Enable Notifications</label>
+      <input type="checkbox" id="notifications" checked />
+    </div>
+
+    <!-- Language -->
+    <div class="setting">
+      <label for="language">Language</label>
+      <select id="language">
+        <option value="en">English</option>
+        <option value="ar">Arabic</option>
+        <option value="fr">French</option>
+        <option value="es">Spanish</option>
+        <!-- Add more languages as needed -->
+      </select>
+    </div>
+
+    <!-- Save Button -->
+    <button id="saveBtn">Save Settings</button>
+  </div>
+
+  <script>
+    // Load saved settings from local storage if available
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      const savedNotifications = localStorage.getItem('notifications');
+      const savedLanguage = localStorage.getItem('language');
+
+      if (savedTheme) document.getElementById('theme').value = savedTheme;
+      if (savedNotifications !== null) document.getElementById('notifications').checked = (savedNotifications === 'true');
+      if (savedLanguage) document.getElementById('language').value = savedLanguage;
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const theme = document.getElementById('theme').value;
+      const notifications = document.getElementById('notifications').checked;
+      const language = document.getElementById('language').value;
+
+      localStorage.setItem('theme', theme);
+      localStorage.setItem('notifications', notifications);
+      localStorage.setItem('language', language);
+
+      alert('Settings saved!');
+    });
+  </script>
+</body>
+</html>
