@@ -94,7 +94,7 @@ header h3 {
 
 /* Tabs styles */
 .tabs {
-  margin-top: 100px;
+  margin-top: 20px; /* reduced from 100px to 20px */
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -129,24 +129,25 @@ header h3 {
 .section.active {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
+  height: auto; /* changed from calc(100vh - 180px) to auto */
 }
 
 /* AI chat container with message area and input fixed at bottom */
 #aiSection {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
+  flex: 1; /* fill available space */
+  height: auto; /* no fixed height */
 }
 
-/* Remove scrollbars from message container and results */
+/* Make #messages fill space and be scrollable without scrollbar */
 #messages {
-  flex: 1;
+  flex-grow: 1; /* fill remaining space */
   padding: 10px;
   background: #fff;
   border-radius: 8px;
   margin-bottom: 10px;
-  overflow: hidden; /* hide scrollbar */
+  overflow-y: auto; /* allow scrolling if needed */
 }
 #messages::-webkit-scrollbar {
   display: none; /* hide scrollbar for WebKit browsers */
@@ -207,14 +208,14 @@ header h3 {
   color: #555;
 }
 
-/* Results styles for Quran / Hadith etc. */
+/* Results styles for Quran / Hadith etc., hide scrollbar */
 .results {
   margin-top: 20px;
   background-color: #f9f9f9;
   padding: 15px;
   border-radius: 10px;
   max-height: 300px;
-  overflow-y: hidden; /* hide scrollbar for results too */
+  overflow-y: auto; /* or hidden if you prefer no scrollbar */
 }
 .results::-webkit-scrollbar {
   display: none;
@@ -285,8 +286,8 @@ header h3 {
   <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- AI Chat with fixed scrollbar hidden -->
-<div class="section active" id="aiSection" style="display:flex; flex-direction:column; height: calc(100vh - 180px);">
+<!-- AI Chat with scrollable message area -->
+<div class="section active" id="aiSection" style="display:flex; flex-direction:column; flex:1;">
   <div id="messages"></div>
   <div id="aiInputContainer">
     <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
@@ -472,7 +473,7 @@ header h3 {
     });
   }
 
-  // Load daily Dua on page load
+  // Load daily Dua into main and menu sections on page load
   function loadDailyDua() {
     fetch('data/daily_duas.json')
       .then(res => res.json())
@@ -699,6 +700,5 @@ function searchHadith() {
   });
 }
 </script>
-
 </body>
 </html>
