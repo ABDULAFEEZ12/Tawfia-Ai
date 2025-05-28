@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Islamic Motivation</title>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background-color: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 40px 20px;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .quote-box {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .quote {
+      font-size: 1.8em;
+      font-style: italic;
+      color: #34495e;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .author {
+      font-size: 1.2em;
+      color: #7f8c8d;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 1em;
+      background-color: #2980b9;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #3498db;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Islamic Motivation</h1>
+  <div class="quote-box">
+    <div class="quote" id="quote">Loading a quote...</div>
+    <div class="author" id="author"></div>
+    <button @click="getNewQuote">Get Another Quote</button>
+  </div>
+
+  <!-- Include Vue.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          quotes: [
+            {
+              text: "And whoever fears Allah – He will make for him a way out and will provide for him from where he does not expect.",
+              author: "Qur'an 65:2-3"
+            },
+            {
+              text: "Indeed, with hardship [will be] ease.",
+              author: "Qur'an 94:6"
+            },
+            {
+              text: "The best among you are those who have the best manners and character.",
+              author: "Prophet Muhammad (peace be upon him)"
+            },
+            {
+              text: "Verily, Allah does not look at your appearance or wealth, but looks at your hearts and deeds.",
+              author: "Prophet Muhammad (peace be upon him)"
+            },
+            {
+              text: "Trust in Allah, but tie your camel first.",
+              author: "Prophet Muhammad (peace be upon him)"
+            },
+            {
+              text: "Do not lose hope, nor be sad.",
+              author: "Qur'an 3:139"
+            },
+            {
+              text: "Indeed, Allah is with those who fear Him and those who are doers of good.",
+              author: "Qur'an 16:128"
+            },
+            {
+              text: "Say, 'My Lord, increase me in knowledge.'",
+              author: "Qur'an 20:114"
+            },
+            {
+              text: "The strong believer is better and more beloved to Allah than the weak believer, while there is good in both.",
+              author: "Prophet Muhammad (peace be upon him)"
+            },
+            {
+              text: "Remember Allah, and He will remember you.",
+              author: "Qur'an 2:152"
+            }
+          ],
+          currentQuote: {}
+        };
+      },
+      methods: {
+        getNewQuote() {
+          const randomIndex = Math.floor(Math.random() * this.quotes.length);
+          this.currentQuote = this.quotes[randomIndex];
+          document.getElementById('quote').textContent = this.currentQuote.text;
+          document.getElementById('author').textContent = this.currentQuote.author;
+        }
+      },
+      mounted() {
+        this.getNewQuote();
+      }
+    }).mount('body');
+  </script>
+</body>
+</html>
