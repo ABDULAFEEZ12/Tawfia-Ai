@@ -1,83 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Your Profile - Tawfiq AI</title>
-  <!-- Assuming you have a static folder for CSS, use url_for('static', filename='css/style.css') -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="/static/styles.css"> <!-- Optional external CSS -->
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f3f4f6;
-      padding: 20px;
-      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 0;
     }
 
     .profile-container {
-      background-color: #fff;
-      max-width: 400px;
-      margin: 0 auto;
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
       padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
 
-    .profile-image {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background-color: #d1d5db;
+    .profile-header {
+      text-align: center;
       margin-bottom: 20px;
-      display: inline-block;
     }
 
-    h2 {
-      margin: 0;
-      font-size: 24px;
+    .profile-header h2 {
+      margin-bottom: 8px;
+      color: #1f2937;
     }
 
-    p {
-      color: #555;
-      margin-top: 5px;
+    .profile-header p {
+      color: #6b7280;
     }
 
-    .logout-btn {
+    .profile-info {
+      line-height: 1.7;
+      font-size: 16px;
+      color: #374151;
+    }
+
+    .edit-btn {
       margin-top: 20px;
-      background-color: #10b981;
+      background: #10b981;
       color: white;
-      padding: 10px 20px;
+      padding: 10px 18px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
-      transition: background-color 0.3s;
     }
 
-    .logout-btn:hover {
-      background-color: #059669;
-    }
-
-    a {
-      display: block;
-      margin-top: 30px;
-      text-decoration: none;
-      color: #3b82f6;
+    .edit-btn:hover {
+      background: #059669;
     }
   </style>
 </head>
 <body>
 
   <div class="profile-container">
-    <div class="profile-image"></div>
-    <h2>As-Salaamu Alaikum, Abdul!</h2>
-    <p>Email: abdul@example.com</p>
-    <p>Joined: Ramadan 1446 AH</p>
+    <div class="profile-header">
+      <h2>Welcome, {{ username or "Tawfiq User" }} 👋</h2>
+      <p>Your personal Islamic assistant profile</p>
+    </div>
 
-    <button class="logout-btn">Log Out</button>
+    <div class="profile-info">
+      <p><strong>Email:</strong> {{ email or "not_set@example.com" }}</p>
+      <p><strong>Joined On:</strong> {{ joined_date or "Unknown" }}</p>
+      <p><strong>Preferred Language:</strong> {{ language or "English" }}</p>
+      <p><strong>Last Login:</strong> {{ last_login or "N/A" }}</p>
+    </div>
 
-    <!-- Use url_for to link back to the main page -->
-    <a href="{{ url_for('index') }}">← Back to Main Menu</a>
+    <form action="/edit-profile" method="get">
+      <button class="edit-btn">Edit Profile</button>
+    </form>
   </div>
 
 </body>
