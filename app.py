@@ -77,10 +77,9 @@ def profile():
 def prayer_times():
     return render_template('pages/prayer-times.html')
 
-@app.route('/daily-dua')
-def daily_dua():
-    # This route can serve a template or just redirect; your front end fetches data
-    return render_template('pages/daily-dua.html')
+@app.route('/api/daily-dua')
+def get_daily_dua():
+    # Return the JSON data
 
 @app.route('/reminder')
 def reminder():
