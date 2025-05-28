@@ -122,6 +122,7 @@ def privacy():
 
 @app.route('/about')
 def about():
+    # Render the about page instead of returning JSON
     return render_template('pages/about.html')
 
 @app.route('/feedback')
@@ -129,15 +130,6 @@ def feedback():
     return render_template('pages/feedback.html')
 
 # --- Existing API Endpoints ---
-@app.route('/about')
-def about():
-    return jsonify({
-        'name': 'Tawfiq AI',
-        'creator': 'Tella Abdul Afeez Adewale',
-        'year_created': 2025,
-        'description': 'Tawfiq AI is a wise, kind, and trustworthy Muslim assistant designed to help people with Islamic and general knowledge.'
-    })
-
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
