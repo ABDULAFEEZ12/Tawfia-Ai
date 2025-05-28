@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Your Profile - Tawfiq AI</title>
-  <link rel="stylesheet" href="../css/style.css" />
+  <!-- Assuming you have a static folder for CSS, use url_for('static', filename='css/style.css') -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -75,7 +76,8 @@
 
     <button class="logout-btn">Log Out</button>
 
-    <a href="../index.html">← Back to Main Menu</a>
+    <!-- Use url_for to link back to the main page -->
+    <a href="{{ url_for('index') }}">← Back to Main Menu</a>
   </div>
 
 </body>
