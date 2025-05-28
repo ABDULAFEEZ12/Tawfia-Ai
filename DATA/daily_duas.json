@@ -1,5 +1,24 @@
-
+{
+  "duas": [
+    {
       "arabic": "اللهم اغفر لي وارحمني واهدني وارزقني",
       "transliteration": "Allahumma ighfir li warhamni wahdini warzuqni",
       "english": "O Allah, forgive me, have mercy on me, guide me, and provide for me."
-    
+    },
+    {
+      "arabic": "اللهم إني أسألك العفو والعافية في ديني ودنياي وأهلي ومالي",
+      "transliteration": "Allahumma inni as'aluka al-'afwa wal-'afiata fi deeni wa dunyaaya wa ahli wa mali",
+      "english": "O Allah, I ask You for forgiveness and well-being in my religion, world, family, and wealth."
+    },
+    {
+      "arabic": "اللهم اجعلني من عبادك الصالحين",
+      "transliteration": "Allahumma ajilni min 'ibadika al-saliheen",
+      "english": "O Allah, make me among Your righteous servants."
+    },
+    {
+      "arabic": "اللهم إني أعوذ بك من شر ما عملت ومن شر ما لم أعمل",
+      "transliteration": "Allahumma inni a'udhu bika min sharri ma 'amiltu wa min sharri ma lam a'mal",
+      "english": "O Allah, I seek refuge in You from the evil of what I have done and from the evil of what I have not done."
+    }
+  ]
+}
