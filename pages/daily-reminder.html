@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Reminder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    .reminder {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    input[type="time"] {
+      padding: 8px;
+      font-size: 1em;
+      width: 150px;
+    }
+    #status {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Daily Reminder</h1>
+
+  <div class="reminder">
+    <h2>Set a Reminder Time</h2>
+    <input type="time" v-model="reminderTime" />
+    <button @click="saveReminder">Save Reminder</button>
+    <div id="status">{{ statusMessage }}</div>
+  </div>
+
+  <!-- Include Vue.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          reminderTime: '',
+          statusMessage: ''
+        };
+      },
+      methods: {
+        saveReminder() {
+          if (!this.reminderTime) {
+            this.statusMessage = 'Please select a time.';
+            return;
+          }
+          // Save the reminder time in local storage (or send to backend)
+          localStorage.setItem('dailyReminderTime', this.reminderTime);
+          this.statusMessage = `Reminder set for ${this.reminderTime}`;
+          
+          // Optional: Implement logic to trigger reminder (e.g., notifications)
+        },
+        loadReminder() {
+          const savedTime = localStorage.getItem('dailyReminderTime');
+          if (savedTime) {
+            this.reminderTime = savedTime;
+            this.statusMessage = `Current reminder set for ${savedTime}`;
+          }
+        }
+      },
+      mounted() {
+        this.loadReminder();
+      }
+    }).mount('body');
+  </script>
+</body>
+</html>
