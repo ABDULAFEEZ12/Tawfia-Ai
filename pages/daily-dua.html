@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Dua</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      font-size: 1em;
+    }
+    .response {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f0f0f0;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Daily Dua Assistant</h1>
+  <p>Ask a question about Dua, Taqwa, or anything else.</p>
+
+  <div>
+    <input type="text" v-model="question" placeholder="Type your question here" />
+    <button @click="sendQuestion">Ask</button>
+  </div>
+
+  <div v-if="reply" class="response">
+    <h2>Response:</h2>
+    <p>{{ reply }}</p>
+  </div>
+
+  <!-- Include Vue.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          question: '',
+          reply: ''
+        }
+      },
+      methods: {
+        async sendQuestion() {
+          if (!this.question.trim()) {
+            alert('Please enter a question.');
+            return;
+          }
+          try {
+            const response = await fetch('http://localhost:5000/api/tawfiq', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ message: this.question })
+            });
+            const data = await response.json();
+            this.reply = data.reply;
+          } catch (error) {
+            console.error('Error:', error);
+            this.reply = 'Sorry, there was an error connecting to the server.';
+          }
+        }
+      }
+    }).mount('body');
+  </script>
+</body>
+</html>
