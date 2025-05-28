@@ -19,9 +19,7 @@ body {
   background-color: #f4f4f4;
   color: #333;
   line-height: 1.6;
-  /* Enable smooth scrolling */
   scroll-behavior: smooth;
-  /* Prevent horizontal overflow */
   overflow-x: hidden;
 }
 
@@ -73,7 +71,6 @@ header h3 {
   overflow-y: auto;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
 }
 #side-menu.hidden {
   left: -280px;
@@ -93,6 +90,11 @@ header h3 {
 #side-menu li:hover {
   background-color: #333;
   transform: translateX(2px);
+}
+#side-menu a {
+  color: inherit;
+  text-decoration: none;
+  display: block;
 }
 
 /* Tabs styles */
@@ -128,7 +130,7 @@ header h3 {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-top: 20px;
-  width: 100%; /* Ensure full width on small screens */
+  width: 100%;
 }
 .section.active {
   display: block;
@@ -242,15 +244,15 @@ body {
 <!-- SIDEBAR MENU -->
 <div id="side-menu" class="hidden">
   <ul>
-    <li onclick="goTo('profile')">👤 Profile</li>
-    <li onclick="goTo('prayerTimes')">🕌 Prayer Times</li>
-    <li onclick="goTo('dailyDuaMenu')">🕌 Daily Dua</li>
-    <li onclick="goTo('reminder')">📅 Daily Reminder</li>
-    <li onclick="goTo('motivation')">✨ Islamic Motivation</li>
-    <li onclick="goTo('settings')">⚙️ Settings</li>
-    <li onclick="goTo('privacy')">🔒 Privacy & Policy</li>
-    <li onclick="goTo('about')">ℹ️ About Tawfiq AI</li>
-    <li onclick="goTo('feedback')">📢 Feedback / Report</li>
+    <li><a href="../pages/profile.html">👤 Profile</a></li>
+    <li><a href="../pages/prayer-times.html">🕌 Prayer Times</a></li>
+    <li><a href="../pages/daily-dua.html">🕌 Daily Dua</a></li>
+    <li><a href="../pages/reminder.html">📅 Daily Reminder</a></li>
+    <li><a href="../pages/motivation.html">✨ Islamic Motivation</a></li>
+    <li><a href="../pages/settings.html">⚙️ Settings</a></li>
+    <li><a href="../pages/privacy.html">🔒 Privacy & Policy</a></li>
+    <li><a href="../pages/about.html">ℹ️ About Tawfiq AI</a></li>
+    <li><a href="../pages/feedback.html">📢 Feedback / Report</a></li>
   </ul>
 </div>
 
@@ -276,7 +278,6 @@ body {
   <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
   <button id="askButton" onclick="sendQuestion()">Ask</button>
 </div>
-
 
 <!-- Quran Section -->
 <div class="section" id="quranSection">
@@ -353,15 +354,12 @@ body {
     }
   }
 
-  // Function for navigation
+  // Function for navigation (not used if full page links are used)
   function goTo(sectionId) {
-    // Hide all sections
     document.querySelectorAll('.section').forEach(s => s.style.display='none');
-    // Show the selected section
     const section = document.getElementById(sectionId);
     if(section) {
       section.style.display='block';
-      // Load data if needed
       if(sectionId==='prayerTimes') {
         loadPrayerTimes();
       }
@@ -558,50 +556,50 @@ body {
   }
 
   // Send question to AI
-  async function sendQuestion() {
-    const inputEl = document.getElementById("userInput");
-    const question = inputEl.value.trim();
-    if (!question) return;
+async function sendQuestion() {
+  const inputEl = document.getElementById("userInput");
+  const question = inputEl.value.trim();
+  if (!question) return;
 
-    const messagesDiv = document.getElementById("messages");
-    const userMsg = document.createElement("p");
-    userMsg.className = "user-message";
-    userMsg.textContent = "You: " + question;
-    messagesDiv.appendChild(userMsg);
-    inputEl.value = "";
+  const messagesDiv = document.getElementById("messages");
+  const userMsg = document.createElement("p");
+  userMsg.className = "user-message";
+  userMsg.textContent = "You: " + question;
+  messagesDiv.appendChild(userMsg);
+  inputEl.value = "";
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  chatHistory.push({ role: "user", content: question });
+
+  const loadingMsg = document.createElement("p");
+  loadingMsg.className = "loading-indicator";
+  loadingMsg.textContent = "Tawfiq AI is thinking...";
+  messagesDiv.appendChild(loadingMsg);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  try {
+    const response = await fetch('/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ history: chatHistory })
+    });
+    const data = await response.json();
+    messagesDiv.removeChild(loadingMsg);
+    const answerText = data.answer || "Sorry, couldn't answer.";
+    chatHistory.push({ role: "assistant", content: answerText });
+    const aiMsg = document.createElement("p");
+    aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
+    messagesDiv.appendChild(aiMsg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    chatHistory.push({ role: "user", content: question });
-
-    const loadingMsg = document.createElement("p");
-    loadingMsg.className = "loading-indicator";
-    loadingMsg.textContent = "Tawfiq AI is thinking...";
-    messagesDiv.appendChild(loadingMsg);
+  } catch (error) {
+    console.error('Error:', error);
+    messagesDiv.removeChild(loadingMsg);
+    const errorMsg = document.createElement("p");
+    errorMsg.textContent = "Tawfiq AI: Error getting response.";
+    messagesDiv.appendChild(errorMsg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    try {
-      const response = await fetch('/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history: chatHistory })
-      });
-      const data = await response.json();
-      messagesDiv.removeChild(loadingMsg);
-      const answerText = data.answer || "Sorry, couldn't answer.";
-      chatHistory.push({ role: "assistant", content: answerText });
-      const aiMsg = document.createElement("p");
-      aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
-      messagesDiv.appendChild(aiMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    } catch (error) {
-      console.error('Error:', error);
-      messagesDiv.removeChild(loadingMsg);
-      const errorMsg = document.createElement("p");
-      errorMsg.textContent = "Tawfiq AI: Error getting response.";
-      messagesDiv.appendChild(errorMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
   }
+}
 
   // Search Quran
   function searchQuran() {
