@@ -139,6 +139,14 @@ header h3 {
   height: calc(100vh - 160px); /* reduced from 180px for more space */
 }
 
+/* Container wrapping messages and input, for repositioning */
+#chatContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
+
 /* Messages styling with reduced margin-bottom */
 #messages {
   flex-grow: 1;
@@ -290,12 +298,14 @@ header h3 {
   <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
-<!-- AI Chat with compact spacing -->
+<!-- AI Chat Section with container for repositioning -->
 <div class="section active" id="aiSection" style="display:flex; flex-direction:column; flex:1;">
-  <div id="messages"></div>
-  <div id="aiInputContainer" class="ask-bar">
-    <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
-    <button id="askButton" onclick="sendQuestion()">Ask</button>
+  <div id="chatContainer" style="display: flex; flex-direction: column; height: 100%;">
+    <div id="aiInputContainer" class="ask-bar" style="order: -1;">
+      <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
+      <button id="askButton" onclick="sendQuestion()">Ask</button>
+    </div>
+    <div id="messages"></div>
   </div>
 </div>
 
@@ -322,7 +332,9 @@ header h3 {
 <!-- Scripts -->
 <script>
   let chatHistory = [];
+  let messageCount = 0; // to track first message
 
+  // Function to switch tabs
   function switchTab(sectionId, event) {
     document.querySelectorAll('.section').forEach(s => s.style.display='none');
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -494,6 +506,7 @@ header h3 {
     loadSurahList();
   });
 
+  // Function to switch sections
   function goTo(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.style.display='none');
     document.getElementById(sectionId).style.display='block';
@@ -511,192 +524,205 @@ header h3 {
     toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
   }
 
-  // Chat function
-async function sendQuestion() {
-  const inputEl = document.getElementById("userInput");
-  const question = inputEl.value.trim();
-  if (!question) return;
+  // Chat logic with reposition after first message
+  let chatHistory = [];
+  let messageCount = 0; // tracks number of messages sent
 
-  const container = document.getElementById("messages");
-  // User message
-  const userMsg = document.createElement("div");
-  userMsg.className = "message user";
-  userMsg.innerHTML = "<strong>You:</strong> " + question;
-  container.appendChild(userMsg);
-  inputEl.value = "";
-  container.scrollTop = container.scrollHeight;
+  async function sendQuestion() {
+    const inputEl = document.getElementById("userInput");
+    const question = inputEl.value.trim();
+    if (question === '') return;
 
-  chatHistory.push({ role: "user", content: question });
-  // Append loading indicator
-  const loadingMsg = document.createElement("div");
-  loadingMsg.className = "message ai loading-indicator";
-  loadingMsg.innerText = "Tawfiq AI is thinking...";
-  container.appendChild(loadingMsg);
-  container.scrollTop = container.scrollHeight;
+    const container = document.getElementById("messages");
+    // User message
+    const userMsg = document.createElement("div");
+    userMsg.className = "message user";
+    userMsg.innerHTML = "<strong>You:</strong> " + question;
+    container.appendChild(userMsg);
 
-  try {
-    const response = await fetch('/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history: chatHistory })
-    });
-    const data = await response.json();
-    // Remove loading
-    container.removeChild(loadingMsg);
-    const answer = data.answer || "Sorry, couldn't answer.";
-    chatHistory.push({ role: "assistant", content: answer });
+    // Append "thinking" message
     const aiMsg = document.createElement("div");
     aiMsg.className = "message ai";
-    aiMsg.innerHTML = "Tawfiq AI: " + answer.replace(/\n/g, '<br>');
+    aiMsg.innerText = "Thinking... 🤖";
     container.appendChild(aiMsg);
+
+    // Scroll
     container.scrollTop = container.scrollHeight;
-  } catch (err) {
-    console.error(err);
-    container.removeChild(loadingMsg);
-    const errorMsg = document.createElement("div");
-    errorMsg.className = "message ai";
-    errorMsg.innerText = "Tawfiq AI: Error getting response.";
-    container.appendChild(errorMsg);
-    container.scrollTop = container.scrollHeight;
+    inputEl.value = "";
+
+    chatHistory.push({ role: "user", content: question });
+    messageCount++;
+    if (messageCount === 1) {
+      // move ask bar below messages after first message
+      document.getElementById('aiInputContainer').style.order = "1";
+    }
+
+    try {
+      const response = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history: chatHistory })
+      });
+      const data = await response.json();
+
+      // Remove "thinking" message
+      container.removeChild(aiMsg);
+      // Show answer
+      const answer = data.answer || "Sorry, couldn't answer.";
+      chatHistory.push({ role: "assistant", content: answer });
+      const aiResponseDiv = document.createElement("div");
+      aiResponseDiv.className = "message ai";
+      aiResponseDiv.innerHTML = "Tawfiq AI: " + answer.replace(/\n/g, '<br>');
+      container.appendChild(aiResponseDiv);
+      container.scrollTop = container.scrollHeight;
+    } catch (err) {
+      console.error(err);
+      container.removeChild(aiMsg);
+      const errorMsg = document.createElement("div");
+      errorMsg.className = "message ai";
+      errorMsg.innerText = "Tawfiq AI: Error getting response.";
+      container.appendChild(errorMsg);
+      container.scrollTop = container.scrollHeight;
+    }
   }
-}
 
-// Quran Search
-function searchQuran() {
-  const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
-  if (!query) return;
-  const resultDiv = document.getElementById("quranResult");
-  resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-  const loading = document.createElement("div");
-  loading.className = "loading-indicator";
-  loading.innerText = "Searching Quran...";
-  resultDiv.appendChild(loading);
-  document.getElementById("quranSearchButton").disabled = true;
-
-  fetch('/quran-search', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query })
-  }).then(res => res.json()).then(data => {
-    resultDiv.innerHTML = `<div class="user-message">Results for: ${query}</div>`;
-    if (data.surah_title && data.results && Array.isArray(data.results) && data.results.length > 0) {
-      const titleEl = document.createElement("div");
-      titleEl.innerHTML = `<strong>${data.surah_title}:</strong>`;
-      titleEl.style.fontWeight = 'bold';
-      titleEl.style.marginBottom = '10px';
-      resultDiv.appendChild(titleEl);
-      data.results.forEach(verse => {
-        const verseEl = document.createElement("div");
-        verseEl.className = "quran-verse";
-
-        const info = document.createElement("p");
-        info.innerHTML = `<strong>${verse.surah_number}:${verse.verse_number}</strong>`;
-        verseEl.appendChild(info);
-
-        const trans = document.createElement("p");
-        trans.textContent = verse.translation;
-        verseEl.appendChild(trans);
-
-        const arabic = document.createElement("p");
-        arabic.textContent = verse.arabic_text;
-        arabic.style.textAlign = 'right';
-        arabic.style.fontWeight = 'bold';
-        arabic.style.marginTop = '5px';
-        arabic.style.direction = 'rtl';
-        verseEl.appendChild(arabic);
-
-        if (verse.transliteration) {
-          const translitPara = document.createElement("p");
-          translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
-          translitPara.style.marginTop = '5px';
-          translitPara.style.fontSize = '0.95em';
-          verseEl.appendChild(translitPara);
-        }
-
-        resultDiv.appendChild(verseEl);
-      });
-    } else if (data.result) {
-      resultDiv.innerHTML += `<div>${data.result}</div>`;
-    } else {
-      resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
-    }
-  }).catch(error => {
-    console.error('Error:', error);
-    resultDiv.innerHTML += `<div>Error searching Quran.</div>`;
-  }).finally(() => {
-    const loadingEl = resultDiv.querySelector('.loading-indicator');
-    if (loadingEl) loadingEl.remove();
-    document.getElementById("quranSearchButton").disabled = false;
-  });
-}
-
-// Hadith Search
-function searchHadith() {
-  const inputQuery = document.getElementById("hadithInput").value.trim();
-  const dropdownQuery = document.getElementById("hadithDropdown").value;
-  const query = inputQuery || dropdownQuery;
-  if (!query) return;
-  const resultDiv = document.getElementById("hadithResult");
-  resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-  const loading = document.createElement("div");
-  loading.className = "loading-indicator";
-  loading.innerText = "Searching Hadith...";
-  resultDiv.appendChild(loading);
-  document.getElementById("hadithSearchButton").disabled = true;
-
-  fetch('/hadith-search', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query })
-  }).then(res => res.json()).then(data => {
+  // Search Quran
+  function searchQuran() {
+    const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
+    if (!query) return;
+    const resultDiv = document.getElementById("quranResult");
     resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-      data.results.forEach(hadith => {
-        const hadithEl = document.createElement("div");
-        hadithEl.className = "hadith-entry";
+    const loading = document.createElement("div");
+    loading.className = "loading-indicator";
+    loading.innerText = "Searching Quran...";
+    resultDiv.appendChild(loading);
+    document.getElementById("quranSearchButton").disabled = true;
 
-        let infoText = '';
-        if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
-          infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
-        } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
-          infoText += `<strong>Book:</strong> ${hadith.book_name}`;
-        } else if (hadith.book_number && hadith.book_number !== 'N/A') {
-          infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
-        }
-        if (hadith.volume_number && hadith.volume_number !== 'N/A') {
-          infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
-        }
-        if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
-          if (!infoText.includes(hadith.hadith_info))
-            infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
-        }
-        if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
-          infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
-        }
+    fetch('/quran-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    }).then(res => res.json()).then(data => {
+      resultDiv.innerHTML = `<div class="user-message">Results for: ${query}</div>`;
+      if (data.surah_title && data.results && Array.isArray(data.results) && data.results.length > 0) {
+        const titleEl = document.createElement("div");
+        titleEl.innerHTML = `<strong>${data.surah_title}:</strong>`;
+        titleEl.style.fontWeight = 'bold';
+        titleEl.style.marginBottom = '10px';
+        resultDiv.appendChild(titleEl);
+        data.results.forEach(verse => {
+          const verseEl = document.createElement("div");
+          verseEl.className = "quran-verse";
 
-        const infoPara = document.createElement("p");
-        infoPara.innerHTML = infoText;
-        hadithEl.appendChild(infoPara);
+          const info = document.createElement("p");
+          info.innerHTML = `<strong>${verse.surah_number}:${verse.verse_number}</strong>`;
+          verseEl.appendChild(info);
 
-        const textPara = document.createElement("p");
-        textPara.textContent = hadith.text;
-        textPara.style.marginTop = '8px';
-        hadithEl.appendChild(textPara);
+          const trans = document.createElement("p");
+          trans.textContent = verse.translation;
+          verseEl.appendChild(trans);
 
-        resultDiv.appendChild(hadithEl);
-      });
-    } else if (data.result) {
-      resultDiv.innerHTML += `<div>${data.result}</div>`;
-    } else {
-      resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
-    }
-  }).catch(error => {
-    console.error('Error:', error);
-    resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
-  }).finally(() => {
-    document.getElementById("hadithSearchButton").disabled = false;
-  });
-}
+          const arabic = document.createElement("p");
+          arabic.textContent = verse.arabic_text;
+          arabic.style.textAlign = 'right';
+          arabic.style.fontWeight = 'bold';
+          arabic.style.marginTop = '5px';
+          arabic.style.direction = 'rtl';
+          verseEl.appendChild(arabic);
+
+          if (verse.transliteration) {
+            const translitPara = document.createElement("p");
+            translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
+            translitPara.style.marginTop = '5px';
+            translitPara.style.fontSize = '0.95em';
+            verseEl.appendChild(translitPara);
+          }
+
+          resultDiv.appendChild(verseEl);
+        });
+      } else if (data.result) {
+        resultDiv.innerHTML += `<div>${data.result}</div>`;
+      } else {
+        resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
+      }
+    }).catch(error => {
+      console.error('Error:', error);
+      resultDiv.innerHTML += `<div>Error searching Quran.</div>`;
+    }).finally(() => {
+      const loadingEl = resultDiv.querySelector('.loading-indicator');
+      if (loadingEl) loadingEl.remove();
+      document.getElementById("quranSearchButton").disabled = false;
+    });
+  }
+
+  // Search Hadith
+  function searchHadith() {
+    const inputQuery = document.getElementById("hadithInput").value.trim();
+    const dropdownQuery = document.getElementById("hadithDropdown").value;
+    const query = inputQuery || dropdownQuery;
+    if (!query) return;
+    const resultDiv = document.getElementById("hadithResult");
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+    const loading = document.createElement("div");
+    loading.className = "loading-indicator";
+    loading.innerText = "Searching Hadith...";
+    resultDiv.appendChild(loading);
+    document.getElementById("hadithSearchButton").disabled = true;
+
+    fetch('/hadith-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    }).then(res => res.json()).then(data => {
+      resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+      if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+        data.results.forEach(hadith => {
+          const hadithEl = document.createElement("div");
+          hadithEl.className = "hadith-entry";
+
+          let infoText = '';
+          if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
+            infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
+          } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
+            infoText += `<strong>Book:</strong> ${hadith.book_name}`;
+          } else if (hadith.book_number && hadith.book_number !== 'N/A') {
+            infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
+          }
+          if (hadith.volume_number && hadith.volume_number !== 'N/A') {
+            infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
+          }
+          if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
+            if (!infoText.includes(hadith.hadith_info))
+              infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
+          }
+          if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
+            infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
+          }
+
+          const infoPara = document.createElement("p");
+          infoPara.innerHTML = infoText;
+          hadithEl.appendChild(infoPara);
+
+          const textPara = document.createElement("p");
+          textPara.textContent = hadith.text;
+          textPara.style.marginTop = '8px';
+          hadithEl.appendChild(textPara);
+
+          resultDiv.appendChild(hadithEl);
+        });
+      } else if (data.result) {
+        resultDiv.innerHTML += `<div>${data.result}</div>`;
+      } else {
+        resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
+      }
+    }).catch(error => {
+      console.error('Error:', error);
+      resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
+    }).finally(() => {
+      document.getElementById("hadithSearchButton").disabled = false;
+    });
+  }
 </script>
+
 </body>
 </html>
