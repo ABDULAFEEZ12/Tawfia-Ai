@@ -260,6 +260,30 @@ body {
     font-size: 0.95em;
   }
 }
+
+/* Specific styles for the Dua section */
+#duaSection {
+  margin-top: 20px;
+  padding: 20px;
+}
+#dailyDuaSection {
+  background-color: #e0f7fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+#dailyDuaSection h2 {
+  margin-bottom: 15px;
+  font-size: 1.4em;
+  color: #00695c;
+}
+#dailyDuaContent {
+  font-size: 1.2em;
+  font-family: 'Poppins', sans-serif;
+  color: #004d40;
+}
 </style>
 </head>
 <body class="light-mode">
@@ -332,7 +356,7 @@ body {
   <!-- The prominent Daily Dua box -->
   <div id="dailyDuaSection">
     <h2>🕌 Daily Dua 📿</h2>
-    <div id="dailyDuaContent" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
+    <div id="dailyDuaContent">Loading the Dua of the Day...</div>
   </div>
 </div>
 
@@ -360,255 +384,183 @@ body {
   // Initialize chat history
   let chatHistory = [];
 
-  // Function to switch between main sections
+  // Utility functions
   function switchTab(sectionId, event) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(sectionId).classList.add('active');
     event.target.classList.add('active');
 
-    if (sectionId === 'prayerTimes') {
-      loadPrayerTimes();
-    }
+    if (sectionId === 'prayerTimes') loadPrayerTimes();
   }
 
-  // Function to toggle light/dark mode
   function toggleMode() {
     document.body.classList.toggle('light-mode');
     document.body.classList.toggle('dark-mode');
     const toggleBtn = document.querySelector('.toggle-btn');
-    if (document.body.classList.contains('dark-mode')) {
-      toggleBtn.textContent = 'Toggle Light Mode';
-    } else {
-      toggleBtn.textContent = 'Toggle Dark Mode';
-    }
+    toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Toggle Light Mode' : 'Toggle Dark Mode';
   }
 
-  // Function for navigation (not used if full page links are used)
-  function goTo(sectionId) {
-    document.querySelectorAll('.section').forEach(s => s.style.display='none');
-    const section = document.getElementById(sectionId);
-    if(section) {
-      section.style.display='block';
-      if(sectionId==='prayerTimes') {
-        loadPrayerTimes();
+  function toggleMenu() {
+    document.getElementById('side-menu').classList.toggle('hidden');
+  }
+
+  // Load Daily Dua
+function loadDailyDua() {
+  fetch('data/daily_duas.json')
+    .then(res => res.json())
+    .then(data => {
+      const duaText = data.dua || "No Dua available.";
+      document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
+      document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
+    })
+    .catch(error => {
+      document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
+      document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
+      console.error('Error loading daily_duas.json:', error);
+    });
+}
+
+// Load prayer times
+function loadPrayerTimes() {
+  fetch('/get-prayer-times')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('prayerTimesContent');
+      if (data && data.prayer_times) {
+        container.innerHTML = '';
+        for (const [name, time] of Object.entries(data.prayer_times)) {
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${name}:</strong> ${time}`;
+          container.appendChild(p);
+        }
+      } else {
+        container.innerHTML = '<p>Prayer times data unavailable.</p>';
       }
-    }
-  }
+    })
+    .catch(error => {
+      console.error('Error fetching prayer times:', error);
+      document.getElementById('prayerTimesContent').innerHTML = '<p>Error loading prayer times.</p>';
+    });
+}
 
-  // Function to toggle menu visibility
-  function toggleMenu() {
-    document.getElementById('side-menu').classList.toggle('hidden');
-  }
-
-  // Load Daily Dua into main section and menu on page load
-  function loadDailyDua() {
-    fetch('data/daily_duas.json')
-      .then(res => res.json())
-      .then(data => {
-        const duaText = data.dua || "No Dua available.";
-        document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
-        document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
-      })
-      .catch(error => {
-        document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-        document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
-        console.error('Error loading daily_duas.json:', error);
-      });
-  }
-
-  // Load prayer times
-  function loadPrayerTimes() {
-    fetch('/get-prayer-times')
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('prayerTimesContent');
-        if (data && data.prayer_times) {
-          container.innerHTML = '';
-          for (const [name, time] of Object.entries(data.prayer_times)) {
-            const p = document.createElement('p');
-            p.innerHTML = `<strong>${name}:</strong> ${time}`;
-            container.appendChild(p);
-          }
-        } else {
-          container.innerHTML = '<p>Prayer times data unavailable.</p>';
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching prayer times:', error);
-        document.getElementById('prayerTimesContent').innerHTML = '<p>Error loading prayer times.</p>';
-      });
-  }
-
-  // Load Surah list
-  function loadSurahList() {
-    fetch('/get-surah-list')
-      .then(res => res.json())
-      .then(data => {
-        const select = document.getElementById('surahList');
-        select.innerHTML = '<option value="">-- Or Select Surah --</option>';
-        if (data && data.surahs && Array.isArray(data.surahs)) {
-          data.surahs.forEach(surah => {
-            const option = document.createElement('option');
-            option.value = surah;
-            option.textContent = surah;
-            select.appendChild(option);
-          });
-        } else {
-          loadHardcodedSurahList();
-        }
-      })
-      .catch(error => {
-        console.error('Error loading Surah list:', error);
+// Load Surah list
+function loadSurahList() {
+  fetch('/get-surah-list')
+    .then(res => res.json())
+    .then(data => {
+      const select = document.getElementById('surahList');
+      select.innerHTML = '<option value="">-- Or Select Surah --</option>';
+      if (data && data.surahs && Array.isArray(data.surahs)) {
+        data.surahs.forEach(surah => {
+          const option = document.createElement('option');
+          option.value = surah;
+          option.textContent = surah;
+          select.appendChild(option);
+        });
+      } else {
         loadHardcodedSurahList();
-      });
-  }
-
-  function loadHardcodedSurahList() {
-    const surahs = [
-      "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf",
-      "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr",
-      "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun",
-      "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
-      "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad",
-      "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya",
-      "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur",
-      "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr",
-      "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
-      "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
-      "Al-Muzzammil", "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba",
-      "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq",
-      "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams",
-      "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina",
-      "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humazah",
-      "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad",
-      "Al-Ikhlas", "Al-Falaq", "An-Nas"
-    ];
-    const select = document.getElementById('surahList');
-    surahs.forEach(surah => {
-      const option = document.createElement('option');
-      option.value = surah;
-      option.textContent = surah;
-      select.appendChild(option);
+      }
+    })
+    .catch(error => {
+      console.error('Error loading Surah list:', error);
+      loadHardcodedSurahList();
     });
-  }
+}
 
-  // Load Hadith topics
-  function loadHadithTopics() {
-    const topics = [
-      "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
-      "Hadith on Gratitude", "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj",
-      "Hadith on Honesty", "Hadith on Forgiveness", "Hadith on Parents", "Hadith on Children",
-      "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood", "Hadith on Modesty",
-      "Hadith on Repenance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
-      "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran",
-      "Hadith on Sunnah", "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting",
-      "Hadith on Lying", "Hadith on Trust", "Hadith on Trade", "Hadith on Wealth",
-      "Hadith on Poverty", "Hadith on Oppression", "Hadith on Manners", "Hadith on Sincerity",
-      "Hadith on Innovation", "Hadith on Angels", "Hadith on Jinn", "Hadith on Death",
-      "Hadith on Resurrection", "Hadith on Signs of Day of Judgment", "Hadith on Health",
-      "Hadith on Cleanliness", "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip",
-      "Hadith on Leadership", "Hadith on Love", "Hadith on Peace", "Hadith on Prayer at Night",
-      "Hadith on Ablution", "Hadith on Sadaqah", "Hadith on Zakat", "Hadith on Seeking Knowledge",
-      "Hadith on Good Deeds", "Hadith on Evil Deeds", "Hadith on Hypocrisy", "Hadith on Arrogance",
-      "Hadith on Tawheed", "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth",
-      "Hadith on Orphans", "Hadith on Widows", "Hadith on Modesty in Dressing",
-      "Hadith on Halal and Haram", "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling",
-      "Hadith on Good Speech", "Hadith on Contentment", "Hadith on Worldly Life",
-      "Hadith on Akhirah", "Hadith on Thankfulness", "Hadith on Seeking Forgiveness",
-      "Hadith on Trials", "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves",
-      "Hadith on Trust in Allah", "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage",
-      "Hadith on Sin", "Hadith on Purification", "Hadith on Eid", "Hadith on Sacrifice",
-      "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam", "Hadith on Reciting Quran",
-      "Hadith on Betrayal", "Hadith on Contentment", "Hadith on Piety", "Hadith on Remembrance of Allah",
-      "Hadith on Friday Prayer", "Hadith on Allah’s Mercy", "Hadith on Night of Qadr",
-      "Hadith on Family Ties"
-    ];
-    const dropdown = document.getElementById('hadithDropdown');
-    topics.forEach(topic => {
-      const option = document.createElement('option');
-      option.value = topic;
-      option.textContent = topic;
-      dropdown.appendChild(option);
-    });
-  }
-
-  // Load Daily Dua into main and menu sections on page load
-  function loadDailyDua() {
-    fetch('data/daily_duas.json')
-      .then(res => res.json())
-      .then(data => {
-        const duaText = data.dua || "No Dua available.";
-        document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
-        document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
-      })
-      .catch(error => {
-        document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-        document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
-        console.error('Error loading daily_duas.json:', error);
-      });
-  }
-
-  // Initialize on DOM load
-  document.addEventListener("DOMContentLoaded", () => {
-    loadDailyDua();
-    loadHadithTopics();
-    loadSurahList();
+function loadHardcodedSurahList() {
+  const surahs = [
+    "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf",
+    "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr",
+    "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun",
+    "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
+    "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad",
+    "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya",
+    "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur",
+    "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr",
+    "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
+    "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
+    "Al-Muzzammil", "Al-Muddathir", "Al-Qiyama", "Al-Insan", "Al-Mursalat", "An-Naba",
+    "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq",
+    "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams",
+    "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina",
+    "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humazah",
+    "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad",
+    "Al-Ikhlas", "Al-Falaq", "An-Nas"
+  ];
+  const select = document.getElementById('surahList');
+  surahs.forEach(surah => {
+    const option = document.createElement('option');
+    option.value = surah;
+    option.textContent = surah;
+    select.appendChild(option);
   });
+}
 
-  // Function to handle tab switching
-  function switchTab(sectionId, event) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-    event.target.classList.add('active');
+// Load Hadith topics
+function loadHadithTopics() {
+  const topics = [
+    "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
+    "Hadith on Gratitude", "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj",
+    "Hadith on Honesty", "Hadith on Forgiveness", "Hadith on Parents", "Hadith on Children",
+    "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood", "Hadith on Modesty",
+    "Hadith on Repenance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
+    "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran",
+    "Hadith on Sunnah", "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting",
+    "Hadith on Lying", "Hadith on Trust", "Hadith on Trade", "Hadith on Wealth",
+    "Hadith on Poverty", "Hadith on Oppression", "Hadith on Manners", "Hadith on Sincerity",
+    "Hadith on Innovation", "Hadith on Angels", "Hadith on Jinn", "Hadith on Death",
+    "Hadith on Resurrection", "Hadith on Signs of Day of Judgment", "Hadith on Health",
+    "Hadith on Cleanliness", "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip",
+    "Hadith on Leadership", "Hadith on Love", "Hadith on Peace", "Hadith on Prayer at Night",
+    "Hadith on Ablution", "Hadith on Sadaqah", "Hadith on Zakat", "Hadith on Seeking Knowledge",
+    "Hadith on Good Deeds", "Hadith on Evil Deeds", "Hadith on Hypocrisy", "Hadith on Arrogance",
+    "Hadith on Tawheed", "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth",
+    "Hadith on Orphans", "Hadith on Widows", "Hadith on Modesty in Dressing",
+    "Hadith on Halal and Haram", "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling",
+    "Hadith on Good Speech", "Hadith on Contentment", "Hadith on Worldly Life",
+    "Hadith on Akhirah", "Hadith on Thankfulness", "Hadith on Seeking Forgiveness",
+    "Hadith on Trials", "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves",
+    "Hadith on Trust in Allah", "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage",
+    "Hadith on Sin", "Hadith on Purification", "Hadith on Eid", "Hadith on Sacrifice",
+    "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam", "Hadith on Reciting Quran",
+    "Hadith on Betrayal", "Hadith on Contentment", "Hadith on Piety", "Hadith on Remembrance of Allah",
+    "Hadith on Friday Prayer", "Hadith on Allah’s Mercy", "Hadith on Night of Qadr",
+    "Hadith on Family Ties"
+  ];
+  const dropdown = document.getElementById('hadithDropdown');
+  topics.forEach(topic => {
+    const option = document.createElement('option');
+    option.value = topic;
+    option.textContent = topic;
+    dropdown.appendChild(option);
+  });
+}
 
-    if (sectionId === 'prayerTimes') {
-      loadPrayerTimes();
-    }
-  }
+// Load Daily Dua into main and menu sections on page load
+function loadDailyDua() {
+  fetch('data/daily_duas.json')
+    .then(res => res.json())
+    .then(data => {
+      const duaText = data.dua || "No Dua available.";
+      document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
+      document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
+    })
+    .catch(error => {
+      document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
+      document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
+      console.error('Error loading daily_duas.json:', error);
+    });
+}
 
-  // Toggle Light/Dark Mode
-  function toggleMode() {
-    document.body.classList.toggle('light-mode');
-    document.body.classList.toggle('dark-mode');
-    const toggleBtn = document.querySelector('.toggle-btn');
-    if (document.body.classList.contains('dark-mode')) {
-      toggleBtn.textContent = 'Toggle Light Mode';
-    } else {
-      toggleBtn.textContent = 'Toggle Dark Mode';
-    }
-  }
+// Event listener for DOM load
+document.addEventListener("DOMContentLoaded", () => {
+  loadDailyDua();
+  loadHadithTopics();
+  loadSurahList();
+});
 
-  // Toggle Menu
-  function toggleMenu() {
-    document.getElementById('side-menu').classList.toggle('hidden');
-  }
-
-  // Load Prayer Times
-  function loadPrayerTimes() {
-    fetch('/get-prayer-times')
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('prayerTimesContent');
-        if (data && data.prayer_times) {
-          container.innerHTML = '';
-          for (const [name, time] of Object.entries(data.prayer_times)) {
-            const p = document.createElement('p');
-            p.innerHTML = `<strong>${name}:</strong> ${time}`;
-            container.appendChild(p);
-          }
-        } else {
-          container.innerHTML = '<p>Prayer times data unavailable.</p>';
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching prayer times:', error);
-        document.getElementById('prayerTimesContent').innerHTML = '<p>Error loading prayer times.</p>';
-      });
-  }
-
-  // Send question to AI
+// Send question to AI
 async function sendQuestion() {
   const inputEl = document.getElementById("userInput");
   const question = inputEl.value.trim();
@@ -794,6 +746,29 @@ function searchHadith() {
     document.getElementById("hadithSearchButton").disabled = false;
   });
 }
+
+// --------- NEW PART: Load Dua of the Day and display in styled box ---------
+function loadDailyDua() {
+  fetch('data/daily_duas.json')
+    .then(res => res.json())
+    .then(data => {
+      const duaText = data.dua || "No Dua available.";
+      document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
+      document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
+    })
+    .catch(error => {
+      document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
+      document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
+      console.error('Error loading daily_duas.json:', error);
+    });
+}
+
+// Call loadDailyDua on DOMContentLoaded
+document.addEventListener("DOMContentLoaded", () => {
+  loadDailyDua();
+  loadHadithTopics();
+  loadSurahList();
+});
 </script>
 </body>
 </html>
