@@ -111,18 +111,21 @@ def get_daily_dua():
 def reminder():
     return render_template('pages/reminder.html')
 
-@app.route('/motivation')
-def motivation():
+@app.route('/islamic-motivation')
+def islamic_motivation():
     try:
-        if not islamic_motivation or 'quotes' not in islamic_motivation:
-            return jsonify({'error': 'Motivational quotes not available.'}), 500
-        day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(islamic_motivation['quotes'])
-        quote = islamic_motivation['quotes'][index]
-        return jsonify({'quote': quote})
+        data_path = os.path.join('DATA', 'islamic_motivation.json')
+        with open(data_path, 'r', encoding='utf-8') as f:
+            motivation_data = json.load(f)
+
+        if not motivation_data or 'motivations' not in motivation_data:
+            return render_template('pages/islamic_motivation.html', motivations=[])
+
+        return render_template('pages/islamic_motivation.html', motivations=motivation_data['motivations'])
+
     except Exception as e:
         print(f"Islamic Motivation Error: {e}")
-        return jsonify({'error': 'Failed to fetch motivational quote.'}), 500
+        return render_template('pages/islamic_motivation.html', motivations=[])
 
 @app.route('/settings')
 def settings():
