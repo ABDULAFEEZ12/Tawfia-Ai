@@ -22,6 +22,31 @@
             text-align: center;
             color: #2c3e50;
         }
+        .search-bar {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 60%;
+            max-width: 400px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            font-size: 1em;
+            background-color: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3498db;
+        }
         .dua {
             margin-bottom: 30px;
             padding: 20px;
@@ -38,29 +63,50 @@
             line-height: 1.6;
             margin: 10px 0;
         }
-        .dua hr {
-            margin: 20px 0;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Daily Duas</h1>
-        {% if duas %}
-            {% for dua in duas %}
-                <div class="dua">
-                    <h2>{{ dua.title }}</h2>
-                    <p><strong>Arabic:</strong> {{ dua.arabic }}</p>
-                    <p><strong>Translation:</strong> {{ dua.translation }}</p>
-                    {% if dua.transliteration %}
-                    <p><strong>Transliteration:</strong> {{ dua.transliteration }}</p>
-                    {% endif %}
-                    <p><strong>Reference:</strong> {{ dua.reference }}</p>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No duas available at the moment.</p>
-        {% endif %}
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search dua by title..." />
+            <button onclick="filterDuas()">Search</button>
+        </div>
+
+        <div id="duas-container">
+            {% if duas %}
+                {% for dua in duas %}
+                    <div class="dua" data-title="{{ dua.title | lower }}">
+                        <h2>{{ dua.title }}</h2>
+                        <p><strong>Arabic:</strong> {{ dua.arabic }}</p>
+                        <p><strong>Translation:</strong> {{ dua.translation }}</p>
+                        {% if dua.transliteration %}
+                        <p><strong>Transliteration:</strong> {{ dua.transliteration }}</p>
+                        {% endif %}
+                        <p><strong>Reference:</strong> {{ dua.reference }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No duas available at the moment.</p>
+            {% endif %}
+        </div>
     </div>
+
+    <script>
+        function filterDuas() {
+            const searchValue = document.getElementById('search-input').value.toLowerCase();
+            const duas = document.querySelectorAll('.dua');
+
+            duas.forEach(dua => {
+                const title = dua.getAttribute('data-title');
+                if (title.includes(searchValue)) {
+                    dua.style.display = 'block';
+                } else {
+                    dua.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
