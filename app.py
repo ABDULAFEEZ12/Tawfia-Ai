@@ -81,11 +81,11 @@ def profile():
 def prayer_times():
     return render_template('pages/prayer-times.html')
 
-# Route to render the daily dua page
 @app.route('/daily-dua')
 def daily_dua_page():
     try:
         data_path = os.path.join('DATA', 'daily_duas.json')
+        print(f"Looking for file at: {data_path}")
         with open(data_path, 'r', encoding='utf-8') as f:
             daily_duas = json.load(f)
 
@@ -105,7 +105,6 @@ def daily_dua_page():
     except Exception as e:
         print(f"Daily Dua Page Error: {e}")
         return "Failed to load daily dua page.", 500
-
 
 @app.route('/reminder')
 def reminder():
