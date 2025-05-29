@@ -66,10 +66,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # Main page (home) - in your templates/
     return render_template('index.html')
 
-# Page routes
+# --- Existing Routes ---
 @app.route('/profile')
 def profile():
     return render_template('pages/profile.html')
@@ -77,21 +76,6 @@ def profile():
 @app.route('/prayer-times')
 def prayer_times():
     return render_template('pages/prayer-times.html')
-
-@app.route('/daily-dua')
-def daily_dua():
-    try:
-        # Use only the daily_duas.json data
-        if not daily_duas or 'duas' not in daily_duas:
-            return jsonify({'error': 'Dua data not available.'}), 500
-        duas_list = daily_duas['duas']
-        day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(duas_list)
-        dua = duas_list[index]
-        return jsonify({'dua': dua})
-    except Exception as e:
-        print(f"Daily Dua Error: {e}")
-        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
 
 @app.route('/reminder')
 def reminder():
@@ -125,6 +109,26 @@ def about():
 @app.route('/feedback')
 def feedback():
     return render_template('pages/feedback.html')
+
+# --- Daily Dua Page Route ---
+@app.route('/daily-dua-page')
+def daily_dua_page():
+    return render_template('pages/daily-dua.html')
+
+# --- Daily Dua API ---
+@app.route('/daily-dua')
+def daily_dua():
+    try:
+        if not daily_duas or 'duas' not in daily_duas:
+            return jsonify({'error': 'Dua data not available.'}), 500
+        duas_list = daily_duas['duas']
+        day_of_year = datetime.now().timetuple().tm_yday
+        index = day_of_year % len(duas_list)
+        dua = duas_list[index]
+        return jsonify({'dua': dua})
+    except Exception as e:
+        print(f"Daily Dua Error: {e}")
+        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
 
 # --- Ask API endpoint ---
 @app.route('/ask', methods=['POST'])
