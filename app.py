@@ -111,7 +111,7 @@ def get_daily_dua():
 def reminder():
     return render_template('pages/reminder.html')
 
-@app.route('/islamic-motivation')
+@app.route('/motivation')
 def islamic_motivation():
     try:
         data_path = os.path.join('DATA', 'islamic_motivation.json')
