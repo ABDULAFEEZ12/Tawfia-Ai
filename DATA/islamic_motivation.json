@@ -1,154 +1,192 @@
-[
-  {
-    "type": "quran",
-    "quote": "Indeed, with hardship comes ease.",
-    "reference": "Qur’an 94:6"
-  },
-  {
-    "type": "quran",
-    "quote": "So remember Me; I will remember you.",
-    "reference": "Qur’an 2:152"
-  },
-  {
-    "type": "quran",
-    "quote": "And whoever puts their trust in Allah – He is sufficient for them.",
-    "reference": "Qur’an 65:3"
-  },
-  {
-    "type": "quran",
-    "quote": "Verily, in the remembrance of Allah do hearts find rest.",
-    "reference": "Qur’an 13:28"
-  },
-  {
-    "type": "quran",
-    "quote": "Indeed, Allah is with the patient.",
-    "reference": "Qur’an 2:153"
-  },
-  {
-    "type": "quran",
-    "quote": "Do not despair of the mercy of Allah.",
-    "reference": "Qur’an 39:53"
-  },
-  {
-    "type": "quran",
-    "quote": "And He found you lost and guided you.",
-    "reference": "Qur’an 93:7"
-  },
-  {
-    "type": "quran",
-    "quote": "Whoever does an atom’s weight of good will see it.",
-    "reference": "Qur’an 99:7"
-  },
-  {
-    "type": "quran",
-    "quote": "And We have certainly made the Qur’an easy for remembrance.",
-    "reference": "Qur’an 54:17"
-  },
-  {
-    "type": "quran",
-    "quote": "Allah does not burden a soul beyond that it can bear.",
-    "reference": "Qur’an 2:286"
-  },
-
-  {
-    "type": "hadith",
-    "quote": "The strong believer is better and more beloved to Allah than the weak believer.",
-    "reference": "Sahih Muslim"
-  },
-  {
-    "type": "hadith",
-    "quote": "Allah is more merciful to His servants than a mother is to her child.",
-    "reference": "Sahih al-Bukhari"
-  },
-  {
-    "type": "hadith",
-    "quote": "Whoever relies upon Allah – He will be enough for him.",
-    "reference": "Sunan At-Tirmidhi"
-  },
-  {
-    "type": "hadith",
-    "quote": "Make things easy and do not make them difficult.",
-    "reference": "Sahih al-Bukhari"
-  },
-  {
-    "type": "hadith",
-    "quote": "None of you truly believes until he loves for his brother what he loves for himself.",
-    "reference": "Sahih al-Bukhari"
-  },
-  {
-    "type": "hadith",
-    "quote": "Smiling at your brother is a charity.",
-    "reference": "Jami' at-Tirmidhi"
-  },
-  {
-    "type": "hadith",
-    "quote": "Every act of kindness is charity.",
-    "reference": "Sahih Muslim"
-  },
-  {
-    "type": "hadith",
-    "quote": "Whoever follows a path in search of knowledge, Allah will make easy for him a path to Paradise.",
-    "reference": "Sahih Muslim"
-  },
-  {
-    "type": "hadith",
-    "quote": "He who does not thank people, does not thank Allah.",
-    "reference": "Musnad Ahmad"
-  },
-  {
-    "type": "hadith",
-    "quote": "Your smile for your brother is charity.",
-    "reference": "Jami' at-Tirmidhi"
-  },
-
-  {
-    "type": "quote",
-    "quote": "This world is just a moment. Live it in obedience.",
-    "reference": "Imam al-Shafi’i"
-  },
-  {
-    "type": "quote",
-    "quote": "The dunya is a bridge — cross it, but do not build on it.",
-    "reference": "Imam al-Ghazali"
-  },
-  {
-    "type": "quote",
-    "quote": "He who remembers death often will be given contentment.",
-    "reference": "Umar ibn al-Khattab"
-  },
-  {
-    "type": "quote",
-    "quote": "What is destined for you will reach you, even if it is beneath two mountains.",
-    "reference": "Ali ibn Abi Talib"
-  },
-  {
-    "type": "quote",
-    "quote": "Don’t grieve. Anything you lose comes round in another form.",
-    "reference": "Rumi"
-  },
-  {
-    "type": "quote",
-    "quote": "He who has no manners has no knowledge.",
-    "reference": "Ibn al-Qayyim"
-  },
-  {
-    "type": "quote",
-    "quote": "The heart that is attached to Allah is never broken.",
-    "reference": "Unknown"
-  },
-  {
-    "type": "quote",
-    "quote": "A sin that humbles you is better than a good deed that makes you arrogant.",
-    "reference": "Ibn Ata’illah"
-  },
-  {
-    "type": "quote",
-    "quote": "You were born to worship, not to worry.",
-    "reference": "Unknown"
-  },
-  {
-    "type": "quote",
-    "quote": "When the world pushes you to your knees, you're in the perfect position to make sujood.",
-    "reference": "Unknown"
-  }
-]
+{
+  "motivations": [
+    {
+      "quote": "Indeed, with hardship comes ease.",
+      "source": "Qur'an 94:6"
+    },
+    {
+      "quote": "The most beloved deed to Allah is the most regular and constant even if it were little.",
+      "source": "Sahih Bukhari"
+    },
+    {
+      "quote": "And whoever puts all his trust in Allah, He will be enough for him.",
+      "source": "Qur'an 65:3"
+    },
+    {
+      "quote": "Say, 'My Lord, forgive and have mercy, and You are the best of the merciful.'",
+      "source": "Qur'an 7:56"
+    },
+    {
+      "quote": "Indeed, Allah loves those who rely upon Him.",
+      "source": "Qur'an 3:159"
+    },
+    {
+      "quote": "Do not lose hope, nor be sad.",
+      "source": "Qur'an 3:139"
+    },
+    {
+      "quote": "The best among you are those who have the best manners and character.",
+      "source": "Sahih Bukhari"
+    },
+    {
+      "quote": "Verily, after hardship, there is ease.",
+      "source": "Qur'an 94:5"
+    },
+    {
+      "quote": "Allah does not burden a soul beyond that it can bear.",
+      "source": "Qur'an 2:286"
+    },
+    {
+      "quote": "And your Lord is going to give you, and you will be satisfied.",
+      "source": "Qur'an 93:5"
+    },
+    {
+      "quote": "Indeed, Allah is with those who fear Him and those who are doers of good.",
+      "source": "Qur'an 16:128"
+    },
+    {
+      "quote": "Allah's mercy encompasses all things.",
+      "source": "Qur'an 7:156"
+    },
+    {
+      "quote": "The best among people are those that bring most benefit to mankind.",
+      "source": "Daraqutni"
+    },
+    {
+      "quote": "The heart that is grateful will never be poor.",
+      "source": "Imam Al-Ghazali"
+    },
+    {
+      "quote": "Patience is the key to relief.",
+      "source": "Al-Tirmidhi"
+    },
+    {
+      "quote": "Seek knowledge from the cradle to the grave.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "The strongest among you is the one who controls his anger.",
+      "source": "Sahih Bukhari"
+    },
+    {
+      "quote": "The best of people are those that bring the most benefit to others.",
+      "source": "Daraqutni"
+    },
+    {
+      "quote": "Repent to Allah, for indeed Allah loves those who repent.",
+      "source": "Qur'an 2:222"
+    },
+    {
+      "quote": "Do good and do not seek recognition.",
+      "source": "Imam Al-Shafi'i"
+    },
+    {
+      "quote": "Make things easy and do not make them difficult.",
+      "source": "Sahih Bukhari"
+    },
+    {
+      "quote": "Remember Allah, and He will remember you.",
+      "source": "Qur'an 2:152"
+    },
+    {
+      "quote": "The best form of worship is to seek Allah’s pleasure.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "Trust in Allah but tie your camel.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "The most beloved words to Allah are: SubhanAllah, Alhamdulillah, La ilaha illa Allah, Allahu Akbar.",
+      "source": "Sahih Muslim"
+    },
+    {
+      "quote": "Keep your tongue moist with the remembrance of Allah.",
+      "source": "Imam Al-Ghazali"
+    },
+    {
+      "quote": "Sincerity is the foundation of worship.",
+      "source": "Imam Al-Ghazali"
+    },
+    {
+      "quote": "Do not despair of Allah’s mercy.",
+      "source": "Qur'an 39:53"
+    },
+    {
+      "quote": "The believer’s shade on the Day of Resurrection will be their charity.",
+      "source": "Tirmidhi"
+    },
+    {
+      "quote": "The best deed is the prayer at its proper time.",
+      "source": "Sahih Bukhari"
+    },
+    {
+      "quote": "Indeed, Allah loves those who rely on Him.",
+      "source": "Qur'an 3:159"
+    },
+    {
+      "quote": "Even a smile is charity.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "The cure for ignorance is to ask and learn.",
+      "source": "Imam Al-Ghazali"
+    },
+    {
+      "quote": "Be kind to your parents and be humble.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "The best among you are those who learn the Qur'an and teach it.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "Turn to Allah in repentance, for He is the Most Merciful.",
+      "source": "Qur'an 39:53"
+    },
+    {
+      "quote": "Every day is a new opportunity for forgiveness and mercy.",
+      "source": "Islamic Scholars"
+    },
+    {
+      "quote": "Make your dua your weapon and your patience your armor.",
+      "source": "Islamic Proverb"
+    },
+    {
+      "quote": "Patience and prayer are the two keys to success.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "The best wealth is contentment.",
+      "source": "Imam Al-Ghazali"
+    },
+    {
+      "quote": "Seek Allah's forgiveness daily.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "Allah’s plan is always better than ours.",
+      "source": "Islamic Scholars"
+    },
+    {
+      "quote": "Keep your heart attached to the Hereafter.",
+      "source": "Imam Al-Ghazali"
+    },
+    {
+      "quote": "He who puts his trust in Allah will never be lost.",
+      "source": "Qur'an 3:159"
+    },
+    {
+      "quote": "Allah's guidance is the greatest blessing.",
+      "source": "Qur'an 2:213"
+    },
+    {
+      "quote": "Good character is the best inheritance.",
+      "source": "Prophet Muhammad (peace be upon him)"
+    },
+    {
+      "quote": "Strive for Allah’s pleasure in all your actions.",
+      "source": "Islamic Scholars"
+    }
+  ]
+}
