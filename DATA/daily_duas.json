@@ -1,16 +1,354 @@
 {
-  "duas": [
-    {
-      "title": "Morning Dua",
-      "arabic": "اللَّهُمَّ أَنْتَ رَبِّي لا إِلَهَ إِلا أَنْتَ...",
-      "translation": "O Allah, You are my Lord, there is no deity except You...",
-      "reference": "Bukhari"
-    },
-    {
-      "title": "Evening Dua",
-      "arabic": "اللَّهُمَّ بِكَ أَصْبَحْنَا...",
-      "translation": "O Allah, by You we enter the morning...",
-      "reference": "Muslim"
-    }
-  ]
+    "duas": [
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        },
+        {
+            "title": "Dua for Mercy",
+            "arabic": "رَبِّ اغْفِرْ وَارْحَمْ وَأَنْتَ خَيْرُ الرَّاحِمِينَ",
+            "translation": "My Lord, forgive and have mercy, and You are the best of the merciful.",
+            "transliteration": "Rabbi ighfir warham wa anta khayru ar-raahimeen",
+            "reference": "Surah Al-Mu’minun 23:118"
+        },
+        {
+            "title": "Dua for Knowledge",
+            "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+            "translation": "My Lord, increase me in knowledge.",
+            "transliteration": "Rabbi zidnee ‘ilmaa",
+            "reference": "Surah Ta-Ha 20:114"
+        },
+        {
+            "title": "Dua for Patience",
+            "arabic": "رَبِّ أَفْرِغْ عَلَيَّ صَبْرًا",
+            "translation": "My Lord, pour upon me patience.",
+            "transliteration": "Rabbi afrigh ‘alayya sabraa",
+            "reference": "Surah Al-A'raf 7:126"
+        },
+        {
+            "title": "Dua for Guidance",
+            "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+            "translation": "Guide us to the straight path.",
+            "transliteration": "Ihdinas-siraatal-mustaqeem",
+            "reference": "Surah Al-Fatihah 1:6"
+        },
+        {
+            "title": "Dua for Forgiveness",
+            "arabic": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا",
+            "translation": "Our Lord, we have wronged ourselves.",
+            "transliteration": "Rabbanaa zhalamnaa anfusanaa",
+            "reference": "Surah Al-A'raf 7:23"
+        }
+    ]
 }
