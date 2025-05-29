@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Daily Dua</title>
+    <title>Daily Duas</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,7 +11,7 @@
             background-color: #f9f9f9;
         }
         .container {
-            max-width: 700px;
+            max-width: 800px;
             margin: auto;
             background: #fff;
             padding: 30px;
@@ -22,83 +22,45 @@
             text-align: center;
             color: #2c3e50;
         }
-        p {
-            font-size: 1.2em;
-            line-height: 1.6;
-            margin-top: 20px;
-            text-align: center;
-        }
-        button {
-            display: block;
-            margin: 30px auto 0 auto;
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #2980b9;
-            color: #fff;
-            border: none;
+        .dua {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f0f8ff;
+            border-left: 5px solid #2980b9;
             border-radius: 5px;
-            cursor: pointer;
         }
-        button:hover {
-            background-color: #3498db;
+        .dua h2 {
+            margin-top: 0;
+            color: #2980b9;
         }
-        #loading {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
+        .dua p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin: 10px 0;
         }
-        #error {
-            color: red;
-            text-align: center;
-            margin-top: 20px;
+        .dua hr {
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Daily Dua</h1>
-        <p id="dua-text">Loading today's dua...</p>
-        <div id="loading">Loading...</div>
-        <div id="error"></div>
-        <button id="refresh-btn">Refresh Dua</button>
+        <h1>Daily Duas</h1>
+        {% if duas %}
+            {% for dua in duas %}
+                <div class="dua">
+                    <h2>{{ dua.title }}</h2>
+                    <p><strong>Arabic:</strong> {{ dua.arabic }}</p>
+                    <p><strong>Translation:</strong> {{ dua.translation }}</p>
+                    {% if dua.transliteration %}
+                    <p><strong>Transliteration:</strong> {{ dua.transliteration }}</p>
+                    {% endif %}
+                    <p><strong>Reference:</strong> {{ dua.reference }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No duas available at the moment.</p>
+        {% endif %}
     </div>
-
-    <script>
-        async function fetchDailyDua() {
-            const duaText = document.getElementById('dua-text');
-            const loading = document.getElementById('loading');
-            const errorDiv = document.getElementById('error');
-
-            duaText.innerHTML = '';
-            errorDiv.innerHTML = '';
-            loading.style.display = 'block';
-
-            try {
-                const response = await fetch('/api/daily-dua');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                if (data.dua) {
-                    duaText.innerHTML = `
-                        <strong>${data.dua.title || 'Today\'s Dua'}</strong><br><br>
-                        <em>${data.dua.arabic || ''}</em><br><br>
-                        ${data.dua.translation || ''}<br><br>
-                        <small><strong>Reference:</strong> ${data.dua.reference || 'N/A'}</small>
-                    `;
-                } else {
-                    duaText.innerHTML = 'Could not load dua today.';
-                }
-            } catch (err) {
-                errorDiv.innerHTML = 'Error fetching dua.';
-                console.error(err);
-            } finally {
-                loading.style.display = 'none';
-            }
-        }
-
-        document.getElementById('refresh-btn').addEventListener('click', fetchDailyDua);
-        window.onload = fetchDailyDua;
-    </script>
 </body>
 </html>
