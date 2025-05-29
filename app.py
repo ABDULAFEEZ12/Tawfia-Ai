@@ -82,29 +82,20 @@ def prayer_times():
     return render_template('pages/prayer-times.html')
 
 @app.route('/daily-dua')
-def daily_dua_page():
+def daily_dua():
     try:
         data_path = os.path.join('DATA', 'daily_duas.json')
-        print(f"Looking for file at: {data_path}")
         with open(data_path, 'r', encoding='utf-8') as f:
-            daily_duas = json.load(f)
+            dua_data = json.load(f)
 
-        if not daily_duas or 'duas' not in daily_duas or not daily_duas['duas']:
-            return "Dua data not available", 500
+        if not dua_data or 'duas' not in dua_data:
+            return render_template('pages/daily-dua.html', duas=[])
 
-        duas = daily_duas['duas']
-        day_of_year = datetime.now().timetuple().tm_yday
-        daily_index = day_of_year % len(duas)
-
-        today_dua = duas[daily_index]
-        remaining_duas = [d for i, d in enumerate(duas) if i != daily_index]
-        another_dua = random.choice(remaining_duas) if remaining_duas else None
-
-        return render_template('pages/daily_dua.html', today_dua=today_dua, another_dua=another_dua)
+        return render_template('pages/daily-dua.html', duas=dua_data['duas'])
 
     except Exception as e:
-        print(f"Daily Dua Page Error: {e}")
-        return "Failed to load daily dua page.", 500
+        print(f"Daily Dua Error: {e}")
+        return render_template('pages/daily-dua.html', duas=[])
 
 @app.route('/reminder')
 def reminder():
