@@ -284,13 +284,6 @@ body {
   font-family: 'Poppins', sans-serif;
   color: #004d40;
 }
-
-/* Style for the audio player */
-#audio-player {
-  display: block;
-  width: 100%;
-  margin-top: 20px;
-}
 </style>
 </head>
 <body class="light-mode">
@@ -343,10 +336,6 @@ body {
     <option value="">-- Or Select Surah --</option>
   </select>
   <button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
-  <!-- Audio Player for Surah -->
-  <audio id="quran-audio" controls style="width: 100%; margin-top: 20px;">
-    Your browser does not support the audio element.
-  </audio>
   <div class="results" id="quranResult"></div>
 </div>
 
@@ -371,12 +360,6 @@ body {
   </div>
 </div>
 
-<!-- Motivation Section -->
-<div class="section" id="motivationSection">
-  <h3>Daily Motivation</h3>
-  <div id="motivationText">Loading Motivation...</div>
-</div>
-
 <!-- Prayer Times Section -->
 <div class="section" id="prayerTimes" style="display:none;">
   <h3>🕌 Prayer Times</h3>
@@ -385,16 +368,13 @@ body {
   </div>
 </div>
 
-<!-- Daily Dua Menu Section (for menu navigation) -->
-<div class="section" id="dailyDuaMenu" style="display:none;">
-  <h3>🕌 Daily Dua 📿</h3>
-  <div id="dailyDuaContentMenu" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
+<!-- Surah Display & Audio Controls -->
+<div class="section" id="surahSection">
+  <!-- The Surah content will load here -->
 </div>
 
+<!-- Scripts -->
 <script>
-  // Initialize chat history
-  let chatHistory = [];
-
   // Utility functions
   function switchTab(sectionId, event) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -423,11 +403,10 @@ function loadDailyDua() {
     .then(data => {
       const duaText = data.dua || "No Dua available.";
       document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
-      document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
+      // Also update in menu section if exists
     })
     .catch(error => {
       document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-      document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
       console.error('Error loading daily_duas.json:', error);
     });
 }
@@ -555,264 +534,113 @@ function loadDailyDua() {
     .then(data => {
       const duaText = data.dua || "No Dua available.";
       document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
-      document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
+      // Similarly update menu section if needed
     })
     .catch(error => {
       document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-      document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
       console.error('Error loading daily_duas.json:', error);
     });
 }
 
-// Event listener for DOM load
+// Call load functions on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   loadDailyDua();
   loadHadithTopics();
   loadSurahList();
 });
 
-// Send question to AI
-async function sendQuestion() {
-  const inputEl = document.getElementById("userInput");
-  const question = inputEl.value.trim();
-  if (!question) return;
+// --- Surah Fetch & Display ---
+async function fetchSurah(surahNumber) {
+  const response = await fetch(`https://api.quran.gading.dev/surah/${surahNumber}`);
+  const data = await response.json();
 
-  const messagesDiv = document.getElementById("messages");
-  // User message
-  const userMsg = document.createElement("p");
-  userMsg.className = "user-message"; 
-  userMsg.textContent = "You: " + question;
-  messagesDiv.appendChild(userMsg);
-  inputEl.value = "";
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  if (data.code !== 200) return;
 
-  chatHistory.push({ role: "user", content: question });
+  const verses = data.data.verses;
+  const container = document.getElementById("surah-section");
+  const audioPlayer = document.createElement('audio');
+  audioPlayer.id = 'quran-audio';
+  audioPlayer.controls = true;
+  audioPlayer.style.width = '100%';
+  container.innerHTML = ''; // Clear previous content
+  container.appendChild(document.createElement('h2')).innerText = `${data.data.name.long} (${data.data.name.transliteration.en})`;
+  // Play Full Surah button
+  const playFullBtn = document.createElement('button');
+  playFullBtn.innerText = '🔊 Play Full Surah';
+  playFullBtn.onclick = () => {
+    playFullSurah();
+  };
+  container.appendChild(playFullBtn);
+  // Ayah list container
+  const ayahDiv = document.createElement('div');
+  ayahDiv.id = 'ayah-list';
+  container.appendChild(ayahDiv);
 
-  const loadingMsg = document.createElement("p");
-  loadingMsg.className = "loading-indicator";
-  loadingMsg.textContent = "Tawfiq AI is thinking...";
-  messagesDiv.appendChild(loadingMsg);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  window.fullSurahQueue = [];
+  let currentIndex = 0;
 
-  try {
-    const response = await fetch('/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history: chatHistory })
-    });
-    const data = await response.json();
-    messagesDiv.removeChild(loadingMsg);
-    const answerText = data.answer || "Sorry, couldn't answer.";
-    chatHistory.push({ role: "assistant", content: answerText });
-    // AI message
-    const aiMsg = document.createElement("p");
-    aiMsg.className = "ai-message"; 
-    aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
-    messagesDiv.appendChild(aiMsg);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  } catch (error) {
-    console.error('Error:', error);
-    messagesDiv.removeChild(loadingMsg);
-    const errorMsg = document.createElement("p");
-    errorMsg.className = "ai-message"; 
-    errorMsg.textContent = "Tawfiq AI: Error getting response.";
-    messagesDiv.appendChild(errorMsg);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  }
-}
+  verses.forEach((verse, index) => {
+    const ayahContainer = document.createElement('div');
+    ayahContainer.style.marginBottom = '20px';
 
-// Search Quran
-function searchQuran() {
-  const query = document.getElementById("quranInput").value.trim() || document.getElementById("surahList").value;
-  if (!query) return;
-  const resultDiv = document.getElementById("quranResult");
-  const quranSearchBtn = document.getElementById("quranSearchButton");
-  resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-  const loading = document.createElement("div");
-  loading.className = "loading-indicator";
-  loading.textContent = "Searching Quran...";
-  resultDiv.appendChild(loading);
-  quranSearchBtn.disabled = true;
+    // Arabic text
+    const arabicPara = document.createElement('p');
+    arabicPara.innerHTML = verse.text.arab;
+    arabicPara.style.fontSize = '24px';
+    arabicPara.style.textAlign = 'center';
 
-  fetch('/quran-search', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query })
-  }).then(res => res.json()).then(data => {
-    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    if (data.surah_title && data.results && Array.isArray(data.results) && data.results.length > 0) {
-      const titleEl = document.createElement("div");
-      titleEl.innerHTML = `<strong>${data.surah_title}:</strong>`;
-      titleEl.style.fontWeight = 'bold';
-      titleEl.style.marginBottom = '10px';
-      resultDiv.appendChild(titleEl);
-      data.results.forEach(verse => {
-        const verseEl = document.createElement("div");
-        const info = document.createElement("p");
-        info.innerHTML = `<strong>${verse.surah_number}:${verse.verse_number}</strong>`;
-        verseEl.appendChild(info);
+    // Play button
+    const playBtn = document.createElement('button');
+    playBtn.innerText = '▶️ Play Ayah ' + verse.number.inSurah;
+    playBtn.onclick = () => {
+      document.getElementById('quran-audio').src = verse.audio.primary;
+      document.getElementById('quran-audio').play();
+    };
 
-        const trans = document.createElement("p");
-        trans.textContent = verse.translation;
-        verseEl.appendChild(trans);
+    ayahContainer.appendChild(arabicPara);
+    ayahContainer.appendChild(playBtn);
+    ayahDiv.appendChild(ayahContainer);
 
-        const arabic = document.createElement("p");
-        arabic.textContent = verse.arabic_text;
-        arabic.style.textAlign = 'right';
-        arabic.style.fontWeight = 'bold';
-        arabic.style.marginTop = '5px';
-        arabic.style.direction = 'rtl';
-        verseEl.appendChild(arabic);
-
-        if (verse.transliteration) {
-          const translitPara = document.createElement("p");
-          translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
-          translitPara.style.marginTop = '5px';
-          translitPara.style.fontSize = '0.95em';
-          verseEl.appendChild(translitPara);
-        }
-
-        resultDiv.appendChild(verseEl);
-      });
-    } else if (data.result) {
-      resultDiv.innerHTML += `<div>${data.result}</div>`;
-    } else {
-      resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
-    }
-  }).catch(error => {
-    console.error('Error:', error);
-    resultDiv.innerHTML += `<div>Error searching Quran.</div>`;
-  }).finally(() => {
-    const loadingEl = resultDiv.querySelector('.loading-indicator');
-    if (loadingEl) loadingEl.remove();
-    document.getElementById("quranSearchButton").disabled = false;
+    // Add to full surah queue
+    window.fullSurahQueue.push(verse.audio.primary);
   });
-}
 
-// Search Hadith
-function searchHadith() {
-  const inputQuery = document.getElementById("hadithInput").value.trim();
-  const dropdownQuery = document.getElementById("hadithDropdown").value;
-  const query = inputQuery || dropdownQuery;
-  if (!query) return;
-  const resultDiv = document.getElementById("hadithResult");
-  const hadithBtn = document.getElementById("hadithSearchButton");
-  resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-  const loading = document.createElement("div");
-  loading.className = "loading-indicator";
-  loading.textContent = "Searching Hadith...";
-  resultDiv.appendChild(loading);
-  hadithBtn.disabled = true;
+  // Append the audio element at the end
+  container.appendChild(audioPlayer);
 
-  fetch('/hadith-search', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query })
-  }).then(res => res.json()).then(data => {
-    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-      data.results.forEach(hadith => {
-        const hadithEl = document.createElement("div");
-        hadithEl.className = "hadith-entry";
+  // Function to play the entire surah
+  window.playFullSurah = () => {
+    if (!window.fullSurahQueue || window.fullSurahQueue.length === 0) return;
+    let index = 0;
+    const audioEl = document.getElementById('quran-audio');
 
-        let infoText = '';
-        if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
-          infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
-        } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
-          infoText += `<strong>Book:</strong> ${hadith.book_name}`;
-        } else if (hadith.book_number && hadith.book_number !== 'N/A') {
-          infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
-        }
-        if (hadith.volume_number && hadith.volume_number !== 'N/A') {
-          infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
-        }
-        if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
-          if (!infoText.includes(hadith.hadith_info))
-            infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
-        }
-        if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
-          infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
-        }
-
-        const infoPara = document.createElement("p");
-        infoPara.innerHTML = infoText;
-        hadithEl.appendChild(infoPara);
-
-        const textPara = document.createElement("p");
-        textPara.textContent = hadith.text;
-        textPara.style.marginTop = '8px';
-        hadithEl.appendChild(textPara);
-
-        resultDiv.appendChild(hadithEl);
-      });
-    } else if (data.result) {
-      resultDiv.innerHTML += `<div>${data.result}</div>`;
-    } else {
-      resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
-    }
-  }).catch(error => {
-    console.error('Error:', error);
-    resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
-  }).finally(() => {
-    document.getElementById("hadithSearchButton").disabled = false;
-  });
-}
-
-// --------- NEW PART: Load Dua of the Day and display in styled box ---------
-function loadDailyDua() {
-  fetch('data/daily_duas.json')
-    .then(res => res.json())
-    .then(data => {
-      const duaText = data.dua || "No Dua available.";
-      document.getElementById('dailyDuaContent').innerHTML = `<p>"${duaText}"</p>`;
-      document.getElementById('dailyDuaContentMenu').innerHTML = `<p>"${duaText}"</p>`;
-    })
-    .catch(error => {
-      document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
-      document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
-      console.error('Error loading daily_duas.json:', error);
-    });
-}
-
-// Call loadDailyDua on DOMContentLoaded
-document.addEventListener("DOMContentLoaded", () => {
-  loadDailyDua();
-  loadHadithTopics();
-  loadSurahList();
-});
-
-// --- NEW: Function to fetch and play Surah first ayah ---
-async function playSurahAudio(surahNumber) {
-  try {
-    const response = await fetch(`https://api.quran.gading.dev/surah/${surahNumber}`);
-    const data = await response.json();
-
-    if (data.code === 200) {
-      const verses = data.data.verses;
-      if (verses && verses.length > 0) {
-        const firstVerseAudio = verses[0].audio.primary; // Use primary audio
-        const audioPlayer = document.getElementById('quran-audio');
-        audioPlayer.src = firstVerseAudio;
-        audioPlayer.play();
-      } else {
-        console.error("No verses found for Surah " + surahNumber);
+    const playNext = () => {
+      if (index >= window.fullSurahQueue.length) {
+        audioEl.onended = null;
+        return;
       }
-    } else {
-      console.error("Failed to load surah audio:", data.message);
-    }
-  } catch (err) {
-    console.error("Error fetching surah audio:", err);
-  }
+      audioEl.src = window.fullSurahQueue[index];
+      audioEl.play();
+      index++;
+    };
+
+    audioEl.onended = () => {
+      playNext();
+    };
+
+    // Start playing first
+    index = 0;
+    audioEl.src = window.fullSurahQueue[index];
+    audioEl.play();
+    index++;
+  };
 }
 
-// Auto play Surah Al-Fatiha (Surah 1) on page load
+// Load default Surah 1 on page load
 window.onload = () => {
-  playSurahAudio(1); 
+  fetchSurah(1);
 };
 </script>
-
-<!-- Optional: Add a button to manually trigger Surah 1 playback -->
-<button onclick="playSurahAudio(1)">Play Surah Al-Fatiha</button>
 
 </body>
 </html>
