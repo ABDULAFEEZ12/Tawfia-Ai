@@ -1,4 +1,3 @@
-<!-- templates/pages/daily-dua.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,20 +68,24 @@
             const duaText = document.getElementById('dua-text');
             const loading = document.getElementById('loading');
             const errorDiv = document.getElementById('error');
-            const button = document.getElementById('refresh-btn');
 
             duaText.innerHTML = '';
             errorDiv.innerHTML = '';
             loading.style.display = 'block';
 
             try {
-                const response = await fetch('/daily-dua');
+                const response = await fetch('/api/daily-dua');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
                 if (data.dua) {
-                    duaText.innerHTML = data.dua;
+                    duaText.innerHTML = `
+                        <strong>${data.dua.title || 'Today\'s Dua'}</strong><br><br>
+                        <em>${data.dua.arabic || ''}</em><br><br>
+                        ${data.dua.translation || ''}<br><br>
+                        <small><strong>Reference:</strong> ${data.dua.reference || 'N/A'}</small>
+                    `;
                 } else {
                     duaText.innerHTML = 'Could not load dua today.';
                 }
@@ -95,8 +98,6 @@
         }
 
         document.getElementById('refresh-btn').addEventListener('click', fetchDailyDua);
-
-        // Fetch dua on page load
         window.onload = fetchDailyDua;
     </script>
 </body>
