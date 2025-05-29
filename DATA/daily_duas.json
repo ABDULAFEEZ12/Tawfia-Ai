@@ -1,19 +1,54 @@
 {
-  "htmlContent": "<div style='background-color:#e0f7fa; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1); max-width:800px; margin:auto;'>\
-<h2 style='margin-bottom:15px; font-size:1.4em; color:#00695c; text-align:center;'>🕌 Daily Dua 📿</h2>\
-<div style='font-family: Poppins, sans-serif; color:#004d40;'>\
-<h3 style='margin-top:20px; font-size:1.2em; color:#00796b;'>اللَّهُمَّ اجعل في قلبي نوراً، وفي بصري نوراً، وفي سمعي نوراً، وعن يميني نوراً، وعن شمالي نوراً، ومن فوقي نوراً، ومن تحتي نوراً، واجعل لي نوراً.</h3>\
-<p style='margin:10px 0;'><strong>Translation:</strong> O Allah, make in my heart a light, in my sight a light, in my hearing a light, on my right a light, on my left a light, above me a light, below me a light, and make for me light.</p>\
-<p style='margin:10px 0;'><strong>Transliteration:</strong> Allahumma ajil fi qalbi nooran wa fi basari nooran wa fi sam'i nooran wa 'an yamini nooran wa 'an shimali nooran wa fawqi nooran wa tahti nooran wa ajil li nooran.</p>\
-<h3 style='margin-top:20px; font-size:1.2em; color:#00796b;'>اللَّهُمَّ إني أسألك علماً نافعاً، ورزقاً واسعاً، وشفاءً من كل داء.</h3>\
-<p style='margin:10px 0;'><strong>Translation:</strong> O Allah, I ask You for beneficial knowledge, abundant provision, and healing from every disease.</p>\
-<p style='margin:10px 0;'><strong>Transliteration:</strong> Allahumma inni as'aluka 'ilman nafi'an wa rizqan wasi'an wa shifa'an min kulli da'in.</p>\
-\
-<!-- Add more duas here following the same pattern -->\
-<h3 style='margin-top:20px; font-size:1.2em; color:#00796b;'>اللَّهُمَّ أصلح لي ديني الذي هو عصمة أمري، وأصلح لي دنياي التي فيها معاشي، وأصلح لي آخرتي التي إليها معادي.</h3>\
-<p style='margin:10px 0;'><strong>Translation:</strong> O Allah, rectify my religion which is the safeguard of my affairs, rectify my worldly life in which is my livelihood, and rectify my Hereafter to which is my return.</p>\
-<p style='margin:10px 0;'><strong>Transliteration:</strong> Allahumma aslaha li deeni alladhi huwa 'ismatu amri wa aslaha li dunyaya allati fiha ma'ashi wa aslaha li akhirati allati ilayha ma'adhi.</p>\
-\
-<!-- Continue with the remaining duas as needed -->\
-</div></div>"
+  "duas": [
+    {
+      "arabic": "اللَّهُمَّ اجعل في قلبي نوراً، وفي بصري نوراً، وفي سمعي نوراً، وعن يميني نوراً، وعن شمالي نوراً، ومن فوقي نوراً، ومن تحتي نوراً، واجعل لي نوراً.",
+      "translation": "O Allah, make in my heart a light, in my sight a light, in my hearing a light, on my right a light, on my left a light, above me a light, below me a light, and make for me light.",
+      "transliteration": "Allahumma ajil fi qalbi nooran wa fi basari nooran wa fi sam'i nooran wa 'an yamini nooran wa 'an shimali nooran wa fawqi nooran wa tahti nooran wa ajil li nooran."
+    },
+    {
+      "arabic": "اللَّهُمَّ إني أسألك علماً نافعاً، ورزقاً واسعاً، وشفاءً من كل داء.",
+      "translation": "O Allah, I ask You for beneficial knowledge, abundant provision, and healing from every disease.",
+      "transliteration": "Allahumma inni as'aluka 'ilman nafi'an wa rizqan wasi'an wa shifa'an min kulli da'in."
+    },
+    {
+      "arabic": "اللَّهُمَّ أصلح لي ديني الذي هو عصمة أمري، وأصلح لي دنياي التي فيها معاشي، وأصلح لي آخرتي التي إليها معادي.",
+      "translation": "O Allah, rectify my religion which is the safeguard of my affairs, rectify my worldly life in which is my livelihood, and rectify my Hereafter to which is my return.",
+      "transliteration": "Allahumma aslaha li deeni alladhi huwa 'ismatu amri wa aslaha li dunyaya allati fiha ma'ashi wa aslaha li akhirati allati ilayha ma'adhi."
+    },
+    {
+      "arabic": "اللَّهُمَّ اجعل خير عمري آخره، وخير عملي خواتيمه، وخير أيامي يوم ألقاك فيه.",
+      "translation": "O Allah, make the best of my days the last, and the best of my deeds the closing, and the best of my days the day I meet You.",
+      "transliteration": "Allahumma ajil khayra 'umri akhirahu wa khayra 'amali khawatimahu wa khayra ayami yawma alqaaka fihi."
+    },
+    {
+      "arabic": "اللَّهُمَّ إني أعوذ بك من العلم الذي لا ينفع، ومن القلب الذي لا يخشع، ومن النفس التي لا تشبع، ومن الدعاء الذي لا يُسمع.",
+      "translation": "O Allah, I seek refuge in You from knowledge that does not benefit, from a heart that does not fear You, from a soul that is never satisfied, and from a supplication that is not answered.",
+      "transliteration": "Allahumma inni a'udhu bika min al-ilmi la yanfa'u wa min qalbin la yakhsha'u wa min nafsin la tashba'u wa min da'in la yusma'u."
+    },
+    {
+      "arabic": "اللَّهُمَّ إني أسألك الهدى والتقى والعفاف والغنى، وأن تغفر لي ذنبي، وتيسير أمري، وتصلح لي زوجتي ومالي وولدي.",
+      "translation": "O Allah, I ask You for guidance, piety, chastity, and wealth. And I ask You to forgive my sins, ease my affairs, and rectify my wife, my wealth, and my children.",
+      "transliteration": "Allahumma inni as'aluka al-huda wa al-taqa wa al-'afaafa wa al-ghina wa an taghfir li dhambi wa yassir amri wa aslaha li zawjati wa mali wa waladi."
+    },
+    {
+      "arabic": "اللَّهُمَّ إني أسألك الجنة وما قرب إليها من قول أو عمل، وأعوذ بك من النار وما قرب إليها من قول أو عمل.",
+      "translation": "O Allah, I ask You for Paradise and everything that brings me closer to it, and I seek refuge in You from the Fire and everything that brings me closer to it.",
+      "transliteration": "Allahumma inni as'aluka al-janna wa ma qarraba ilayha min qawl aw 'amal wa a'udhu bika min al-nar wa ma qarraba ilayha min qawl aw 'amal."
+    },
+    {
+      "arabic": "اللَّهُمَّ اجعلني من الذين يستمعون القول فيتبعون أحسنه، واغفر لي ولولدي وللمؤمنين والمؤمنات.",
+      "translation": "O Allah, make me among those who listen to speech and follow the best of it. Forgive me, my children, and all believing men and women.",
+      "transliteration": "Allahumma ajilni min alladhina yastami'una al-qawla fayattabi'una ahsana wa ighfir li wa li waladi wa lil-mu'minina wal-mu'minat."
+    },
+    {
+      "arabic": "اللَّهُمَّ إني أسألك حبك، وحب من يحبك، والعمل الذي يُقربني إلى حبك.",
+      "translation": "O Allah, I ask You for Your love, the love of those who love You, and actions that will bring me closer to Your love.",
+      "transliteration": "Allahumma inni as'aluka hubbaka wa hubba man yuhibbuka wa al-'amala alladhi yubarriruni ila hubbika."
+    },
+    {
+      "arabic": "اللَّهُمَّ ارزقني حبك، وحب من يحبك، وحب عمل يقربني إلى حبك.",
+      "translation": "O Allah, grant me Your love, the love of those who love You, and love of deeds that bring me closer to Your love.",
+      "transliteration": "Allahumma arzuqni hubbaka wa hubba man yuhibbuka wa hubba 'amalin yuqarribuni ila hubbika."
+    }
+  ]
 }
