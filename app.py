@@ -81,11 +81,6 @@ def profile():
 def prayer_times():
     return render_template('pages/prayer-times.html')
 
-# Route to render the daily dua page
-@app.route('/daily-dua')
-def daily_dua_page():
-    return render_template('pages/daily-dua.html')
-
 # Route to render the daily dua page 
 @app.route('/daily-dua')
 def daily_dua_page():
