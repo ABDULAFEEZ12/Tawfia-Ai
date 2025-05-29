@@ -81,28 +81,31 @@ def profile():
 def prayer_times():
     return render_template('pages/prayer-times.html')
 
+# Route to render the daily dua page
 @app.route('/daily-dua')
-def daily_dua():
+def daily_dua_page():
+    return render_template('pages/daily-dua.html')
+
+# API route to return today's dua as JSON
+@app.route('/api/daily-dua')
+def get_daily_dua():
     try:
-        # Load dua data from JSON file
-        with open('DATA/daily_duas.json', 'r', encoding='utf-8') as f:
+        data_path = os.path.join('DATA', 'daily_duas.json')
+        with open(data_path, 'r', encoding='utf-8') as f:
             daily_duas = json.load(f)
 
-        # Check if the data is valid
         if not daily_duas or 'duas' not in daily_duas or not daily_duas['duas']:
-            return render_template('pages/daily-dua.html', error='Dua data not available.')
+            return jsonify({'error': 'Dua data not available.'}), 500
 
-        # Get current day of year to pick a dua
         day_of_year = datetime.now().timetuple().tm_yday
         index = day_of_year % len(daily_duas['duas'])
         dua = daily_duas['duas'][index]
 
-        # Render the dua on the template
-        return render_template('pages/daily-dua.html', dua=dua)
+        return jsonify({'dua': dua})
 
     except Exception as e:
         print(f"Daily Dua Error: {e}")
-        return render_template('pages/daily-dua.html', error='Failed to fetch daily dua.')
+        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
 
 @app.route('/reminder')
 def reminder():
