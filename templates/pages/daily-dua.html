@@ -1,72 +1,103 @@
+<!-- templates/pages/daily-dua.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily Dua</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-    #dua-container {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #f0f0f0;
-      border-radius: 8px;
-    }
-    h2 {
-      margin-top: 0;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>Daily Dua</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            display: block;
+            margin: 30px auto 0 auto;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #2980b9;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3498db;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #error {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Daily Dua</h1>
+        <p id="dua-text">Loading today's dua...</p>
+        <div id="loading">Loading...</div>
+        <div id="error"></div>
+        <button id="refresh-btn">Refresh Dua</button>
+    </div>
 
-  <h1>Daily Dua</h1>
-  <button id="showDuaBtn">Show Today's Dua</button>
+    <script>
+        async function fetchDailyDua() {
+            const duaText = document.getElementById('dua-text');
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+            const button = document.getElementById('refresh-btn');
 
-  <div id="dua-container" style="display:none;">
-    <h2>Arabic</h2>
-    <p id="arabic"></p>
+            duaText.innerHTML = '';
+            errorDiv.innerHTML = '';
+            loading.style.display = 'block';
 
-    <h2>English</h2>
-    <p id="english"></p>
+            try {
+                const response = await fetch('/daily-dua');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                if (data.dua) {
+                    duaText.innerHTML = data.dua;
+                } else {
+                    duaText.innerHTML = 'Could not load dua today.';
+                }
+            } catch (err) {
+                errorDiv.innerHTML = 'Error fetching dua.';
+                console.error(err);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
 
-    <h2>Transliteration</h2>
-    <p id="transliteration"></p>
-  </div>
+        document.getElementById('refresh-btn').addEventListener('click', fetchDailyDua);
 
-  <script>
-    document.getElementById('showDuaBtn').addEventListener('click', () => {
-      fetch('DATA/daily_duas.json')
-        .then(res => {
-          if (!res.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return res.json();
-        })
-        .then(data => {
-          const duas = data.duas;
-          if (!duas || duas.length === 0) {
-            alert('No duas available.');
-            return;
-          }
-          const randomIndex = Math.floor(Math.random() * duas.length);
-          const dua = duas[randomIndex];
-
-          document.getElementById('arabic').innerText = dua.arabic;
-          document.getElementById('english').innerText = dua.english;
-          document.getElementById('transliteration').innerText = dua.transliteration;
-
-          document.getElementById('dua-container').style.display = 'block';
-        })
-        .catch(error => {
-          console.error('Error fetching JSON:', error);
-          alert('Failed to load daily dua. Please try again later.');
-        });
-    });
-  </script>
+        // Fetch dua on page load
+        window.onload = fetchDailyDua;
+    </script>
 </body>
 </html>
