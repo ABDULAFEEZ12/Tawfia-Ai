@@ -82,11 +82,6 @@ def prayer_times():
     return render_template('pages/prayer-times.html')
 
 # Route to render the daily dua page
-@app.route('/daily-dua')
-def daily_dua_page():
-    return render_template('pages/daily-dua.html')
-
-# API route to return today's dua as JSON
 @app.route('/api/daily-dua')
 def get_daily_dua():
     try:
@@ -97,11 +92,21 @@ def get_daily_dua():
         if not daily_duas or 'duas' not in daily_duas or not daily_duas['duas']:
             return jsonify({'error': 'Dua data not available.'}), 500
 
+        duas = daily_duas['duas']
         day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(daily_duas['duas'])
-        dua = daily_duas['duas'][index]
+        daily_index = day_of_year % len(duas)
 
-        return jsonify({'dua': dua})
+        # Today's Dua
+        today_dua = duas[daily_index]
+
+        # Get another random dua that's not the daily one
+        remaining_duas = [d for i, d in enumerate(duas) if i != daily_index]
+        random_dua = random.choice(remaining_duas) if remaining_duas else None
+
+        return jsonify({
+            'today_dua': today_dua,
+            'another_dua': random_dua
+        })
 
     except Exception as e:
         print(f"Daily Dua Error: {e}")
