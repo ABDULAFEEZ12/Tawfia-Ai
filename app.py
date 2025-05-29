@@ -246,53 +246,24 @@ def quran_search():
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
-# --- Hadith Search ---
-@app.route('/hadith-search', methods=['POST'])
-def hadith_search():
-    data = request.get_json()
-    query = data.get('query', '').strip().lower()
+@app.route('/hadith')
+def hadith_page():
+    with open("DATA/sahih_bukhari_coded.json", "r", encoding="utf-8") as f:
+        hadith_data = json.load(f)
 
-    if not query:
-        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
+    # Flatten the hadiths from volumes > books > hadiths
+    all_hadiths = []
+    for volume in hadith_data.get("volumes", []):
+        for book in volume.get("books", []):
+            for h in book.get("hadiths", []):
+                all_hadiths.append({
+                    "number": h.get("number", "N/A"),
+                    "title": h.get("info", "No title"),
+                    "text": h.get("text", "No text"),
+                    "topic": book.get("book_name", "Unknown Topic")
+                })
 
-    # Normalize query
-    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
-
-    if not hadith_data:
-        return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
-
-    try:
-        matches = []
-        count = 0
-        for volume in hadith_data.get('volumes', []):
-            for book in volume.get('books', []):
-                for hadith in book.get('hadiths', []):
-                    text = hadith.get('text', '').lower()
-                    keywords = hadith.get('keywords', [])
-                    if query in text or any(query in k.lower() for k in keywords):
-                        if count < 5:
-                            matches.append({
-                                'volume_number': volume.get('volume_number', 'N/A'),
-                                'book_number': book.get('book_number', 'N/A'),
-                                'book_name': book.get('book_name', 'Unknown Book'),
-                                'hadith_info': hadith.get('info', 'Info'),
-                                'narrator': hadith.get('by', 'Unknown narrator'),
-                                'text': hadith.get('text', 'No text found')
-                            })
-                            count += 1
-                        else:
-                            break
-                if count >= 5:
-                    break
-            if count >= 5:
-                break
-        if matches:
-            return jsonify({'results': matches})
-        else:
-            return jsonify({'result': f'No Hadith found for "{query}".', 'results': []})
-    except Exception as e:
-        print(f"Hadith Search Error: {e}")
-        return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
+    return render_template("hadith.html", hadiths=all_hadiths)
 
 # --- Get Surah List ---
 @app.route('/get-surah-list')
