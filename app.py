@@ -86,9 +86,14 @@ def prayer_times():
 def daily_dua_page():
     return render_template('pages/daily-dua.html')
 
-# API route to return today's dua as JSON
+# Route to render the daily dua page 
+@app.route('/daily-dua')
+def daily_dua_page():
+    return render_template('pages/daily-dua.html')
+
+# API route to return today's 5 duas as JSON
 @app.route('/api/daily-dua')
-def get_daily_dua():
+def get_daily_duas():
     try:
         data_path = os.path.join('DATA', 'daily_duas.json')
         with open(data_path, 'r', encoding='utf-8') as f:
@@ -97,15 +102,24 @@ def get_daily_dua():
         if not daily_duas or 'duas' not in daily_duas or not daily_duas['duas']:
             return jsonify({'error': 'Dua data not available.'}), 500
 
-        day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(daily_duas['duas'])
-        dua = daily_duas['duas'][index]
+        all_duas = daily_duas['duas']
+        total = len(all_duas)
 
-        return jsonify({'dua': dua})
+        # Get 5 consistent duas based on day of the year
+        day_of_year = datetime.now().timetuple().tm_yday
+        start_index = (day_of_year * 5) % total
+        end_index = start_index + 5
+        todays_duas = all_duas[start_index:end_index]
+
+        # Wrap around if end_index exceeds total
+        if end_index > total:
+            todays_duas = all_duas[start_index:] + all_duas[:end_index - total]
+
+        return jsonify({'duas': todays_duas})
 
     except Exception as e:
         print(f"Daily Dua Error: {e}")
-        return jsonify({'error': 'Failed to fetch daily dua.'}), 500
+        return jsonify({'error': 'Failed to fetch daily duas.'}), 500
 
 @app.route('/reminder')
 def reminder():
