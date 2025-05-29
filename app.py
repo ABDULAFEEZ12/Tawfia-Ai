@@ -69,10 +69,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    # Main page (home) - placed directly in templates/
     return render_template('index.html')
 
-# --- Page Routes - all templates inside 'templates/pages/' ---
+# --- Page Routes ---
 @app.route('/profile')
 def profile():
     return render_template('pages/profile.html')
@@ -87,12 +86,9 @@ def daily_dua():
         data_path = os.path.join('DATA', 'daily_duas.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             dua_data = json.load(f)
-
         if not dua_data or 'duas' not in dua_data:
             return render_template('pages/daily-dua.html', duas=[])
-
         return render_template('pages/daily-dua.html', duas=dua_data['duas'])
-
     except Exception as e:
         print(f"Daily Dua Error: {e}")
         return render_template('pages/daily-dua.html', duas=[])
@@ -107,12 +103,9 @@ def islamic_motivation():
         data_path = os.path.join('DATA', 'islamic_motivation.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             motivation_data = json.load(f)
-
         if not motivation_data or 'motivations' not in motivation_data:
             return render_template('pages/islamic_motivation.html', motivations=[])
-
         return render_template('pages/islamic_motivation.html', motivations=motivation_data['motivations'])
-
     except Exception as e:
         print(f"Islamic Motivation Error: {e}")
         return render_template('pages/islamic_motivation.html', motivations=[])
@@ -127,7 +120,6 @@ def privacy():
 
 @app.route('/about')
 def about():
-    # About page - in templates/pages/about.html
     return render_template('pages/about.html')
 
 @app.route('/feedback')
@@ -246,24 +238,53 @@ def quran_search():
         print(f"Quran API Error: {e}")
         return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
 
-@app.route('/hadith')
-def hadith_page():
-    with open("DATA/sahih_bukhari_coded.json", "r", encoding="utf-8") as f:
-        hadith_data = json.load(f)
+# --- Hadith Search ---
+@app.route('/hadith-search', methods=['POST'])
+def hadith_search():
+    data = request.get_json()
+    query = data.get('query', '').strip().lower()
 
-    # Flatten the hadiths from volumes > books > hadiths
-    all_hadiths = []
-    for volume in hadith_data.get("volumes", []):
-        for book in volume.get("books", []):
-            for h in book.get("hadiths", []):
-                all_hadiths.append({
-                    "number": h.get("number", "N/A"),
-                    "title": h.get("info", "No title"),
-                    "text": h.get("text", "No text"),
-                    "topic": book.get("book_name", "Unknown Topic")
-                })
+    if not query:
+        return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
-    return render_template("hadith.html", hadiths=all_hadiths)
+    # Normalize query
+    query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
+
+    if not hadith_data:
+        return jsonify({'result': 'Hadith data is not loaded. Please contact the admin.', 'results': []})
+
+    try:
+        matches = []
+        count = 0
+        for volume in hadith_data.get('volumes', []):
+            for book in volume.get('books', []):
+                for hadith in book.get('hadiths', []):
+                    text = hadith.get('text', '').lower()
+                    keywords = hadith.get('keywords', [])
+                    if query in text or any(query in k.lower() for k in keywords):
+                        if count < 5:
+                            matches.append({
+                                'volume_number': volume.get('volume_number', 'N/A'),
+                                'book_number': book.get('book_number', 'N/A'),
+                                'book_name': book.get('book_name', 'Unknown Book'),
+                                'hadith_info': hadith.get('info', 'Info'),
+                                'narrator': hadith.get('by', 'Unknown narrator'),
+                                'text': hadith.get('text', 'No text found')
+                            })
+                            count += 1
+                        else:
+                            break
+                if count >= 5:
+                    break
+            if count >= 5:
+                break
+        if matches:
+            return jsonify({'results': matches})
+        else:
+            return jsonify({'result': f'No Hadith found for "{query}".', 'results': []})
+    except Exception as e:
+        print(f"Hadith Search Error: {e}")
+        return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
 
 # --- Get Surah List ---
 @app.route('/get-surah-list')
@@ -322,6 +343,12 @@ def recognize_speech():
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+# --- New route to display all Hadiths with search ---
+@app.route('/hadiths')
+def hadiths():
+    # Render the hadiths page with all hadiths
+    return render_template('hadiths.html', hadiths=hadith_data.get('volumes', []))
 
 if __name__ == '__main__':
     app.run(debug=True)
