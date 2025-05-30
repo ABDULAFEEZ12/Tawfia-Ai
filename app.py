@@ -207,7 +207,7 @@ def ask():
         print(f"Unexpected error: {e}")
         return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
 
-# --- Quran Search ---
+# --- Quran Search with local data fallback ---
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
     data = request.get_json()
@@ -216,16 +216,46 @@ def quran_search():
     if not query:
         return jsonify({'result': 'Please provide a Surah name.', 'results': []})
 
-    try:
-        response = requests.get('https://api.quran.gading.dev/surah')
-        response.raise_for_status()
-        surahs = response.json().get('data', [])
+    # Path to local surah data
+    local_surah_path = os.path.join('DATA', 'surah.json')
 
-        surah_names = {s['name']['transliteration']['en'].lower(): s['number'] for s in surahs}
-        close_matches = get_close_matches(query, surah_names.keys(), n=1, cutoff=0.6)
+    surahs = []
 
-        if close_matches:
-            surah_number = surah_names[close_matches[0]]
+    # Try to load local surah data first
+    if os.path.exists(local_surah_path):
+        try:
+            with open(local_surah_path, 'r', encoding='utf-8') as f:
+                surahs = json.load(f)
+            print("Loaded surah data from local file.")
+        except json.JSONDecodeError:
+            print("Error decoding local surah data. Will fetch from API.")
+        except Exception as e:
+            print(f"Unexpected error loading local surah data: {e}")
+
+    # If local data not loaded, fetch from API
+    if not surahs:
+        try:
+            response = requests.get('https://api.quran.gading.dev/surah')
+            response.raise_for_status()
+            surahs = response.json().get('data', [])
+            # Save to local file for future use
+            try:
+                with open(local_surah_path, 'w', encoding='utf-8') as f:
+                    json.dump(surahs, f, indent=2, ensure_ascii=False)
+                print("Saved surah data to local file.")
+            except Exception as e:
+                print(f"Error saving surah data locally: {e}")
+        except requests.RequestException as e:
+            print(f"Quran API Error: {e}")
+            return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
+
+    # Map surah names to numbers
+    surah_names = {s['name']['transliteration']['en'].lower(): s['number'] for s in surahs}
+    close_matches = get_close_matches(query, surah_names.keys(), n=1, cutoff=0.6)
+
+    if close_matches:
+        surah_number = surah_names[close_matches[0]]
+        try:
             verses_response = requests.get(f'https://api.quran.gading.dev/surah/{surah_number}')
             verses_response.raise_for_status()
             surah_data = verses_response.json().get('data', [])
@@ -240,11 +270,11 @@ def quran_search():
             } for v in surah_data['verses']]
 
             return jsonify({'surah_title': surah_title, 'results': structured_verses})
-        else:
-            return jsonify({'result': f'No Surah found for "{query}".', 'results': []})
-    except requests.RequestException as e:
-        print(f"Quran API Error: {e}")
-        return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
+        except requests.RequestException as e:
+            print(f"Error fetching verses: {e}")
+            return jsonify({'result': 'Error fetching verses. Try again later.', 'results': []})
+    else:
+        return jsonify({'result': f'No Surah found for "{query}".', 'results': []})
 
 # --- Hadith Search ---
 @app.route('/hadith-search', methods=['POST'])
