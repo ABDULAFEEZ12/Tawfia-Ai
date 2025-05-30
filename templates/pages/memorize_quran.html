@@ -1,71 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Memorize Quran</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background-color: #f9f9f9;
-  }
-  h1 {
-    color: #2c3e50;
-  }
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  li {
-    background-color: #ffffff;
-    margin-bottom: 10px;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  .surah-title {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  .surah-details {
-    font-size: 0.9em;
-    color: #555;
-  }
-  a {
-    text-decoration: none;
-    color: #2980b9;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  /* Optional: add hover effect */
-  li:hover {
-    background-color: #eef2f3;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Memorize Quran</title>
 </head>
 <body>
+  <h1>Memorize Surah</h1>
+  <div id="surah-name"></div>
+  <div id="verses-container"></div>
 
-<h1>Memorize Quran</h1>
+  <script>
+    // Load Surah Al-Fatihah
+    fetch('/static/DATA/surah/surah_Al-Fatihah.json')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("surah-name").textContent = `${data.english_name} - ${data.translation}`;
 
-<p>Below is a list of Surahs. Click on a Surah to view its details or start memorizing.</p>
-
-<ul>
-  {% for surah in surahs %}
-    <li>
-      <div class="surah-title">
-        <a href="{{ url_for('surah_detail', surah_id=surah.id) }}">
-          Surah {{ surah.name }} ({{ surah.english_name }})
-        </a>
-      </div>
-      <div class="surah-details">
-        Ayahs: {{ surah.ayahs|length }} | Reached: {{ surah.memorized_ayahs|length if surah.memorized_ayahs else 0 }}
-      </div>
-    </li>
-  {% endfor %}
-</ul>
-
+        const container = document.getElementById("verses-container");
+        data.verses.forEach(verse => {
+          const div = document.createElement('div');
+          div.innerHTML = `
+            <h3>Verse ${verse.number}</h3>
+            <p><strong>Arabic:</strong> ${verse.arabic}</p>
+            <p><strong>English:</strong> ${verse.english}</p>
+            <p><strong>Transliteration:</strong> ${verse.transliteration}</p>
+            <audio controls src="${verse.audio}"></audio>
+            <hr/>
+          `;
+          container.appendChild(div);
+        });
+      })
+      .catch(err => console.error('Error loading surah:', err));
+  </script>
 </body>
 </html>
