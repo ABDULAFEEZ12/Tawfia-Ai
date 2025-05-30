@@ -81,6 +81,10 @@ def profile():
 def prayer_times():
     return render_template('pages/prayer-times.html')
 
+@app.route("/memorize_quran")
+def memorize_quran():
+    return render_template("memorize_quran.html")
+
 @app.route('/daily-dua')
 def daily_dua():
     try:
