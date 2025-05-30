@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Memorize Quran</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+  }
+  h1 {
+    color: #2c3e50;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  li {
+    background-color: #ffffff;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .surah-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .surah-details {
+    font-size: 0.9em;
+    color: #555;
+  }
+  a {
+    text-decoration: none;
+    color: #2980b9;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  /* Optional: add hover effect */
+  li:hover {
+    background-color: #eef2f3;
+  }
+</style>
+</head>
+<body>
+
+<h1>Memorize Quran</h1>
+
+<p>Below is a list of Surahs. Click on a Surah to view its details or start memorizing.</p>
+
+<ul>
+  {% for surah in surahs %}
+    <li>
+      <div class="surah-title">
+        <a href="{{ url_for('surah_detail', surah_id=surah.id) }}">
+          Surah {{ surah.name }} ({{ surah.english_name }})
+        </a>
+      </div>
+      <div class="surah-details">
+        Ayahs: {{ surah.ayahs|length }} | Reached: {{ surah.memorized_ayahs|length if surah.memorized_ayahs else 0 }}
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
+</body>
+</html>
