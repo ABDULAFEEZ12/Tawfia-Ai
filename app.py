@@ -89,8 +89,18 @@ def profile():
 
 @app.route('/memorize-quran')
 def memorize_quran():
-    return render_template('memorize_quran.html')
+    surah_dir = os.path.join('DATA', 'surah')
+    surah_files = sorted(os.listdir(surah_dir), key=lambda x: int(os.path.splitext(x)[0]))
+    surahs = []
 
+    for filename in surah_files:
+        filepath = os.path.join(surah_dir, filename)
+        with open(filepath, 'r', encoding='utf-8') as f:
+            surah_data = json.load(f)
+            surahs.append(surah_data)
+
+    return render_template('memorize_quran.html', surahs=surahs)
+    
 @app.route('/prayer-times')
 def prayer_times():
     return render_template('pages/prayer-times.html')
