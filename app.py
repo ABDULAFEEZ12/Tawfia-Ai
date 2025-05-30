@@ -1,20 +1,19 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import json
-from difflib import get_close_matches
-from dotenv import load_dotenv
 import os
 from hashlib import sha256
+from dotenv import load_dotenv
 import redis
 from datetime import datetime
 
 # Load environment variables
 load_dotenv()
 
+# Environment variables
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-
 if not openrouter_api_key:
-    raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
+    raise RuntimeError("Please set the OPENROUTER_API_KEY environment variable.")
 
 # --- Redis Cache Setup ---
 redis_host = os.getenv("REDIS_HOST", "localhost")
@@ -26,8 +25,6 @@ r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_pa
 
 # --- File-Based Cache ---
 CACHE_FILE = "tawfiq_cache.json"
-
-# Load cache from file
 if os.path.exists(CACHE_FILE):
     try:
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
@@ -74,11 +71,17 @@ def load_surah_by_id(surah_id):
         with open(file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
+        print(f"Surah file not found: {file_path}")
         return None
     except json.JSONDecodeError:
+        print(f"JSON decode error in {file_path}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error loading surah {surah_id}: {e}")
         return None
 
 # --- Routes ---
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -90,17 +93,19 @@ def profile():
 @app.route('/memorize-quran')
 def memorize_quran():
     surah_dir = os.path.join('DATA', 'surah')
-    surah_files = sorted(os.listdir(surah_dir), key=lambda x: int(os.path.splitext(x)[0]))
-    surahs = []
+    try:
+        surah_files = sorted(os.listdir(surah_dir), key=lambda x: int(os.path.splitext(x)[0]))
+        surahs = []
+        for filename in surah_files:
+            filepath = os.path.join(surah_dir, filename)
+            with open(filepath, 'r', encoding='utf-8') as f:
+                surah_data = json.load(f)
+                surahs.append(surah_data)
+        return render_template('memorize_quran.html', surahs=surahs)
+    except Exception as e:
+        print(f"Error loading surahs: {e}")
+        return "Error loading surahs.", 500
 
-    for filename in surah_files:
-        filepath = os.path.join(surah_dir, filename)
-        with open(filepath, 'r', encoding='utf-8') as f:
-            surah_data = json.load(f)
-            surahs.append(surah_data)
-
-    return render_template('memorize_quran.html', surahs=surahs)
-    
 @app.route('/prayer-times')
 def prayer_times():
     return render_template('pages/prayer-times.html')
@@ -111,9 +116,8 @@ def daily_dua():
         data_path = os.path.join('data', 'daily_duas.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             dua_data = json.load(f)
-        if not dua_data or 'duas' not in dua_data:
-            return render_template('pages/daily-dua.html', duas=[])
-        return render_template('pages/daily-dua.html', duas=dua_data['duas'])
+        duas = dua_data.get('duas', []) if dua_data else []
+        return render_template('pages/daily-dua.html', duas=duas)
     except Exception as e:
         print(f"Daily Dua Error: {e}")
         return render_template('pages/daily-dua.html', duas=[])
@@ -128,9 +132,8 @@ def islamic_motivation():
         data_path = os.path.join('data', 'islamic_motivation.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             motivation_data = json.load(f)
-        if not motivation_data or 'motivations' not in motivation_data:
-            return render_template('pages/islamic_motivation.html', motivations=[])
-        return render_template('pages/islamic_motivation.html', motivations=motivation_data['motivations'])
+        quotes = motivation_data.get('quotes', []) if motivation_data else []
+        return render_template('pages/islamic_motivation.html', motivations=quotes)
     except Exception as e:
         print(f"Islamic Motivation Error: {e}")
         return render_template('pages/islamic_motivation.html', motivations=[])
@@ -216,7 +219,6 @@ def ask():
         question_cache[cache_key] = answer
         save_cache()
         return jsonify({'answer': answer})
-
     except requests.RequestException as e:
         print(f"OpenRouter API Error: {e}")
         return jsonify({'answer': 'Tawfiq AI is having trouble reaching external knowledge. Try again later.'})
@@ -332,8 +334,9 @@ def get_islamic_motivation():
             return jsonify({'error': 'Motivational quotes not available.'}), 500
 
         day_of_year = datetime.now().timetuple().tm_yday
-        index = day_of_year % len(islamic_motivation['quotes'])
-        quote = islamic_motivation['quotes'][index]
+        quotes = islamic_motivation['quotes']
+        index = day_of_year % len(quotes)
+        quote = quotes[index]
         return jsonify({'quote': quote})
     except Exception as e:
         print(f"Islamic Motivation Error: {e}")
@@ -372,10 +375,14 @@ def recognize_speech():
 # --- New route to display a specific Surah ---
 @app.route('/surah/<int:surah_id>')
 def surah_page(surah_id):
-    surah_data = load_surah_by_id(surah_id)
-    if surah_data is None:
-        return render_template('404.html', message="Surah not found."), 404
-    return render_template('Surah.html', surah=surah_data)
+    try:
+        surah_data = load_surah_by_id(surah_id)
+        if surah_data is None:
+            return render_template('404.html', message="Surah not found."), 404
+        return render_template('surah.html', surah=surah_data)
+    except Exception as e:
+        print(f"Error rendering surah {surah_id}: {e}")
+        return f"Error rendering surah: {e}", 500
 
 if __name__ == '__main__':
     app.run(debug=True)
