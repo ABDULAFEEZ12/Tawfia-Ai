@@ -44,7 +44,7 @@ def save_cache():
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
-    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
+    file_path = os.path.join(os.path.dirname(__file__), 'data', file_name)
     print(f"Attempting to load {data_variable_name} data from: {file_path}")
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -67,11 +67,22 @@ islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivati
 
 app = Flask(__name__)
 
+# --- Utility: Load Surah JSON ---
+def load_surah_by_id(surah_id):
+    file_path = os.path.join('data', 'surahs', f'surah_{surah_id}.json')
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
+    except json.JSONDecodeError:
+        return None
+
+# --- Routes ---
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# --- Page Routes ---
 @app.route('/profile')
 def profile():
     return render_template('pages/profile.html')
@@ -83,7 +94,7 @@ def prayer_times():
 @app.route('/daily-dua')
 def daily_dua():
     try:
-        data_path = os.path.join('DATA', 'daily_duas.json')
+        data_path = os.path.join('data', 'daily_duas.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             dua_data = json.load(f)
         if not dua_data or 'duas' not in dua_data:
@@ -100,7 +111,7 @@ def reminder():
 @app.route('/motivation')
 def islamic_motivation():
     try:
-        data_path = os.path.join('DATA', 'islamic_motivation.json')
+        data_path = os.path.join('data', 'islamic_motivation.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             motivation_data = json.load(f)
         if not motivation_data or 'motivations' not in motivation_data:
@@ -126,7 +137,7 @@ def about():
 def feedback():
     return render_template('pages/feedback.html')
 
-# --- Ask API endpoint ---
+# --- Ask API ---
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
@@ -344,11 +355,13 @@ def recognize_speech():
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-# --- New route to display all Hadiths with search ---
-@app.route('/hadiths')
-def hadiths():
-    # Render the hadiths page with all hadiths
-    return render_template('hadiths.html', hadiths=hadith_data.get('volumes', []))
+# --- New route to display a specific Surah ---
+@app.route('/surah/<int:surah_id>')
+def surah_page(surah_id):
+    surah_data = load_surah_by_id(surah_id)
+    if surah_data is None:
+        return render_template('404.html', message="Surah not found."), 404
+    return render_template('Surah.html', surah=surah_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
