@@ -83,7 +83,7 @@ def prayer_times():
 
 @app.route("/memorize_quran")
 def memorize_quran():
-    return render_template("memorize_quran.html")
+    return render_template("pages/memorize_quran.html")
 
 @app.route('/daily-dua')
 def daily_dua():
