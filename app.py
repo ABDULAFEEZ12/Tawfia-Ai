@@ -85,6 +85,27 @@ def prayer_times():
 def memorize_quran():
     return render_template("pages/memorize_quran.html")
 
+@app.route('/api/surah-list')
+def surah_list():
+    return jsonify([
+        {"id": 1, "name": "الفاتحة", "english_name": "Al-Fatihah"},
+        {"id": 2, "name": "البقرة", "english_name": "Al-Baqarah"},
+        {"id": 3, "name": "آل عمران", "english_name": "Aali Imran"},
+        # ... up to 114
+    ])
+
+@app.route('/api/surah/<int:surah_id>')
+def get_surah_by_id(surah_id):
+    filename = f"surah_{surah_id}.json"  # or based on name if you're using names
+    filepath = os.path.join("static/DATA/surah", filename)
+
+    if not os.path.exists(filepath):
+        return jsonify({"error": "Surah not found"}), 404
+
+    with open(filepath, 'r', encoding='utf-8') as f:
+        surah_data = json.load(f)
+    return jsonify(surah_data)
+
 @app.route('/daily-dua')
 def daily_dua():
     try:
