@@ -87,6 +87,10 @@ def index():
 def profile():
     return render_template('pages/profile.html')
 
+@app.route('/memorize-quran')
+def memorize_quran():
+    return render_template('memorize_quran.html')
+
 @app.route('/prayer-times')
 def prayer_times():
     return render_template('pages/prayer-times.html')
