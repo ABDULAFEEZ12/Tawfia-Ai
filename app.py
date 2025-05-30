@@ -96,14 +96,32 @@ def surah_list():
 
 @app.route('/api/surah/<int:surah_id>')
 def get_surah_by_id(surah_id):
-    filename = f"surah_{surah_id}.json"  # or based on name if you're using names
-    filepath = os.path.join("static/DATA/surah", filename)
+    # Map Surah IDs to their names
+    surah_map = {
+        1: "Al-Fatihah",
+        2: "Al-Baqarah",
+        3: "Aali Imran",
+        # Add all other Surah ID to name mappings here...
+        # For example:
+        # 4: "An-Nisa",
+        # 5: "Al-Ma'idah",
+        # ...
+        # 114: "An-Nas"
+    }
+
+    surah_name = surah_map.get(surah_id)
+    if not surah_name:
+        return jsonify({"error": "Surah not found"}), 404
+
+    filename = f"surah_{surah_name}.json"
+    filepath = os.path.join("static", "DATA", "surah", filename)
 
     if not os.path.exists(filepath):
-        return jsonify({"error": "Surah not found"}), 404
+        return jsonify({"error": "Surah data file not found."}), 404
 
     with open(filepath, 'r', encoding='utf-8') as f:
         surah_data = json.load(f)
+
     return jsonify(surah_data)
 
 @app.route('/daily-dua')
