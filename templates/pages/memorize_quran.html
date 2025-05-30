@@ -3,34 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <title>Memorize Quran</title>
+  <style>
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #surahList {
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Memorize Surah</h1>
-  <div id="surah-name"></div>
-  <div id="verses-container"></div>
+  <h1>🧠 Memorize Surahs from the Quran</h1>
+  <div id="surahList"></div>
+  <div id="memorizationArea"></div>
 
   <script>
-    // Load Surah Al-Fatihah
-    fetch('/static/DATA/surah/surah_Al-Fatihah.json')
-      .then(response => response.json())
+    // Load all Surah names
+    fetch('/api/surah-list') // Make sure this route returns all surahs
+      .then(res => res.json())
       .then(data => {
-        document.getElementById("surah-name").textContent = `${data.english_name} - ${data.translation}`;
-
-        const container = document.getElementById("verses-container");
-        data.verses.forEach(verse => {
-          const div = document.createElement('div');
-          div.innerHTML = `
-            <h3>Verse ${verse.number}</h3>
-            <p><strong>Arabic:</strong> ${verse.arabic}</p>
-            <p><strong>English:</strong> ${verse.english}</p>
-            <p><strong>Transliteration:</strong> ${verse.transliteration}</p>
-            <audio controls src="${verse.audio}"></audio>
-            <hr/>
-          `;
-          container.appendChild(div);
+        const surahList = document.getElementById('surahList');
+        data.forEach(surah => {
+          const surahBtn = document.createElement('button');
+          surahBtn.textContent = `${surah.id}. ${surah.english_name} (${surah.name})`;
+          surahBtn.onclick = () => loadSurah(surah.id, surah.english_name, surah.name);
+          surahList.appendChild(surahBtn);
         });
       })
-      .catch(err => console.error('Error loading surah:', err));
+      .catch(err => console.error('Error loading Surah list:', err));
+
+    // Load one Surah
+    function loadSurah(id, englishName, arabicName) {
+      fetch(`/api/surah/${id}`) // This should return the Surah’s full data
+        .then(res => res.json())
+        .then(data => displayMemorizationContent(data, englishName, arabicName))
+        .catch(err => console.error(`Error loading Surah ${id}:`, err));
+    }
+
+    // Display Surah Ayahs
+    function displayMemorizationContent(data, englishName, arabicName) {
+      const container = document.getElementById("memorizationArea");
+      container.innerHTML = `<h2>${englishName} (${arabicName})</h2>`;
+
+      data.verses.forEach(verse => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <h3>Verse ${verse.number}</h3>
+          <p><strong>Arabic:</strong> ${verse.arabic}</p>
+          <p><strong>English:</strong> ${verse.english}</p>
+          <p><strong>Transliteration:</strong> ${verse.transliteration}</p>
+          <audio controls src="${verse.audio}"></audio>
+          <hr/>
+        `;
+        container.appendChild(div);
+      });
+    }
   </script>
 </body>
 </html>
