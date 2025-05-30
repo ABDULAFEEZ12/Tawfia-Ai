@@ -69,9 +69,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
+    # Main page (home) - placed directly in templates/
     return render_template('index.html')
 
-# --- Page Routes ---
+# --- Page Routes - all templates inside 'templates/pages/' ---
 @app.route('/profile')
 def profile():
     return render_template('pages/profile.html')
@@ -86,9 +87,12 @@ def daily_dua():
         data_path = os.path.join('DATA', 'daily_duas.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             dua_data = json.load(f)
+
         if not dua_data or 'duas' not in dua_data:
             return render_template('pages/daily-dua.html', duas=[])
+
         return render_template('pages/daily-dua.html', duas=dua_data['duas'])
+
     except Exception as e:
         print(f"Daily Dua Error: {e}")
         return render_template('pages/daily-dua.html', duas=[])
@@ -103,9 +107,12 @@ def islamic_motivation():
         data_path = os.path.join('DATA', 'islamic_motivation.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             motivation_data = json.load(f)
+
         if not motivation_data or 'motivations' not in motivation_data:
             return render_template('pages/islamic_motivation.html', motivations=[])
+
         return render_template('pages/islamic_motivation.html', motivations=motivation_data['motivations'])
+
     except Exception as e:
         print(f"Islamic Motivation Error: {e}")
         return render_template('pages/islamic_motivation.html', motivations=[])
@@ -120,6 +127,7 @@ def privacy():
 
 @app.route('/about')
 def about():
+    # About page - in templates/pages/about.html
     return render_template('pages/about.html')
 
 @app.route('/feedback')
@@ -343,12 +351,6 @@ def recognize_speech():
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
-
-# --- New route to display all Hadiths with search ---
-@app.route('/hadiths')
-def hadiths():
-    # Render the hadiths page with all hadiths
-    return render_template('hadiths.html', hadiths=hadith_data.get('volumes', []))
 
 if __name__ == '__main__':
     app.run(debug=True)
