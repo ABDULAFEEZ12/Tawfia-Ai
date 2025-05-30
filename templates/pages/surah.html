@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Surah {{ surah.name }}</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f9f9f9;
+  }
+  h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  .surah-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .surah-title {
+    font-size: 2em;
+    margin: 0;
+  }
+  .back-link {
+    font-size: 0.9em;
+    text-decoration: none;
+    color: #2980b9;
+  }
+  .surah-details {
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  li {
+    background-color: #ffffff;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ayah-text {
+    flex: 1;
+    margin-left: 10px;
+  }
+  .memorize-button {
+    padding: 6px 12px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .memorize-button:hover {
+    background-color: #2980b9;
+  }
+  /* Optional: style for memorized ayahs */
+  .memorized {
+    background-color: #dff0d8;
+  }
+</style>
+</head>
+<body>
+
+<div class="surah-header">
+  <h1 class="surah-title">Surah {{ surah.name }} ({{ surah.english_name }})</h1>
+  <a class="back-link" href="{{ url_for('memorize_quran') }}">Back to Surah List</a>
+</div>
+
+<div class="surah-details">
+  <p>Total Ayahs: {{ surah.ayahs|length }}</p>
+  <p>Progress: {{ surah.memorized_ayahs|length if surah.memorized_ayahs else 0 }} / {{ surah.ayahs|length }}</p>
+</div>
+
+<ul>
+  {% for idx, ayah in enumerate(surah.ayahs, start=1) %}
+    <li class="{% if ayah.memorized %}memorized{% endif %}">
+      <div>
+        <strong>Ayah {{ idx }}:</strong> {{ ayah.text }}
+      </div>
+      <button class="memorize-button" onclick="toggleMemorize({{ idx }})">
+        {% if ayah.memorized %}Unmemorize{% else %}Memorize{% endif %}
+      </button>
+    </li>
+  {% endfor %}
+</ul>
+
+<script>
+  // Example JavaScript to toggle memorization status
+  function toggleMemorize(ayahNumber) {
+    // You can implement AJAX here to update memorization status in backend
+    alert('Toggle memorization for Ayah ' + ayahNumber);
+  }
+</script>
+
+</body>
+</html>
