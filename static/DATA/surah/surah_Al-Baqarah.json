@@ -1,149 +1,29 @@
 {
-    "id": 1,
-    "name": "سورة البقرة",
-    "english_name": "Al-Baqarah",
-    "translation": "The Cow",
-    "verses": [
-      {
-        "number": 1,
-        "arabic": "الم",
-        "english": "Alif, Lam, Meem.",
-        "transliteration": "Alif-Lām-Mīm.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3"
-      },
-      {
-        "number": 2,
-        "arabic": "ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ",
-        "english": "This is the Book about which there is no doubt, a guidance for those conscious of Allah.",
-        "transliteration": "Ḏālika l-kitābu lā rayba fīhi, hudan lil-muttaqīn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/2.mp3"
-      },
-      {
-        "number": 3,
-        "arabic": "الَّذِينَ يُؤْمِنُونَ بِالْغَيْبِ وَيُقِيمُونَ الصَّلَاةَ وَمِمَّا رَزَقْنَاهُمْ يُنفِقُونَ",
-        "english": "Who believe in the unseen, establish prayer, and spend out of what We have provided for them.",
-        "transliteration": "Alladhīna yu'minūna bil-ghaybi wa yuqīmūna aṣ-ṣalata wa mimmā razaqnāhum yunfiqūn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/3.mp3"
-      },
-      {
-        "number": 4,
-        "arabic": "وَالَّذِينَ يُؤْمِنُونَ بِمَا أُنزِلَ إِلَيْكَ وَمَا أُنزِلَ مِن قَبْلِكَ وَبِالْآخِرَةِ هُمْ يُوقِنُونَ",
-        "english": "And who believe in what has been revealed to you, and what was revealed before you, and in the Hereafter they are certain.",
-        "transliteration": "Wa alladhīna yu'minūna bīl-ākhirati hum yūqinūn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/4.mp3"
-      },
-      {
-        "number": 5,
-        "arabic": "أُو۟لَـٰٓـئِكَ عَلَىٰ هُدًۭ مِّن رَّبِّهِمْ ۖ ۖ ۚ أُو۟لَـٰٓـئِكَ هُمُ الْمُفْلِحُونَ",
-        "english": "It is they who are upon guidance from their Lord, and it is they who will be successful.",
-        "transliteration": "Ūlā'ika ʿalā ḥudāin min rabbihim wa ulā'ika humu l-muf'liḥūn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/5.mp3"
-      },
-      {
-        "number": 6,
-        "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
-        "english": "Our Lord, do not make our hearts stray after You have guided us and grant us mercy from You. Surely, You are the Most Generous.",
-        "transliteration": "Rabbana lā tuzigh quloobana baʿda idh hadaytana wa hab lanā min ladunka raḥmatan, innaka anta l-ʾaḥḥab.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/6.mp3"
-      },
-      {
-        "number": 7,
-        "arabic": "رَحْمَتُكَ وَسِعْتْ كُلَّ شَيْءٍ ۖ فَاغْفِرْ لِلَّذِينَ تَابُوا وَاتَّبَعُوا سَبِيلَكَ وَقِهِمْ عَذَابَ الْجَحِيمِ",
-        "english": "Your mercy encompasses all things; so forgive those who repented and followed Your way and save them from the punishment of the Hellfire.",
-        "transliteration": "Raḥmatuka wasiʿatun kulla shay'in faghfir lil-ladhīna tābū wa ittabāʿū sabiilka wa qihim ʿadhāba l-jaḥīmi.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/7.mp3"
-      },
-      {
-        "number": 8,
-        "arabic": "رَبَّنَا وَآتنا مَا وَعَدتَّنَا عَلَىٰ رُسُلِكَ ۖ وَلَا تُخْزِنَا يَوْمَ الْقِيَامَةِ ۚ إِنَّكَ لَا تُخْلِفُ الْمِيعَادَ",
-        "english": "Our Lord, give us what You have promised to us through Your messengers and do not put us to shame on the Day of Resurrection. Surely, You do not break Your promise.",
-        "transliteration": "Rabbana wa ātina mā waʿadttanā ʿalā ar-rasūlīka wa lā tukhzinā yawma l-qiyāmati, innaka lā tukhlifu l-mīʿāda.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/8.mp3"
-      },
-      {
-        "number": 9,
-        "arabic": "رَبَّنَا إِنَّكَ تَجْعَلُ مَن تَشَاءُ فِيمَن تَشَاءُ وَتَذَرُ مَن تَشَاءُ ۖ تَكْدِرُهُ عَلَىٰ خَيْرٍ ۚ إِنَّكَ أَنتَ الْعَزِيزُ الْحَكِيمُ",
-        "english": "Our Lord, You are the All-Knowing, the All-Wise. You make whom You will live a long life, and You give whom You will short life. You are the Powerful over everything.",
-        "transliteration": "Rabbana innaka tajʿalu man tashāʾu fī man tashāʾu wa tadharu man tashāʾu, tukdīruhu ʿala l-khayri, innaka ʿalā kulli shay'in qadīr.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/9.mp3"
-      },
-      {
-        "number": 10,
-        "arabic": "رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِن قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنتَ مَوْلَانَا فَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
-        "english": "Our Lord, do not impose blame upon us if we forget or make a mistake. Our Lord, do not lay upon us a burden like what You laid upon those before us. Our Lord, do not burden us beyond our capacity. Pardon us, forgive us, and have mercy on us. You are our Protector, so help us against the disbelieving people.",
-        "transliteration": "Rabbana lā tuʾākhidhna in nasīnā aw akhṭaʾnā, Rabbana wa lā taḥmili ʿalaynā isran kamā ḥamalta ʿala alladhīna min qablina, Rabbana wa lā tuḥammilnā mā lā ṭāqata lanā bihi, wa-ʿfu ʿannā, wa-ighfirlana, warḥamnā, anta mawlānā fa-ansurnā ʿala l-qawmi l-kāfirīn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/10.mp3"
-      },
-      {
-        "number": 11,
-        "arabic": "رَبَّنَا وَآعِنَّا عَلَىٰ قَوْمِ الْكَافِرِينَ",
-        "english": "Our Lord, help us against the disbelieving people.",
-        "transliteration": "Rabbana wāʿinā ʿala qawmi l-kāfirīn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/11.mp3"
-      },
-      {
-        "number": 12,
-        "arabic": "إِنَّ الَّذِينَ قَالُوا رَبُّنَا اللَّهُ ثُمَّ اسْتَقَامُوا تَتَنَزَّلُ عَلَيْهِمُ الْمَلَائِكَةُ ۖ أَلَّا تَخَافُوا وَلَا تَحْزَنُوا ۖ وَأَبْشِرُوا بِالْجَنَّةِ الَّتِي كُنْتُمْ تُعْدُونَ",
-        "english": "Indeed, those who say, 'Our Lord is Allah' and then remain steadfast—angels will descend upon them, saying, 'Do not fear, nor grieve, but receive good news of Paradise, which you were promised.'",
-        "transliteration": "Inna alladhīna qālū rabbunā allāhu thumma istaqāmū tatanazzalu ʿalayhimu l-malāʾikatu allā takhāfū wa la taḥzanū wa abshirū bil-janna allatī kuntum tuʿadūn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/12.mp3"
-      },
-      {
-        "number": 13,
-        "arabic": "نَحْنُ أَوْلِيَاؤُكُمْ فِى الْحَيَاةِ الدُّنْيَا وَفِى الْآخِرَةِ ۖ وَلَكُمْ فِيهَا مَا تَشْتَهِ أَنفُسُكُمْ ۖ وَلَكُمْ فِيهَا مَا تَدَّعُونَ",
-        "english": "We are your allies in this worldly life and in the Hereafter. You will have whatever your souls desire and whatever you request.",
-        "transliteration": "Naḥnu awliyāʾukum fī l-ḥayati l-dunyā wa fī l-ākhirati wākum fīhā mā tashtahī anfusukum wākum fīhā mā taddāʿūn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/13.mp3"
-      },
-      {
-        "number": 14,
-        "arabic": "خِلَـٰلِهِمُ الْمَلَائِكَةُ ۖ أَخْلَصُوا الْخِلَـٰلَ لِلَّهِ ۖ وَقَالُوا حِمْنَا اللَّهُ ۖ إِنَّا كُنَّا مِنْ قَبْلُ نَخْشَاهُ",
-        "english": "The angels will say to those who have settled in Paradise, 'Peace be upon you! Enter it to stay forever.'",
-        "transliteration": "Khilālihimu l-malāʾikatu akhlasu l-khilāla lillāhi wa qālū ḥimnā allāhu innā kunnā min qablu nakhāhu.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/14.mp3"
-      },
-      {
-        "number": 15,
-        "arabic": "الَّذِينَ يَسْتَمِعُونَ الْقَوْلَ فَيَتَّبِعُونَ أَحْسَنَهُ ۚ أُو۟لَـٰٓـئِكَ الَّذِينَ هَدَاهُمُ اللَّهُ ۖ وَأُو۟لَـٰٓـئِكَ هُمُ الْمُفْلِحُونَ",
-        "english": "Those who listen to the Word and follow the best of it—those are the ones Allah has guided, and those are the ones who will be successful.",
-        "transliteration": "Alladhīna yastamiʿūna l-qawla fayattabiʿūna aḥsana, ulāʾika alladhīna hadāhumullāhu wa ulāʾika humu l-muf'liḥūn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/15.mp3"
-      },
-      {
-        "number": 16,
-        "arabic": "أَفَمَن يَتَّقِي بِوَجْهِهِ ۚ أَفَأَنتَ تَكُونُ لَهُۥ وَكِيلًا",
-        "english": "Is one who guides to the truth equal to one who himself is not guided? So, what is the matter with you?",
-        "transliteration": "Afaman yattaqi biwajhihi, afā anta taku lahu wakīlān.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/16.mp3"
-      },
-      {
-        "number": 17,
-        "arabic": "اللَّهُ يَسْتَجِيبُ الَّذِينَ آمَنُوا ۚ وَعَمِلُوا الصَّـٰلِحَـٰتِ ۚ وَيَزِيدُهُمْ مِّن فَضْلِهِ ۚ وَالْكٰفِرُونَ مَتَـٰعٌ ۖ وَلَهُمُ الْعَذَابُ أَلِيمٌ",
-        "english": "Allah responds to those who believe and do righteous deeds, and He increases them in His bounty. But for the disbelievers, there is only torment and a severe punishment.",
-        "transliteration": "Allāhu yastajību alladhīna āmanū wa ʿamilū aṣ-ṣāliḥāti wa yaziḥhum min faḍlihi, wa l-kāfirūna mataʿun wa lahumu l-ʿadhābu al-ʾalīmu.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/17.mp3"
-      },
-      {
-        "number": 18,
-        "arabic": "اللَّهُ يَسْتَفْتَحُ ۖ لَهُ ۥ الْحُكْمُ ۚ وَإِلَيْهِ تُرْجَعُونَ",
-        "english": "It is Allah who opens the doors of guidance, and to Him you will return.",
-        "transliteration": "Allāhu yastaftīḥu lahu l-ḥukmu wa ilayhi turjaʿūn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/18.mp3"
-      },
-      {
-        "number": 19,
-        "arabic": "قُلْ أَتُعَلِّمُونَ اللَّهَ بِدِينِكُمْ ۚ وَاللَّهُ يَعْلَمُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۚ وَاللَّهُ بِكُلِّ شَيْءٍ عَلِيمٌ",
-        "english": "Say, 'Do you instruct Allah about your religion while Allah knows what is in the heavens and what is on the earth? Allah is Knowing of all things.'",
-        "transliteration": "Qul atُʿallimūna allāha bī dīnikum, wa allāhu yaʿlamu mā fī as-samāwāti wa mā fī l-ʾarḍi, wa allāhu bī kulli shay'in ʿalīmun.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/19.mp3"
-      },
-      {
-        "number": 20,
-        "arabic": "اللَّهُ يَسْتَخْفِي عَنْ عِبَادِهِ ۚ وَيُرْسِلُ عَلَيْهِمْ حَفَظَةً ۚ حَتَّىٰ إِذَا جَاء أَحَدَهُمُ الْمَوْتُ تَوَفَّتْهُ الرُّسُلُ ۚ وَهُمْ لَا يُفْتَنُونَ",
-        "english": "Allah conceals what is in the hearts of His servants, and He sends angels to watch over them until death approaches. When death comes to one of them, the angels take his soul, and they are not negligent.",
-        "transliteration": "Allāhu yastaḫfī ʿan ʿibādihi wa yursilu ʿalayhimu ḥifẓatan ḥattā ʾidha jāa aḥaduhumu l-mawtu tawaffat-hu ar-rusulu wa hum lā yuf'ṭanūn.",
-        "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/20.mp3"
-      }
-    ]
-  }
-]
+  "id": 1,
+  "name": "سورة البقرة",
+  "english_name": "Al-Baqarah",
+  "translation": "The Cow",
+  "verses": [
+    {
+      "number": 1,
+      "arabic": "الم",
+      "english": "Alif, Lam, Meem.",
+      "transliteration": "Alif-Lām-Mīm.",
+      "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3"
+    },
+    {
+      "number": 2,
+      "arabic": "ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًۭى لِّلْمُتَّقِينَ",
+      "english": "This is the Book about which there is no doubt, a guidance for those conscious of Allah.",
+      "transliteration": "Ḏālika l-kitābu lā rayba fīhi, hudan lil-muttaqīn.",
+      "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/2.mp3"
+    },
+    {
+      "number": 3,
+      "arabic": "الَّذِينَ يُؤْمِنُونَ بِالْغَيْبِ وَيُقِيمُونَ الصَّلَاةَ وَمِمَّا رَزَقْنَاهُمْ يُنفِقُونَ",
+      "english": "Who believe in the unseen, establish prayer, and spend out of what We have provided for them.",
+      "transliteration": "Alladhīna yu'minūna bil-ghaybi wa yuqīmūna aṣ-ṣalata wa mimmā razaqnāhum yunfiqūn.",
+      "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/3.mp3"
+    }
+  ]
+}
