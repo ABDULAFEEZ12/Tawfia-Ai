@@ -29,7 +29,7 @@
       "number": 4,
       "arabic": "وَالَّذِينَ يُؤْمِنُونَ بِمَا أُنزِلَ إِلَيْكَ وَمَا أُنزِلَ مِن قَبْلِكَ وَبِالْآخِرَةِ هُمْ يُوقِنُونَ",
       "english": "And those who believe in what has been revealed to you, and what was revealed before you, and in the Hereafter they are certain.",
-      "transliteration": "Wa alladhīna yu'minūna bīl-ākhirati hum yūqinūn.",
+      "transliteration": "Wa alladhīna yu’minūna bimā unzila ilayka wa mā unzila min qablika wa bil-ākhirati hum yūqinūn.",
       "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/11.mp3"
     },
     {
@@ -143,6 +143,27 @@
       "english": "The lightning almost snatches away their sight. Every time it lights [the way] for them, they walk therein; but when darkness covers them, they stand still. And if Allah had willed, He could have taken away their hearing and their sight. Indeed, Allah is over all things competent.",
       "transliteration": "Yakādu al-barqu yakhtaful abṣārahum, kullamā aḍā’a lahum mashaw fīh, wa-idhā aẓlama ʿalayhim qāmū, walaw shā’a allāhu ladhahaba bisamʿihim wa abṣārihim, innallāha ʿalā kulli shay’in qadīr.",
       "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/27.mp3"
-    }
-  ]
+    },
+  {
+    "number": 21,
+    "arabic": "يَا أَيُّهَا ٱلنَّاسُ ٱعْبُدُوا۟ رَبَّكُمُ ٱلَّذِى خَلَقَكُمْ وَٱلَّذِينَ مِن قَبْلِكُمْ لَعَلَّكُمْ تَتَّقُونَ",
+    "english": "O mankind, worship your Lord, who created you and those before you, that you may become righteous.",
+    "transliteration": "Yā ayyuhā an-nāsu uʿbudū rabbakumu alladhī khalaqakum wa alladhīna min qablikum laʿallakum tattaqūn.",
+    "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/21.mp3"
+  },
+  {
+    "number": 22,
+    "arabic": "ٱلَّذِى جَعَلَ لَكُمُ ٱلْأَرْضَ فِرَٰشًۭا وَٱلسَّمَآءَ بِنَآءًۭ وَأَنزَلَ مِنَ ٱلسَّمَآءِ مَآءًۭ فَأَخْرَجَ بِهِۦ مِنَ ٱلثَّمَرَٰتِ رِزْقًۭا لَّكُمْ ۖ فَلَا تَجْعَلُوا۟ لِلَّهِ أَندَادًۭا وَأَنتُمْ تَعْلَمُونَ",
+    "english": "He who made for you the earth a bed and the sky a canopy, and sent down from the sky rain and brought forth thereby fruits as provision for you. So do not attribute to Allah equals while you know [that there is nothing similar to Him].",
+    "transliteration": "Alladhī jaʿala lakumu al-arḍa firāshan wa as-samā’a binā’an wa anzala mina as-samā’i mā’an fa-akhraja bihi mina ath-thamarāti rizqan lakum, fa-lā tajʿalū lillāhi andādan wa antum taʿlamūn.",
+    "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/22.mp3"
+  },
+  {
+    "number": 23,
+    "arabic": "وَإِن كُنتُمْ فِى رَيْبٍۢ مِّمَّا نَزَّلْنَا عَلَىٰ عَبْدِنَا فَأْتُوا۟ بِسُورَةٍۢ مِّن مِّثْلِهِۦ وَٱدْعُوا۟ شُهَدَآءَكُم مِّن دُونِ ٱللَّهِ إِن كُنتُمْ صَـٰدِقِينَ",
+    "english": "And if you are in doubt about what We have sent down upon Our Servant [Muhammad], then produce a surah the like thereof and call upon your witnesses other than Allah, if you should be truthful.",
+    "transliteration": "Wa in kuntum fī raybin mimmā nazzalnā ʿalā ʿabdinā fa’tū bisūratin min mithlihī wa’dʿū shuhadā’akum min dūni allāhi in kuntum ṣādiqīn.",
+    "audio": "https://cdn.islamic.network/quran/audio/128/ar.alafasy/23.mp3"
+  }
+]
 }
