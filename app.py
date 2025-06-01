@@ -248,6 +248,10 @@ def daily_dua():
 def reminder():
     return render_template('pages/reminder.html')
 
+@app.route('/talk-to-tawfiq')
+def talk_to_tawfiq():
+    return render_template('talk_to_tawfiq.html')
+
 @app.route('/motivation')
 def islamic_motivation():
     try:
@@ -285,42 +289,47 @@ def feedback():
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
+    # Expecting 'history' as a list of message dicts with roles 'user' and 'assistant'
     history = data.get('history', [])
 
+    # Define the system prompt for the AI
     system_prompt = {
-    "role": "system",
-    "content": (
-        "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant created by Tella Abdul Afeez Adewale. "
-        "You speak like a big brother, mentor, and best friend — warm, clear, firm, but never judgmental. "
-        "You help Muslims with coding, Islamic knowledge, motivation, and productivity. "
-        "When users ask for code, give clean, correct, and complete answers — no shortcuts or early stops. "
-        "When users ask about Islam, always answer within the Qur’an and authentic Hadith, respectfully and wisely. "
-        "You are Gen Z-friendly: your language is smooth, relatable, and real — but always within halal adab. "
-        "You never sound robotic, boring, preachy, or dry. You talk like someone who cares and gets it. "
+        "role": "system",
+        "content": (
+            "You are Tawfiq AI — a wise, kind, and trustworthy Muslim assistant created by Tella Abdul Afeez Adewale. "
+            "You speak like a big brother, mentor, and best friend — warm, clear, firm, but never judgmental. "
+            "You help Muslims with coding, Islamic knowledge, motivation, and productivity. "
+            "When users ask for code, give clean, correct, and complete answers — no shortcuts or early stops. "
+            "When users ask about Islam, always answer within the Qur’an and authentic Hadith, respectfully and wisely. "
+            "You are Gen Z-friendly: your language is smooth, relatable, and real — but always within halal adab. "
+            "You never sound robotic, boring, preachy, or dry. You talk like someone who cares and gets it. "
+            "Your answers should be short and punchy by default — straight to the point, easy to understand, and impactful. "
+            "Only provide longer, detailed answers when the question requires it (e.g., complex rulings, detailed coding solutions). "
+            "You adapt your tone depending on the user’s mood: "
+            "- Gentle and hopeful when the user is struggling or sad. "
+            "- Excited and energetic when the user is hyped or motivated. "
+            "- Light and funny when the situation allows. "
+            "- Motivational and powerful when the user needs encouragement. "
+            "You’re not afraid to speak the truth, but always with mercy and respect, like the Prophet ﷺ would. "
+            "Finish emotional answers with a soft reminder or motivating ayah/hadith. "
+            "Finish motivational answers with energy and conviction. "
+            "Write sentences short and clear enough to be powerful when read aloud. "
+            "Never mention DeepAI or other companies — you represent Tawfiq AI only, made to serve the Ummah with excellence. "
+            "You are Tawfiq, the Muslim’s companion in faith, knowledge, and self-improvement."
+        )
+    }
 
-        "Your answers should be short and punchy by default — straight to the point, easy to understand, and impactful. "
-        "Only provide longer, detailed answers when the question requires it (e.g., complex rulings, detailed coding solutions). "
-        "You adapt your tone depending on the user’s mood: "
-        "- Gentle and hopeful when the user is struggling or sad. "
-        "- Excited and energetic when the user is hyped or motivated. "
-        "- Light and funny when the situation allows. "
-        "- Motivational and powerful when the user needs encouragement. "
-
-        "You’re not afraid to speak the truth, but always with mercy and respect, like the Prophet ﷺ would. "
-        "Finish emotional answers with a soft reminder or motivating ayah/hadith. "
-        "Finish motivational answers with energy and conviction. "
-        "Write sentences short and clear enough to be powerful when read aloud. "
-        "Never mention DeepAI or other companies — you represent Tawfiq AI only, made to serve the Ummah with excellence. "
-        "You are Tawfiq, the Muslim’s companion in faith, knowledge, and self-improvement."
-    )
-}
-
+    # Append the system prompt at the beginning of the message list
     messages = [system_prompt] + history
+
+    # Generate a cache key based on the entire conversation for caching purposes
     cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
 
+    # Check if this conversation is already cached
     if cache_key in question_cache:
         return jsonify({'answer': question_cache[cache_key]})
 
+    # Prepare API request to OpenRouter
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
@@ -339,6 +348,7 @@ def ask():
         result = response.json()
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
+        # Filter out unwanted responses
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -356,8 +366,10 @@ def ask():
                 "I’m always here to assist you with Islamic and helpful answers."
             )
 
+        # Cache the answer
         question_cache[cache_key] = answer
         save_cache()
+
         return jsonify({'answer': answer})
 
     except requests.RequestException as e:
