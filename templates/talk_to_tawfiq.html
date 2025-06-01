@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Talk to Tawfiq</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #009688;
+        }
+
+        .text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .mic-btn {
+            font-size: 60px;
+            color: #009688;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .mic-btn:hover {
+            color: #00796b;
+            transform: scale(1.2);
+        }
+
+        .log {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background: #f9f9f9;
+            text-align: left;
+            font-size: 16px;
+            color: #444;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap; /* keep line breaks */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎙️ Talk to Tawfiq</h2>
+        <div class="text">Click the mic and ask your question</div>
+        <div class="mic-btn" id="mic">🎤</div>
+        <div class="log" id="log">No conversation yet.</div>
+    </div>
+
+    <script>
+        const micBtn = document.getElementById('mic');
+        const logDiv = document.getElementById('log');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            logDiv.innerHTML = "❌ Your browser does not support Speech Recognition.";
+            micBtn.style.display = "none";
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            // Maintain conversation history
+            let conversationHistory = [];
+
+            // Start recognition on mic click
+            micBtn.onclick = () => {
+                logDiv.innerHTML = "🎤 Listening...";
+                recognition.start();
+            };
+
+            recognition.onresult = async (event) => {
+                const spokenText = event.results[0][0].transcript.trim();
+
+                // Append user's message to conversation history
+                conversationHistory.push({ role: 'user', content: spokenText });
+
+                // Display user's question
+                logDiv.innerHTML = `<strong>You:</strong> ${spokenText}\n<em>Tawfiq is thinking...</em>`;
+
+                try {
+                    // Send entire conversation history to backend
+                    const res = await fetch('/ask', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ history: conversationHistory })
+                    });
+
+                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+                    const data = await res.json();
+                    const answer = data.answer || "Sorry, I don't have an answer right now.";
+
+                    // Append assistant's reply to conversation history
+                    conversationHistory.push({ role: 'assistant', content: answer });
+
+                    // Update chat log with the assistant's reply
+                    logDiv.innerHTML = `<strong>You:</strong> ${spokenText}\n<strong>Tawfiq:</strong> ${answer}`;
+
+                    // Speak the answer
+                    const utterance = new SpeechSynthesisUtterance(answer);
+                    utterance.lang = 'en-US';
+                    window.speechSynthesis.speak(utterance);
+                } catch (err) {
+                    logDiv.innerHTML = "❌ Error getting answer. Try again.";
+                    console.error(err);
+                }
+            };
+
+            recognition.onerror = (event) => {
+                logDiv.innerHTML = `❌ Speech recognition error: ${event.error}`;
+            };
+
+            recognition.onspeechend = () => {
+                recognition.stop();
+            };
+        }
+    </script>
+</body>
+</html>
