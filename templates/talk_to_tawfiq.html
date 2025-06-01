@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Talk to Tawfiq</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -9,7 +10,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 50px;
+            padding: 30px;
+            margin: 0;
         }
 
         .container {
@@ -34,17 +36,101 @@
             color: #333;
         }
 
-        .mic-btn {
-            font-size: 60px;
-            color: #009688;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: transform 0.2s;
+        .orb-wrapper {
+            position: relative;
+            margin: 0 auto;
+            width: 150px;
+            height: 150px;
         }
 
-        .mic-btn:hover {
-            color: #00796b;
-            transform: scale(1.2);
+        .orb {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #61dafb, #3b82f6 70%, #1e3a8a);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.8),
+                        0 0 40px rgba(59, 130, 246, 0.5),
+                        0 0 60px rgba(59, 130, 246, 0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .orb::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59,130,246,0.2), transparent 70%);
+            animation: auraGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes auraGlow {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.6; }
+        }
+
+        .orb.listening {
+            animation: pulse 1s infinite;
+        }
+
+        .orb.loading {
+            animation: spin 1.2s linear infinite;
+        }
+
+        .orb.speaking {
+            animation: bounce 0.4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .sound-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 140%;
+            height: 140%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .bar {
+            width: 4px;
+            height: 20px;
+            background: #3b82f6;
+            border-radius: 10px;
+            animation: waveAnim 1s infinite;
+        }
+
+        .bar:nth-child(1) { animation-delay: 0s; }
+        .bar:nth-child(2) { animation-delay: 0.2s; }
+        .bar:nth-child(3) { animation-delay: 0.4s; }
+        .bar:nth-child(4) { animation-delay: 0.2s; }
+        .bar:nth-child(5) { animation-delay: 0s; }
+
+        @keyframes waveAnim {
+            0%, 100% { height: 20px; }
+            50% { height: 40px; }
         }
 
         .log {
@@ -58,21 +144,48 @@
             color: #444;
             max-height: 300px;
             overflow-y: auto;
-            white-space: pre-wrap; /* keep line breaks */
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .orb-wrapper {
+                width: 120px;
+                height: 120px;
+            }
+
+            .sound-wave {
+                width: 160%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>🎙️ Talk to Tawfiq</h2>
-        <div class="text">Click the mic and ask your question</div>
-        <div class="mic-btn" id="mic">🎤</div>
+        <div class="text">Click the glowing orb and ask your question</div>
+        <div class="orb-wrapper" id="mic">
+            <div class="orb" id="orb">
+                <div class="sound-wave" id="wave">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+        </div>
         <div class="log" id="log">No conversation yet.</div>
     </div>
 
     <script>
         const micBtn = document.getElementById('mic');
+        const orb = document.getElementById('orb');
         const logDiv = document.getElementById('log');
+        const wave = document.getElementById('wave');
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
@@ -84,26 +197,23 @@
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
 
-            // Maintain conversation history
             let conversationHistory = [];
 
-            // Start recognition on mic click
             micBtn.onclick = () => {
-                logDiv.innerHTML = "🎤 Listening...";
+                logDiv.innerHTML = "🎤 Listening... Go ahead, ask me anything!";
+                orb.className = 'orb listening';
+                wave.style.display = "flex";
                 recognition.start();
             };
 
             recognition.onresult = async (event) => {
                 const spokenText = event.results[0][0].transcript.trim();
-
-                // Append user's message to conversation history
                 conversationHistory.push({ role: 'user', content: spokenText });
 
-                // Display user's question
-                logDiv.innerHTML = `<strong>You:</strong> ${spokenText}\n<em>Tawfiq is thinking...</em>`;
+                logDiv.innerHTML = `<strong>You:</strong> ${spokenText}\n<em>Tawfiq is thinking... 😊</em>`;
+                orb.className = 'orb loading';
 
                 try {
-                    // Send entire conversation history to backend
                     const res = await fetch('/ask', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -114,24 +224,50 @@
 
                     const data = await res.json();
                     const answer = data.answer || "Sorry, I don't have an answer right now.";
-
-                    // Append assistant's reply to conversation history
                     conversationHistory.push({ role: 'assistant', content: answer });
 
-                    // Update chat log with the assistant's reply
                     logDiv.innerHTML = `<strong>You:</strong> ${spokenText}\n<strong>Tawfiq:</strong> ${answer}`;
+                    orb.className = 'orb speaking';
 
-                    // Speak the answer
                     const utterance = new SpeechSynthesisUtterance(answer);
                     utterance.lang = 'en-US';
+
+                    // Make Tawfiq sound warm and lovable
+                    if ('speechSynthesis' in window && window.speechSynthesis.getVoices) {
+                        const voices = window.speechSynthesis.getVoices();
+                        // Select a friendly voice if available
+                        const friendlyVoices = voices.filter(voice => 
+                            voice.name.toLowerCase().includes('female') || 
+                            voice.name.toLowerCase().includes('en-us') || 
+                            voice.name.toLowerCase().includes('friendly')
+                        );
+                        if (friendlyVoices.length > 0) {
+                            utterance.voice = friendlyVoices[0];
+                        }
+                        // Adjust pitch and rate for a warm, lovable tone
+                        utterance.pitch = 1.2; // Slightly higher pitch for warmth
+                        utterance.rate = 1; // Normal rate
+                        // Optional: add some volume control if supported
+                        // utterance.volume = 1;
+                    }
+
+                    utterance.onend = () => {
+                        orb.className = 'orb';
+                        wave.style.display = "none";
+                    };
+
                     window.speechSynthesis.speak(utterance);
                 } catch (err) {
+                    orb.className = 'orb';
+                    wave.style.display = "none";
                     logDiv.innerHTML = "❌ Error getting answer. Try again.";
                     console.error(err);
                 }
             };
 
             recognition.onerror = (event) => {
+                orb.className = 'orb';
+                wave.style.display = "none";
                 logDiv.innerHTML = `❌ Speech recognition error: ${event.error}`;
             };
 
