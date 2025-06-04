@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+import random
 import requests
 import json
 from difflib import get_close_matches
@@ -6,7 +7,40 @@ from dotenv import load_dotenv
 import os
 from hashlib import sha256
 import redis
+from functools import wraps
 from datetime import datetime
+
+user_data = {}
+
+users = {}  # username -> password
+USERS_FILE = 'users.json'
+
+def save_users():
+    with open(USERS_FILE, 'w') as f:
+        json.dump(users, f)
+
+def load_users():
+    global users
+    try:
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+    except FileNotFoundError:
+        users = {}
+
+        load_users()
+
+
+# Simple in-memory user database
+users = {
+    'tawfiqai12345': 'password123',
+    'admin': 'adminpass'
+}
+
+def get_current_user():
+    user_id = session.get('user_id')
+    if user_id:
+        return User.query.get(user_id)
+    return None
 
 # Load environment variables
 load_dotenv()
@@ -67,15 +101,717 @@ islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivati
 
 app = Flask(__name__)
 
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.secret_key = 'super_secret_key'  # Replace in production
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    level = db.Column(db.Integer, default=1)  # For trivia, later features etc.
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+with app.app_context():
+    db.create_all()
+
+    from flask import flash
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+
+        if username in users:
+            return "Username already exists", 400
+
+        users[username] = {
+            'password': password,
+            'email': email,
+            'joined_on': datetime.now().strftime('%Y-%m-%d'),
+            'preferred_language': 'English',
+            'last_login': 'N/A'
+        }
+
+        save_users()
+
+        return redirect(url_for('login'))
+
+    return render_template('signup.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = users.get(username)
+        if user and user['password'] == password:
+            last_login = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            user['last_login'] = last_login
+            save_users()
+
+            session['username'] = username
+            session['email'] = user.get('email', f'{username}@example.com')
+            session['joined_on'] = user.get('joined_on', '2023-01-01')
+            session['preferred_language'] = user.get('preferred_language', 'English')
+            session['last_login'] = last_login
+
+            return redirect(url_for('profile'))
+
+        else:
+            return "Invalid username or password", 401
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return """
+    <h2>You have been logged out</h2>
+    <a href="/login">Login Again</a> | <a href="/signup">Create Account</a>
+    """
+
+# Read the secret key from environment variable
+app.secret_key = os.getenv('MY_SECRET')
+
+# Optional: if the environment variable is not set, use a fallback (not recommended for production)
+if not app.secret_key:
+    app.secret_key = 'fallback_secret_key_for_dev_only'
+
+questions = levels = {
+    1: [
+        {
+            "question": "Who was the first prophet in Islam?",
+            "options": ["Prophet Musa", "Prophet Isa", "Prophet Adam", "Prophet Muhammad"],
+            "answer": "Prophet Adam"
+        },
+        {
+            "question": "How many times do Muslims pray in a day?",
+            "options": ["3", "5", "7", "6"],
+            "answer": "5"
+        },
+        {
+            "question": "Which angel delivered the Quran to the Prophet ﷺ?",
+            "options": ["Jibril", "Mikail", "Israfil", "Azrael"],
+            "answer": "Jibril"
+        },
+        {
+            "question": "Which month is Ramadan in the Islamic calendar?",
+            "options": ["9th", "1st", "12th", "10th"],
+            "answer": "9th"
+        },
+        {
+            "question": "What is the first word revealed in the Quran?",
+            "options": ["Read", "Pray", "Worship", "Write"],
+            "answer": "Read"
+        }
+    ],
+
+    2: [
+        {
+            "question": "How many Surahs are in the Quran?",
+            "options": ["114", "113", "112", "110"],
+            "answer": "114"
+        },
+        {
+            "question": "Which prophet built the Kaaba with his son?",
+            "options": ["Ibrahim", "Musa", "Isa", "Nuh"],
+            "answer": "Ibrahim"
+        },
+        {
+            "question": "What does 'Salah' mean?",
+            "options": ["Charity", "Fasting", "Prayer", "Pilgrimage"],
+            "answer": "Prayer"
+        },
+        {
+            "question": "Which prayer is offered just after sunset?",
+            "options": ["Fajr", "Maghrib", "Asr", "Isha"],
+            "answer": "Maghrib"
+        },
+        {
+            "question": "What is the Islamic month of fasting?",
+            "options": ["Shawwal", "Rajab", "Ramadan", "Dhul Hijjah"],
+            "answer": "Ramadan"
+        }
+    ],
+
+    3: [
+        {
+            "question": "Who was the last prophet in Islam?",
+            "options": ["Prophet Isa", "Prophet Musa", "Prophet Muhammad", "Prophet Nuh"],
+            "answer": "Prophet Muhammad"
+        },
+        {
+            "question": "What is the Arabic term for charity?",
+            "options": ["Zakat", "Sadaqah", "Siyam", "Hajj"],
+            "answer": "Sadaqah"
+        },
+        {
+            "question": "Which city is known as the birthplace of Islam?",
+            "options": ["Madina", "Mecca", "Jerusalem", "Karbala"],
+            "answer": "Mecca"
+        },
+        {
+            "question": "What is the significance of the night of Laylat al-Qadr?",
+            "options": ["The night of the Prophet's birth", "The night the Quran was revealed", "The night of the Hijra", "The night of Eid"],
+            "answer": "The night the Quran was revealed"
+        },
+        {
+            "question": "Which prophet is known for building the Ark?",
+            "options": ["Nuh", "Ibrahim", "Musa", "Yusuf"],
+            "answer": "Nuh"
+        }
+    ],
+
+    4: [
+        {
+            "question": "What is the direction Muslims face during prayer?",
+            "options": ["North", "South", "Qibla (Kaaba)", "East"],
+            "answer": "Qibla (Kaaba)"
+        },
+        {
+            "question": "Which surah is known as 'The Heart of the Quran'?",
+            "options": ["Al-Fatiha", "Yasin", "Al-Baqarah", "Al-Ikhlas"],
+            "answer": "Yasin"
+        },
+        {
+            "question": "How many pillars of Islam are there?",
+            "options": ["3", "5", "4", "6"],
+            "answer": "5"
+        },
+        {
+            "question": "What is the Islamic declaration of faith called?",
+            "options": ["Salah", "Shahada", "Zakat", "Hajj"],
+            "answer": "Shahada"
+        },
+        {
+            "question": "Who was the first caliph after Prophet Muhammad?",
+            "options": ["Abu Bakr", "Umar", "Uthman", "Ali"],
+            "answer": "Abu Bakr"
+        }
+    ],
+
+    5: [
+        {
+            "question": "Which angel blows the trumpet to announce the Day of Judgment?",
+            "options": ["Jibril", "Israfil", "Mikail", "Azrael"],
+            "answer": "Israfil"
+        },
+        {
+            "question": "What is the pilgrimage to Mecca called?",
+            "options": ["Hajj", "Umrah", "Ziyarat", "Siyam"],
+            "answer": "Hajj"
+        },
+        {
+            "question": "Which surah is the longest in the Quran?",
+            "options": ["Al-Baqarah", "Al-Fatiha", "Al-Imran", "An-Nisa"],
+            "answer": "Al-Baqarah"
+        },
+        {
+            "question": "What is the Islamic month after Ramadan?",
+            "options": ["Shawwal", "Dhul Hijjah", "Dhu al-Qi'dah", "Rajab"],
+            "answer": "Shawwal"
+        },
+        {
+            "question": "Who was known as the 'Second Muhammad' due to his knowledge?",
+            "options": ["Imam Abu Hanifa", "Imam Malik", "Imam Shafi'i", "Imam Ahmad"],
+            "answer": "Imam Ahmad"
+        }
+    ],
+
+    6: [
+        {
+            "question": "What is the term for the Islamic law?",
+            "options": ["Sharia", "Fiqh", "Sunnah", "Hadd"],
+            "answer": "Sharia"
+        },
+        {
+            "question": "Which Prophet is associated with the story of Yusuf (Joseph)?",
+            "options": ["Yusuf", "Musa", "Isa", "Nuh"],
+            "answer": "Yusuf"
+        },
+        {
+            "question": "In which city did the Prophet Muhammad pass away?",
+            "options": ["Mecca", "Madina", "Karbala", "Jerusalem"],
+            "answer": "Madina"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed at dawn?",
+            "options": ["Fajr", "Dhuhr", "Asr", "Isha"],
+            "answer": "Fajr"
+        },
+        {
+            "question": "Which prophet is known for splitting the Red Sea?",
+            "options": ["Musa", "Isa", "Yusuf", "Nuh"],
+            "answer": "Musa"
+        }
+    ],
+
+    7: [
+        {
+            "question": "What does the term 'Halal' mean?",
+            "options": ["Forbidden", "Permissible", "Unclean", "Sacred"],
+            "answer": "Permissible"
+        },
+        {
+            "question": "Which city is called the 'City of the Prophet'?",
+            "options": ["Mecca", "Madina", "Jerusalem", "Cairo"],
+            "answer": "Madina"
+        },
+        {
+            "question": "What is the name of the festival that marks the end of Ramadan?",
+            "options": ["Eid al-Fitr", "Eid al-Adha", "Lailat al-Qadr", "Mawlid"],
+            "answer": "Eid al-Fitr"
+        },
+        {
+            "question": "Which prophet is associated with building the Ark?",
+            "options": ["Nuh", "Ibrahim", "Musa", "Yusuf"],
+            "answer": "Nuh"
+        },
+        {
+            "question": "What is the Islamic term for the fast of Ramadan?",
+            "options": ["Siyam", "Hajj", "Zakat", "Qiyam"],
+            "answer": "Siyam"
+        }
+    ],
+
+    8: [
+        {
+            "question": "Which Surah is known as 'The Opening'?",
+            "options": ["Al-Fatiha", "Al-Baqarah", "Al-Ikhlas", "Al-Nas"],
+            "answer": "Al-Fatiha"
+        },
+        {
+            "question": "Who was the wife of the Prophet Muhammad?",
+            "options": ["Aisha", "Khadijah", "Fatimah", "Hafsa"],
+            "answer": "Khadijah"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed after sunset?",
+            "options": ["Maghrib", "Fajr", "Isha", "Dhuhr"],
+            "answer": "Maghrib"
+        },
+        {
+            "question": "Which prophet is associated with the story of the cow?",
+            "options": ["Yusuf", "Musa", "Isa", "Nuh"],
+            "answer": "Musa"
+        },
+        {
+            "question": "What is the significance of the month of Dhu al-Hijjah?",
+            "options": ["Hajj pilgrimage", "Fasting", "New Year", "Eid"],
+            "answer": "Hajj pilgrimage"
+        }
+    ],
+
+    9: [
+        {
+            "question": "What is the Arabic term for 'Good Deeds'?",
+            "options": ["Amal", "A'mal", "A'mal Salih", "Sadaqah"],
+            "answer": "A'mal Salih"
+        },
+        {
+            "question": "Which prophet is known for his patience and long life?",
+            "options": ["Nuh", "Ayyub", "Ibrahim", "Yusuf"],
+            "answer": "Ayyub"
+        },
+        {
+            "question": "What is the name of the city where the Prophet Muhammad was born?",
+            "options": ["Mecca", "Madina", "Jerusalem", "Cairo"],
+            "answer": "Mecca"
+        },
+        {
+            "question": "Which of the following is NOT one of the five pillars of Islam?",
+            "options": ["Salah", "Zakat", "Hajj", "Jihad"],
+            "answer": "Jihad"
+        },
+        {
+            "question": "What is the Islamic term for the pilgrimage to Mecca?",
+            "options": ["Hajj", "Umrah", "Ziyarat", "Siyam"],
+            "answer": "Hajj"
+        }
+    ],
+
+    10: [
+        {
+            "question": "Who was the first martyr in Islam?",
+            "options": ["Sumayyah", "Bilal", "Khadijah", "Umar"],
+            "answer": "Sumayyah"
+        },
+        {
+            "question": "What is the name of the mountain where Prophet Musa received the commandments?",
+            "options": ["Mount Sinai", "Mount Arafat", "Mount Everest", "Mount Thawr"],
+            "answer": "Mount Sinai"
+        },
+        {
+            "question": "Which Surah is known as 'The Women'?",
+            "options": ["An-Nisa", "Al-Mumtahanah", "Al-Mumtahinah", "Al-Ma'idah"],
+            "answer": "An-Nisa"
+        },
+        {
+            "question": "What does the term 'Eid' mean?",
+            "options": ["Festival", "Fast", "Prayer", "Pilgrimage"],
+            "answer": "Festival"
+        },
+        {
+            "question": "Which prophet is associated with the story of the whale?",
+            "options": ["Yunus", "Musa", "Isa", "Nuh"],
+            "answer": "Yunus"
+        }
+    ],
+
+    11: [
+        {
+            "question": "What is the Islamic ruling called for giving a portion of wealth to the poor?",
+            "options": ["Zakat", "Sadaqah", "Fitrah", "Kaffara"],
+            "answer": "Zakat"
+        },
+        {
+            "question": "Which prophet is known for his wisdom and the story of the two women and the baby?",
+            "options": ["Sulaiman", "Yusuf", "Ibrahim", "Musa"],
+            "answer": "Sulaiman"
+        },
+        {
+            "question": "What is the name of the night when the Quran was first revealed?",
+            "options": ["Laylat al-Qadr", "Eid al-Fitr", "Laylat al-Miraj", "Laylat al-Bara'ah"],
+            "answer": "Laylat al-Qadr"
+        },
+        {
+            "question": "Which city did the Prophet migrate to from Mecca?",
+            "options": ["Madina", "Jerusalem", "Cairo", "Baghdad"],
+            "answer": "Madina"
+        },
+        {
+            "question": "What is the Islamic term for the act of fasting during Ramadan?",
+            "options": ["Siyam", "Zakat", "Hajj", "Qiyam"],
+            "answer": "Siyam"
+        }
+    ],
+
+    12: [
+        {
+            "question": "Which surah is known as 'The Chapter of Light'?",
+            "options": ["An-Nur", "Al-Hadid", "Al-Ma'idah", "Al-Anfal"],
+            "answer": "An-Nur"
+        },
+        {
+            "question": "Who was the mother of Prophet Isa (Jesus)?",
+            "options": ["Maryam", "Khadijah", "Asiya", "Hawwa"],
+            "answer": "Maryam"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed at midday?",
+            "options": ["Dhuhr", "Asr", "Fajr", "Isha"],
+            "answer": "Dhuhr"
+        },
+        {
+            "question": "Which prophet is associated with the story of the flood?",
+            "options": ["Nuh", "Musa", "Yusuf", "Ibrahim"],
+            "answer": "Nuh"
+        },
+        {
+            "question": "What is the Islamic term for the pilgrimage to Mecca during Hajj?",
+            "options": ["Tawaf", "Sa'i", "Ihram", "Hajj"],
+            "answer": "Hajj"
+        }
+    ],
+
+    13: [
+        {
+            "question": "What is the name of the angel responsible for taking souls?",
+            "options": ["Mikail", "Jibril", "Azrael", "Israfil"],
+            "answer": "Azrael"
+        },
+        {
+            "question": "Which Surah is known as 'The Opening'?",
+            "options": ["Al-Fatiha", "Al-Baqarah", "Al-Ikhlas", "Al-Nas"],
+            "answer": "Al-Fatiha"
+        },
+        {
+            "question": "Who was the first person to accept Islam after the Prophet?",
+            "options": ["Khadijah", "Ali", "Abu Bakr", "Umar"],
+            "answer": "Khadijah"
+        },
+        {
+            "question": "Which prophet is called the 'Friend of Allah'?",
+            "options": ["Ibrahim", "Yusuf", "Musa", "Isa"],
+            "answer": "Ibrahim"
+        },
+        {
+            "question": "What is the term for the minor pilgrimage in Islam?",
+            "options": ["Umrah", "Hajj", "Ziyarat", "Siyam"],
+            "answer": "Umrah"
+        }
+    ],
+
+    14: [
+        {
+            "question": "Which city is the third holiest city in Islam?",
+            "options": ["Jerusalem", "Mecca", "Madina", "Karbala"],
+            "answer": "Jerusalem"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed in the evening?",
+            "options": ["Isha", "Maghrib", "Fajr", "Dhuhr"],
+            "answer": "Isha"
+        },
+        {
+            "question": "Who was the first martyr in Islam?",
+            "options": ["Sumayyah", "Bilal", "Khadijah", "Umar"],
+            "answer": "Sumayyah"
+        },
+        {
+            "question": "Which prophet is known for his patience during suffering?",
+            "options": ["Ayyub", "Yunus", "Ibrahim", "Nuh"],
+            "answer": "Ayyub"
+        },
+        {
+            "question": "What does the term 'Hijrah' refer to?",
+            "options": ["Migration", "Fasting", "Prayer", "Pilgrimage"],
+            "answer": "Migration"
+        }
+    ],
+
+    15: [
+        {
+            "question": "What is the significance of the month of Muharram?",
+            "options": ["New Year", "Day of Arafah", "Eid al-Adha", "Ashura"],
+            "answer": "Ashura"
+        },
+        {
+            "question": "Which prophet is associated with the story of the two gardens?",
+            "options": ["Yusuf", "Dhul-Qarnayn", "Sulaiman", "Yunus"],
+            "answer": "Yusuf"
+        },
+        {
+            "question": "What is the name of the chapter that describes the Battle of Badr?",
+            "options": ["Al-Anfal", "Ali-Imran", "Al-Mumtahanah", "Al-Hajj"],
+            "answer": "Al-Anfal"
+        },
+        {
+            "question": "Who is known as the 'Second Caliph'?",
+            "options": ["Umar ibn al-Khattab", "Uthman ibn Affan", "Ali ibn Abi Talib", "Abu Bakr"],
+            "answer": "Umar ibn al-Khattab"
+        },
+        {
+            "question": "What is the Islamic ruling on interest (riba)?",
+            "options": ["Permissible", "Forbidden", "Must be paid", "Optional"],
+            "answer": "Forbidden"
+        }
+    ],
+
+    16: [
+        {
+            "question": "What is the name of the mountain where Prophet Musa received the commandments?",
+            "options": ["Mount Sinai", "Mount Arafat", "Mount Thawr", "Mount Everest"],
+            "answer": "Mount Sinai"
+        },
+        {
+            "question": "What is the name of the compulsory charity paid during Ramadan?",
+            "options": ["Zakat al-Fitr", "Zakat al-Mal", "Sadaqah", "Fitrah"],
+            "answer": "Zakat al-Fitr"
+        },
+        {
+            "question": "Which Surah is known as 'The Cow'?",
+            "options": ["Al-Baqarah", "Al-Imran", "An-Nisa", "Al-Ma'idah"],
+            "answer": "Al-Baqarah"
+        },
+        {
+            "question": "Who was the Prophet's first wife?",
+            "options": ["Khadijah", "Aisha", "Hafsa", "Zaynab"],
+            "answer": "Khadijah"
+        },
+        {
+            "question": "What does the term 'Makkah' mean?",
+            "options": ["City of the Prophet", "The Sacred Mosque", "The Holy City", "The City of Mecca"],
+            "answer": "The City of Mecca"
+        }
+    ],
+
+    17: [
+        {
+            "question": "Which prophet is associated with the story of the burning bush?",
+            "options": ["Musa", "Isa", "Yusuf", "Nuh"],
+            "answer": "Musa"
+        },
+        {
+            "question": "What is the name of the festival that commemorates Prophet Ibrahim's willingness to sacrifice his son?",
+            "options": ["Eid al-Adha", "Eid al-Fitr", "Lailat al-Qadr", "Mawlid"],
+            "answer": "Eid al-Adha"
+        },
+        {
+            "question": "Which chapter of the Quran is known as 'The Family of Imran'?",
+            "options": ["Al-Imran", "Al-Anfal", "Al-Ma'idah", "Al-Hadid"],
+            "answer": "Al-Imran"
+        },
+        {
+            "question": "What is the term for the Islamic study of law and jurisprudence?",
+            "options": ["Fiqh", "Tafsir", "Hadith", "Aqidah"],
+            "answer": "Fiqh"
+        },
+        {
+            "question": "Who was the Prophet's uncle who supported him in Mecca?",
+            "options": ["Abu Talib", "Umar", "Uthman", "Ali"],
+            "answer": "Abu Talib"
+        }
+    ],
+
+    18: [
+        {
+            "question": "What is the name of the city where the Prophet performed the Night Journey (Isra and Miraj)?",
+            "options": ["Jerusalem", "Mecca", "Madina", "Cairo"],
+            "answer": "Jerusalem"
+        },
+        {
+            "question": "Which Surah is called 'The Light'?",
+            "options": ["An-Nur", "Al-Hadid", "Al-Mumtahanah", "Al-Ahzab"],
+            "answer": "An-Nur"
+        },
+        {
+            "question": "What is the term for the Islamic obligation to give a specific portion of wealth to the needy?",
+            "options": ["Zakat", "Sadaqah", "Fitrah", "Kaffara"],
+            "answer": "Zakat"
+        },
+        {
+            "question": "Who is the Prophet associated with the story of the two sons and the murder?",
+            "options": ["Qabil and Habil", "Yusuf and Benjamin", "Isa and Yahya", "Musa and Harun"],
+            "answer": "Qabil and Habil"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed at night?",
+            "options": ["Qiyam", "Taraweeh", "Tahajjud", "Isha"],
+            "answer": "Tahajjud"
+        }
+    ],
+
+    19: [
+        {
+            "question": "Which chapter of the Quran discusses the creation of man?",
+            "options": ["Al-Mu'minun", "Al-Hajj", "Al-Alaq", "Al-Qiyamah"],
+            "answer": "Al-Alaq"
+        },
+        {
+            "question": "What is the name of the festival that celebrates the birthday of Prophet Muhammad?",
+            "options": ["Mawlid", "Eid al-Fitr", "Eid al-Adha", "Lailat al-Qadr"],
+            "answer": "Mawlid"
+        },
+        {
+            "question": "Which prophet is called the 'Friend of Allah' in Islamic tradition?",
+            "options": ["Ibrahim", "Musa", "Isa", "Yusuf"],
+            "answer": "Ibrahim"
+        },
+        {
+            "question": "What is the Arabic term for the Day of Judgment?",
+            "options": ["Qiyamah", "Salah", "Jannah", "Akhirah"],
+            "answer": "Qiyamah"
+        },
+        {
+            "question": "Which prophet was sent to the people of Nineveh?",
+            "options": ["Yunus", "Nuh", "Ibrahim", "Musa"],
+            "answer": "Yunus"
+        }
+    ],
+
+    20: [
+        {
+            "question": "What is the name of the event where the Prophet ascended to the heavens?",
+            "options": ["Isra and Miraj", "Hajj", "Laylat al-Qadr", "Mawlid"],
+            "answer": "Isra and Miraj"
+        },
+        {
+            "question": "Which surah is often recited for protection and is called 'The Queen'?",
+            "options": ["Al-Naml", "Al-Fil", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Mulk"
+        },
+        {
+            "question": "Who was the first person to accept Islam from the youth?",
+            "options": ["Ali ibn Abi Talib", "Umar", "Abu Bakr", "Bilal"],
+            "answer": "Ali ibn Abi Talib"
+        },
+        {
+            "question": "Which city was the first capital of the Islamic Caliphate?",
+            "options": ["Medina", "Kufa", "Damascus", "Baghdad"],
+            "answer": "Kufa"
+        },
+        {
+            "question": "What is the term for the Islamic concept of divine decree and predestination?",
+            "options": ["Qadar", "Tawakkul", "Tawhid", "Aqidah"],
+            "answer": "Qadar"
+        }
+    ],
+}
+
+def get_questions_for_level(level):
+    return levels.get(level, [])
+
 @app.route('/')
 def index():
-    # Main page (home) - placed directly in templates/
-    return render_template('index.html')
+    # Just basic home page, maybe show login or welcome message
+    user = session.get('user')  # Or however you track login
+    return render_template('index.html', user=user)
 
 # --- Page Routes - all templates inside 'templates/pages/' ---
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            flash('Please login to access this page', 'error')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/profile')
 def profile():
-    return render_template('pages/profile.html')
+    username = session.get('username', 'Guest')
+    email = session.get('email', 'not_set@example.com')
+    joined_on = session.get('joined_on', 'Unknown')
+    preferred_language = session.get('preferred_language', 'English')
+    last_login = session.get('last_login', 'N/A')
+
+    return f"""
+    <h1>Welcome, 👋 {username}</h1>
+    <p>Your personal Islamic assistant profile</p>
+    <p>Email: {email}</p>
+    <p>Joined On: {joined_on}</p>
+    <p>Preferred Language: {preferred_language}</p>
+    <p>Last Login: {last_login}</p>
+    <a href="/edit-profile">Edit Profile</a> | <a href="/logout">Logout</a>
+    <br><br>
+    <a href="/" style="
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    ">🏠 Home</a>
+    """
+
+@app.route('/edit-profile', methods=['GET', 'POST'])
+def edit_profile():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+
+        # Save data to dictionary (or database later)
+        user_data['username'] = username
+        user_data['email'] = email
+
+        # Redirect to profile page after update
+        return redirect(url_for('profile'))
+
+    return render_template('pages/edit_profile.html')
 
 @app.route('/prayer-times')
 def prayer_times():
@@ -85,6 +821,101 @@ def prayer_times():
 def memorize_quran():
     return render_template("pages/memorize_quran.html")
 
+@app.route('/reels')
+def reels():
+    reels_data = [
+        {'title': 'How Can We Benefit More From Lectures?', 'youtube_id': 'FDmz4nnWQIo', 'description': 'Insightful discussion on maximizing the benefits of lectures.'},
+        {'title': 'Two Ways To Invite People To Islam', 'youtube_id': '3qlHV-0U87I', 'description': 'Guidance on inviting others to Islam effectively.'},
+        {'title': 'Have I Fulfilled Her Rights?', 'youtube_id': 'TT0_zjp9vcg', 'description': 'Important reflections on fulfilling the rights of others.'},
+        {'title': 'In the End You Will Return to Allah', 'youtube_id': 'O2XuvXRFiqc', 'description': 'A reminder of our return to Allah.'},
+        {'title': 'Marriage, Mahr, and Finding the One', 'youtube_id': 'XLOJ2WlGUNw', 'description': 'Discussing the aspects of marriage and finding the right partner.'},
+        {'title': 'We All Have This Urge', 'youtube_id': '54IRtLoxBsw', 'description': 'Addressing common urges and how to manage them.'},
+        {'title': 'Deception & Fake Accounts', 'youtube_id': 'a_fSK_PLoBQ', 'description': 'Discussing the dangers of deception and fake accounts.'},
+        {'title': 'Final Advice to the Married and Unmarried', 'youtube_id': '957272405862627', 'description': 'Valuable advice for both married and unmarried individuals.'},
+        {'title': 'Connecting Hearts With Allah', 'youtube_id': 'Connecting Hearts With Allah', 'description': 'A talk on strengthening our connection with Allah.'}
+    ]
+    return render_template('pages/reels.html', reels=reels_data)
+
+
+@app.route('/trivia', methods=['GET', 'POST'])
+def trivia():
+    if 'level' not in session:
+        session['level'] = 1
+
+    if 'question_index' not in session:
+        session['question_index'] = 0
+        session['score'] = 0
+        level = session['level']
+        session['questions'] = random.sample(get_questions_for_level(level), len(get_questions_for_level(level)))
+
+    q_index = session['question_index']
+    questions = session['questions']
+
+    if request.method == 'POST':
+        selected = request.form.get('option')
+        correct = questions[q_index]['answer']
+        if selected == correct:
+            session['score'] += 1
+
+        session['question_index'] += 1
+        q_index = session['question_index']
+
+        if q_index >= len(questions):
+            return redirect(url_for('trivia_result'))
+
+    if q_index < len(questions):
+        question = questions[q_index]
+        return render_template('trivia.html', question=question, index=q_index + 1, total=len(questions))
+    else:
+        return redirect(url_for('trivia_result'))
+
+
+@app.route('/trivia_result')
+def trivia_result():
+    score = session.get('score', 0)
+    level = session.get('level', 1)
+    questions = session.get('questions', get_questions_for_level(level))
+    total = len(questions)
+    passed = score == total
+
+    if passed:
+        # Advance to next level only if passed
+        session['level'] = level + 1
+
+    # Reset score and question index whether passed or not
+    session['score'] = 0
+    session['question_index'] = 0
+
+    return render_template('result.html', score=score, total=total, passed=passed, level=level)
+
+
+@app.route('/restart')
+def restart():
+    # Do NOT clear level; just reset current level's questions
+    level = session.get('level', 1)
+    session['score'] = 0
+    session['question_index'] = 0
+    questions = get_questions_for_level(level)
+    session['questions'] = random.sample(questions, len(questions))
+    return redirect(url_for('trivia'))
+
+
+@app.route('/next_level')
+def next_level():
+    current_level = session.get('level', 1)
+    max_level = max(levels.keys())
+
+    new_level = current_level
+    if current_level < max_level:
+        new_level = current_level + 1
+
+    session['level'] = new_level
+    session['score'] = 0
+    session['question_index'] = 0
+    session['questions'] = random.sample(get_questions_for_level(new_level), len(get_questions_for_level(new_level)))
+
+    return redirect(url_for('trivia'))
+
 @app.route('/api/surah-list')
 def surah_list():
     return jsonify([
@@ -93,6 +924,7 @@ def surah_list():
         {"id": 3, "name": "آل عمران", "english_name": "Aali Imran"},
         # ... up to 114
     ])
+
 
 @app.route('/api/surah/<int:surah_id>')
 def get_surah_by_id(surah_id):
@@ -247,6 +1079,11 @@ def daily_dua():
 @app.route('/reminder')
 def reminder():
     return render_template('pages/reminder.html')
+
+@app.route('/dashboard')
+def dashboard():
+    # Your dashboard logic here
+    return render_template('dashboard.html')
 
 @app.route('/talk-to-tawfiq')
 def talk_to_tawfiq():
