@@ -295,11 +295,14 @@ body {
 <div id="side-menu" class="hidden">
   <ul>
     <li><a href="/profile">👤 Profile</a></li>
+    <li><a href="/memorize_quran">Memorize Quran</a></li>
     <li><a href="/talk-to-tawfiq">Talk to Tawfiq</a></li>
     <li><a href="/prayer-times">🕌 Prayer Times</a></li>
     <li><a href="/daily-dua">🕌 Daily Dua</a></li>
     <li><a href="/reminder">📅 Daily Reminder</a></li>
     <li><a href="/motivation">✨ Islamic Motivation</a></li>
+    <li><a href="/reels">📱 Reels</a></li>
+    <li><a href="/trivia">🎮 Play Game</a></li>
     <li><a href="/settings">⚙️ Settings</a></li>
     <li><a href="/privacy">🔒 Privacy & Policy</a></li>
     <li><a href="/about">ℹ️ About Tawfiq AI</a></li>
@@ -384,6 +387,24 @@ body {
 <script>
   // Initialize chat history
   let chatHistory = [];
+
+fetch("/chat", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded"
+  },
+  body: new URLSearchParams({
+    message: userInput
+  })
+})
+.then(res => res.json())
+.then(data => {
+  if (data.login_required) {
+    showLoginPopup(); // Friendly modal here
+  } else {
+    displayMessage(data.response);
+  }
+});
 
   // Utility functions
   function switchTab(sectionId, event) {
@@ -578,6 +599,7 @@ async function sendQuestion() {
 
   chatHistory.push({ role: "user", content: question });
 
+  // Loading indicator
   const loadingMsg = document.createElement("p");
   loadingMsg.className = "loading-indicator";
   loadingMsg.textContent = "Tawfiq AI is thinking...";
@@ -591,18 +613,53 @@ async function sendQuestion() {
       body: JSON.stringify({ history: chatHistory })
     });
     const data = await response.json();
-    messagesDiv.removeChild(loadingMsg);
+    // Remove loading indicator
+    if (loadingMsg.parentNode) {
+      loadingMsg.parentNode.removeChild(loadingMsg);
+    }
+
     const answerText = data.answer || "Sorry, couldn't answer.";
+
+    // Update chat history with AI answer
     chatHistory.push({ role: "assistant", content: answerText });
-    // AI message
+
+    // Create AI message element
     const aiMsg = document.createElement("p");
-    aiMsg.className = "ai-message"; 
-    aiMsg.innerHTML = "Tawfiq AI: " + answerText.replace(/\n/g, '<br>');
+    aiMsg.className = "ai-message";
+
+    // Append the message element to start the typing effect
     messagesDiv.appendChild(aiMsg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Typing effect function
+    function typeText(element, text, speed = 20) {
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          const char = text.charAt(i);
+          // Handle newlines for better formatting
+          if (char === "\n") {
+            element.innerHTML += "<br>";
+          } else {
+            element.innerHTML += char;
+          }
+          i++;
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        } else {
+          clearInterval(interval);
+        }
+      }, speed);
+    }
+
+    // Start the typing animation
+    typeText(aiMsg, answerText, 20); // Adjust speed as desired
+
   } catch (error) {
     console.error('Error:', error);
-    messagesDiv.removeChild(loadingMsg);
+    if (loadingMsg.parentNode) {
+      loadingMsg.parentNode.removeChild(loadingMsg);
+    }
+
     const errorMsg = document.createElement("p");
     errorMsg.className = "ai-message"; 
     errorMsg.textContent = "Tawfiq AI: Error getting response.";
