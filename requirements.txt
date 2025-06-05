@@ -9,3 +9,4 @@ transliterate
 transformers
 huggingface_hub
 redis
+Flask-SQLAlchemy
