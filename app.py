@@ -824,15 +824,16 @@ def memorize_quran():
 @app.route('/reels')
 def reels():
     reels_data = [
-        {'title': 'How Can We Benefit More From Lectures?', 'youtube_id': 'FDmz4nnWQIo', 'description': 'Insightful discussion on maximizing the benefits of lectures.'},
         {'title': 'Two Ways To Invite People To Islam', 'youtube_id': '3qlHV-0U87I', 'description': 'Guidance on inviting others to Islam effectively.'},
         {'title': 'Have I Fulfilled Her Rights?', 'youtube_id': 'TT0_zjp9vcg', 'description': 'Important reflections on fulfilling the rights of others.'},
         {'title': 'In the End You Will Return to Allah', 'youtube_id': 'O2XuvXRFiqc', 'description': 'A reminder of our return to Allah.'},
         {'title': 'Marriage, Mahr, and Finding the One', 'youtube_id': 'XLOJ2WlGUNw', 'description': 'Discussing the aspects of marriage and finding the right partner.'},
+        {'title': 'How Can We Benefit More From Lectures?', 'youtube_id': 'FDmz4nnWQIo', 'description': 'Insightful discussion on maximizing the benefits of lectures.'},
         {'title': 'We All Have This Urge', 'youtube_id': '54IRtLoxBsw', 'description': 'Addressing common urges and how to manage them.'},
         {'title': 'Deception & Fake Accounts', 'youtube_id': 'a_fSK_PLoBQ', 'description': 'Discussing the dangers of deception and fake accounts.'},
         {'title': 'Final Advice to the Married and Unmarried', 'youtube_id': '957272405862627', 'description': 'Valuable advice for both married and unmarried individuals.'},
         {'title': 'Connecting Hearts With Allah', 'youtube_id': 'Connecting Hearts With Allah', 'description': 'A talk on strengthening our connection with Allah.'}
+        
     ]
     return render_template('pages/reels.html', reels=reels_data)
 
