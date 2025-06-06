@@ -89,12 +89,11 @@
       <div class="reel-content">
         <div class="reel-title">{{ reel.title }}</div>
         <div class="youtube-player" data-id="{{ reel.youtube_id }}"></div>
-
         <div class="reel-description">{{ reel.description }}</div>
 
         <div class="actions">
-          <button onclick="backplay('{{ loop.index0 }}')">⏮ Back 10s</button>
-          <button onclick="forwardplay('{{ loop.index0 }}')">⏭ Forward 10s</button>
+         <button onclick="backplay('{{ loop.index0 }}')">⏮ Back 10s</button>
+<button onclick="forwardplay('{{ loop.index0 }}')">⏭ Forward 10s</button>
           <button onclick="likeReel(this)">❤️ Like</button>
           <button onclick="commentReel()">💬 Comment</button>
           <button onclick="shareReel('{{ reel.youtube_id }}')">📤 Share</button>
@@ -119,12 +118,12 @@
       const player = new YT.Player(el, {
         videoId: el.dataset.id,
         playerVars: {
-          autoplay: 1,
+          autoplay: 0,
           controls: 0,
           modestbranding: 1,
           rel: 0,
           loop: 1,
-          mute: 0, // ❗ Unmuted (but most mobile browsers will ignore this unless user taps)
+          mute: 0,
           fs: 0,
           iv_load_policy: 3,
           showinfo: 0,
@@ -154,6 +153,7 @@
     document.querySelectorAll('.reel-container').forEach(section => observer.observe(section));
   }
 
+  // Backplay: jump backward 10 seconds
   function backplay(index) {
     const player = players[index];
     if (player && player.getCurrentTime) {
@@ -162,6 +162,7 @@
     }
   }
 
+  // Forwardplay: jump forward 10 seconds
   function forwardplay(index) {
     const player = players[index];
     if (player && player.getCurrentTime && player.getDuration) {
@@ -176,17 +177,18 @@
     btn.style.background = '#880808';
   }
 
-  function commentReel() {
-    const comment = prompt("💬 Please enter your comment:");
-    if (comment && comment.trim() !== "") {
-      alert("Thanks for your comment! It will be reviewed soon.");
-    } else {
-      alert("No comment entered.");
-    }
+ function commentReel() {
+  const comment = prompt("💬 Please enter your comment:");
+  if (comment && comment.trim() !== "") {
+    alert("Thanks for your comment! It will be reviewed soon.");
+    // Here you could send comment to server via AJAX if implemented
+  } else {
+    alert("No comment entered.");
   }
+}
 
   function shareReel(id) {
-    const url = `https://www.youtube.com/watch?v=${id}`;
+    const url = https://www.youtube.com/watch?v=${id};
     navigator.clipboard.writeText(url);
     alert("📤 Link copied to clipboard!");
   }
