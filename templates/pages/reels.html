@@ -188,7 +188,7 @@
 }
 
   function shareReel(id) {
-    const url = https://www.youtube.com/watch?v=${id};
+    const url = `https://www.youtube.com/watch?v=${id}`;
     navigator.clipboard.writeText(url);
     alert("📤 Link copied to clipboard!");
   }
