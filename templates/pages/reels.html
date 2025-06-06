@@ -9,6 +9,7 @@
     height: 100%;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
     background: black;
   }
 
@@ -92,8 +93,8 @@
         <div class="reel-description">{{ reel.description }}</div>
 
         <div class="actions">
-         <button onclick="backplay('{{ loop.index0 }}')">⏮ Back 10s</button>
-<button onclick="forwardplay('{{ loop.index0 }}')">⏭ Forward 10s</button>
+          <button onclick="backplay('{{ loop.index0 }}')">⏮ Back 10s</button>
+          <button onclick="forwardplay('{{ loop.index0 }}')">⏭ Forward 10s</button>
           <button onclick="likeReel(this)">❤️ Like</button>
           <button onclick="commentReel()">💬 Comment</button>
           <button onclick="shareReel('{{ reel.youtube_id }}')">📤 Share</button>
@@ -111,6 +112,7 @@
   document.body.appendChild(tag);
 
   let players = [];
+  let isPlayerReady = [];
 
   function onYouTubeIframeAPIReady() {
     const playersDivs = document.querySelectorAll('.youtube-player');
@@ -131,7 +133,12 @@
           playsinline: 1
         },
         events: {
-          'onReady': (e) => { if (index === 0) e.target.playVideo(); }
+          'onReady': (e) => {
+            isPlayerReady[index] = true;
+            if (index === 0) {
+              e.target.playVideo();
+            }
+          }
         }
       });
       players.push(player);
@@ -142,18 +149,30 @@
         const index = Array.from(document.querySelectorAll('.reel-container')).indexOf(entry.target);
         if (index !== -1 && players[index]) {
           if (entry.isIntersecting) {
-            players[index].playVideo();
+            stopAllExcept(index);
+            if (isPlayerReady[index]) {
+              players[index].playVideo();
+            }
           } else {
-            players[index].pauseVideo();
+            if (isPlayerReady[index]) {
+              players[index].pauseVideo();
+            }
           }
         }
       });
-    }, { threshold: 0.6 });
+    }, { threshold: 0.75 });
 
     document.querySelectorAll('.reel-container').forEach(section => observer.observe(section));
   }
 
-  // Backplay: jump backward 10 seconds
+  function stopAllExcept(currentIndex) {
+    players.forEach((player, i) => {
+      if (i !== currentIndex && isPlayerReady[i]) {
+        player.pauseVideo();
+      }
+    });
+  }
+
   function backplay(index) {
     const player = players[index];
     if (player && player.getCurrentTime) {
@@ -162,7 +181,6 @@
     }
   }
 
-  // Forwardplay: jump forward 10 seconds
   function forwardplay(index) {
     const player = players[index];
     if (player && player.getCurrentTime && player.getDuration) {
@@ -177,15 +195,14 @@
     btn.style.background = '#880808';
   }
 
- function commentReel() {
-  const comment = prompt("💬 Please enter your comment:");
-  if (comment && comment.trim() !== "") {
-    alert("Thanks for your comment! It will be reviewed soon.");
-    // Here you could send comment to server via AJAX if implemented
-  } else {
-    alert("No comment entered.");
+  function commentReel() {
+    const comment = prompt("💬 Please enter your comment:");
+    if (comment && comment.trim() !== "") {
+      alert("Thanks for your comment! It will be reviewed soon.");
+    } else {
+      alert("No comment entered.");
+    }
   }
-}
 
   function shareReel(id) {
     const url = `https://www.youtube.com/watch?v=${id}`;
