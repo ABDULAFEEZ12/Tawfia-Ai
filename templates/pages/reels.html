@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}Tawfiq AI | Reels{% endblock %}
+
+{% block content %}
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    background: black;
+  }
+
+  .reel-container {
+    height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .reel-content {
+    width: 100%;
+    max-width: 600px;
+    color: white;
+    text-align: center;
+    position: relative;
+    padding-bottom: 4rem;
+  }
+
+  iframe {
+    width: 100%;
+    height: 60vh;
+    border-radius: 12px;
+    border: none;
+  }
+
+  .reel-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .reel-description {
+    color: #ccc;
+    margin-top: 0.5rem;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .actions button {
+    background: #222;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+
+  .actions button:hover {
+    background: #444;
+  }
+
+  .watermark {
+    position: absolute;
+    bottom: 10%;
+    right: 10px;
+    font-size: 0.8rem;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: none;
+  }
+</style>
+
+<div id="reels-wrapper">
+  {% for reel in reels %}
+    <div class="reel-container">
+      <div class="reel-content">
+        <div class="reel-title">{{ reel.title }}</div>
+        <div class="youtube-player" data-id="{{ reel.youtube_id }}"></div>
+        <div class="reel-description">{{ reel.description }}</div>
+
+        <div class="actions">
+         <button onclick="backplay('{{ loop.index0 }}')">⏮ Back 10s</button>
+<button onclick="forwardplay('{{ loop.index0 }}')">⏭ Forward 10s</button>
+          <button onclick="likeReel(this)">❤️ Like</button>
+          <button onclick="commentReel()">💬 Comment</button>
+          <button onclick="shareReel('{{ reel.youtube_id }}')">📤 Share</button>
+          <button onclick="saveReel(this)">💾 Save</button>
+        </div>
+        <div class="watermark">Tawfiq AI</div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<script>
+  let tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+
+  let players = [];
+
+  function onYouTubeIframeAPIReady() {
+    const playersDivs = document.querySelectorAll('.youtube-player');
+    playersDivs.forEach((el, index) => {
+      const player = new YT.Player(el, {
+        videoId: el.dataset.id,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          loop: 1,
+          mute: 0,
+          fs: 0,
+          iv_load_policy: 3,
+          showinfo: 0,
+          enablejsapi: 1,
+          playsinline: 1
+        },
+        events: {
+          'onReady': (e) => { if (index === 0) e.target.playVideo(); }
+        }
+      });
+      players.push(player);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const index = Array.from(document.querySelectorAll('.reel-container')).indexOf(entry.target);
+        if (index !== -1 && players[index]) {
+          if (entry.isIntersecting) {
+            players[index].playVideo();
+          } else {
+            players[index].pauseVideo();
+          }
+        }
+      });
+    }, { threshold: 0.6 });
+
+    document.querySelectorAll('.reel-container').forEach(section => observer.observe(section));
+  }
+
+  // Backplay: jump backward 10 seconds
+  function backplay(index) {
+    const player = players[index];
+    if (player && player.getCurrentTime) {
+      let current = player.getCurrentTime();
+      player.seekTo(Math.max(0, current - 10), true);
+    }
+  }
+
+  // Forwardplay: jump forward 10 seconds
+  function forwardplay(index) {
+    const player = players[index];
+    if (player && player.getCurrentTime && player.getDuration) {
+      let current = player.getCurrentTime();
+      let duration = player.getDuration();
+      player.seekTo(Math.min(duration, current + 10), true);
+    }
+  }
+
+  function likeReel(btn) {
+    btn.innerText = '❤️ Liked';
+    btn.style.background = '#880808';
+  }
+
+ function commentReel() {
+  const comment = prompt("💬 Please enter your comment:");
+  if (comment && comment.trim() !== "") {
+    alert("Thanks for your comment! It will be reviewed soon.");
+    // Here you could send comment to server via AJAX if implemented
+  } else {
+    alert("No comment entered.");
+  }
+}
+
+  function shareReel(id) {
+    const url = `https://www.youtube.com/watch?v=${id}`;
+    navigator.clipboard.writeText(url);
+    alert("📤 Link copied to clipboard!");
+  }
+
+  function saveReel(btn) {
+    const container = btn.closest('.reel-content');
+    const watermark = container.querySelector('.watermark');
+    watermark.style.display = 'block';
+    btn.innerText = '✅ Saved';
+  }
+</script>
+{% endblock %}
