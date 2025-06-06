@@ -1,3 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Tawfiq AI | Reels{% endblock %}
+
 {% block content %}
 <style>
   html, body {
@@ -9,103 +12,211 @@
     background: black;
   }
 
+  #reels-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
   .reel-container {
     height: 100vh;
     scroll-snap-align: start;
     position: relative;
-    background-size: cover;
-    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: black;
+  }
+
+  .reel-content {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    color: white;
     padding: 1rem;
+    box-sizing: border-box;
   }
 
-  .reel-overlay {
+  /* Make iframe fill the container, like TikTok's video */
+  iframe {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.2);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: none;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  /* Overlay content (title, description, buttons) */
+  .overlay {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-end;
+    padding: 1rem;
+    color: white;
+  }
+
+  .reel-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  .reel-description {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: #ccc;
+  }
+
+  /* Action buttons similar to TikTok */
+  .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-self: flex-end;
+  }
+
+  .actions button {
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+    color: white;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .reel-overlay img {
-    width: 70px;
-    height: 70px;
-    opacity: 0.9;
-  }
-
-  .reel-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 0.3rem;
-  }
-
-  .reel-description {
-    font-size: 1rem;
-    color: #ccc;
-    margin-bottom: 0.5rem;
-  }
-
-  .actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.5rem;
-  }
-
-  .actions button {
-    background: rgba(0,0,0,0.6);
-    color: white;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    cursor: pointer;
+    transition: background 0.2s;
   }
 
   .actions button:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgba(0, 0, 0, 0.8);
   }
 
+  /* Watermark */
   .watermark {
-    font-size: 0.75rem;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.8rem;
     background: rgba(0, 0, 0, 0.6);
     padding: 4px 8px;
     border-radius: 6px;
-    position: absolute;
-    bottom: 5%;
-    right: 10px;
+    display: none;
+    z-index: 3;
+  }
+
+  /* Hide scrollbar for cleaner look */
+  ::-webkit-scrollbar {
     display: none;
   }
+  scrollbar-width: none;
 </style>
 
 <div id="reels-wrapper">
   {% for reel in reels %}
-    <div class="reel-container" style="background-image: url('https://img.youtube.com/vi/{{ reel.youtube_id }}/maxresdefault.jpg');">
-      <div class="reel-overlay" onclick="window.open('https://www.youtube.com/watch?v={{ reel.youtube_id }}', '_blank')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/YouTube_social_white_squircle_(2017).svg" alt="Play">
+    <div class="reel-container">
+      <div class="reel-content">
+        <!-- Video iframe -->
+        <iframe class="youtube-player" data-id="{{ reel.youtube_id }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <!-- Overlay content -->
+        <div class="overlay">
+          <div class="reel-title">{{ reel.title }}</div>
+          <div class="reel-description">{{ reel.description }}</div>
+          <div class="actions">
+            <button onclick="backplay('{{ loop.index0 }}')">⏮️</button>
+            <button onclick="forwardplay('{{ loop.index0 }}')">⏭️</button>
+            <button onclick="likeReel(this)">❤️</button>
+            <button onclick="commentReel()">💬</button>
+            <button onclick="shareReel('{{ reel.youtube_id }}')">📤</button>
+            <button onclick="saveReel(this)">💾</button>
+          </div>
+        </div>
+        <div class="watermark">Tawfiq AI</div>
       </div>
-
-      <div class="reel-title">{{ reel.title }}</div>
-      <div class="reel-description">{{ reel.description }}</div>
-
-      <div class="actions">
-        <button onclick="likeReel(this)">❤️ Like</button>
-        <button onclick="commentReel()">💬 Comment</button>
-        <button onclick="shareReel('{{ reel.youtube_id }}')">📤 Share</button>
-        <button onclick="saveReel(this)">💾 Save</button>
-      </div>
-      <div class="watermark">Tawfiq AI</div>
     </div>
   {% endfor %}
 </div>
 
 <script>
+  let tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+
+  let players = [];
+
+  function onYouTubeIframeAPIReady() {
+    const playersDivs = document.querySelectorAll('.youtube-player');
+    playersDivs.forEach((el, index) => {
+      const player = new YT.Player(el, {
+        videoId: el.dataset.id,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          loop: 1,
+          mute: 0,
+          fs: 0,
+          iv_load_policy: 3,
+          showinfo: 0,
+          enablejsapi: 1,
+          playsinline: 1
+        },
+        events: {
+          'onReady': (e) => { if (index === 0) e.target.playVideo(); }
+        }
+      });
+      players.push(player);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const index = Array.from(document.querySelectorAll('.reel-container')).indexOf(entry.target);
+        if (index !== -1 && players[index]) {
+          if (entry.isIntersecting) {
+            players[index].playVideo();
+          } else {
+            players[index].pauseVideo();
+          }
+        }
+      });
+    }, { threshold: 0.8 }); // Slightly higher threshold for precise snapping
+
+    document.querySelectorAll('.reel-container').forEach(section => observer.observe(section));
+  }
+
+  // Backward 10s
+  function backplay(index) {
+    const player = players[index];
+    if (player && player.getCurrentTime) {
+      let current = player.getCurrentTime();
+      player.seekTo(Math.max(0, current - 10), true);
+    }
+  }
+
+  // Forward 10s
+  function forwardplay(index) {
+    const player = players[index];
+    if (player && player.getCurrentTime && player.getDuration) {
+      let current = player.getCurrentTime();
+      let duration = player.getDuration();
+      player.seekTo(Math.min(duration, current + 10), true);
+    }
+  }
+
   function likeReel(btn) {
     btn.innerText = '❤️ Liked';
     btn.style.background = '#880808';
@@ -122,12 +233,13 @@
 
   function shareReel(id) {
     const url = `https://www.youtube.com/watch?v=${id}`;
-    navigator.clipboard.writeText(url);
-    alert("📤 Link copied to clipboard!");
+    navigator.clipboard.writeText(url).then(() => {
+      alert("📤 Link copied to clipboard!");
+    });
   }
 
   function saveReel(btn) {
-    const container = btn.closest('.reel-container');
+    const container = btn.closest('.reel-content');
     const watermark = container.querySelector('.watermark');
     watermark.style.display = 'block';
     btn.innerText = '✅ Saved';
