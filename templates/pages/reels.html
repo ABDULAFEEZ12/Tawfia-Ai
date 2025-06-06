@@ -12,137 +12,92 @@
     background: black;
   }
 
-  #reels-wrapper {
-    display: flex;
-    flex-direction: column;
-  }
-
   .reel-container {
     height: 100vh;
     scroll-snap-align: start;
-    position: relative;
     display: flex;
-    align-items: center;
     justify-content: center;
-    background: black;
+    align-items: center;
+    position: relative;
   }
 
   .reel-content {
-    position: relative;
     width: 100%;
     max-width: 600px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 1rem;
-    box-sizing: border-box;
+    color: white;
+    text-align: center;
+    position: relative;
+    padding-bottom: 4rem;
   }
 
-  /* Make iframe fill the container, like TikTok's video */
   iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
+    height: 60vh;
     border-radius: 12px;
     border: none;
-    object-fit: cover;
-    z-index: 1;
-  }
-
-  /* Overlay content (title, description, buttons) */
-  .overlay {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: flex-end;
-    padding: 1rem;
-    color: white;
   }
 
   .reel-title {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 0.5rem;
+    margin: 1rem 0 0.5rem;
   }
 
   .reel-description {
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
     color: #ccc;
+    margin-top: 0.5rem;
   }
 
-  /* Action buttons similar to TikTok */
   .actions {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
     gap: 1rem;
-    margin-bottom: 2rem;
-    align-self: flex-end;
+    margin-top: 1rem;
+    flex-wrap: wrap;
   }
 
   .actions button {
-    background: rgba(0, 0, 0, 0.6);
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
+    background: #222;
     color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 0.9rem;
     transition: background 0.2s;
   }
 
   .actions button:hover {
-    background: rgba(0, 0, 0, 0.8);
+    background: #444;
   }
 
-  /* Watermark */
   .watermark {
     position: absolute;
-    bottom: 10px;
+    bottom: 10%;
     right: 10px;
     font-size: 0.8rem;
     background: rgba(0, 0, 0, 0.6);
     padding: 4px 8px;
     border-radius: 6px;
     display: none;
-    z-index: 3;
   }
-
-  /* Hide scrollbar for cleaner look */
-  ::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
 </style>
 
 <div id="reels-wrapper">
   {% for reel in reels %}
     <div class="reel-container">
       <div class="reel-content">
-        <!-- Video iframe -->
-        <iframe class="youtube-player" data-id="{{ reel.youtube_id }}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        <!-- Overlay content -->
-        <div class="overlay">
-          <div class="reel-title">{{ reel.title }}</div>
-          <div class="reel-description">{{ reel.description }}</div>
-          <div class="actions">
-            <button onclick="backplay('{{ loop.index0 }}')">⏮️</button>
-            <button onclick="forwardplay('{{ loop.index0 }}')">⏭️</button>
-            <button onclick="likeReel(this)">❤️</button>
-            <button onclick="commentReel()">💬</button>
-            <button onclick="shareReel('{{ reel.youtube_id }}')">📤</button>
-            <button onclick="saveReel(this)">💾</button>
-          </div>
+        <div class="reel-title">{{ reel.title }}</div>
+        <div class="youtube-player" data-id="{{ reel.youtube_id }}"></div>
+        <div class="reel-description">{{ reel.description }}</div>
+
+        <div class="actions">
+         <button onclick="backplay('{{ loop.index0 }}')">⏮ Back 10s</button>
+<button onclick="forwardplay('{{ loop.index0 }}')">⏭ Forward 10s</button>
+          <button onclick="likeReel(this)">❤️ Like</button>
+          <button onclick="commentReel()">💬 Comment</button>
+          <button onclick="shareReel('{{ reel.youtube_id }}')">📤 Share</button>
+          <button onclick="saveReel(this)">💾 Save</button>
         </div>
         <div class="watermark">Tawfiq AI</div>
       </div>
@@ -193,12 +148,12 @@
           }
         }
       });
-    }, { threshold: 0.8 }); // Slightly higher threshold for precise snapping
+    }, { threshold: 0.6 });
 
     document.querySelectorAll('.reel-container').forEach(section => observer.observe(section));
   }
 
-  // Backward 10s
+  // Backplay: jump backward 10 seconds
   function backplay(index) {
     const player = players[index];
     if (player && player.getCurrentTime) {
@@ -207,7 +162,7 @@
     }
   }
 
-  // Forward 10s
+  // Forwardplay: jump forward 10 seconds
   function forwardplay(index) {
     const player = players[index];
     if (player && player.getCurrentTime && player.getDuration) {
@@ -222,20 +177,20 @@
     btn.style.background = '#880808';
   }
 
-  function commentReel() {
-    const comment = prompt("💬 Please enter your comment:");
-    if (comment && comment.trim() !== "") {
-      alert("Thanks for your comment! It will be reviewed soon.");
-    } else {
-      alert("No comment entered.");
-    }
+ function commentReel() {
+  const comment = prompt("💬 Please enter your comment:");
+  if (comment && comment.trim() !== "") {
+    alert("Thanks for your comment! It will be reviewed soon.");
+    // Here you could send comment to server via AJAX if implemented
+  } else {
+    alert("No comment entered.");
   }
+}
 
   function shareReel(id) {
     const url = `https://www.youtube.com/watch?v=${id}`;
-    navigator.clipboard.writeText(url).then(() => {
-      alert("📤 Link copied to clipboard!");
-    });
+    navigator.clipboard.writeText(url);
+    alert("📤 Link copied to clipboard!");
   }
 
   function saveReel(btn) {
