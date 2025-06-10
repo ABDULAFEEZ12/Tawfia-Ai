@@ -2,49 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Tawfiq AI</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(145deg, #e6f0ff, #f9f9f9);
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
         }
 
         .signup-form {
             background-color: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            width: 320px;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 400px;
         }
 
         .signup-form h2 {
             text-align: center;
             margin-bottom: 20px;
+            color: #333;
         }
 
         .signup-form input[type="text"],
         .signup-form input[type="email"],
         .signup-form input[type="password"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
-            border-radius: 6px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .signup-form input:focus {
+            border-color: #007bff;
+            outline: none;
         }
 
         .signup-form button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 17px;
+            transition: background-color 0.3s ease;
         }
 
         .signup-form button:hover {
@@ -53,7 +70,8 @@
 
         .login-link {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 18px;
+            font-size: 15px;
         }
 
         .login-link a {
@@ -65,36 +83,54 @@
             text-decoration: underline;
         }
 
-        .error {
-            color: red;
+        .error, .success {
             text-align: center;
+            padding: 10px;
+            border-radius: 6px;
             margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .error {
+            background-color: #ffe5e5;
+            color: #d9534f;
         }
 
         .success {
-            color: green;
-            text-align: center;
-            margin-bottom: 10px;
+            background-color: #e6ffea;
+            color: #28a745;
+        }
+
+        @media (max-width: 400px) {
+            .signup-form {
+                padding: 20px;
+            }
+
+            .signup-form h2 {
+                font-size: 22px;
+            }
         }
     </style>
 </head>
 <body>
 
     <form class="signup-form" method="POST" action="/signup">
-        <h2>Create Account</h2>
+        <h2>Create Your Account</h2>
 
         {% if error %}
-            <p class="error">{{ error }}</p>
+            <div class="error">{{ error }}</div>
         {% endif %}
 
         {% if message %}
-            <p class="success">{{ message }}</p>
+            <div class="success">{{ message }}</div>
         {% endif %}
 
-        <input type="text" name="username" placeholder="Enter Username" required value="{{ username or '' }}">
-        <input type="email" name="email" placeholder="Enter Email" required value="{{ email or '' }}">
-        <input type="password" name="password" placeholder="Enter Password" required>
+        <input type="text" name="username" placeholder="Username" required value="{{ username or '' }}">
+        <input type="email" name="email" placeholder="Email" required value="{{ email or '' }}">
+        <input type="password" name="password" placeholder="Password" required>
+
         <button type="submit">Sign Up</button>
+
         <div class="login-link">
             Already have an account? <a href="/login">Login here</a>
         </div>
