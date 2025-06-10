@@ -2,139 +2,108 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Tawfiq AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(145deg, #e6f0ff, #f9f9f9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             margin: 0;
-            padding: 10px;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1f4037, #99f2c8);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
-        .signup-form {
-            background-color: white;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        .signup-container {
+            background-color: rgba(255, 255, 255, 0.07);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
             width: 100%;
             max-width: 400px;
         }
 
-        .signup-form h2 {
+        .signup-container h1 {
             text-align: center;
-            margin-bottom: 20px;
-            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
         }
 
-        .signup-form input[type="text"],
-        .signup-form input[type="email"],
-        .signup-form input[type="password"] {
+        form div {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
+            padding: 0.7rem;
+            border: none;
             border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .signup-form input:focus {
-            border-color: #007bff;
             outline: none;
+            font-size: 1rem;
         }
 
-        .signup-form button {
+        button {
             width: 100%;
-            padding: 12px;
-            background-color: #007bff;
+            padding: 0.75rem;
+            background-color: #00b894;
             color: white;
             border: none;
             border-radius: 8px;
+            font-size: 1rem;
             cursor: pointer;
-            font-size: 17px;
             transition: background-color 0.3s ease;
         }
 
-        .signup-form button:hover {
-            background-color: #0056b3;
+        button:hover {
+            background-color: #019875;
         }
 
-        .login-link {
+        p {
             text-align: center;
-            margin-top: 18px;
-            font-size: 15px;
+            margin-top: 1rem;
+            font-size: 0.95rem;
         }
 
-        .login-link a {
-            color: #007bff;
+        a {
+            color: #00ffd0;
             text-decoration: none;
         }
 
-        .login-link a:hover {
+        a:hover {
             text-decoration: underline;
-        }
-
-        .error, .success {
-            text-align: center;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .error {
-            background-color: #ffe5e5;
-            color: #d9534f;
-        }
-
-        .success {
-            background-color: #e6ffea;
-            color: #28a745;
-        }
-
-        @media (max-width: 400px) {
-            .signup-form {
-                padding: 20px;
-            }
-
-            .signup-form h2 {
-                font-size: 22px;
-            }
         }
     </style>
 </head>
 <body>
-
-    <form class="signup-form" method="POST" action="/signup">
-        <h2>Create Your Account</h2>
-
-        {% if error %}
-            <div class="error">{{ error }}</div>
-        {% endif %}
-
-        {% if message %}
-            <div class="success">{{ message }}</div>
-        {% endif %}
-
-        <input type="text" name="username" placeholder="Username" required value="{{ username or '' }}">
-        <input type="email" name="email" placeholder="Email" required value="{{ email or '' }}">
-        <input type="password" name="password" placeholder="Password" required>
-
-        <button type="submit">Sign Up</button>
-
-        <div class="login-link">
-            Already have an account? <a href="/login">Login here</a>
-        </div>
-    </form>
-
+    <div class="signup-container">
+        <h1>Create Your Account</h1>
+        <form method="POST" action="/signup">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="/login">Login here</a></p>
+    </div>
 </body>
 </html>
