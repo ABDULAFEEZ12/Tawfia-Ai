@@ -36,6 +36,17 @@ users = {
     'admin': 'adminpass'
 }
 
+import sqlite3
+
+def get_user_from_db(username):
+    conn = sqlite3.connect('your_database.db')
+    conn.row_factory = sqlite3.Row  # <-- makes rows behave like dictionaries
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    user = cursor.fetchone()
+    conn.close()
+    return dict(user) if user else None
+
 def get_current_user():
     user_id = session.get('user_id')
     if user_id:
@@ -181,6 +192,10 @@ def logout():
     <h2>You have been logged out</h2>
     <a href="/login">Login Again</a> | <a href="/signup">Create Account</a>
     """
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    return render_template('forgot_password.html')  # make sure this template exists
 
 # Read the secret key from environment variable
 app.secret_key = os.getenv('MY_SECRET')
