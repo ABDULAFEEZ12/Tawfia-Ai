@@ -2,124 +2,103 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login | Tawfiq AI</title>
+    <title>Login - Tawfiq AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
+            margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f2f7f5;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
 
         .login-container {
-            background-color: #ffffff;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 400px;
         }
 
-        h2 {
+        .login-container h1 {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
         }
 
-        form {
-            display: flex;
-            flex-direction: column;
+        form div {
+            margin-bottom: 1rem;
         }
 
         label {
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #333;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
         }
 
         input[type="text"],
         input[type="password"] {
-            padding: 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-            transition: border 0.3s ease;
-        }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            border-color: #1abc9c;
-            outline: none;
-        }
-
-        .button {
-            padding: 12px;
-            background-color: #1abc9c;
-            color: #ffffff;
+            width: 100%;
+            padding: 0.7rem;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #00cba9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
             transition: background-color 0.3s ease;
         }
 
-        .button:hover {
-            background-color: #16a085;
+        button:hover {
+            background-color: #00b097;
         }
 
-        .bottom-links {
+        p {
             text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 1rem;
+            font-size: 0.95rem;
         }
 
-        .bottom-links a {
-            color: #3498db;
+        a {
+            color: #00cba9;
             text-decoration: none;
-            margin: 0 8px;
-            transition: color 0.3s ease;
         }
 
-        .bottom-links a:hover {
-            color: #1d6fa5;
-        }
-
-        .error {
-            color: red;
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 14px;
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-
     <div class="login-container">
-        <h2>Login to Tawfiq AI</h2>
-
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-
-        <form method="POST" action="{{ url_for('login') }}">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" placeholder="Enter your username" required>
-
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
-
-            <button type="submit" class="button">Login</button>
+        <h1>Login to Tawfiq AI</h1>
+        <form method="POST" action="/login">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
         </form>
-
-        <div class="bottom-links">
-            <a href="{{ url_for('signup') }}">Sign Up</a> |
-            <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
-        </div>
+        <p>Don't have an account? <a href="/signup">Sign up here</a></p>
     </div>
-
 </body>
 </html>
