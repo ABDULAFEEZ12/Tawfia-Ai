@@ -155,10 +155,11 @@ def signup():
         }
 
         save_users()
-
         return redirect(url_for('login'))
 
-    return render_template('signup.html')
+    # Pass 'user' to prevent template error if {{ user.username }} is used
+    return render_template('signup.html', user=session.get('user'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -172,14 +173,16 @@ def login():
             user['last_login'] = last_login
             save_users()
 
-            session['username'] = username
-            session['email'] = user.get('email', f'{username}@example.com')
-            session['joined_on'] = user.get('joined_on', '2023-01-01')
-            session['preferred_language'] = user.get('preferred_language', 'English')
-            session['last_login'] = last_login
+            # ✅ Save all user info into one session dictionary
+            session['user'] = {
+                'username': username,
+                'email': user.get('email', f'{username}@example.com'),
+                'joined_on': user.get('joined_on', '2023-01-01'),
+                'preferred_language': user.get('preferred_language', 'English'),
+                'last_login': last_login
+            }
 
             return redirect(url_for('profile'))
-
         else:
             return "Invalid username or password", 401
 
@@ -787,11 +790,13 @@ def login_required(f):
 
 @app.route('/profile')
 def profile():
-    username = session.get('username', 'Guest')
-    email = session.get('email', 'not_set@example.com')
-    joined_on = session.get('joined_on', 'Unknown')
-    preferred_language = session.get('preferred_language', 'English')
-    last_login = session.get('last_login', 'N/A')
+    user = session.get('user', {})  # Get the user dictionary or an empty one
+
+    username = user.get('username', 'Guest')
+    email = user.get('email', 'not_set@example.com')
+    joined_on = user.get('joined_on', 'Unknown')
+    preferred_language = user.get('preferred_language', 'English')
+    last_login = user.get('last_login', 'N/A')
 
     return f"""
     <h1>Welcome, 👋 {username}</h1>
@@ -800,7 +805,8 @@ def profile():
     <p>Joined On: {joined_on}</p>
     <p>Preferred Language: {preferred_language}</p>
     <p>Last Login: {last_login}</p>
-    <a href="/edit-profile">Edit Profile</a> | <a href="/logout">Logout</a>
+    <a href="/edit-profile">Edit Profile</a> | 
+    <a href="/logout">{'Logout' if user else 'Login/Signup'}</a>
     <br><br>
     <a href="/" style="
         display: inline-block;
