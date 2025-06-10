@@ -288,6 +288,15 @@ body {
 </head>
 <body class="light-mode">
 
+<div class="auth-status">
+  {% if user %}
+    <p>Welcome, {{ user.username }}! <a href="/logout">Logout</a></p>
+  {% else %}
+    <p><a href="/login">Login</a> | <a href="/signup">Sign Up</a></p>
+  {% endif %}
+</div>
+
+
 <!-- MENU TOGGLE BUTTON -->
 <div id="menu-toggle" onclick="toggleMenu()">☰</div>
 
@@ -295,6 +304,7 @@ body {
 <div id="side-menu" class="hidden">
   <ul>
     <li><a href="/profile">👤 Profile</a></li>
+    <li><a href="/memorize_quran">Memorize Quran</a></li>
     <li><a href="/talk-to-tawfiq">Talk to Tawfiq</a></li>
     <li><a href="/prayer-times">🕌 Prayer Times</a></li>
     <li><a href="/daily-dua">🕌 Daily Dua</a></li>
