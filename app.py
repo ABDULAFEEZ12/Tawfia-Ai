@@ -10,6 +10,7 @@ import redis
 from functools import wraps
 from datetime import datetime
 
+
 user_data = {}
 
 users = {}  # username -> password
@@ -774,21 +775,23 @@ def get_questions_for_level(level):
 
 @app.route('/')
 def index():
-    # Just basic home page, maybe show login or welcome message
-    user = session.get('user')  # Or however you track login
-    return render_template('index.html', user=user)
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('index.html', user=session.get('user'))
 
-# --- Page Routes - all templates inside 'templates/pages/' ---
+from functools import wraps
+
+# Add this login_required decorator (place it with your other utility functions)
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'username' not in session:
-            flash('Please login to access this page', 'error')
-            return redirect(url_for('login'))
+        if 'user' not in session:
+            return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
 
 @app.route('/profile')
+@login_required
 def profile():
     user = session.get('user', {})  # Get the user dictionary or an empty one
 
