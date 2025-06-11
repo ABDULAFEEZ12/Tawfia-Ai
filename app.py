@@ -7,6 +7,8 @@ import redis
 from functools import wraps
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import random
+from difflib import get_close_matches
 
 # Load environment variables
 load_dotenv()
@@ -56,6 +58,13 @@ def load_users():
             json.dump({"users": []}, f, indent=2)
     with open(USER_FILE, 'r') as f:
         return json.load(f)
+    
+def get_questions_for_user(username):
+    questions = [
+        {"question": "What is your name?", "answer": "My name is AI."},
+        {"question": "How are you?", "answer": "I'm good."}
+    ]
+    return questions
 
 def save_users(data):
     with open(USER_FILE, 'w') as f:
@@ -154,6 +163,18 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openrouter_api_key:
     raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
+def load_users():
+    if os.path.exists('users.json'):
+        with open('users.json', 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_users(users):
+    with open('users.json', 'w') as f:
+        json.dump(users, f)
+
+users = load_users()
+
 # --- Flask Routes and Logic ---
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -180,7 +201,10 @@ def signup():
         }
 
         save_users(users)
-        session['user'] = username
+        session['user'] = {
+            'username': username,
+            # optionally include other info if you want to access it later
+        }
         flash('Account created successfully!')
         return redirect(url_for('index'))
 
@@ -803,9 +827,15 @@ def get_questions_for_level(level):
 
 @app.route('/')
 def index():
-    if 'user' not in session:
+    user = session.get('user')
+    if not user:
         return redirect(url_for('login'))
-    return render_template('index.html', user=session.get('user'))
+
+    username = user['username']
+    # Fetch user-specific data, e.g., questions, using username
+    questions = get_questions_for_user(username)  # Your function
+
+    return render_template('index.html', user=user, questions=questions)
 
 from functools import wraps
 
@@ -823,6 +853,7 @@ def login_required(f):
 def my_questions():
     username = session['user']['username']
     questions = UserQuestions.query.filter_by(username=username).order_by(UserQuestions.timestamp.desc()).all()
+    print(f"Fetched questions for {username}: {[q.question for q in questions]}")
     return render_template('my_questions.html', questions=questions)
 
 @app.route('/admin/questions')
@@ -842,6 +873,8 @@ def profile():
                            preferred_language=user.get('preferred_language', 'English'),
                            last_login=user.get('last_login', 'N/A'))
 
+# Example:
+user_data = users.get('username')
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
     if request.method == 'POST':
@@ -1511,4 +1544,3 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-    
