@@ -9,7 +9,6 @@ from hashlib import sha256
 import redis
 from functools import wraps
 from datetime import datetime
-from utils import save_question_and_answer
 
 import json
 import os
