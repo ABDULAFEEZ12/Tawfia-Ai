@@ -155,12 +155,6 @@ if not openrouter_api_key:
     raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
 # --- Flask Routes and Logic ---
-# (Add your routes here, for example: /get-surah-list, /ask, etc.)
-
-# Example route for testing
-@app.route('/')
-def index():
-    return "Welcome to the Flask App!"
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
