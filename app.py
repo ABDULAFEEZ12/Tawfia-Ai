@@ -40,32 +40,45 @@ def add_user(username):
 data = {
     'users': []
 }
-def save_question_and_answer(username, question, answer):
-    global data
-    # Initialize data if needed
-    if 'users' not in data:
-        data['users'] = []
+# Save users to JSON file
+def save_users(data):
+    with open(USER_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
 
-    # Find user
-    user_found = False
+# Add new user if not already in JSON
+def add_user(username):
+    data = load_users()
+    if not any(u['username'] == username for u in data['users']):
+        data['users'].append({
+            "username": username,
+            "questions": []
+        })
+        save_users(data)
+
+def save_question_and_answer(username, question, answer):
+    data = load_users()  # Load fresh data from file
+
+    # Look for the user
     for user in data['users']:
         if user['username'] == username:
-            # Initialize questions list if not present
             if 'questions' not in user:
                 user['questions'] = []
-            user['questions'].append({'question': question, 'answer': answer})
-            user_found = True
+            user['questions'].append({
+                'question': question,
+                'answer': answer
+            })
             break
-
-    # If user not found, add new user with question
-    if not user_found:
+    else:
+        # User not found, create new entry
         data['users'].append({
             'username': username,
-            'questions': [{'question': question, 'answer': answer}],
-            # include other user info as needed
+            'questions': [{
+                'question': question,
+                'answer': answer
+            }]
         })
 
-
+    save_users(data)  # ✅ Save everything back to file
 user_data = {}
 
 users = {}  # username -> password
