@@ -1,21 +1,55 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-import random
-import requests
-import json
-from difflib import get_close_matches
-from dotenv import load_dotenv
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash, send_file
 import os
+import json
+from dotenv import load_dotenv
 from hashlib import sha256
 import redis
 from functools import wraps
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
-import json
-import os
+# Load environment variables
+load_dotenv()
 
+# Initialize Flask app
+app = Flask(__name__)
+
+# Configurations
+app.secret_key = 'super_secret_key'  # Replace with a secure key in production
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+
+# Initialize SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
+db.init_app(app)
+
+# --- Models ---
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    level = db.Column(db.Integer, default=1)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+class UserQuestions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), nullable=False)
+    question = db.Column(db.Text, nullable=False)
+    answer = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Create database tables
+with app.app_context():
+    db.create_all()
+
+# --- User JSON Data Management ---
 USER_FILE = 'user.json'
 
-# Load users from JSON
 def load_users():
     if not os.path.exists(USER_FILE):
         with open(USER_FILE, 'w') as f:
@@ -23,25 +57,20 @@ def load_users():
     with open(USER_FILE, 'r') as f:
         return json.load(f)
 
-# Save users to JSON
 def save_users(data):
     with open(USER_FILE, 'w') as f:
         json.dump(data, f, indent=2)
 
-# Add user if not exists
 def add_user(username):
     data = load_users()
     if not any(u['username'] == username for u in data['users']):
-        data['users'].append({
-            "username": username,
-            "questions": []
-        })
+        data['users'].append({"username": username, "questions": []})
         save_users(data)
-data = {
-    'users': []
-}
+
+# --- Save questions and answers ---
+data = {'users': []}  # In-memory cache for user questions
+
 def save_question_and_answer(username, question, answer):
-    # Save to JSON (existing code) if needed
     global data
     if 'users' not in data:
         data['users'] = []
@@ -64,55 +93,12 @@ def save_question_and_answer(username, question, answer):
     # Save in database
     existing_entry = UserQuestions.query.filter_by(username=username, question=question).first()
     if existing_entry:
-        # Optional: update the answer if needed
         existing_entry.answer = answer
         existing_entry.timestamp = datetime.utcnow()
     else:
         new_entry = UserQuestions(username=username, question=question, answer=answer)
         db.session.add(new_entry)
     db.session.commit()
-
-user_data = {}
-
-users = {}  # username -> password
-
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-db = SQLAlchemy(app)
-
-class UserQuestions(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), nullable=False)
-    question = db.Column(db.Text, nullable=False)
-    answer = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-import sqlite3
-
-def get_user_from_db(username):
-    conn = sqlite3.connect('your_database.db')
-    conn.row_factory = sqlite3.Row  # <-- makes rows behave like dictionaries
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    user = cursor.fetchone()
-    conn.close()
-    return dict(user) if user else None
-
-def get_current_user():
-    user_id = session.get('user_id')
-    if user_id:
-        return User.query.get(user_id)
-    return None
-
-# Load environment variables
-load_dotenv()
-
-openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-
-if not openrouter_api_key:
-    raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
 # --- Redis Cache Setup ---
 redis_host = os.getenv("REDIS_HOST", "localhost")
@@ -163,31 +149,18 @@ friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Re
 daily_duas = load_json_data('daily_duas.json', 'Daily Duas')
 islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivation')
 
-app = Flask(__name__)
+# --- OpenRouter API Key ---
+openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+if not openrouter_api_key:
+    raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
+# --- Flask Routes and Logic ---
+# (Add your routes here, for example: /get-surah-list, /ask, etc.)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.secret_key = 'super_secret_key'  # Replace in production
-db = SQLAlchemy(app)
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=False)
-    level = db.Column(db.Integer, default=1)  # For trivia, later features etc.
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-with app.app_context():
-    db.create_all()
-
-    from flask import flash
+# Example route for testing
+@app.route('/')
+def index():
+    return "Welcome to the Flask App!"
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
