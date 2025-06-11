@@ -790,6 +790,10 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 @app.route('/profile')
 @login_required
 def profile():
