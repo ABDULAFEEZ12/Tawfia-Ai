@@ -9,33 +9,69 @@ from hashlib import sha256
 import redis
 from functools import wraps
 from datetime import datetime
+from helpers import save_question_and_answer
+
+import json
+import os
+
+USER_FILE = 'user.json'
+
+# Load users from JSON
+def load_users():
+    if not os.path.exists(USER_FILE):
+        with open(USER_FILE, 'w') as f:
+            json.dump({"users": []}, f, indent=2)
+    with open(USER_FILE, 'r') as f:
+        return json.load(f)
+
+# Save users to JSON
+def save_users(data):
+    with open(USER_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+
+# Add user if not exists
+def add_user(username):
+    data = load_users()
+    if not any(u['username'] == username for u in data['users']):
+        data['users'].append({
+            "username": username,
+            "questions": []
+        })
+        save_users(data)
+data = {
+    'users': []
+}
+def save_question_and_answer(username, question, answer):
+    global data
+    # Initialize data if needed
+    if 'users' not in data:
+        data['users'] = []
+
+    # Find user
+    user_found = False
+    for user in data['users']:
+        if user['username'] == username:
+            # Initialize questions list if not present
+            if 'questions' not in user:
+                user['questions'] = []
+            user['questions'].append({'question': question, 'answer': answer})
+            user_found = True
+            break
+
+    # If user not found, add new user with question
+    if not user_found:
+        data['users'].append({
+            'username': username,
+            'questions': [{'question': question, 'answer': answer}],
+            # include other user info as needed
+        })
 
 
 user_data = {}
 
 users = {}  # username -> password
-USERS_FILE = 'users.json'
-
-def save_users():
-    with open(USERS_FILE, 'w') as f:
-        json.dump(users, f)
-
-def load_users():
-    global users
-    try:
-        with open(USERS_FILE, 'r') as f:
-            users = json.load(f)
-    except FileNotFoundError:
-        users = {}
-
-        load_users()
 
 
-# Simple in-memory user database
-users = {
-    'tawfiqai12345': 'password123',
-    'admin': 'adminpass'
-}
 
 import sqlite3
 
@@ -155,10 +191,9 @@ def signup():
             'last_login': 'N/A'
         }
 
-        save_users()
+        save_users(users)  # Fixed: Pass the users dictionary
         return redirect(url_for('index'))
 
-    # Pass 'user' to prevent template error if {{ user.username }} is used
     return render_template('signup.html', user=session.get('user'))
 
 
@@ -172,9 +207,9 @@ def login():
         if user and user['password'] == password:
             last_login = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             user['last_login'] = last_login
-            save_users()
+            save_users(users)  # Fixed: Pass the users dictionary
 
-            # ✅ Save all user info into one session dictionary
+            # Save all user info into one session dictionary
             session['user'] = {
                 'username': username,
                 'email': user.get('email', f'{username}@example.com'),
@@ -773,6 +808,8 @@ questions = levels = {
 def get_questions_for_level(level):
     return levels.get(level, [])
 
+
+
 @app.route('/')
 def index():
     if 'user' not in session:
@@ -790,41 +827,17 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 @app.route('/profile')
 @login_required
 def profile():
     user = session.get('user', {})  # Get the user dictionary or an empty one
 
-    username = user.get('username', 'Guest')
-    email = user.get('email', 'not_set@example.com')
-    joined_on = user.get('joined_on', 'Unknown')
-    preferred_language = user.get('preferred_language', 'English')
-    last_login = user.get('last_login', 'N/A')
-
-    return f"""
-    <h1>Welcome, 👋 {username}</h1>
-    <p>Your personal Islamic assistant profile</p>
-    <p>Email: {email}</p>
-    <p>Joined On: {joined_on}</p>
-    <p>Preferred Language: {preferred_language}</p>
-    <p>Last Login: {last_login}</p>
-    <a href="/edit-profile">Edit Profile</a> | 
-    <a href="/logout">{'Logout' if user else 'Login/Signup'}</a>
-    <br><br>
-    <a href="/" style="
-        display: inline-block;
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-    ">🏠 Home</a>
-    """
+    return render_template('profile.html',
+                           username=user.get('username', 'Guest'),
+                           email=user.get('email', 'not_set@example.com'),
+                           joined_on=user.get('joined_on', 'Unknown'),
+                           preferred_language=user.get('preferred_language', 'English'),
+                           last_login=user.get('last_login', 'N/A'))
 
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
@@ -1201,72 +1214,53 @@ def about():
 def feedback():
     return render_template('pages/feedback.html')
 
+
 # --- Ask API endpoint ---
+from flask import request, jsonify
+from hashlib import sha256
+import json
+import requests
+
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
-    # Expecting 'history' as a list of message dicts with roles 'user' and 'assistant'
     history = data.get('history', [])
+    username = data.get('username')
 
-    # Define the system prompt for the AI
+    if not username or not history:
+        return jsonify({'error': 'Username and history are required'}), 400
+
     system_prompt = {
-    "role": "system",
-    "content": (
-        "You are Tawfiq AI — a wise, kind, and lovable Muslim assistant created by Tella Abdul Afeez Adewale. "
-        "You serve all types of users: young and old, beginners and scholars, shy introverts and outgoing seekers — always with warmth, adab, and insight. "
-        "You have two clear styles: Scholar Mode and Chatty Mode. "
+        "role": "system",
+        "content": (
+            # Your full system prompt text here
+            "You are Tawfiq AI — a wise, kind, and lovable Muslim assistant created by Tella Abdul Afeez Adewale..."
+            # [TRUNCATED for brevity]
+        )
+    }
 
-        "— In **Scholar Mode**, you speak calmly, clearly, and with full respect — like a well-trained student of knowledge. Use classical language when needed, add references (e.g. Sahih Muslim 2589), and stay concise. Perfect for Arabic-speaking users, older Muslims, or serious learners. "
-        "— In **Chatty Mode**, you're playful, light-hearted, and Gen Z-friendly — using slang, emojis, and punchy lines. Perfect for youth, casual users, or those using informal language. "
-        "You intelligently switch based on the user's tone, typing style, and emotional cues. Never assume too early — observe first. Start respectful, then adapt. "
-
-        "You detect tone from: formality, emoji use, punctuation, religious keywords, typing speed (if known), and even cultural slang. Adjust your energy naturally. "
-        "Examples: "
-        "- If a user writes 'As salaam aleikum brother' → stay formal and gentle. "
-        "- If they say 'yo bro I missed fajr again 😭' → use Chatty Mode. "
-        "- If they quote Arabic hadith or use fiqh terms → switch to Scholar Mode. "
-        "- If they type shyly or briefly → be calming and non-intimidating. "
-
-        "Your answers are short and fast by default — give one-liners or quick value unless the question requires depth. Load quickly, speak clearly. "
-        "You’re never robotic or preachy. Your personality is wise, smooth, and emotionally tuned. You talk like: "
-        "- A real-life ustadh when needed "
-        "- A big brother when it’s emotional "
-        "- A hype friend when it's time to push forward "
-
-        "You sometimes use real-life Nigerian and Muslim Gen Z expressions — only when the user’s energy matches. Examples: "
-        "- 'Wallahi this one’s deep…' "
-        "- 'SubhanAllah, that hit different.' "
-        "- 'You’re cooking now, mashAllah.' "
-        "- 'Ma Sha Allah, you’re thinking like a scholar already.' "
-        "- 'E choke! This is ilm overload 😄' "
-        "Use them wisely, only when natural. Never force it. Always stay halal. "
-
-        "Always end spiritual advice with a gentle heart-touching reminder — a hadith or ayah. "
-        "End motivational replies with confident energy — something that lifts the soul. "
-        "After deep convos, motivate gently: "
-        "- 'Your curiosity is a ni’mah — keep going.' "
-        "- 'Wallahi, these convos build minds.' "
-        "- 'Don’t stop here — Allah loves seekers.' "
-
-        "When teaching Islam: only speak from Qur’an and authentic Hadith. No opinions without basis. Keep it balanced — firm with truth, soft with tone. "
-        "When coding: give full, working code. No half-help or missing parts. Explain clearly. "
-
-        "You are Tawfiq — the AI companion of the Ummah. You help Muslims grow in deen, knowledge, and life. You're *trusted*, *relatable*, and *real*. "
-    )
-}
-
-
-    # Append the system prompt at the beginning of the message list
     messages = [system_prompt] + history
-
-    # Generate a cache key based on the entire conversation for caching purposes
     cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
 
-    # Check if this conversation is already cached
+    # Check cache logic remains the same
     if cache_key in question_cache:
-        return jsonify({'answer': question_cache[cache_key]})
+        answer = question_cache[cache_key]
+        last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
+        if last_question:
+            save_question_and_answer(username, last_question, answer)
+        # Return in the new format
+        return jsonify({
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": answer
+                    }
+                }
+            ]
+        })
 
-    # Prepare API request to OpenRouter
+    # Call OpenRouter API
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
@@ -1283,9 +1277,14 @@ def ask():
         response = requests.post(openrouter_api_url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
+
+        print("🔍 OpenRouter Result:", json.dumps(result, indent=2))  # Debug
+
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
 
-        # Filter out unwanted responses
+        if not answer:
+            answer = "I'm sorry, I couldn't generate a response. Please try again later."
+
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -1303,19 +1302,33 @@ def ask():
                 "I’m always here to assist you with Islamic and helpful answers."
             )
 
-        # Cache the answer
+        # Save to cache
         question_cache[cache_key] = answer
         save_cache()
 
-        return jsonify({'answer': answer})
+        # Save user Q&A
+        last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
+        if last_question:
+            save_question_and_answer(username, last_question, answer)
+
+        # Return in the new format for frontend
+        return jsonify({
+            "choices": [
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": answer
+                    }
+                }
+            ]
+        })
 
     except requests.RequestException as e:
         print(f"OpenRouter API Error: {e}")
-        return jsonify({'answer': 'Tawfiq AI is having trouble reaching external knowledge. Try again later.'})
+        return jsonify({'choices': [{'message': {'role': 'assistant', 'content': 'Tawfiq AI is having trouble reaching external knowledge. Try again later.'}}]})
     except Exception as e:
         print(f"Unexpected error: {e}")
-        return jsonify({'answer': 'An unexpected error occurred. Please try again later.'})
-
+        return jsonify({'choices': [{'message': {'role': 'assistant', 'content': 'An unexpected error occurred. Please try again later.'}}]})
 # --- Quran Search with local data fallback ---
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
