@@ -592,13 +592,17 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Send question to AI
+// Example: define currentUser somewhere in your script
+const currentUser = 'Abdul';
+
 async function sendQuestion() {
   const inputEl = document.getElementById("userInput");
   const question = inputEl.value.trim();
   if (!question) return;
 
   const messagesDiv = document.getElementById("messages");
-  // User message
+  
+  // User message display
   const userMsg = document.createElement("p");
   userMsg.className = "user-message"; 
   userMsg.textContent = "You: " + question;
@@ -606,6 +610,7 @@ async function sendQuestion() {
   inputEl.value = "";
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
+  // Append to chat history
   chatHistory.push({ role: "user", content: question });
 
   // Loading indicator
@@ -616,27 +621,33 @@ async function sendQuestion() {
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
   try {
+    // Send POST request with username and history
     const response = await fetch('/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history: chatHistory })
+      body: JSON.stringify({ username: currentUser, history: chatHistory }) // <-- Updated line
     });
+
     const data = await response.json();
+
     // Remove loading indicator
     if (loadingMsg.parentNode) {
       loadingMsg.parentNode.removeChild(loadingMsg);
     }
 
-    const answerText = data.answer || "Sorry, couldn't answer.";
+  // Extract the message content based on your API's response structure
+const messageContent = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
 
-    // Update chat history with AI answer
+const answerText = messageContent || "Sorry, couldn't answer.";
+
+    // Update chat history with AI response
     chatHistory.push({ role: "assistant", content: answerText });
 
     // Create AI message element
     const aiMsg = document.createElement("p");
     aiMsg.className = "ai-message";
 
-    // Append the message element to start the typing effect
+    // Append to chat and start typing effect
     messagesDiv.appendChild(aiMsg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
@@ -646,7 +657,6 @@ async function sendQuestion() {
       const interval = setInterval(() => {
         if (i < text.length) {
           const char = text.charAt(i);
-          // Handle newlines for better formatting
           if (char === "\n") {
             element.innerHTML += "<br>";
           } else {
@@ -660,8 +670,8 @@ async function sendQuestion() {
       }, speed);
     }
 
-    // Start the typing animation
-    typeText(aiMsg, answerText, 20); // Adjust speed as desired
+    // Start typing the AI response
+    typeText(aiMsg, answerText, 20);
 
   } catch (error) {
     console.error('Error:', error);
