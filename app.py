@@ -156,7 +156,7 @@ def signup():
         }
 
         save_users()
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     # Pass 'user' to prevent template error if {{ user.username }} is used
     return render_template('signup.html', user=session.get('user'))
@@ -183,7 +183,7 @@ def login():
                 'last_login': last_login
             }
 
-            return redirect(url_for('profile'))
+            return redirect(url_for('index'))
         else:
             return "Invalid username or password", 401
 
