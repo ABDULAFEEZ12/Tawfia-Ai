@@ -817,6 +817,11 @@ def my_questions():
     questions = UserQuestions.query.filter_by(username=username).order_by(UserQuestions.timestamp.desc()).all()
     return render_template('my_questions.html', questions=questions)
 
+@app.route('/admin/questions')
+def view_questions():
+    questions = UserQuestions.query.order_by(UserQuestions.timestamp.desc()).all()
+    return render_template('questions.html', questions=questions)
+    
 @app.route('/profile')
 @login_required
 def profile():
