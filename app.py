@@ -159,12 +159,17 @@ if not openrouter_api_key:
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+
+        if not username or not password or not email:
+            flash('Please fill out all fields.')
+            return redirect(url_for('signup'))
 
         if username in users:
-            return "Username already exists", 400
+            flash('Username already exists.')
+            return redirect(url_for('signup'))
 
         users[username] = {
             'password': password,
@@ -174,11 +179,12 @@ def signup():
             'last_login': 'N/A'
         }
 
-        save_users(users)  # Fixed: Pass the users dictionary
+        save_users(users)
+        session['user'] = username
+        flash('Account created successfully!')
         return redirect(url_for('index'))
 
     return render_template('signup.html', user=session.get('user'))
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -190,9 +196,9 @@ def login():
         if user and user['password'] == password:
             last_login = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             user['last_login'] = last_login
-            save_users(users)  # Fixed: Pass the users dictionary
+            save_users(users)  # Save updated last_login
 
-            # Save all user info into one session dictionary
+            # Store user info in session
             session['user'] = {
                 'username': username,
                 'email': user.get('email', f'{username}@example.com'),
@@ -201,9 +207,11 @@ def login():
                 'last_login': last_login
             }
 
+            flash('Logged in successfully!')
             return redirect(url_for('index'))
         else:
-            return "Invalid username or password", 401
+            flash('Invalid username or password.')
+            return redirect(url_for('login'))
 
     return render_template('login.html')
 
