@@ -10,6 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from difflib import get_close_matches
 
+
 # Load environment variables
 load_dotenv()
 
@@ -857,9 +858,19 @@ def my_questions():
     return render_template('my_questions.html', questions=questions)
 
 @app.route('/admin/questions')
-def view_questions():
-    questions = UserQuestions.query.order_by(UserQuestions.timestamp.desc()).all()
+def admin_questions():
+    questions = UserQuestions.query.all()
+    if not questions:
+        print("No questions found")
+    else:
+        for q in questions:
+            print(f"{q.username} - {q.question}")
     return render_template('questions.html', questions=questions)
+    
+@app.route('/debug/questions')
+def debug_questions():
+    questions = UserQuestions.query.all()
+    return '<br>'.join([f"{q.username}: {q.question}" for q in questions])
     
 @app.route('/profile')
 @login_required
