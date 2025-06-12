@@ -217,18 +217,21 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        user = users.get(username)
-        if user and user['password'] == password:
+        # Fetch user from database
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password_hash, password):
             last_login = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            user['last_login'] = last_login
-            save_users(users)  # Save updated last_login
+            # Optionally update last login in database
+            # user.last_login = last_login
+            # db.session.commit()
 
             # Store user info in session
             session['user'] = {
-                'username': username,
-                'email': user.get('email', f'{username}@example.com'),
-                'joined_on': user.get('joined_on', '2023-01-01'),
-                'preferred_language': user.get('preferred_language', 'English'),
+                'username': user.username,
+                'email': user.email,
+                'joined_on': user.joined_on.strftime('%Y-%m-%d') if user.joined_on else '',
+                'preferred_language': 'English',  # or store in user model if needed
                 'last_login': last_login
             }
 
@@ -238,6 +241,7 @@ def login():
             flash('Invalid username or password.')
             return redirect(url_for('login'))
 
+    # GET request
     return render_template('login.html')
 
 @app.route('/logout')
