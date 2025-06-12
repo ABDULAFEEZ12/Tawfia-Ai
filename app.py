@@ -30,8 +30,11 @@ db.init_app(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     level = db.Column(db.Integer, default=1)
+    joined_on = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login = db.Column(db.DateTime)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -185,27 +188,44 @@ def signup():
         password = request.form.get('password')
         email = request.form.get('email')
 
+        # Validate input
         if not username or not password or not email:
             flash('Please fill out all fields.')
             return redirect(url_for('signup'))
 
-        if username in users:
+        # Check if username already exists
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
             flash('Username already exists.')
             return redirect(url_for('signup'))
 
-        users[username] = {
-            'password': password,
-            'email': email,
-            'joined_on': datetime.now().strftime('%Y-%m-%d'),
-            'preferred_language': 'English',
-            'last_login': 'N/A'
-        }
+        # Check if email already exists
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            flash('Email already registered.')
+            return redirect(url_for('signup'))
 
-        save_users(users)
+        # Create new user
+        new_user = User(
+            username=username,
+            email=email,
+            joined_on=datetime.utcnow()
+        )
+        new_user.set_password(password)  # Hash the password
+
+        # Save to database
+        db.session.add(new_user)
+        db.session.commit()
+
+        # Store user info in session (excluding sensitive info)
         session['user'] = {
             'username': username,
-            # optionally include other info if you want to access it later
+            'email': email,
+            'joined_on': new_user.joined_on.strftime('%Y-%m-%d'),
+            'preferred_language': 'English',
+            'last_login': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
+
         flash('Account created successfully!')
         return redirect(url_for('index'))
 
