@@ -1,280 +1,311 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html> 
+<html lang="en">
 <head>
-    <title>Talk to Tawfiq</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f0f4f8;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px;
-            margin: 0;
-        }
+  <meta charset="UTF-8" />
+  <title>Talk to Tawfiq</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#009688" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      align-items: center;
+    }
 
-        .container {
-            background: #ffffff;
-            width: 100%;
-            max-width: 600px;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
+    .container {
+      max-width: 480px;
+      width: 90%;
+      background: white;
+      padding: 20px;
+      border-radius: 1rem;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
 
-        h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-            color: #009688;
-        }
+    h2 {
+      font-size: 1.5rem;
+      color: #009688;
+      margin-bottom: 10px;
+    }
 
-        .text {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: #333;
-        }
+    .text {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: #555;
+    }
 
-        .orb-wrapper {
-            position: relative;
-            margin: 0 auto;
-            width: 150px;
-            height: 150px;
-        }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
 
-        .orb {
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, #61dafb, #3b82f6 70%, #1e3a8a);
-            border-radius: 50%;
-            position: relative;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.8),
-                        0 0 40px rgba(59, 130, 246, 0.5),
-                        0 0 60px rgba(59, 130, 246, 0.3);
-            transition: transform 0.3s ease-in-out;
-        }
+    .orb-wrapper {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
 
-        .orb::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: -20px;
-            width: 190px;
-            height: 190px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(59,130,246,0.2), transparent 70%);
-            animation: auraGlow 2s ease-in-out infinite;
-        }
+    .orb {
+      width: 80px;
+      height: 80px;
+      background: #009688;
+      border-radius: 50%;
+      box-shadow: 0 0 20px #009688;
+      position: relative;
+      animation: pulse 2s infinite;
+      transition: box-shadow 0.3s ease;
+    }
 
-        @keyframes auraGlow {
-            0% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.6; }
-        }
+    .orb.listening {
+      animation: glow 1s infinite alternate;
+      background: #ff5722;
+      box-shadow: 0 0 25px #ff5722;
+    }
 
-        .orb.listening {
-            animation: pulse 1s infinite;
-        }
+    .orb.speaking {
+      background: #4caf50;
+      box-shadow: 0 0 25px #4caf50;
+    }
 
-        .orb.loading {
-            animation: spin 1.2s linear infinite;
-        }
+    .sound-wave {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 3px;
+    }
 
-        .orb.speaking {
-            animation: bounce 0.4s ease-in-out infinite;
-        }
+    .sound-wave .bar {
+      width: 4px;
+      height: 10px;
+      background: white;
+      animation: wave 0.7s infinite ease-in-out;
+    }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+    .sound-wave .bar:nth-child(2) { animation-delay: 0.1s; }
+    .sound-wave .bar:nth-child(3) { animation-delay: 0.2s; }
+    .sound-wave .bar:nth-child(4) { animation-delay: 0.3s; }
+    .sound-wave .bar:nth-child(5) { animation-delay: 0.4s; }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+    @keyframes glow {
+      from { box-shadow: 0 0 20px #ff5722; }
+      to { box-shadow: 0 0 35px #ff5722; }
+    }
 
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-        }
+    @keyframes wave {
+      0%, 100% { height: 10px; }
+      50% { height: 20px; }
+    }
 
-        .sound-wave {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 140%;
-            height: 140%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            pointer-events: none;
-        }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px #009688; }
+      50% { box-shadow: 0 0 20px #009688; }
+      100% { box-shadow: 0 0 10px #009688; }
+    }
 
-        .bar {
-            width: 4px;
-            height: 20px;
-            background: #3b82f6;
-            border-radius: 10px;
-            animation: waveAnim 1s infinite;
-        }
+    .log {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 0.95rem;
+      white-space: pre-line;
+      margin-bottom: 1rem;
+    }
 
-        .bar:nth-child(1) { animation-delay: 0s; }
-        .bar:nth-child(2) { animation-delay: 0.2s; }
-        .bar:nth-child(3) { animation-delay: 0.4s; }
-        .bar:nth-child(4) { animation-delay: 0.2s; }
-        .bar:nth-child(5) { animation-delay: 0s; }
+    .info {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 1rem;
+    }
 
-        @keyframes waveAnim {
-            0%, 100% { height: 20px; }
-            50% { height: 40px; }
-        }
+    .info button {
+      background: #009688;
+      color: white;
+      border: none;
+      margin-top: 0.5rem;
+    }
 
-        .log {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            background: #f9f9f9;
-            text-align: left;
-            font-size: 16px;
-            color: #444;
-            max-height: 300px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-
-            .orb-wrapper {
-                width: 120px;
-                height: 120px;
-            }
-
-            .sound-wave {
-                width: 160%;
-            }
-        }
-    </style>
+    @media (max-width: 480px) {
+      h2 { font-size: 1.3rem; }
+      .orb { width: 70px; height: 70px; }
+      input, select { font-size: 0.95rem; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🎙️ Talk to Tawfiq</h2>
-        <div class="text">Click the glowing orb and ask your question</div>
-        <div class="orb-wrapper" id="mic">
-            <div class="orb" id="orb">
-                <div class="sound-wave" id="wave">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </div>
-            </div>
+  <div class="container">
+    <h2>🎙️ Talk to Tawfiq</h2>
+    <div class="text">Enter your name, pick a voice, then click the glowing orb to speak or type below</div>
+
+    <input type="text" id="username" placeholder="Enter your name (optional)">
+    <select id="voiceSelect" aria-label="Voice Selection"><option>Loading voices...</option></select>
+
+    <div class="orb-wrapper" id="mic">
+      <div class="orb" id="orb">
+        <div class="sound-wave" id="wave" style="display:none;">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
         </div>
-        <div class="log" id="log">No conversation yet.</div>
+      </div>
     </div>
 
-    <script>
-        const micBtn = document.getElementById('mic');
-        const orb = document.getElementById('orb');
-        const logDiv = document.getElementById('log');
-        const wave = document.getElementById('wave');
+    <input type="text" id="typedQuestion" placeholder="Type your question here..." />
+    <button onclick="handleTypedInput()">Ask Tawfiq</button>
 
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            logDiv.innerHTML = "❌ Your browser does not support Speech Recognition.";
-            micBtn.style.display = "none";
-        } else {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+    <div class="log" id="log">No conversation yet.</div>
 
-            let conversationHistory = [];
+    <div class="info">
+      🌍 <strong>Multilingual Support:</strong> Arabic, French, Hausa, Yoruba and more (Coming Soon, in shaa Allah)<br>
+      🔊 <strong>Real Scholar Voices:</strong> Authentic recitations (Coming Soon, in shaa Allah)<br>
+      📱 <strong>Install App:</strong> Use browser menu to "Add to Home Screen"<br>
+      📥 <button onclick="downloadChat()">Download Full Chat</button>
+    </div>
+  </div>
 
-            micBtn.onclick = () => {
-                logDiv.innerHTML = "🎤 Listening... Go ahead, ask me anything!";
-                orb.className = 'orb listening';
-                wave.style.display = "flex";
-                recognition.start();
-            };
+  <script>
+    const micBtn = document.getElementById('mic');
+    const orb = document.getElementById('orb');
+    const logDiv = document.getElementById('log');
+    const wave = document.getElementById('wave');
+    const voiceSelect = document.getElementById('voiceSelect');
+    const usernameInput = document.getElementById('username');
+    const typedInput = document.getElementById('typedQuestion');
 
-            recognition.onresult = async (event) => {
-                const spokenText = event.results[0][0].transcript.trim();
-                conversationHistory.push({ role: 'user', content: spokenText });
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let conversationHistory = JSON.parse(localStorage.getItem('tawfiqHistory')) || [];
+    let voices = [], bestVoice = null;
 
-                logDiv.innerHTML = `<strong>You:</strong> ${spokenText}\n<em>Tawfiq is thinking... 😊</em>`;
-                orb.className = 'orb loading';
+    function populateVoiceOptions() {
+      voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return;
+      voiceSelect.innerHTML = voices.map(v => `<option value="${v.name}">${v.name} (${v.lang})</option>`).join('');
+      bestVoice = voices.find(v => v.name.includes('Google US English') || v.lang === 'en-US') || voices[0];
+      voiceSelect.value = bestVoice?.name || voices[0].name;
+    }
 
-                try {
-                    const res = await fetch('/ask', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ history: conversationHistory })
-                    });
+    voiceSelect.onchange = () => {
+      bestVoice = voices.find(v => v.name === voiceSelect.value);
+    };
 
-                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = populateVoiceOptions;
+      populateVoiceOptions();
+    }
 
-                    const data = await res.json();
-                    const answer = data.answer || "Sorry, I don't have an answer right now.";
-                    conversationHistory.push({ role: 'assistant', content: answer });
+    function saveHistory() {
+      localStorage.setItem('tawfiqHistory', JSON.stringify(conversationHistory));
+    }
 
-                    logDiv.innerHTML = `<strong>You:</strong> ${spokenText}\n<strong>Tawfiq:</strong> ${answer}`;
-                    orb.className = 'orb speaking';
+    function downloadChat() {
+      const chatText = conversationHistory.map(entry => {
+        const time = new Date().toLocaleTimeString();
+        const who = entry.role === 'user' ? "🧑 You" : "🧠 Tawfiq";
+        return `[${time}] ${who}: ${entry.content}`;
+      }).join('\n\n');
 
-                    const utterance = new SpeechSynthesisUtterance(answer);
-                    utterance.lang = 'en-US';
+      const blob = new Blob([chatText], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.download = 'tawfiq_chat.txt';
+      link.href = URL.createObjectURL(blob);
+      link.click();
+    }
 
-                    // Make Tawfiq sound warm and lovable
-                    if ('speechSynthesis' in window && window.speechSynthesis.getVoices) {
-                        const voices = window.speechSynthesis.getVoices();
-                        // Select a friendly voice if available
-                        const friendlyVoices = voices.filter(voice => 
-                            voice.name.toLowerCase().includes('female') || 
-                            voice.name.toLowerCase().includes('en-us') || 
-                            voice.name.toLowerCase().includes('friendly')
-                        );
-                        if (friendlyVoices.length > 0) {
-                            utterance.voice = friendlyVoices[0];
-                        }
-                        // Adjust pitch and rate for a warm, lovable tone
-                        utterance.pitch = 1.2; // Slightly higher pitch for warmth
-                        utterance.rate = 1; // Normal rate
-                        // Optional: add some volume control if supported
-                        // utterance.volume = 1;
-                    }
+    async function sendToTawfiq(userText) {
+      const username = usernameInput.value.trim() || "Guest";
+      conversationHistory.push({ role: 'user', content: userText });
+      saveHistory();
+      logDiv.innerHTML = `<strong>You:</strong> ${userText}\n<em>Tawfiq is thinking...</em>`;
+      orb.className = 'orb speaking';
 
-                    utterance.onend = () => {
-                        orb.className = 'orb';
-                        wave.style.display = "none";
-                    };
+      try {
+        const res = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ history: conversationHistory, username })
+        });
 
-                    window.speechSynthesis.speak(utterance);
-                } catch (err) {
-                    orb.className = 'orb';
-                    wave.style.display = "none";
-                    logDiv.innerHTML = "❌ Error getting answer. Try again.";
-                    console.error(err);
-                }
-            };
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        let answer = data.choices?.[0]?.message?.content || "Sorry, I don't have an answer right now.";
+        answer = answer.replace(/^#+\s*/gm, '').trim();
 
-            recognition.onerror = (event) => {
-                orb.className = 'orb';
-                wave.style.display = "none";
-                logDiv.innerHTML = `❌ Speech recognition error: ${event.error}`;
-            };
+        conversationHistory.push({ role: 'assistant', content: answer });
+        saveHistory();
 
-            recognition.onspeechend = () => {
-                recognition.stop();
-            };
-        }
-    </script>
+        logDiv.innerHTML = `<strong>You:</strong> ${userText}\n<strong>Tawfiq:</strong> ${answer}`;
+        speakOut(answer);
+      } catch (err) {
+        orb.className = 'orb';
+        wave.style.display = "none";
+        logDiv.innerHTML = "❌ Error getting answer. Try again.";
+        console.error(err);
+      }
+    }
+
+    function speakOut(text) {
+      // Prevent emoji descriptions by keeping emojis as-is
+      const cleanedText = text.replace(/\p{Emoji_Presentation}/gu, match => match);
+
+      const utterance = new SpeechSynthesisUtterance(cleanedText);
+      utterance.voice = bestVoice;
+      utterance.lang = bestVoice?.lang || 'en-US';
+      utterance.pitch = 1.15;
+      utterance.rate = 0.94;
+      utterance.onend = () => {
+        orb.className = 'orb';
+        wave.style.display = "none";
+      };
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function handleTypedInput() {
+      const typedText = typedInput.value.trim();
+      if (typedText) {
+        sendToTawfiq(typedText);
+        typedInput.value = "";
+      }
+    }
+
+    if (!SpeechRecognition) {
+      logDiv.innerHTML = "❌ Your browser does not support Speech Recognition.";
+      micBtn.style.display = "none";
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      micBtn.onclick = () => {
+        logDiv.innerHTML = "🎤 Listening...";
+        orb.className = 'orb listening';
+        wave.style.display = "flex";
+        recognition.start();
+      };
+
+      recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript.trim();
+        sendToTawfiq(spokenText);
+      };
+
+      recognition.onerror = (event) => {
+        orb.className = 'orb';
+        wave.style.display = "none";
+        logDiv.innerHTML = `❌ Speech recognition error: ${event.error}`;
+      };
+
+      recognition.onspeechend = () => recognition.stop();
+    }
+  </script>
 </body>
 </html>
