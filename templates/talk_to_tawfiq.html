@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -135,6 +135,9 @@
       color: white;
       border: none;
       margin-top: 0.5rem;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
     }
 
     @media (max-width: 480px) {
@@ -254,9 +257,7 @@
     }
 
     function speakOut(text) {
-      // Prevent emoji descriptions by keeping emojis as-is
       const cleanedText = text.replace(/\p{Emoji_Presentation}/gu, match => match);
-
       const utterance = new SpeechSynthesisUtterance(cleanedText);
       utterance.voice = bestVoice;
       utterance.lang = bestVoice?.lang || 'en-US';
