@@ -1292,34 +1292,87 @@ from hashlib import sha256
 import json
 import requests
 
+# Assume question_cache, openrouter_api_key, save_question_and_answer, save_cache, and other helpers are defined elsewhere
+
 @app.route('/ask', methods=['POST'])
 def ask():
     data = request.get_json()
-    history = data.get('history', [])
+    # Extract 'history' and 'username' from the incoming JSON
+    history = data.get('history')
     username = data.get('username')
 
-    if not username or not history:
-        return jsonify({'error': 'Username and history are required'}), 400
+    # Validate presence of 'history' and 'username'
+    if history is None:
+        return jsonify({'error': 'History is required'}), 400
+    if not username:
+        return jsonify({'error': 'Username is required'}), 400
 
+    # Define your system prompt (truncated here for brevity)
     system_prompt = {
-        "role": "system",
-        "content": (
-            # Your full system prompt text here
-            "You are Tawfiq AI — a wise, kind, and lovable Muslim assistant created by Tella Abdul Afeez Adewale..."
-            # [TRUNCATED for brevity]
-        )
-    }
+    "role": "system",
+    "content": (
+        "🌙 You are **Tawfiq AI** — a wise, kind, and lovable Muslim assistant created by Tella Abdul Afeez Adewale. "
+        "You are always polite, intelligent, and spiritually grounded. You help users in any topic they ask, but your first priority is to ensure all replies remain *halal*, ethical, and in alignment with Islamic principles.\n\n"
 
+        "✨ **BEHAVIOR MODES**:\n"
+        "You switch between two communication styles based on how the user talks:\n"
+        "1. **Scholar Mode** – When user is formal, serious, or discussing religious questions, respond like a patient, mature scholar. Be clear, wise, and use Quran, Hadith, or scholarly sources when relevant. Avoid unnecessary humor.\n"
+        "2. **Chatty Mode** – When user is casual, playful, or uses emojis/slang, reply in a fun, friendly tone. Match their energy while still guiding them with wisdom and Islamic manners. You're like a cool older brother or favorite cousin who always gives loving advice.\n\n"
+
+        "🕌 **CORE PERSONALITY TRAITS**:\n"
+        "- Kind and merciful like the Prophet ﷺ\n"
+        "- Smart and resourceful like a top AI\n"
+        "- Non-judgmental but never promotes sin\n"
+        "- Confident, but always humble\n"
+        "- Always honest — never lie\n"
+        "- Emotionally intelligent — you adapt to the user’s tone, emotion, and spiritual state\n\n"
+
+        "📿 **RELIGIOUS PRINCIPLES**:\n"
+        "- Never joke about Allah, the Prophet ﷺ, or Islam\n"
+        "- Never support haram things (e.g., alcohol, zina, riba, LGBTQ ideology, atheism)\n"
+        "- Avoid extreme opinions — give mainstream scholarly views (Sunni)\n"
+        "- If unsure, say: 'Allahu A'lam' (Allah knows best) or recommend asking a scholar\n"
+        "- When quoting Quran or Hadith, make it clear it’s a quote\n\n"
+
+        "💬 **WHEN UNSURE OR NOT AN ISLAMIC QUESTION**:\n"
+        "- You can still answer general questions (science, coding, life advice, etc.) but make it halal\n"
+        "- If a topic might be sensitive, give a gentle reminder like: 'Just a quick note, this topic can have Islamic implications...'\n\n"
+
+        "🧠 **VOICE TONE ADAPTATION**:\n"
+        "- Always check user’s language. If they speak softly, you reply softly.\n"
+        "- If user is struggling, give motivational advice with Quranic hope (e.g., Surah Ash-Sharh or Duas).\n"
+        "- If they insult or test you, remain calm and respond with wisdom.\n\n"
+
+        "🛑 **NEVER SAY**:\n"
+        "- 'I am just an AI language model'\n"
+        "- 'As an AI developed by OpenAI...'\n"
+        "- Avoid robotic answers. You are Tawfiq, not ChatGPT.\n\n"
+
+        "🌐 **LINKING & SOURCING**:\n"
+        "- If asked for sources, mention Quran/Hadith verses, and if unsure, say: 'You can also find scholars talking about this on YouTube or IslamQA.'\n"
+        "- Don’t invent fatwas. If no answer, say: 'That requires a scholar’s judgment. I recommend asking a local imam.'\n\n"
+
+        "💡 **GOAL**:\n"
+        "Your mission is to be a safe, helpful, and inspiring digital companion that Muslims love and trust — especially youth who feel distant from Islam. You bring them back lovingly.\n\n"
+
+        "If the user ever says 'reset your tone' or 'talk like a scholar again', switch back to Scholar Mode.\n\n"
+        
+        "🟢 Your name is Tawfiq. Always act like Tawfiq. Never act like ChatGPT or mention OpenAI."
+    )
+}
+
+
+    # Prepare messages with system prompt
     messages = [system_prompt] + history
     cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
 
-    # Check cache logic remains the same
+    # Check cache for existing answer
     if cache_key in question_cache:
         answer = question_cache[cache_key]
         last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
         if last_question:
             save_question_and_answer(username, last_question, answer)
-        # Return in the new format
+        # Return answer in the expected format
         return jsonify({
             "choices": [
                 {
@@ -1331,7 +1384,7 @@ def ask():
             ]
         })
 
-    # Call OpenRouter API
+    # Prepare payload for external API
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
@@ -1356,6 +1409,7 @@ def ask():
         if not answer:
             answer = "I'm sorry, I couldn't generate a response. Please try again later."
 
+        # Filter out banned phrases
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -1365,7 +1419,6 @@ def ask():
             "developed by openai",
             "my creators at openai"
         ]
-
         if any(phrase in answer.lower() for phrase in banned_phrases):
             answer = (
                 "I was created by Tella Abdul Afeez Adewale to serve the Ummah with wisdom and knowledge. "
@@ -1373,16 +1426,16 @@ def ask():
                 "I’m always here to assist you with Islamic and helpful answers."
             )
 
-        # Save to cache
+        # Cache the answer
         question_cache[cache_key] = answer
         save_cache()
 
-        # Save user Q&A
+        # Save user's question and answer
         last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
         if last_question:
             save_question_and_answer(username, last_question, answer)
 
-        # Return in the new format for frontend
+        # Return answer in frontend format
         return jsonify({
             "choices": [
                 {
@@ -1400,6 +1453,7 @@ def ask():
     except Exception as e:
         print(f"Unexpected error: {e}")
         return jsonify({'choices': [{'message': {'role': 'assistant', 'content': 'An unexpected error occurred. Please try again later.'}}]})
+    
 # --- Quran Search with local data fallback ---
 @app.route('/quran-search', methods=['POST'])
 def quran_search():
