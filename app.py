@@ -53,30 +53,54 @@ with app.app_context():
     db.create_all()
 
 # --- User JSON Data Management ---
-# Removed all JSON user management functions and variables for consistency with SQLAlchemy.
+USER_FILE = 'users.json'
+
+def load_users():
+    if os.path.exists(USER_FILE):
+        with open(USER_FILE, 'r') as f:
+            return json.load(f)
+    return {"users": []}
+
+def save_users(data):
+    with open(USER_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+
+def get_user_data(username):
+    users = load_users()
+    for user in users["users"]:
+        if user["username"] == username:
+            return user
+    return None
 
 # --- Save questions and answers ---
 def save_question_and_answer(username, question, answer):
-    # Save in JSON structure (if needed elsewhere)
-    # (Optional: remove if not used, but kept for completeness)
-    global data
-    if 'users' not in data:
-        data['users'] = []
-
     # Save in JSON structure
+    users_data = load_users()
     user_found = False
-    for user in data['users']:
-        if user['username'] == username:
-            if 'questions' not in user:
-                user['questions'] = []
-            user['questions'].append({'question': question, 'answer': answer})
+    
+    for user in users_data["users"]:
+        if user["username"] == username:
+            if "questions" not in user:
+                user["questions"] = []
+            user["questions"].append({
+                "question": question,
+                "answer": answer,
+                "timestamp": datetime.now().isoformat()
+            })
             user_found = True
             break
+    
     if not user_found:
-        data['users'].append({
-            'username': username,
-            'questions': [{'question': question, 'answer': answer}],
+        users_data["users"].append({
+            "username": username,
+            "questions": [{
+                "question": question,
+                "answer": answer,
+                "timestamp": datetime.now().isoformat()
+            }]
         })
+    
+    save_users(users_data)
 
     # Save in database
     existing_entry = UserQuestions.query.filter_by(username=username, question=question).first()
@@ -150,12 +174,6 @@ def add_user(username, email, password):
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
-
-# --- Example usage in route ---
-# You can now call add_user() during registration process
-
-# ... rest of your routes and logic ...
-
 
 # --- Flask Routes and Logic ---
 
@@ -825,8 +843,6 @@ questions = levels = {
 
 def get_questions_for_level(level):
     return levels.get(level, [])
-
-
 
 @app.route('/')
 def index():
