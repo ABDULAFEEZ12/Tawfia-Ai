@@ -902,8 +902,6 @@ def profile():
                            preferred_language=user.get('preferred_language', 'English'),
                            last_login=user.get('last_login', 'N/A'))
 
-# Example:
-user_data = users.get('username')
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
     if request.method == 'POST':
