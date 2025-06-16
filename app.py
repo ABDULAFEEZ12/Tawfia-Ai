@@ -10,7 +10,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from difflib import get_close_matches
 
-
 # Load environment variables
 load_dotenv()
 
@@ -54,36 +53,12 @@ with app.app_context():
     db.create_all()
 
 # --- User JSON Data Management ---
-USER_FILE = 'user.json'
-
-def load_users():
-    if not os.path.exists(USER_FILE):
-        with open(USER_FILE, 'w') as f:
-            json.dump({"users": []}, f, indent=2)
-    with open(USER_FILE, 'r') as f:
-        return json.load(f)
-    
-def get_questions_for_user(username):
-    questions = [
-        {"question": "What is your name?", "answer": "My name is AI."},
-        {"question": "How are you?", "answer": "I'm good."}
-    ]
-    return questions
-
-def save_users(data):
-    with open(USER_FILE, 'w') as f:
-        json.dump(data, f, indent=2)
-
-def add_user(username):
-    data = load_users()
-    if not any(u['username'] == username for u in data['users']):
-        data['users'].append({"username": username, "questions": []})
-        save_users(data)
+# Removed all JSON user management functions and variables for consistency with SQLAlchemy.
 
 # --- Save questions and answers ---
-data = {'users': []}  # In-memory cache for user questions
-
 def save_question_and_answer(username, question, answer):
+    # Save in JSON structure (if needed elsewhere)
+    # (Optional: remove if not used, but kept for completeness)
     global data
     if 'users' not in data:
         data['users'] = []
@@ -167,17 +142,20 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openrouter_api_key:
     raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
-def load_users():
-    if os.path.exists('users.json'):
-        with open('users.json', 'r') as f:
-            return json.load(f)
-    return {}
+# --- New user registration function ---
+def add_user(username, email, password):
+    existing_user = User.query.filter_by(username=username).first()
+    if not existing_user:
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.commit()
 
-def save_users(users):
-    with open('users.json', 'w') as f:
-        json.dump(users, f)
+# --- Example usage in route ---
+# You can now call add_user() during registration process
 
-users = load_users()
+# ... rest of your routes and logic ...
+
 
 # --- Flask Routes and Logic ---
 
