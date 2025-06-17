@@ -1,31 +1,32 @@
-from flask import Flask, request, jsonify, session, render_template, redirect, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
-from dotenv import load_dotenv
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash, send_file
 import os
 import json
+from dotenv import load_dotenv
+from hashlib import sha256
 import redis
+from functools import wraps
+from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+import random
+from difflib import get_close_matches
+
 
 # Load environment variables
 load_dotenv()
 
-# Initialize Flask
+# Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "super_secret_key")
 
-# SQLAlchemy Config
+# Configurations
+app.secret_key = 'super_secret_key'  # Replace with a secure key in production
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-db = SQLAlchemy(app)
 
-# Redis Config
-redis_host = os.getenv("REDIS_HOST", "localhost")
-redis_port = int(os.getenv("REDIS_PORT", 6379))
-redis_db = int(os.getenv("REDIS_DB", 0))
-redis_password = os.getenv("REDIS_PASSWORD", None)
-r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_password, decode_responses=True)
+# Initialize SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
+db.init_app(app)
 
-# Models
+# --- Models ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -35,64 +36,150 @@ class User(db.Model):
     joined_on = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
 
-class UserQuestion(db.Model):
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+class UserQuestions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), nullable=False)
     question = db.Column(db.Text, nullable=False)
     answer = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Create database tables
 with app.app_context():
     db.create_all()
 
-# Save Q&A to DB
+# --- User JSON Data Management ---
+USER_FILE = 'user.json'
+
+def load_users():
+    if not os.path.exists(USER_FILE):
+        with open(USER_FILE, 'w') as f:
+            json.dump({"users": []}, f, indent=2)
+    with open(USER_FILE, 'r') as f:
+        return json.load(f)
+    
+def get_questions_for_user(username):
+    questions = [
+        {"question": "What is your name?", "answer": "My name is AI."},
+        {"question": "How are you?", "answer": "I'm good."}
+    ]
+    return questions
+
+def save_users(data):
+    with open(USER_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+
+def add_user(username):
+    data = load_users()
+    if not any(u['username'] == username for u in data['users']):
+        data['users'].append({"username": username, "questions": []})
+        save_users(data)
+
+# --- Save questions and answers ---
+data = {'users': []}  # In-memory cache for user questions
+
 def save_question_and_answer(username, question, answer):
-    entry = UserQuestion.query.filter_by(username=username, question=question).first()
-    if entry:
-        entry.answer = answer
-        entry.timestamp = datetime.utcnow()
+    global data
+    if 'users' not in data:
+        data['users'] = []
+
+    # Save in JSON structure
+    user_found = False
+    for user in data['users']:
+        if user['username'] == username:
+            if 'questions' not in user:
+                user['questions'] = []
+            user['questions'].append({'question': question, 'answer': answer})
+            user_found = True
+            break
+    if not user_found:
+        data['users'].append({
+            'username': username,
+            'questions': [{'question': question, 'answer': answer}],
+        })
+
+    # Save in database
+    existing_entry = UserQuestions.query.filter_by(username=username, question=question).first()
+    if existing_entry:
+        existing_entry.answer = answer
+        existing_entry.timestamp = datetime.utcnow()
     else:
-        entry = UserQuestion(username=username, question=question, answer=answer)
-        db.session.add(entry)
+        new_entry = UserQuestions(username=username, question=question, answer=answer)
+        db.session.add(new_entry)
     db.session.commit()
 
-# Load JSON Dataset Function (unchanged)
-def load_json_data(filename, name="DATA"):
-    try:
-        path = os.path.join("DATA", filename)
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        print(f"✅ Loaded {name}")
-        return data
-    except Exception as e:
-        print(f"❌ Failed loading {name}: {e}")
-        return {}
+# --- Redis Cache Setup ---
+redis_host = os.getenv("REDIS_HOST", "localhost")
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+redis_db = int(os.getenv("REDIS_DB", 0))
+redis_password = os.getenv("REDIS_PASSWORD", None)
 
-# Cache File
+r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_password, decode_responses=True)
+
+# --- File-Based Cache ---
 CACHE_FILE = "tawfiq_cache.json"
-try:
-    with open(CACHE_FILE, "r", encoding="utf-8") as f:
-        question_cache = json.load(f)
-except:
+
+# Load cache from file
+if os.path.exists(CACHE_FILE):
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            question_cache = json.load(f)
+    except json.JSONDecodeError:
+        question_cache = {}
+else:
     question_cache = {}
 
 def save_cache():
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(question_cache, f, indent=2, ensure_ascii=False)
 
-# Load External Data
-hadith_data = load_json_data("sahih_bukhari_coded.json", "Hadith")
-basic_knowledge_data = load_json_data("basic_islamic_knowledge.json", "Basic Knowledge")
-friendly_responses_data = load_json_data("friendly_responses.json", "Friendly Responses")
-daily_duas = load_json_data("daily_duas.json", "Daily Duas")
-islamic_motivation = load_json_data("islamic_motivation.json", "Islamic Motivation")
+# --- Load JSON datasets ---
+def load_json_data(file_name, data_variable_name):
+    data = {}
+    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
+    print(f"Attempting to load {data_variable_name} data from: {file_path}")
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        print(f"✅ Successfully loaded {data_variable_name} data")
+    except FileNotFoundError:
+        print(f"❌ ERROR: {data_variable_name} data file not found at {file_path}")
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON Decode Error in {file_path}: {e}")
+    except Exception as e:
+        print(f"❌ Unexpected error while loading {file_name}: {e}")
+    return data
+
+# Load datasets
+hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
+basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
+friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
+daily_duas = load_json_data('daily_duas.json', 'Daily Duas')
+islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivation')
 
 # --- OpenRouter API Key ---
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openrouter_api_key:
     raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
-# --- User Authentication Routes ---
+def load_users():
+    if os.path.exists('users.json'):
+        with open('users.json', 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_users(users):
+    with open('users.json', 'w') as f:
+        json.dump(users, f)
+
+users = load_users()
+
+# --- Flask Routes and Logic ---
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -106,13 +193,13 @@ def signup():
             flash('Please fill out all fields.')
             return redirect(url_for('signup'))
 
-        # Check if username exists
+        # Check if username already exists
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             flash('Username already exists.')
             return redirect(url_for('signup'))
 
-        # Check if email exists
+        # Check if email already exists
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
             flash('Email already registered.')
@@ -150,25 +237,31 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
+        # Fetch user from database
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password_hash, password):
-            # Optionally update last login
-            user.last_login = datetime.now()
-            db.session.commit()
 
+        if user and check_password_hash(user.password_hash, password):
+            last_login = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            # Optionally update last login in database
+            # user.last_login = last_login
+            # db.session.commit()
+
+            # Store user info in session
             session['user'] = {
                 'username': user.username,
                 'email': user.email,
                 'joined_on': user.joined_on.strftime('%Y-%m-%d') if user.joined_on else '',
-                'preferred_language': 'English',
-                'last_login': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                'preferred_language': 'English',  # or store in user model if needed
+                'last_login': last_login
             }
+
             flash('Logged in successfully!')
             return redirect(url_for('index'))
         else:
             flash('Invalid username or password.')
             return redirect(url_for('login'))
 
+    # GET request
     return render_template('login.html')
 
 @app.route('/logout')
@@ -181,7 +274,7 @@ def logout():
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    return render_template('forgot_password.html')  # Make sure this template exists
+    return render_template('forgot_password.html')  # make sure this template exists
 
 # Read the secret key from environment variable
 app.secret_key = os.getenv('MY_SECRET')
@@ -815,20 +908,23 @@ def profile():
                            preferred_language=user.get('preferred_language', 'English'),
                            last_login=user.get('last_login', 'N/A'))
 
+# Example:
+user_data = users.get('username')
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
-    # Get user_data from session inside the route where there's a request context
-    user_data = session.get('user', {})
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
-        # Save updates to session
+
+        # Save data to dictionary (or database later)
         user_data['username'] = username
         user_data['email'] = email
-        session['user'] = user_data
+
+        # Redirect to profile page after update
         return redirect(url_for('profile'))
-    return render_template('pages/edit_profile.html', user=user_data)
-    
+
+    return render_template('pages/edit_profile.html')
+
 @app.route('/prayer-times')
 def prayer_times():
     return render_template('pages/prayer-times.html')
