@@ -89,6 +89,7 @@
       font-weight: 600;
       transition: 0.3s ease;
       cursor: pointer;
+      display: inline-block;
     }
 
     .btn-primary {
@@ -136,26 +137,26 @@
     <h1>Welcome, 👋 {{ username }}</h1>
     <p class="profile-subtitle">Your personal Islamic assistant profile</p>
 
-    <div class="profile-details">
+    <div class="profile-details" aria-label="Profile Details">
       <div class="detail-item">
         <span class="detail-label">📧 Email:</span>
-        {{ email }}
+        <span>{{ email }}</span>
       </div>
       <div class="detail-item">
         <span class="detail-label">🗓️ Joined On:</span>
-        {{ joined_on }}
+        <span>{{ joined_on }}</span>
       </div>
       <div class="detail-item">
         <span class="detail-label">🌐 Preferred Language:</span>
-        {{ preferred_language }}
+        <span>{{ preferred_language }}</span>
       </div>
       <div class="detail-item">
         <span class="detail-label">⏰ Last Login:</span>
-        {{ last_login }}
+        <span>{{ last_login }}</span>
       </div>
     </div>
 
-    <div class="btn-group">
+    <div class="btn-group" role="group" aria-label="Profile Actions">
       <a href="/edit-profile" class="btn btn-primary">Edit Profile</a>
       <a href="/login" class="btn btn-primary">Login</a>
       <a href="/" class="btn btn-secondary">🏠 Home</a>
