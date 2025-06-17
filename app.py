@@ -815,23 +815,20 @@ def profile():
                            preferred_language=user.get('preferred_language', 'English'),
                            last_login=user.get('last_login', 'N/A'))
 
-# Example:
-user_data = users.get('username')
+user_data = session.get('user', {})
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
+    user_data = session.get('user', {})
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
-
-        # Save data to dictionary (or database later)
+        # Save updates to session
         user_data['username'] = username
         user_data['email'] = email
-
-        # Redirect to profile page after update
+        session['user'] = user_data
         return redirect(url_for('profile'))
-
-    return render_template('pages/edit_profile.html')
-
+    return render_template('pages/edit_profile.html', user=user_data)
+    
 @app.route('/prayer-times')
 def prayer_times():
     return render_template('pages/prayer-times.html')
