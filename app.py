@@ -815,9 +815,9 @@ def profile():
                            preferred_language=user.get('preferred_language', 'English'),
                            last_login=user.get('last_login', 'N/A'))
 
-user_data = session.get('user', {})
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
+    # Get user_data from session inside the route where there's a request context
     user_data = session.get('user', {})
     if request.method == 'POST':
         username = request.form.get('username')
