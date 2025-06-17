@@ -114,18 +114,20 @@
           {% endif %}
         {% endwith %}
         <h1>Create Your Account</h1>
-        <form method="POST" action="/signup" autocomplete="off">
+        <form method="POST" action="/signup">
             <div>
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required autocomplete="username" />
+                <input type="text" id="username" name="username" required />
             </div>
             <div>
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required autocomplete="email" />
+                <input type="email" id="email" name="email" required />
             </div>
             <div>
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required autocomplete="new-password" />
+                <input type="password" id="password" name="password" required />
+                <!-- Password requirements message added here -->
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Password must be at least 8 characters long and include uppercase, lowercase, digits, and symbols.</p>
             </div>
             <button type="submit">Sign Up</button>
         </form>
