@@ -10,6 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from difflib import get_close_matches
 
+
 # Load environment variables
 load_dotenv()
 
@@ -53,54 +54,54 @@ with app.app_context():
     db.create_all()
 
 # --- User JSON Data Management ---
-USER_FILE = 'users.json'
+USER_FILE = 'user.json'
 
 def load_users():
-    if os.path.exists(USER_FILE):
-        with open(USER_FILE, 'r') as f:
-            return json.load(f)
-    return {"users": []}
+    if not os.path.exists(USER_FILE):
+        with open(USER_FILE, 'w') as f:
+            json.dump({"users": []}, f, indent=2)
+    with open(USER_FILE, 'r') as f:
+        return json.load(f)
+    
+def get_questions_for_user(username):
+    questions = [
+        {"question": "What is your name?", "answer": "My name is AI."},
+        {"question": "How are you?", "answer": "I'm good."}
+    ]
+    return questions
 
 def save_users(data):
     with open(USER_FILE, 'w') as f:
         json.dump(data, f, indent=2)
 
-def get_user_data(username):
-    users = load_users()
-    for user in users["users"]:
-        if user["username"] == username:
-            return user
-    return None
+def add_user(username):
+    data = load_users()
+    if not any(u['username'] == username for u in data['users']):
+        data['users'].append({"username": username, "questions": []})
+        save_users(data)
 
 # --- Save questions and answers ---
+data = {'users': []}  # In-memory cache for user questions
+
 def save_question_and_answer(username, question, answer):
+    global data
+    if 'users' not in data:
+        data['users'] = []
+
     # Save in JSON structure
-    users_data = load_users()
     user_found = False
-    
-    for user in users_data["users"]:
-        if user["username"] == username:
-            if "questions" not in user:
-                user["questions"] = []
-            user["questions"].append({
-                "question": question,
-                "answer": answer,
-                "timestamp": datetime.now().isoformat()
-            })
+    for user in data['users']:
+        if user['username'] == username:
+            if 'questions' not in user:
+                user['questions'] = []
+            user['questions'].append({'question': question, 'answer': answer})
             user_found = True
             break
-    
     if not user_found:
-        users_data["users"].append({
-            "username": username,
-            "questions": [{
-                "question": question,
-                "answer": answer,
-                "timestamp": datetime.now().isoformat()
-            }]
+        data['users'].append({
+            'username': username,
+            'questions': [{'question': question, 'answer': answer}],
         })
-    
-    save_users(users_data)
 
     # Save in database
     existing_entry = UserQuestions.query.filter_by(username=username, question=question).first()
@@ -166,14 +167,17 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openrouter_api_key:
     raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
-# --- New user registration function ---
-def add_user(username, email, password):
-    existing_user = User.query.filter_by(username=username).first()
-    if not existing_user:
-        new_user = User(username=username, email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.commit()
+def load_users():
+    if os.path.exists('users.json'):
+        with open('users.json', 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_users(users):
+    with open('users.json', 'w') as f:
+        json.dump(users, f)
+
+users = load_users()
 
 # --- Flask Routes and Logic ---
 
@@ -844,6 +848,8 @@ questions = levels = {
 def get_questions_for_level(level):
     return levels.get(level, [])
 
+
+
 @app.route('/')
 def index():
     user = session.get('user')
@@ -902,6 +908,8 @@ def profile():
                            preferred_language=user.get('preferred_language', 'English'),
                            last_login=user.get('last_login', 'N/A'))
 
+# Example:
+user_data = users.get('username')
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
     if request.method == 'POST':
