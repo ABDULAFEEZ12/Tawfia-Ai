@@ -9,6 +9,8 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from difflib import get_close_matches
+from flask_sqlalchemy import SQLAlchemy
+
 
 
 # Load environment variables
@@ -17,9 +19,11 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 
+
+
 # Configurations
 app.secret_key = 'super_secret_key'  # Replace with a secure key in production
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
 # Initialize SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy
@@ -53,65 +57,36 @@ class UserQuestions(db.Model):
 with app.app_context():
     db.create_all()
 
-# --- User JSON Data Management ---
-USER_FILE = 'user.json'
+# --- Create a default user (optional testing/demo) ---
+with app.app_context():
+    user = User.query.filter_by(username='zayd').first()
+    if not user:
+        user = User(username='zayd', email='zayd@example.com')
+        user.set_password('secure123')
+        db.session.add(user)
+        db.session.commit()
 
-def load_users():
-    if not os.path.exists(USER_FILE):
-        with open(USER_FILE, 'w') as f:
-            json.dump({"users": []}, f, indent=2)
-    with open(USER_FILE, 'r') as f:
-        return json.load(f)
-    
+# --- Get Questions for User (static demo for now) ---
 def get_questions_for_user(username):
-    questions = [
-        {"question": "What is your name?", "answer": "My name is AI."},
-        {"question": "How are you?", "answer": "I'm good."}
+    questions = UserQuestions.query.filter_by(username=username).order_by(UserQuestions.timestamp.desc()).all()
+    return [
+        {"question": q.question, "answer": q.answer, "timestamp": q.timestamp.strftime("%Y-%m-%d %H:%M:%S")}
+        for q in questions
     ]
-    return questions
 
-def save_users(data):
-    with open(USER_FILE, 'w') as f:
-        json.dump(data, f, indent=2)
-
-def add_user(username):
-    data = load_users()
-    if not any(u['username'] == username for u in data['users']):
-        data['users'].append({"username": username, "questions": []})
-        save_users(data)
-
-# --- Save questions and answers ---
-data = {'users': []}  # In-memory cache for user questions
-
+# --- Save a Question and Answer for a User ---
 def save_question_and_answer(username, question, answer):
-    global data
-    if 'users' not in data:
-        data['users'] = []
+    with app.app_context():
+        # Check if this question already exists
+        existing_entry = UserQuestions.query.filter_by(username=username, question=question).first()
+        if existing_entry:
+            existing_entry.answer = answer
+            existing_entry.timestamp = datetime.utcnow()
+        else:
+            new_entry = UserQuestions(username=username, question=question, answer=answer)
+            db.session.add(new_entry)
+        db.session.commit()
 
-    # Save in JSON structure
-    user_found = False
-    for user in data['users']:
-        if user['username'] == username:
-            if 'questions' not in user:
-                user['questions'] = []
-            user['questions'].append({'question': question, 'answer': answer})
-            user_found = True
-            break
-    if not user_found:
-        data['users'].append({
-            'username': username,
-            'questions': [{'question': question, 'answer': answer}],
-        })
-
-    # Save in database
-    existing_entry = UserQuestions.query.filter_by(username=username, question=question).first()
-    if existing_entry:
-        existing_entry.answer = answer
-        existing_entry.timestamp = datetime.utcnow()
-    else:
-        new_entry = UserQuestions(username=username, question=question, answer=answer)
-        db.session.add(new_entry)
-    db.session.commit()
 
 # --- Redis Cache Setup ---
 redis_host = os.getenv("REDIS_HOST", "localhost")
