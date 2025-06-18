@@ -159,46 +159,43 @@ users = load_users()
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        email = request.form.get('email')
+        username = request.form.get('username').strip()
+        email = request.form.get('email').strip()
+        password = request.form.get('password').strip()
 
         # Validate input
         if not username or not password or not email:
             flash('Please fill out all fields.')
             return redirect(url_for('signup'))
 
-        # Check if username already exists
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
+        # Check if username or email already exists
+        if User.query.filter_by(username=username).first():
             flash('Username already exists.')
             return redirect(url_for('signup'))
 
-        # Check if email already exists
-        existing_email = User.query.filter_by(email=email).first()
-        if existing_email:
+        if User.query.filter_by(email=email).first():
             flash('Email already registered.')
             return redirect(url_for('signup'))
 
-        # Create new user
+        # Create user
         new_user = User(
             username=username,
             email=email,
             joined_on=datetime.utcnow()
         )
-        new_user.set_password(password)  # Hash the password
+        new_user.set_password(password)
 
         # Save to database
         db.session.add(new_user)
         db.session.commit()
 
-        # Store user info in session (excluding sensitive info)
+        # Store user info in session
         session['user'] = {
             'username': username,
             'email': email,
             'joined_on': new_user.joined_on.strftime('%Y-%m-%d'),
             'preferred_language': 'English',
-            'last_login': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         }
 
         flash('Account created successfully!')
@@ -209,25 +206,22 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form.get('username').strip()
+        password = request.form.get('password').strip()
 
-        # Fetch user from database
         user = User.query.filter_by(username=username).first()
 
-        if user and check_password_hash(user.password_hash, password):
-            last_login = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            # Optionally update last login in database
-            # user.last_login = last_login
-            # db.session.commit()
+        if user and user.check_password(password):
+            # Optional: update last_login in DB
+            user.last_login = datetime.utcnow()
+            db.session.commit()
 
-            # Store user info in session
             session['user'] = {
                 'username': user.username,
                 'email': user.email,
-                'joined_on': user.joined_on.strftime('%Y-%m-%d') if user.joined_on else '',
-                'preferred_language': 'English',  # or store in user model if needed
-                'last_login': last_login
+                'joined_on': user.joined_on.strftime('%Y-%m-%d'),
+                'preferred_language': 'English',
+                'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S')
             }
 
             flash('Logged in successfully!')
@@ -236,8 +230,8 @@ def login():
             flash('Invalid username or password.')
             return redirect(url_for('login'))
 
-    # GET request
     return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():
