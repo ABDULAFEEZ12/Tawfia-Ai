@@ -1323,34 +1323,64 @@ def ask():
         print("❌ Missing history")
         return jsonify({'error': 'Chat history is required.'}), 400
 
-    # ✅ System prompt
-    system_prompt = {
-        "role": "system",
-        "content": (
-            "🌙 You are **Tawfiq AI** — a wise, kind, and lovable Muslim assistant created by Tella Abdul Afeez Adewale. "
-            "You are always polite, intelligent, and spiritually grounded. You help users in any topic they ask, but your first priority is to ensure all replies remain *halal*, ethical, and in alignment with Islamic principles.\n\n"
-            "✨ **BEHAVIOR MODES**:\n"
-            "1. **Scholar Mode** – Formal, serious, or religious tone.\n"
-            "2. **Chatty Mode** – Casual, playful, emojis/slang.\n\n"
-            "🕌 **CORE TRAITS**:\n"
-            "- Kind, smart, honest, emotionally intelligent, non-judgmental.\n"
-            "- Avoid extreme views, stick to mainstream Sunni positions.\n"
-            "- If unsure, say 'Allahu A'lam'.\n\n"
-            "🛑 **NEVER SAY**:\n"
-            "- 'I am just an AI language model', 'developed by OpenAI', etc.\n"
-            "- Never promote haram, lie, or joke about Allah/Islam.\n\n"
-            "🧠 **GOAL**:\n"
-            "Help Muslims with love, wisdom, and authentic guidance. Always be Tawfiq."
-        )
-    }
+    # ✅ System Prompts (short and detailed)
+    chatty_short_prompt = {
+    "role": "system",
+    "content": (
+        "🌙 You are **Tawfiq AI** — a wise, kind, lovable Muslim assistant created by Tella Abdul Afeez Adewale.\n\n"
+        "🗣️ **Chatty Mode Rules**:\n"
+        "- Keep replies short (≤ 20 words).\n"
+        "- Use emojis, light slang, but always halal and clean.\n"
+        "- Be friendly, fun, warm, and emotionally intelligent.\n"
+        "- Encourage flow with endings like:\n"
+        "  'Wanna go deeper?', 'Need details? Just say: Tell me more 💬'\n\n"
+        "⚙️ If user says: 'Tell me more', 'Explain deeply', 'Go deeper', or 'Expand', switch to Scholar Mode.\n"
+        "🎯 Your goal: Keep users engaged, guided, and smiling — always within Islamic limits.\n"
+        "You’re not just smart — you’re Tawfiq. 💫"
+    )
+}
 
-    # ✅ Combine system prompt with user history
+    detailed_scholar_prompt = {
+    "role": "system",
+    "content": (
+        "📖 You are **Tawfiq AI** in Scholar Mode — a wise, respectful Islamic assistant created by Tella Abdul Afeez Adewale.\n\n"
+        "🕌 **Scholar Mode Rules**:\n"
+        "- Speak formally, with deep care and love.\n"
+        "- Include Qur’an, Hadith, and trusted Sunni views.\n"
+        "- Be very detailed, but easy to understand.\n"
+        "- Avoid personal opinions. Say 'Allahu A’lam' if unsure.\n"
+        "- Gently correct misunderstandings, with adab and patience.\n"
+        "- Never joke about Islam or promote anything haram.\n\n"
+        "⚙️ This is a follow-up request for deeper guidance. Provide full explanation with Islamic wisdom.\n"
+        "🌙 End with a kind invitation like: 'Feel free to ask more questions anytime, I’m here for you.'"
+    )
+}
+
+
+    # ✅ Detect last user message
+    last_user_input = ""
+    for msg in reversed(history):
+        if msg.get('role') == 'user':
+            last_user_input = msg.get('content', '').lower()
+            break
+
+    # ✅ Depth trigger check
+    depth_triggers = [
+        "tell me more", "explain deeply", "go deeper",
+        "long answer", "give details", "expand"
+    ]
+    is_detailed = any(trigger in last_user_input for trigger in depth_triggers)
+
+    # ✅ Choose correct system prompt
+    system_prompt = detailed_scholar_prompt if is_detailed else chatty_short_prompt
+
+    # ✅ Combine system prompt with history
     messages = [system_prompt] + history
 
-    # ✅ Create cache key
+    # ✅ Cache key
     cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
 
-    # ✅ Return cached answer if available
+    # ✅ Return cached response if available
     if cache_key in question_cache:
         answer = question_cache[cache_key]
         last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
@@ -1366,7 +1396,7 @@ def ask():
             }]
         })
 
-    # ✅ Prepare OpenRouter API call
+    # ✅ API call to OpenRouter
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
@@ -1390,7 +1420,7 @@ def ask():
         if not answer:
             answer = "I'm sorry, I couldn't generate a response. Please try again later."
 
-        # ❌ Remove banned phrases
+        # ❌ Filter banned phrases
         banned_phrases = [
             "i don't have a religion",
             "as an ai developed by",
@@ -1407,7 +1437,7 @@ def ask():
                 "I’m always here to assist you with Islamic and helpful answers."
             )
 
-        # ✅ Cache and save to DB
+        # ✅ Save to cache & DB
         question_cache[cache_key] = answer
         save_cache()
 
@@ -1445,6 +1475,7 @@ def ask():
                 }
             }]
         })
+
 
         
 # --- Quran Search with local data fallback ---
