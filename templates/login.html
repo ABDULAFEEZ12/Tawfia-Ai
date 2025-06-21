@@ -50,8 +50,9 @@
         border-radius: 8px;
         outline: none;
         font-size: 1rem;
-        background-color: #ffffff20;
-        color: white;
+        background-color: #ffffff20; /* semi-transparent background for contrast */
+        color: #fff; /* ensure text is visible */
+        box-sizing: border-box; /* include padding in width calculation */
     }
 
     button {
@@ -116,14 +117,14 @@
       {% endif %}
     {% endwith %}
 
-    <form method="POST" action="/login">
+    <form method="POST" action="/login" autocomplete="off">
         <div>
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required />
+            <input type="text" id="username" name="username" required autocomplete="username" />
         </div>
         <div>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required />
+            <input type="password" id="password" name="password" required autocomplete="current-password" />
         </div>
         <button type="submit">Login</button>
     </form>
