@@ -502,11 +502,6 @@ body {
   <div id="dailyDuaContentMenu" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
 </div>
 
-<!-- Hidden SEO text -->
-<div style="display:none;">
-  Tawfiq AI is the leading Islamic AI built for Muslims who want smart, halal answers about Quran, Hadith, Fiqh, and life. It's like ChatGPT for Muslims – helping with Islamic learning, daily dua, games, and more. Built with love for the ummah.
-</div>
-
 <script>
   // Theme toggle button logic
   const themeToggleBtn = document.getElementById('theme-toggle');
@@ -524,19 +519,19 @@ body {
   }
 
   function toggleMode() {
-    document.body.classList.toggle('light-mode');
-    document.body.classList.toggle('dark-mode');
+  document.body.classList.toggle('light-mode');
+  document.body.classList.toggle('dark-mode');
 
-    // Use the existing themeToggleBtn reference instead of querySelector
-    if (document.body.classList.contains('dark-mode')) {
-      localStorage.setItem('theme', 'dark');
-      themeToggleBtn.innerText = '☀️'; // Show sun icon (click to switch to light)
-    } else {
-      localStorage.setItem('theme', 'light');
-      themeToggleBtn.innerText = '🌙'; // Show moon icon (click to switch to dark)
-    }
+  const toggleBtn = document.querySelector('.toggle-btn');
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('theme', 'dark');
+    toggleBtn.innerText = '☀️'; // Sun icon for light mode
+  } else {
+    localStorage.setItem('theme', 'light');
+    toggleBtn.innerText = '🌙'; // Moon icon for dark mode
   }
-
+}
   let chatHistory = [];
 
   // Load Daily Dua
