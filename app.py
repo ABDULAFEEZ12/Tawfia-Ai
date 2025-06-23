@@ -883,6 +883,10 @@ def google_verification():
         'google76268f26b118dad1.html'
     )
 
+@app.route('/BingSiteAuth.xml')
+def bing_verification():
+    return send_from_directory('static', 'BingSiteAuth.xml')
+
 from functools import wraps
 
 # Add this login_required decorator (place it with your other utility functions)
