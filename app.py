@@ -868,6 +868,10 @@ def index():
 
     return render_template('index.html', user=user, questions=questions)
 
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('static', 'sitemap.xml')
+
 from functools import wraps
 
 # Add this login_required decorator (place it with your other utility functions)
@@ -878,10 +882,6 @@ def login_required(f):
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
-
-@app.route('/sitemap.xml')
-def sitemap():
-    return send_from_directory('static', 'sitemap.xml')
 
 @app.route('/my-questions')
 @login_required
