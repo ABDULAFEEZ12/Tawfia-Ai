@@ -879,6 +879,10 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('static', 'sitemap.xml')
+
 @app.route('/my-questions')
 @login_required
 def my_questions():
