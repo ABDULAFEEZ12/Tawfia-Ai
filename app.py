@@ -1,4 +1,8 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash, send_file
+from flask import (
+    Flask, request, jsonify, render_template,
+    redirect, url_for, session, flash,
+    send_file, send_from_directory
+)
 import os
 import json
 from dotenv import load_dotenv
