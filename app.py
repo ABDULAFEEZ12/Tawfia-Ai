@@ -876,6 +876,13 @@ def index():
 def sitemap():
     return send_from_directory('static', 'sitemap.xml')
 
+@app.route('/google76268f26b118dad1.html')
+def google_verification():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'google76268f26b118dad1.html'
+    )
+
 from functools import wraps
 
 # Add this login_required decorator (place it with your other utility functions)
