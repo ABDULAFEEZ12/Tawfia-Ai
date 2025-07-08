@@ -1,56 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Tawfiq AI – Smart Islamic AI for Muslims Worldwide</title>
-  <meta name="description" content="Tawfiq AI is the smartest Muslim AI that helps with Quran, Hadith, Islamic questions, games, and more – built for Muslims, by Muslims.">
-  <meta name="keywords" content="Tawfiq AI, Islamic AI, Muslim AI, Quran AI, Hadith Chatbot, Muslim Chatbot, AI for Muslims, Halal AI, Islamic ChatGPT">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<title>Tawfiq AI – Smart Islamic AI for Muslims Worldwide</title>
+<meta name="description" content="Tawfiq AI is the smartest Muslim AI that helps with Quran, Hadith, Islamic questions, games, and more – built for Muslims, by Muslims.">
+<meta name="keywords" content="Tawfiq AI, Islamic AI, Muslim AI, Quran AI, Hadith Chatbot, Muslim Chatbot, AI for Muslims, Halal AI, Islamic ChatGPT">
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Tawfiq AI – Islamic AI Chatbot & Quran Helper" />
-  <meta property="og:description" content="Ask Islamic questions, get Quran answers, and play Muslim games with the smartest Islamic AI – Tawfiq AI." />
-  <meta property="og:image" content="https://www.tawfiqai.com/static/logo.png" />
-  <meta property="og:url" content="https://www.tawfiqai.com/" />
-  <meta property="og:type" content="website" />
+<!-- Viewport (mobile-first) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Tawfiq AI – Built for Muslims" />
-  <meta name="twitter:description" content="The world's friendliest halal AI. Quran, Hadith, and fun, all in one place." />
-  <meta name="twitter:image" content="https://www.tawfiqai.com/static/logo.png" />
+<!-- Open Graph -->
+<meta property="og:title" content="Tawfiq AI – Islamic AI Chatbot & Quran Helper" />
+<meta property="og:description" content="Ask Islamic questions, get Quran answers, and play Muslim games with the smartest Islamic AI – Tawfiq AI." />
+<meta property="og:image" content="https://www.tawfiqai.com/static/logo.png" />
+<meta property="og:url" content="https://www.tawfiqai.com/" />
+<meta property="og:type" content="website" />
 
-  <!-- Favicon (🔹 Step 3) -->
-  <link rel="icon" href="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" type="image/jpeg" />
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tawfiq AI – Built for Muslims" />
+<meta name="twitter:description" content="The world's friendliest halal AI. Quran, Hadith, and fun, all in one place." />
+<meta name="twitter:image" content="https://www.tawfiqai.com/static/logo.png" />
 
-  <!-- External CSS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<!-- Force update -->
+<meta name="version" content="1.0.1">
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+<!-- External CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      color: #333;
-      line-height: 1.6;
-      scroll-behavior: smooth;
-      overflow-x: hidden;
-    }
-  </style>
-</head>
+<!-- Updated and Enhanced CSS for Mobile & Aesthetics, including Light/Dark Mode -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-<body>
-
-  <!-- 🔹 Step 2: Logo/Header Section -->
+<link rel="icon" href="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" type="image/jpeg">
+  
+body {
   <header style="text-align: center; padding: 30px;">
-    <img src="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" alt="Tawfiq AI Logo" style="height: 120px; max-width: 100%;">
-    <h1 style="font-family: sans-serif; font-size: 2rem; margin-top: 10px;">Tawfiq AI</h1>
-    <p style="font-style: italic; color: #555;">Smart Islamic Companion</p>
-  </header>
+  <img src="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" alt="Tawfiq AI Logo" style="height: 120px; max-width: 100%;">
+  <h1 style="font-family: sans-serif; font-size: 2rem; margin-top: 10px;">Tawfiq AI</h1>
+  <p style="font-style: italic; color: #555;">Smart Islamic Companion</p>
+</header>
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   margin: 0;
   padding: 0;
