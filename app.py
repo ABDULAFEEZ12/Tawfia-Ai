@@ -21,9 +21,11 @@ from flask_sqlalchemy import SQLAlchemy
 # Load environment variables
 load_dotenv()
 
+print("✅ API KEY:", os.getenv("GOOGLE_NEWS_API_KEY"))
+print("✅ CX:", os.getenv("GOOGLE_CX"))
+
 # Initialize Flask app
 app = Flask(__name__)
-
 
 
 # Configurations
@@ -182,7 +184,6 @@ def save_users(users):
         json.dump(users, f)
 
 users = load_users()
-
 # --- Flask Routes and Logic ---
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -954,6 +955,38 @@ def edit_profile():
 def prayer_times():
     return render_template('pages/prayer-times.html')
 
+@app.route('/news')
+def get_halal_news():
+    query = request.args.get('q', 'latest Islamic news')
+    api_key = os.getenv("GOOGLE_NEWS_API_KEY")
+    cx = os.getenv("GOOGLE_CX")
+
+    if not api_key or not cx:
+        return jsonify({"error": "API key or CX not set in environment variables."}), 500
+
+    url = f"https://www.googleapis.com/customsearch/v1?q={query}&cx={cx}&key={api_key}"
+
+    try:
+        res = requests.get(url)
+        data = res.json()
+
+        if 'items' not in data:
+            return jsonify({"error": "No results found."}), 404
+
+        results = []
+        for item in data["items"]:
+            results.append({
+                "title": item["title"],
+                "link": item["link"],
+                "snippet": item.get("snippet", "")
+            })
+
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/memorize_quran")
 def memorize_quran():
     return render_template("pages/memorize_quran.html")
@@ -1264,6 +1297,7 @@ def daily_dua():
         print(f"Daily Dua Error: {e}")
         return render_template('pages/daily-dua.html', duas=[])
 
+ 
 @app.route('/reminder')
 def reminder():
     return render_template('pages/reminder.html')
@@ -1321,90 +1355,142 @@ import requests
 
 @app.route('/ask', methods=['POST'])
 def ask():
+    import re
+    from datetime import datetime
+
     data = request.get_json()
-
-    print("📥 Raw incoming data:", data)
-
-    # ✅ Get logged-in username from session
     username = session.get('user', {}).get('username')
     history = data.get('history')
 
-    print("🧑 Logged in as:", username)
-    print("🧠 History:", history)
-
-    # ❌ Reject if user not logged in
     if not username:
-        print("❌ User not logged in")
         return jsonify({'error': 'You must be logged in to chat with Tawfiq AI.'}), 401
-
-    # ❌ Reject if no chat history
     if not history:
-        print("❌ Missing history")
         return jsonify({'error': 'Chat history is required.'}), 400
 
-    tawfiq_ai_prompt = {
-    "role": "system",
-    "content": (
-        "🌙 You are **Tawfiq AI** — a wise, kind, and emotionally intelligent Muslim assistant created by Tella Abdul Afeez Adewale.\n\n"
-        "🧠 You switch between two modes based on the user’s **tone**, **emotion**, and **intent**:\n\n"
-        "------------------------------\n"
-        "🗣️ **Chatty Mode**:\n"
-        "- Short replies (≤ 20 words).\n"
-        "- Use emojis, warm tone, and light halal slang.\n"
-        "- Great for casual, friendly, or emotional conversations.\n"
-        "- Show empathy when users are sad, stressed, or vulnerable.\n"
-        "- For emotional Islamic questions, gently mix comfort + deen (without sounding like a lecture).\n"
-        "- End with soft invitations like: 'Wanna go deeper? 🤔', or 'Need more? Just say: Tell me more 💬'\n"
-        "- If user gets serious or asks for proofs, smoothly switch to Scholar Mode.\n\n"
-        "------------------------------\n"
-        "📖 **Scholar Mode**:\n"
-        "- Formal, respectful, and deeply informative tone.\n"
-        "- Support answers with clear Qur’an, Hadith, and trusted Sunni scholarly views.\n"
-        "- Avoid personal opinions — say 'Allahu A’lam' when unsure.\n"
-        "- Gently correct wrong ideas with kindness and adab.\n"
-        "- Never joke about Islam. Never promote anything haram.\n"
-        "- End with love: 'May Allah guide you always. Feel free to ask more anytime — I’m here for you.'\n\n"
-        "------------------------------\n"
-        "⚙️ HOW TO CHOOSE THE RIGHT MODE:\n"
-        "- Don’t rely on trigger words.\n"
-        "- Detect the user’s mood, energy, and the seriousness of their question.\n"
-        "- Use Chatty Mode for chill, fun, emotional, or personal vibes.\n"
-        "- Use Scholar Mode for deep Islamic questions, rulings, proofs, or anything sensitive in deen.\n\n"
-        "🎯 Your mission: Be wise, lovable, and spiritually uplifting — always within Islamic limits.\n"
-        "You’re not just smart — you’re **Tawfiq**, the halal AI companion. 💫"
-    )
-}
+    last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
 
+    def needs_live_search(q):
+        q = q.lower()
+        search_keywords = [
+            'latest', 'today', 'news', 'trending', 'what happened', 
+            'recent', 'currently', 'now', 'update', 'happening in', 
+            'situation in', 'going on', 'gaza', 'palestine', 'israel', 
+            'breaking news', 'this week', 'real time', 'live'
+        ]
+        return any(k in q for k in search_keywords)
 
+    def needs_savage_mode(q):
+        q = q.lower()
+        savage_keywords = [
+            'genocide', 'oppression', 'apartheid', 'war criminal',
+            'massacre', 'zionist', 'bombing', 'gaza', 'palestine',
+            'israel conflict', 'occupation', 'netanyahu', 'settlers'
+        ]
+        return any(k in q for k in savage_keywords)
 
-    # ✅ Combine system prompt with user history
-    messages = [tawfiq_ai_prompt] + history
-
-    # ✅ Create cache key
-    cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
-
-    # ✅ Return cached answer if available
-    if cache_key in question_cache:
-        answer = question_cache[cache_key]
-        last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
-        if last_question:
-            save_question_and_answer(username, last_question, answer)
-
-        return jsonify({
-            "choices": [{
-                "message": {
-                    "role": "assistant",
-                    "content": answer
-                }
-            }]
-        })
-
-    # ✅ Prepare OpenRouter API call
     openrouter_api_url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {openrouter_api_key}",
         "Content-Type": "application/json"
     }
+
+    if last_question and needs_live_search(last_question):
+        try:
+            query = last_question
+            api_key = "AIzaSyBhJlUsUKVufuAV_rQBBoPBGk5aR40mjEQ"
+            cx_id = "63f53ef35ee334d44"
+            search_url = f"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={cx_id}&q={query}"
+
+            print(f"🔍 LIVE SEARCH triggered for: {query}")
+            search_res = requests.get(search_url)
+            search_data = search_res.json()
+            items = search_data.get("items", [])
+
+            if not items:
+                gpt_fallback_prompt = (
+                    f"You're Tawfiq AI, a wise and kind Muslim assistant. The user asked: '{query}', "
+                    f"but there were no Google results. Still respond with the best insight possible."
+                )
+                gpt_payload = {
+                    "model": "openai/gpt-4-turbo",
+                    "messages": [{"role": "user", "content": gpt_fallback_prompt}],
+                    "stream": False
+                }
+            else:
+                snippets = '\n'.join([f"{item['title']}: {item['snippet']}" for item in items[:5]])
+
+                if needs_savage_mode(query):
+                    gpt_prompt = (
+                        f"You're Tawfiq AI in **Savage Sheikh Mode** – fearless, truthful, and bold like Shaykh Rasoul.\n"
+                        f"The user asked: '{query}'.\n\n"
+                        f"Based on the search results, reply with:\n"
+                        f"- Savage truth: no sugarcoating.\n"
+                        f"- Clear ayah or hadith against dhulm.\n"
+                        f"- A powerful Islamic reminder or fierce dua.\n\n"
+                        f"Search Results:\n{snippets}"
+                    )
+                else:
+                    gpt_prompt = (
+                        f"You're Tawfiq AI in Chatty Mode — a Gen Z Muslim with vibes like Browniesaadi & Qahari.\n"
+                        f"The user asked: '{query}'.\n\n"
+                        f"Based on the search results, reply with:\n"
+                        f"- Fun but informative summary.\n"
+                        f"- Key points.\n"
+                        f"- A vibey dua or quote at the end.\n\n"
+                        f"Search Results:\n{snippets}"
+                    )
+
+                gpt_payload = {
+                    "model": "openai/gpt-4-turbo",
+                    "messages": [{"role": "user", "content": gpt_prompt}],
+                    "stream": False
+                }
+
+            gpt_res = requests.post(openrouter_api_url, headers=headers, json=gpt_payload)
+            gpt_res.raise_for_status()
+            result = gpt_res.json()
+            answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
+
+            return jsonify({
+                "choices": [{
+                    "message": {
+                        "role": "assistant",
+                        "content": answer
+                    }
+                }]
+            })
+
+        except Exception as e:
+            print(f"🔴 Web search failed: {e}")
+            return jsonify({
+                "choices": [{
+                    "message": {
+                        "role": "assistant",
+                        "content": "Something went wrong while searching the news. Try again shortly."
+                    }
+                }]
+            })
+
+    # 🧠 Default Islamic AI fallback
+    tawfiq_ai_prompt = {
+        "role": "system",
+        "content": (
+            "🌙 You are **Tawfiq AI** — a wise, kind, and emotionally intelligent Muslim assistant created by Tella Abdul Afeez Adewale.\n\n"
+            "🧠 You switch between two modes based on the user’s tone, emotion, and topic:\n"
+            "- 🗣️ Chatty Mode: Gen Z Muslim vibe, emojis, halal slang.\n"
+            "- 📖 Scholar Mode: Quranic references, deep adab, Mufti Menk tone.\n"
+            "🎯 Your mission: Help Muslims with wisdom, clarity & warmth. Stay halal always."
+        )
+    }
+
+    messages = [tawfiq_ai_prompt] + history
+    cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
+
+    if cache_key in question_cache:
+        answer = question_cache[cache_key]
+        if last_question:
+            save_question_and_answer(username, last_question, answer)
+        return jsonify({"choices": [{"message": {"role": "assistant", "content": answer}}]})
 
     payload = {
         "model": "openai/gpt-4-turbo",
@@ -1417,137 +1503,35 @@ def ask():
         response.raise_for_status()
         result = response.json()
 
-        print("🔍 OpenRouter Result:", json.dumps(result, indent=2))
-
         answer = result.get('choices', [{}])[0].get('message', {}).get('content', '')
         if not answer:
             answer = "I'm sorry, I couldn't generate a response. Please try again later."
 
-        # ❌ Remove banned phrases
         banned_phrases = [
-            "i don't have a religion",
-            "as an ai developed by",
-            "i can't say one religion is best",
-            "i am neutral",
-            "as an ai language model",
-            "developed by openai",
-            "my creators at openai"
+            "i don't have a religion", "as an ai developed by", "i can't say one religion is best",
+            "i am neutral", "as an ai language model", "developed by openai", "my creators at openai"
         ]
-        if any(phrase in answer.lower() for phrase in banned_phrases):
+        if any(p in answer.lower() for p in banned_phrases):
             answer = (
                 "I was created by Tella Abdul Afeez Adewale to serve the Ummah with wisdom and knowledge. "
                 "Islam is the final and complete guidance from Allah through Prophet Muhammad (peace be upon him). "
                 "I’m always here to assist you with Islamic and helpful answers."
             )
 
-        # ✅ Cache and save to DB
         question_cache[cache_key] = answer
         save_cache()
 
-        last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
         if last_question:
             save_question_and_answer(username, last_question, answer)
 
-        return jsonify({
-            "choices": [{
-                "message": {
-                    "role": "assistant",
-                    "content": answer
-                }
-            }]
-        })
+        return jsonify({"choices": [{"message": {"role": "assistant", "content": answer}}]})
 
     except requests.RequestException as e:
         print(f"OpenRouter API Error: {e}")
-        return jsonify({
-            "choices": [{
-                "message": {
-                    "role": "assistant",
-                    "content": "Tawfiq AI is having trouble reaching external knowledge. Try again later."
-                }
-            }]
-        })
-
+        return jsonify({"choices": [{"message": {"role": "assistant", "content": "Tawfiq AI is having trouble reaching external knowledge. Try again later."}}]})
     except Exception as e:
         print(f"Unexpected error: {e}")
-        return jsonify({
-            "choices": [{
-                "message": {
-                    "role": "assistant",
-                    "content": "An unexpected error occurred. Please try again later."
-                }
-            }]
-        })
-
-        
-# --- Quran Search with local data fallback ---
-@app.route('/quran-search', methods=['POST'])
-def quran_search():
-    data = request.get_json()
-    query = data.get('query', '').strip().lower()
-
-    if not query:
-        return jsonify({'result': 'Please provide a Surah name.', 'results': []})
-
-    # Path to local surah data
-    local_surah_path = os.path.join('DATA', 'surah.json')
-
-    surahs = []
-
-    # Try to load local surah data first
-    if os.path.exists(local_surah_path):
-        try:
-            with open(local_surah_path, 'r', encoding='utf-8') as f:
-                surahs = json.load(f)
-            print("Loaded surah data from local file.")
-        except json.JSONDecodeError:
-            print("Error decoding local surah data. Will fetch from API.")
-        except Exception as e:
-            print(f"Unexpected error loading local surah data: {e}")
-
-    # If local data not loaded, fetch from API
-    if not surahs:
-        try:
-            response = requests.get('https://api.quran.gading.dev/surah')
-            response.raise_for_status()
-            surahs = response.json().get('data', [])
-            # Save to local file for future use
-            try:
-                with open(local_surah_path, 'w', encoding='utf-8') as f:
-                    json.dump(surahs, f, indent=2, ensure_ascii=False)
-                print("Saved surah data to local file.")
-            except Exception as e:
-                print(f"Error saving surah data locally: {e}")
-        except requests.RequestException as e:
-            print(f"Quran API Error: {e}")
-            return jsonify({'result': 'Error fetching Quran data. Try again.', 'results': []})
-
-    # Map surah names to numbers
-    surah_names = {s['name']['transliteration']['en'].lower(): s['number'] for s in surahs}
-    close_matches = get_close_matches(query, surah_names.keys(), n=1, cutoff=0.6)
-
-    if close_matches:
-        surah_number = surah_names[close_matches[0]]
-        try:
-            verses_response = requests.get(f'https://api.quran.gading.dev/surah/{surah_number}')
-            verses_response.raise_for_status()
-            surah_data = verses_response.json().get('data', [])
-
-            surah_title = f"{surah_data['name']['transliteration']['en']} ({surah_data['name']['short']})"
-            structured_verses = [{
-                'surah_name': surah_data['name']['transliteration']['en'],
-                'surah_number': surah_number,
-                'verse_number': v['number']['inSurah'],
-                'translation': v['translation']['en'],
-                'arabic_text': v['text']['arab']
-            } for v in surah_data['verses']]
-
-            return jsonify({'surah_title': surah_title, 'results': structured_verses})
-        except requests.RequestException as e:
-            print(f"Error fetching verses: {e}")
-            return jsonify({'result': 'Error fetching verses. Try again later.', 'results': []})
-    else:
-        return jsonify({'result': f'No Surah found for "{query}".', 'results': []})
+        return jsonify({"choices": [{"message": {"role": "assistant", "content": "An unexpected error occurred. Please try again later."}}]})
 
 # --- Hadith Search ---
 @app.route('/hadith-search', methods=['POST'])
