@@ -295,436 +295,301 @@ if not app.secret_key:
     app.secret_key = 'fallback_secret_key_for_dev_only'
 
 questions = levels = {
-    1: [
+        1: [
         {
-            "question": "Who was the first prophet in Islam?",
-            "options": ["Prophet Musa", "Prophet Isa", "Prophet Adam", "Prophet Muhammad"],
-            "answer": "Prophet Adam"
+            "question": "What is the first pillar of Islam?",
+            "options": ["Salah", "Shahada", "Zakat", "Hajj"],
+            "answer": "Shahada"
         },
         {
-            "question": "How many times do Muslims pray in a day?",
-            "options": ["3", "5", "7", "6"],
-            "answer": "5"
+            "question": "Which Surah is recited in every Salah?",
+            "options": ["Al-Ikhlas", "Al-Fatiha", "Yasin", "Al-Baqarah"],
+            "answer": "Al-Fatiha"
         },
         {
-            "question": "Which angel delivered the Quran to the Prophet ﷺ?",
-            "options": ["Jibril", "Mikail", "Israfil", "Azrael"],
-            "answer": "Jibril"
+            "question": "What is the name of the Islamic lunar calendar?",
+            "options": ["Hijri", "Gregorian", "Qamari", "Miladi"],
+            "answer": "Hijri"
         },
         {
-            "question": "Which month is Ramadan in the Islamic calendar?",
-            "options": ["9th", "1st", "12th", "10th"],
-            "answer": "9th"
+            "question": "Who is the father of all prophets in Islam?",
+            "options": ["Nuh", "Ibrahim", "Adam", "Muhammad"],
+            "answer": "Adam"
         },
         {
-            "question": "What is the first word revealed in the Quran?",
-            "options": ["Read", "Pray", "Worship", "Write"],
-            "answer": "Read"
+            "question": "Which angel records our deeds?",
+            "options": ["Jibril", "Mikail", "Raqeeb & Atid", "Israfil"],
+            "answer": "Raqeeb & Atid"
         }
     ],
 
     2: [
         {
-            "question": "How many Surahs are in the Quran?",
-            "options": ["114", "113", "112", "110"],
-            "answer": "114"
+            "question": "What is the term for voluntary charity in Islam?",
+            "options": ["Zakat", "Sadaqah", "Kaffarah", "Fitrah"],
+            "answer": "Sadaqah"
         },
         {
-            "question": "Which prophet built the Kaaba with his son?",
-            "options": ["Ibrahim", "Musa", "Isa", "Nuh"],
+            "question": "Which prophet is known as 'Khalilullah' (Friend of Allah)?",
+            "options": ["Musa", "Ibrahim", "Yusuf", "Sulaiman"],
             "answer": "Ibrahim"
         },
         {
-            "question": "What does 'Salah' mean?",
-            "options": ["Charity", "Fasting", "Prayer", "Pilgrimage"],
-            "answer": "Prayer"
+            "question": "How many Rak'ahs are in Fajr prayer?",
+            "options": ["2", "3", "4", "1"],
+            "answer": "2"
         },
         {
-            "question": "Which prayer is offered just after sunset?",
-            "options": ["Fajr", "Maghrib", "Asr", "Isha"],
-            "answer": "Maghrib"
+            "question": "What is the name of the well in Mecca with Zamzam water?",
+            "options": ["Bir Zamzam", "Ayn Zubaydah", "Qanatir", "Hufayr"],
+            "answer": "Bir Zamzam"
         },
         {
-            "question": "What is the Islamic month of fasting?",
-            "options": ["Shawwal", "Rajab", "Ramadan", "Dhul Hijjah"],
-            "answer": "Ramadan"
+            "question": "Which Surah is called 'The Purity of Faith'?",
+            "options": ["Al-Falaq", "An-Nas", "Al-Ikhlas", "Al-Kafirun"],
+            "answer": "Al-Ikhlas"
         }
     ],
 
     3: [
         {
-            "question": "Who was the last prophet in Islam?",
-            "options": ["Prophet Isa", "Prophet Musa", "Prophet Muhammad", "Prophet Nuh"],
-            "answer": "Prophet Muhammad"
+            "question": "What is the term for the Islamic funeral prayer?",
+            "options": ["Janazah", "Taraweeh", "Tahajjud", "Witr"],
+            "answer": "Janazah"
         },
         {
-            "question": "What is the Arabic term for charity?",
-            "options": ["Zakat", "Sadaqah", "Siyam", "Hajj"],
-            "answer": "Sadaqah"
+            "question": "Which prophet was swallowed by a whale?",
+            "options": ["Yusuf", "Yunus", "Musa", "Nuh"],
+            "answer": "Yunus"
         },
         {
-            "question": "Which city is known as the birthplace of Islam?",
-            "options": ["Madina", "Mecca", "Jerusalem", "Karbala"],
-            "answer": "Mecca"
+            "question": "What is the minimum amount for Zakat on wealth (Nisab)?",
+            "options": ["2.5%", "5%", "10%", "1%"],
+            "answer": "2.5%"
         },
         {
-            "question": "What is the significance of the night of Laylat al-Qadr?",
-            "options": ["The night of the Prophet's birth", "The night the Quran was revealed", "The night of the Hijra", "The night of Eid"],
-            "answer": "The night the Quran was revealed"
+            "question": "Which battle is called 'The Victory' in the Quran?",
+            "options": ["Badr", "Uhud", "Khandaq", "Hunayn"],
+            "answer": "Badr"
         },
         {
-            "question": "Which prophet is known for building the Ark?",
-            "options": ["Nuh", "Ibrahim", "Musa", "Yusuf"],
-            "answer": "Nuh"
+            "question": "What is the Arabic word for the Day of Judgment?",
+            "options": ["Qiyamah", "Barzakh", "Akhirah", "Jannah"],
+            "answer": "Qiyamah"
         }
     ],
 
     4: [
         {
-            "question": "What is the direction Muslims face during prayer?",
-            "options": ["North", "South", "Qibla (Kaaba)", "East"],
-            "answer": "Qibla (Kaaba)"
+            "question": "Which prophet is known for interpreting dreams?",
+            "options": ["Yusuf", "Sulaiman", "Ibrahim", "Dawud"],
+            "answer": "Yusuf"
         },
         {
-            "question": "Which surah is known as 'The Heart of the Quran'?",
-            "options": ["Al-Fatiha", "Yasin", "Al-Baqarah", "Al-Ikhlas"],
-            "answer": "Yasin"
+            "question": "What is the name of the Black Stone in the Kaaba?",
+            "options": ["Hajar al-Aswad", "Rukn al-Yamani", "Maqam Ibrahim", "Hijr Ismail"],
+            "answer": "Hajar al-Aswad"
         },
         {
-            "question": "How many pillars of Islam are there?",
-            "options": ["3", "5", "4", "6"],
-            "answer": "5"
+            "question": "How many times is 'Bismillah' repeated in the Quran?",
+            "options": ["113", "114", "112", "115"],
+            "answer": "114"
         },
         {
-            "question": "What is the Islamic declaration of faith called?",
-            "options": ["Salah", "Shahada", "Zakat", "Hajj"],
+            "question": "Which prophet built the first mosque on Earth?",
+            "options": ["Adam", "Ibrahim", "Nuh", "Muhammad"],
+            "answer": "Adam"
+        },
+        {
+            "question": "What is the term for the Islamic declaration of faith?",
+            "options": ["Takbir", "Shahada", "Tahlil", "Tasbih"],
             "answer": "Shahada"
-        },
-        {
-            "question": "Who was the first caliph after Prophet Muhammad?",
-            "options": ["Abu Bakr", "Umar", "Uthman", "Ali"],
-            "answer": "Abu Bakr"
         }
     ],
 
     5: [
         {
-            "question": "Which angel blows the trumpet to announce the Day of Judgment?",
-            "options": ["Jibril", "Israfil", "Mikail", "Azrael"],
-            "answer": "Israfil"
+            "question": "Which Surah protects against the evil eye?",
+            "options": ["Al-Falaq", "An-Nas", "Al-Kawthar", "Al-Mulk"],
+            "answer": "Al-Falaq"
         },
         {
-            "question": "What is the pilgrimage to Mecca called?",
-            "options": ["Hajj", "Umrah", "Ziyarat", "Siyam"],
-            "answer": "Hajj"
+            "question": "What is the name of the Prophet’s miraculous night journey?",
+            "options": ["Hijrah", "Isra & Miraj", "Ghazwa", "Umrah"],
+            "answer": "Isra & Miraj"
         },
         {
-            "question": "Which surah is the longest in the Quran?",
-            "options": ["Al-Baqarah", "Al-Fatiha", "Al-Imran", "An-Nisa"],
-            "answer": "Al-Baqarah"
+            "question": "Which companion was known as 'The Sword of Allah'?",
+            "options": ["Umar", "Khalid ibn al-Walid", "Ali", "Hamza"],
+            "answer": "Khalid ibn al-Walid"
         },
         {
-            "question": "What is the Islamic month after Ramadan?",
-            "options": ["Shawwal", "Dhul Hijjah", "Dhu al-Qi'dah", "Rajab"],
-            "answer": "Shawwal"
+            "question": "What is the term for the Islamic pilgrimage outside Hajj?",
+            "options": ["Umrah", "Tawaf", "Sa'i", "Qiran"],
+            "answer": "Umrah"
         },
         {
-            "question": "Who was known as the 'Second Muhammad' due to his knowledge?",
-            "options": ["Imam Abu Hanifa", "Imam Malik", "Imam Shafi'i", "Imam Ahmad"],
-            "answer": "Imam Ahmad"
+            "question": "Which prophet was given the Zabur (Psalms)?",
+            "options": ["Musa", "Isa", "Dawud", "Sulaiman"],
+            "answer": "Dawud"
         }
     ],
 
     6: [
         {
-            "question": "What is the term for the Islamic law?",
-            "options": ["Sharia", "Fiqh", "Sunnah", "Hadd"],
-            "answer": "Sharia"
+            "question": "Which Surah is known as 'The Throne Verse'?",
+            "options": ["Ayat al-Kursi", "Surah Yasin", "Surah Rahman", "Surah Mulk"],
+            "answer": "Ayat al-Kursi"
         },
         {
-            "question": "Which Prophet is associated with the story of Yusuf (Joseph)?",
-            "options": ["Yusuf", "Musa", "Isa", "Nuh"],
-            "answer": "Yusuf"
+            "question": "What is the name of the cave where the Prophet received the first revelation?",
+            "options": ["Hira", "Thawr", "Uhud", "Safa"],
+            "answer": "Hira"
         },
         {
-            "question": "In which city did the Prophet Muhammad pass away?",
-            "options": ["Mecca", "Madina", "Karbala", "Jerusalem"],
-            "answer": "Madina"
+            "question": "Which prophet is known as 'The Father of the Prophets'?",
+            "options": ["Ibrahim", "Adam", "Nuh", "Muhammad"],
+            "answer": "Ibrahim"
         },
         {
-            "question": "What is the name of the Islamic prayer performed at dawn?",
-            "options": ["Fajr", "Dhuhr", "Asr", "Isha"],
-            "answer": "Fajr"
+            "question": "What is the term for the Islamic call to prayer?",
+            "options": ["Iqamah", "Adhan", "Takbir", "Tahlil"],
+            "answer": "Adhan"
         },
         {
-            "question": "Which prophet is known for splitting the Red Sea?",
-            "options": ["Musa", "Isa", "Yusuf", "Nuh"],
-            "answer": "Musa"
+            "question": "Which companion was the first martyr in Islam?",
+            "options": ["Sumayyah", "Bilal", "Hamza", "Umar"],
+            "answer": "Sumayyah"
         }
     ],
 
     7: [
         {
-            "question": "What does the term 'Halal' mean?",
-            "options": ["Forbidden", "Permissible", "Unclean", "Sacred"],
-            "answer": "Permissible"
+            "question": "What is the name of the Prophet’s first wife?",
+            "options": ["Aisha", "Khadijah", "Hafsa", "Sawdah"],
+            "answer": "Khadijah"
         },
         {
-            "question": "Which city is called the 'City of the Prophet'?",
-            "options": ["Mecca", "Madina", "Jerusalem", "Cairo"],
-            "answer": "Madina"
+            "question": "Which Surah is the longest in the Quran?",
+            "options": ["Al-Baqarah", "Al-Imran", "An-Nisa", "Al-Ma'idah"],
+            "answer": "Al-Baqarah"
         },
         {
-            "question": "What is the name of the festival that marks the end of Ramadan?",
-            "options": ["Eid al-Fitr", "Eid al-Adha", "Lailat al-Qadr", "Mawlid"],
-            "answer": "Eid al-Fitr"
+            "question": "What is the term for the Islamic fast-breaking meal at sunset?",
+            "options": ["Suhoor", "Iftar", "Taraweeh", "Qiyam"],
+            "answer": "Iftar"
         },
         {
-            "question": "Which prophet is associated with building the Ark?",
-            "options": ["Nuh", "Ibrahim", "Musa", "Yusuf"],
-            "answer": "Nuh"
+            "question": "Which prophet was known for his patience during suffering?",
+            "options": ["Ayyub", "Yunus", "Musa", "Yusuf"],
+            "answer": "Ayyub"
         },
         {
-            "question": "What is the Islamic term for the fast of Ramadan?",
-            "options": ["Siyam", "Hajj", "Zakat", "Qiyam"],
-            "answer": "Siyam"
+            "question": "What is the name of the Islamic New Year?",
+            "options": ["Muharram", "Ramadan", "Shawwal", "Dhul-Hijjah"],
+            "answer": "Muharram"
         }
     ],
 
     8: [
         {
-            "question": "Which Surah is known as 'The Opening'?",
-            "options": ["Al-Fatiha", "Al-Baqarah", "Al-Ikhlas", "Al-Nas"],
-            "answer": "Al-Fatiha"
+            "question": "Which city is called 'The City of the Prophet'?",
+            "options": ["Mecca", "Medina", "Jerusalem", "Kufa"],
+            "answer": "Medina"
         },
         {
-            "question": "Who was the wife of the Prophet Muhammad?",
-            "options": ["Aisha", "Khadijah", "Fatimah", "Hafsa"],
-            "answer": "Khadijah"
+            "question": "What is the term for the Islamic pre-dawn meal during Ramadan?",
+            "options": ["Iftar", "Suhoor", "Taraweeh", "Qiyam"],
+            "answer": "Suhoor"
         },
         {
-            "question": "What is the name of the Islamic prayer performed after sunset?",
-            "options": ["Maghrib", "Fajr", "Isha", "Dhuhr"],
-            "answer": "Maghrib"
-        },
-        {
-            "question": "Which prophet is associated with the story of the cow?",
-            "options": ["Yusuf", "Musa", "Isa", "Nuh"],
+            "question": "Which prophet is associated with the story of the golden calf?",
+            "options": ["Musa", "Harun", "Yusuf", "Ibrahim"],
             "answer": "Musa"
         },
         {
-            "question": "What is the significance of the month of Dhu al-Hijjah?",
-            "options": ["Hajj pilgrimage", "Fasting", "New Year", "Eid"],
-            "answer": "Hajj pilgrimage"
+            "question": "What is the name of the Islamic festival of sacrifice?",
+            "options": ["Eid al-Fitr", "Eid al-Adha", "Mawlid", "Laylat al-Qadr"],
+            "answer": "Eid al-Adha"
+        },
+        {
+            "question": "Which Surah is known as 'The Heart of the Quran'?",
+            "options": ["Yasin", "Al-Fatiha", "Al-Ikhlas", "Al-Mulk"],
+            "answer": "Yasin"
         }
     ],
 
     9: [
         {
-            "question": "What is the Arabic term for 'Good Deeds'?",
-            "options": ["Amal", "A'mal", "A'mal Salih", "Sadaqah"],
-            "answer": "A'mal Salih"
-        },
-        {
-            "question": "Which prophet is known for his patience and long life?",
-            "options": ["Nuh", "Ayyub", "Ibrahim", "Yusuf"],
-            "answer": "Ayyub"
-        },
-        {
-            "question": "What is the name of the city where the Prophet Muhammad was born?",
-            "options": ["Mecca", "Madina", "Jerusalem", "Cairo"],
-            "answer": "Mecca"
-        },
-        {
-            "question": "Which of the following is NOT one of the five pillars of Islam?",
-            "options": ["Salah", "Zakat", "Hajj", "Jihad"],
-            "answer": "Jihad"
-        },
-        {
-            "question": "What is the Islamic term for the pilgrimage to Mecca?",
-            "options": ["Hajj", "Umrah", "Ziyarat", "Siyam"],
+            "question": "What is the term for the Islamic pilgrimage to Mecca?",
+            "options": ["Hajj", "Umrah", "Tawaf", "Sa'i"],
             "answer": "Hajj"
+        },
+        {
+            "question": "Which prophet is known for splitting the sea?",
+            "options": ["Musa", "Yusuf", "Nuh", "Yunus"],
+            "answer": "Musa"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed at night during Ramadan?",
+            "options": ["Tahajjud", "Taraweeh", "Witr", "Qiyam"],
+            "answer": "Taraweeh"
+        },
+        {
+            "question": "Which Surah is known as 'The Sovereignty'?",
+            "options": ["Al-Mulk", "Al-Waqi'ah", "Al-Qalam", "Al-Hadid"],
+            "answer": "Al-Mulk"
+        },
+        {
+            "question": "Who was the first caliph after Prophet Muhammad?",
+            "options": ["Umar", "Abu Bakr", "Ali", "Uthman"],
+            "answer": "Abu Bakr"
         }
     ],
 
     10: [
         {
-            "question": "Who was the first martyr in Islam?",
-            "options": ["Sumayyah", "Bilal", "Khadijah", "Umar"],
-            "answer": "Sumayyah"
+            "question": "What is the term for the Islamic ruling on permissible and forbidden?",
+            "options": ["Halal & Haram", "Sunnah & Bid'ah", "Fard & Mustahabb", "Makruh & Mubah"],
+            "answer": "Halal & Haram"
         },
         {
-            "question": "What is the name of the mountain where Prophet Musa received the commandments?",
-            "options": ["Mount Sinai", "Mount Arafat", "Mount Everest", "Mount Thawr"],
-            "answer": "Mount Sinai"
+            "question": "Which prophet is known for his wisdom and the story of the two women?",
+            "options": ["Sulaiman", "Yusuf", "Dawud", "Ibrahim"],
+            "answer": "Sulaiman"
         },
         {
-            "question": "Which Surah is known as 'The Women'?",
-            "options": ["An-Nisa", "Al-Mumtahanah", "Al-Mumtahinah", "Al-Ma'idah"],
-            "answer": "An-Nisa"
+            "question": "What is the name of the Islamic prayer performed at noon?",
+            "options": ["Dhuhr", "Asr", "Fajr", "Maghrib"],
+            "answer": "Dhuhr"
         },
         {
-            "question": "What does the term 'Eid' mean?",
-            "options": ["Festival", "Fast", "Prayer", "Pilgrimage"],
-            "answer": "Festival"
+            "question": "Which Surah is known as 'The Night Journey'?",
+            "options": ["Al-Isra", "Al-Mi'raj", "An-Najm", "Al-Qadr"],
+            "answer": "Al-Isra"
         },
         {
-            "question": "Which prophet is associated with the story of the whale?",
-            "options": ["Yunus", "Musa", "Isa", "Nuh"],
-            "answer": "Yunus"
+            "question": "Who was the Prophet’s uncle who opposed him?",
+            "options": ["Abu Talib", "Abu Lahab", "Hamza", "Abbas"],
+            "answer": "Abu Lahab"
         }
     ],
 
     11: [
         {
-            "question": "What is the Islamic ruling called for giving a portion of wealth to the poor?",
-            "options": ["Zakat", "Sadaqah", "Fitrah", "Kaffara"],
-            "answer": "Zakat"
+            "question": "What is the term for the Islamic concept of predestination?",
+            "options": ["Qadr", "Tawakkul", "Tawhid", "Akhirah"],
+            "answer": "Qadr"
         },
         {
-            "question": "Which prophet is known for his wisdom and the story of the two women and the baby?",
-            "options": ["Sulaiman", "Yusuf", "Ibrahim", "Musa"],
-            "answer": "Sulaiman"
+            "question": "Which prophet is known for his beautiful voice and the Psalms?",
+            "options": ["Dawud", "Sulaiman", "Musa", "Yusuf"],
+            "answer": "Dawud"
         },
         {
-            "question": "What is the name of the night when the Quran was first revealed?",
-            "options": ["Laylat al-Qadr", "Eid al-Fitr", "Laylat al-Miraj", "Laylat al-Bara'ah"],
-            "answer": "Laylat al-Qadr"
-        },
-        {
-            "question": "Which city did the Prophet migrate to from Mecca?",
-            "options": ["Madina", "Jerusalem", "Cairo", "Baghdad"],
-            "answer": "Madina"
-        },
-        {
-            "question": "What is the Islamic term for the act of fasting during Ramadan?",
-            "options": ["Siyam", "Zakat", "Hajj", "Qiyam"],
-            "answer": "Siyam"
-        }
-    ],
-
-    12: [
-        {
-            "question": "Which surah is known as 'The Chapter of Light'?",
-            "options": ["An-Nur", "Al-Hadid", "Al-Ma'idah", "Al-Anfal"],
-            "answer": "An-Nur"
-        },
-        {
-            "question": "Who was the mother of Prophet Isa (Jesus)?",
-            "options": ["Maryam", "Khadijah", "Asiya", "Hawwa"],
-            "answer": "Maryam"
-        },
-        {
-            "question": "What is the name of the Islamic prayer performed at midday?",
-            "options": ["Dhuhr", "Asr", "Fajr", "Isha"],
-            "answer": "Dhuhr"
-        },
-        {
-            "question": "Which prophet is associated with the story of the flood?",
-            "options": ["Nuh", "Musa", "Yusuf", "Ibrahim"],
-            "answer": "Nuh"
-        },
-        {
-            "question": "What is the Islamic term for the pilgrimage to Mecca during Hajj?",
-            "options": ["Tawaf", "Sa'i", "Ihram", "Hajj"],
-            "answer": "Hajj"
-        }
-    ],
-
-    13: [
-        {
-            "question": "What is the name of the angel responsible for taking souls?",
-            "options": ["Mikail", "Jibril", "Azrael", "Israfil"],
-            "answer": "Azrael"
-        },
-        {
-            "question": "Which Surah is known as 'The Opening'?",
-            "options": ["Al-Fatiha", "Al-Baqarah", "Al-Ikhlas", "Al-Nas"],
-            "answer": "Al-Fatiha"
-        },
-        {
-            "question": "Who was the first person to accept Islam after the Prophet?",
-            "options": ["Khadijah", "Ali", "Abu Bakr", "Umar"],
-            "answer": "Khadijah"
-        },
-        {
-            "question": "Which prophet is called the 'Friend of Allah'?",
-            "options": ["Ibrahim", "Yusuf", "Musa", "Isa"],
-            "answer": "Ibrahim"
-        },
-        {
-            "question": "What is the term for the minor pilgrimage in Islam?",
-            "options": ["Umrah", "Hajj", "Ziyarat", "Siyam"],
-            "answer": "Umrah"
-        }
-    ],
-
-    14: [
-        {
-            "question": "Which city is the third holiest city in Islam?",
-            "options": ["Jerusalem", "Mecca", "Madina", "Karbala"],
-            "answer": "Jerusalem"
-        },
-        {
-            "question": "What is the name of the Islamic prayer performed in the evening?",
-            "options": ["Isha", "Maghrib", "Fajr", "Dhuhr"],
-            "answer": "Isha"
-        },
-        {
-            "question": "Who was the first martyr in Islam?",
-            "options": ["Sumayyah", "Bilal", "Khadijah", "Umar"],
-            "answer": "Sumayyah"
-        },
-        {
-            "question": "Which prophet is known for his patience during suffering?",
-            "options": ["Ayyub", "Yunus", "Ibrahim", "Nuh"],
-            "answer": "Ayyub"
-        },
-        {
-            "question": "What does the term 'Hijrah' refer to?",
-            "options": ["Migration", "Fasting", "Prayer", "Pilgrimage"],
-            "answer": "Migration"
-        }
-    ],
-
-    15: [
-        {
-            "question": "What is the significance of the month of Muharram?",
-            "options": ["New Year", "Day of Arafah", "Eid al-Adha", "Ashura"],
-            "answer": "Ashura"
-        },
-        {
-            "question": "Which prophet is associated with the story of the two gardens?",
-            "options": ["Yusuf", "Dhul-Qarnayn", "Sulaiman", "Yunus"],
-            "answer": "Yusuf"
-        },
-        {
-            "question": "What is the name of the chapter that describes the Battle of Badr?",
-            "options": ["Al-Anfal", "Ali-Imran", "Al-Mumtahanah", "Al-Hajj"],
-            "answer": "Al-Anfal"
-        },
-        {
-            "question": "Who is known as the 'Second Caliph'?",
-            "options": ["Umar ibn al-Khattab", "Uthman ibn Affan", "Ali ibn Abi Talib", "Abu Bakr"],
-            "answer": "Umar ibn al-Khattab"
-        },
-        {
-            "question": "What is the Islamic ruling on interest (riba)?",
-            "options": ["Permissible", "Forbidden", "Must be paid", "Optional"],
-            "answer": "Forbidden"
-        }
-    ],
-
-    16: [
-        {
-            "question": "What is the name of the mountain where Prophet Musa received the commandments?",
-            "options": ["Mount Sinai", "Mount Arafat", "Mount Thawr", "Mount Everest"],
-            "answer": "Mount Sinai"
-        },
-        {
-            "question": "What is the name of the compulsory charity paid during Ramadan?",
-            "options": ["Zakat al-Fitr", "Zakat al-Mal", "Sadaqah", "Fitrah"],
-            "answer": "Zakat al-Fitr"
+            "question": "What is the name of the Islamic prayer performed in the late afternoon?",
+            "options": ["Asr", "Dhuhr", "Maghrib", "Isha"],
+            "answer": "Asr"
         },
         {
             "question": "Which Surah is known as 'The Cow'?",
@@ -732,128 +597,263 @@ questions = levels = {
             "answer": "Al-Baqarah"
         },
         {
-            "question": "Who was the Prophet's first wife?",
-            "options": ["Khadijah", "Aisha", "Hafsa", "Zaynab"],
-            "answer": "Khadijah"
+            "question": "Who was the first female martyr in Islam?",
+            "options": ["Sumayyah", "Khadijah", "Aisha", "Fatimah"],
+            "answer": "Sumayyah"
+        }
+    ],
+
+    12: [
+        {
+            "question": "What is the term for the Islamic tax on wealth?",
+            "options": ["Sadaqah", "Zakat", "Kaffarah", "Fitrah"],
+            "answer": "Zakat"
         },
         {
-            "question": "What does the term 'Makkah' mean?",
-            "options": ["City of the Prophet", "The Sacred Mosque", "The Holy City", "The City of Mecca"],
-            "answer": "The City of Mecca"
+            "question": "Which prophet is known for his Ark and the great flood?",
+            "options": ["Nuh", "Musa", "Yusuf", "Yunus"],
+            "answer": "Nuh"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed after sunset?",
+            "options": ["Maghrib", "Isha", "Fajr", "Dhuhr"],
+            "answer": "Maghrib"
+        },
+        {
+            "question": "Which Surah is known as 'The Light'?",
+            "options": ["An-Nur", "Al-Falaq", "Al-Ikhlas", "Al-Kafirun"],
+            "answer": "An-Nur"
+        },
+        {
+            "question": "Who was the Prophet’s foster mother?",
+            "options": ["Halimah", "Amina", "Khadijah", "Sumayyah"],
+            "answer": "Halimah"
+        }
+    ],
+
+    13: [
+        {
+            "question": "What is the term for the Islamic pilgrimage to Mecca performed at any time?",
+            "options": ["Hajj", "Umrah", "Tawaf", "Sa'i"],
+            "answer": "Umrah"
+        },
+        {
+            "question": "Which prophet is known for his patience and the story of the whale?",
+            "options": ["Yunus", "Musa", "Yusuf", "Ayyub"],
+            "answer": "Yunus"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed at night?",
+            "options": ["Isha", "Tahajjud", "Taraweeh", "Witr"],
+            "answer": "Isha"
+        },
+        {
+            "question": "Which Surah is known as 'The Dawn'?",
+            "options": ["Al-Falaq", "An-Nas", "Al-Ikhlas", "Al-Kafirun"],
+            "answer": "Al-Falaq"
+        },
+        {
+            "question": "Who was the first person to accept Islam from the youth?",
+            "options": ["Ali", "Abu Bakr", "Umar", "Zayd"],
+            "answer": "Ali"
+        }
+    ],
+
+    14: [
+        {
+            "question": "What is the term for the Islamic declaration 'There is no god but Allah'?",
+            "options": ["Tahlil", "Takbir", "Tasbih", "Shahada"],
+            "answer": "Tahlil"
+        },
+        {
+            "question": "Which prophet is known for his dream interpretation and the story of the prison?",
+            "options": ["Yusuf", "Musa", "Ibrahim", "Dawud"],
+            "answer": "Yusuf"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed before sunrise?",
+            "options": ["Fajr", "Dhuhr", "Asr", "Maghrib"],
+            "answer": "Fajr"
+        },
+        {
+            "question": "Which Surah is known as 'The People'?",
+            "options": ["An-Nas", "Al-Falaq", "Al-Ikhlas", "Al-Kafirun"],
+            "answer": "An-Nas"
+        },
+        {
+            "question": "Who was the first caliph to be assassinated?",
+            "options": ["Umar", "Uthman", "Ali", "Abu Bakr"],
+            "answer": "Umar"
+        }
+    ],
+
+    15: [
+        {
+            "question": "What is the term for the Islamic concept of striving in the path of Allah?",
+            "options": ["Jihad", "Hijrah", "Dawah", "Ihsan"],
+            "answer": "Jihad"
+        },
+        {
+            "question": "Which prophet is known for his wisdom and the story of the ants?",
+            "options": ["Sulaiman", "Dawud", "Yusuf", "Ibrahim"],
+            "answer": "Sulaiman"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed in the evening?",
+            "options": ["Maghrib", "Isha", "Fajr", "Dhuhr"],
+            "answer": "Isha"
+        },
+        {
+            "question": "Which Surah is known as 'The Elephant'?",
+            "options": ["Al-Fil", "Al-Quraysh", "Al-Ma'un", "Al-Kawthar"],
+            "answer": "Al-Fil"
+        },
+        {
+            "question": "Who was the first female scholar of Islam?",
+            "options": ["Aisha", "Khadijah", "Fatimah", "Hafsa"],
+            "answer": "Aisha"
+        }
+    ],
+
+    16: [
+        {
+            "question": "What is the term for the Islamic concept of divine unity?",
+            "options": ["Tawhid", "Shirk", "Qadr", "Iman"],
+            "answer": "Tawhid"
+        },
+        {
+            "question": "Which prophet is known for his staff and the parting of the sea?",
+            "options": ["Musa", "Yusuf", "Nuh", "Yunus"],
+            "answer": "Musa"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed after midnight?",
+            "options": ["Tahajjud", "Taraweeh", "Witr", "Qiyam"],
+            "answer": "Tahajjud"
+        },
+        {
+            "question": "Which Surah is known as 'The Iron'?",
+            "options": ["Al-Hadid", "Al-Waqi'ah", "Al-Qalam", "Al-Mulk"],
+            "answer": "Al-Hadid"
+        },
+        {
+            "question": "Who was the first person to compile the Quran into a book?",
+            "options": ["Abu Bakr", "Umar", "Uthman", "Ali"],
+            "answer": "Abu Bakr"
         }
     ],
 
     17: [
         {
-            "question": "Which prophet is associated with the story of the burning bush?",
-            "options": ["Musa", "Isa", "Yusuf", "Nuh"],
-            "answer": "Musa"
+            "question": "What is the term for the Islamic concept of gratitude?",
+            "options": ["Shukr", "Sabr", "Tawakkul", "Ihsan"],
+            "answer": "Shukr"
         },
         {
-            "question": "What is the name of the festival that commemorates Prophet Ibrahim's willingness to sacrifice his son?",
-            "options": ["Eid al-Adha", "Eid al-Fitr", "Lailat al-Qadr", "Mawlid"],
-            "answer": "Eid al-Adha"
+            "question": "Which prophet is known for his kingdom and the story of the hoopoe bird?",
+            "options": ["Sulaiman", "Dawud", "Yusuf", "Ibrahim"],
+            "answer": "Sulaiman"
         },
         {
-            "question": "Which chapter of the Quran is known as 'The Family of Imran'?",
-            "options": ["Al-Imran", "Al-Anfal", "Al-Ma'idah", "Al-Hadid"],
-            "answer": "Al-Imran"
+            "question": "What is the name of the Islamic prayer performed during Eid?",
+            "options": ["Eid Salah", "Taraweeh", "Janazah", "Witr"],
+            "answer": "Eid Salah"
         },
         {
-            "question": "What is the term for the Islamic study of law and jurisprudence?",
-            "options": ["Fiqh", "Tafsir", "Hadith", "Aqidah"],
-            "answer": "Fiqh"
+            "question": "Which Surah is known as 'The Inevitable'?",
+            "options": ["Al-Waqi'ah", "Al-Qiyamah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Waqi'ah"
         },
         {
-            "question": "Who was the Prophet's uncle who supported him in Mecca?",
-            "options": ["Abu Talib", "Umar", "Uthman", "Ali"],
-            "answer": "Abu Talib"
+            "question": "Who was the first person to translate the Quran into another language?",
+            "options": ["Salman al-Farsi", "Umar", "Ali", "Abu Bakr"],
+            "answer": "Salman al-Farsi"
         }
     ],
 
     18: [
         {
-            "question": "What is the name of the city where the Prophet performed the Night Journey (Isra and Miraj)?",
-            "options": ["Jerusalem", "Mecca", "Madina", "Cairo"],
-            "answer": "Jerusalem"
+            "question": "What is the term for the Islamic concept of reliance on Allah?",
+            "options": ["Tawakkul", "Sabr", "Shukr", "Ihsan"],
+            "answer": "Tawakkul"
         },
         {
-            "question": "Which Surah is called 'The Light'?",
-            "options": ["An-Nur", "Al-Hadid", "Al-Mumtahanah", "Al-Ahzab"],
-            "answer": "An-Nur"
+            "question": "Which prophet is known for his patience and the story of the cow?",
+            "options": ["Musa", "Yusuf", "Ibrahim", "Nuh"],
+            "answer": "Musa"
         },
         {
-            "question": "What is the term for the Islamic obligation to give a specific portion of wealth to the needy?",
-            "options": ["Zakat", "Sadaqah", "Fitrah", "Kaffara"],
-            "answer": "Zakat"
+            "question": "What is the name of the Islamic prayer performed during funerals?",
+            "options": ["Janazah", "Taraweeh", "Tahajjud", "Witr"],
+            "answer": "Janazah"
         },
         {
-            "question": "Who is the Prophet associated with the story of the two sons and the murder?",
-            "options": ["Qabil and Habil", "Yusuf and Benjamin", "Isa and Yahya", "Musa and Harun"],
-            "answer": "Qabil and Habil"
+            "question": "Which Surah is known as 'The Resurrection'?",
+            "options": ["Al-Qiyamah", "Al-Waqi'ah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Qiyamah"
         },
         {
-            "question": "What is the name of the Islamic prayer performed at night?",
-            "options": ["Qiyam", "Taraweeh", "Tahajjud", "Isha"],
-            "answer": "Tahajjud"
+            "question": "Who was the first person to memorize the entire Quran?",
+            "options": ["Hafsa", "Aisha", "Uthman", "Ali"],
+            "answer": "Hafsa"
         }
     ],
 
     19: [
         {
-            "question": "Which chapter of the Quran discusses the creation of man?",
-            "options": ["Al-Mu'minun", "Al-Hajj", "Al-Alaq", "Al-Qiyamah"],
-            "answer": "Al-Alaq"
+            "question": "What is the term for the Islamic concept of excellence in worship?",
+            "options": ["Ihsan", "Iman", "Islam", "Taqwa"],
+            "answer": "Ihsan"
         },
         {
-            "question": "What is the name of the festival that celebrates the birthday of Prophet Muhammad?",
-            "options": ["Mawlid", "Eid al-Fitr", "Eid al-Adha", "Lailat al-Qadr"],
-            "answer": "Mawlid"
+            "question": "Which prophet is known for his ring and control over jinn?",
+            "options": ["Sulaiman", "Dawud", "Yusuf", "Ibrahim"],
+            "answer": "Sulaiman"
         },
         {
-            "question": "Which prophet is called the 'Friend of Allah' in Islamic tradition?",
-            "options": ["Ibrahim", "Musa", "Isa", "Yusuf"],
-            "answer": "Ibrahim"
+            "question": "What is the name of the Islamic prayer performed during Laylat al-Qadr?",
+            "options": ["Qiyam", "Taraweeh", "Tahajjud", "Witr"],
+            "answer": "Qiyam"
         },
         {
-            "question": "What is the Arabic term for the Day of Judgment?",
-            "options": ["Qiyamah", "Salah", "Jannah", "Akhirah"],
-            "answer": "Qiyamah"
+            "question": "Which Surah is known as 'The Event'?",
+            "options": ["Al-Waqi'ah", "Al-Qiyamah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Waqi'ah"
         },
         {
-            "question": "Which prophet was sent to the people of Nineveh?",
-            "options": ["Yunus", "Nuh", "Ibrahim", "Musa"],
-            "answer": "Yunus"
+            "question": "Who was the first person to lead prayers in the Prophet’s absence?",
+            "options": ["Abu Bakr", "Umar", "Ali", "Bilal"],
+            "answer": "Abu Bakr"
         }
     ],
 
     20: [
         {
-            "question": "What is the name of the event where the Prophet ascended to the heavens?",
-            "options": ["Isra and Miraj", "Hajj", "Laylat al-Qadr", "Mawlid"],
-            "answer": "Isra and Miraj"
+            "question": "What is the term for the Islamic concept of spiritual excellence?",
+            "options": ["Taqwa", "Ihsan", "Iman", "Tawhid"],
+            "answer": "Ihsan"
         },
         {
-            "question": "Which surah is often recited for protection and is called 'The Queen'?",
-            "options": ["Al-Naml", "Al-Fil", "Al-Mulk", "Al-Hadid"],
-            "answer": "Al-Mulk"
+            "question": "Which prophet is known for his cloak and the story of the two gardens?",
+            "options": ["Yusuf", "Sulaiman", "Dawud", "Ibrahim"],
+            "answer": "Yusuf"
         },
         {
-            "question": "Who was the first person to accept Islam from the youth?",
-            "options": ["Ali ibn Abi Talib", "Umar", "Abu Bakr", "Bilal"],
-            "answer": "Ali ibn Abi Talib"
+            "question": "What is the name of the Islamic prayer performed during Hajj at Arafat?",
+            "options": ["Wuquf", "Tawaf", "Sa'i", "Ramy"],
+            "answer": "Wuquf"
         },
         {
-            "question": "Which city was the first capital of the Islamic Caliphate?",
-            "options": ["Medina", "Kufa", "Damascus", "Baghdad"],
-            "answer": "Kufa"
+            "question": "Which Surah is known as 'The Overwhelming'?",
+            "options": ["Al-Ghashiyah", "Al-Waqi'ah", "Al-Qiyamah", "Al-Mulk"],
+            "answer": "Al-Ghashiyah"
         },
         {
-            "question": "What is the term for the Islamic concept of divine decree and predestination?",
-            "options": ["Qadar", "Tawakkul", "Tawhid", "Aqidah"],
-            "answer": "Qadar"
+            "question": "Who was the first person to compile Hadith into a book?",
+            "options": ["Imam Bukhari", "Imam Muslim", "Imam Malik", "Imam Ahmad"],
+            "answer": "Imam Malik"
         }
-    ],
+    ]
 }
 
 def get_questions_for_level(level):
