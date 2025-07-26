@@ -1582,18 +1582,37 @@ def hadith_search():
         return jsonify({'result': 'Hadith search failed. Try again later.', 'results': []})
 
 # --- Get Surah List ---
-@app.route('/get-surah-list')
-def get_surah_list():
-    try:
-        response = requests.get('https://api.quran.gading.dev/surah')
-        response.raise_for_status()
-        surahs = response.json().get('data', [])
-        names = [s['name']['transliteration']['en'] for s in surahs]
-        return jsonify({'surah_list': names})
-    except requests.RequestException as e:
-        print(f"Surah List API Error: {e}")
-        return jsonify({'surah_list': []})
+@app.route('/quran-surah', methods=['POST'])
+def quran_surah():
+    data = request.get_json()
+    surah_number = data.get('surah_number')
 
+    if not surah_number:
+        return jsonify({'error': 'Surah number is required'}), 400
+
+    try:
+        response = requests.get(f'https://api.quran.gading.dev/surah/{surah_number}')
+        response.raise_for_status()
+        surah_data = response.json().get('data', {})
+
+        ayahs = []
+        for ayah in surah_data.get('verses', []):
+            ayahs.append({
+                'ayah_number': ayah.get('number', {}).get('inSurah'),
+                'arabic': ayah.get('text', {}).get('arab'),
+                'english': ayah.get('translation', {}).get('en'),
+                'transliteration': ayah.get('text', {}).get('transliteration', {}).get('en')
+            })
+
+        return jsonify({
+            'surah_name': surah_data.get('name', {}).get('transliteration', {}).get('en'),
+            'ayahs': ayahs
+        })
+
+    except requests.RequestException as e:
+        print(f"Surah Fetch Error: {e}")
+        return jsonify({'ayahs': []})
+        
 # --- Additional API: Islamic Motivation ---
 @app.route('/islamic-motivation')
 def get_islamic_motivation():
