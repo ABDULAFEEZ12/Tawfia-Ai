@@ -24,13 +24,26 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       padding: 40px 20px;
       border-radius: 20px;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       color: #004d40;
-      line-height: 2;
+      line-height: 1.8;
       transition: all 0.3s ease;
       min-height: 180px;
       max-height: 400px;
       overflow-y: auto;
+    }
+
+    .category {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #00796b;
+    }
+
+    .reference {
+      margin-top: 15px;
+      color: #00695c;
+      font-size: 0.95rem;
     }
 
     button {
@@ -57,7 +70,11 @@
 
   <div id="app">
     <div class="reminder-box">
-      <p v-if="currentIndex < reminders.length" v-text="reminders[currentIndex]"></p>
+      <div v-if="currentIndex < reminders.length">
+        <div class="category">📌 {{ reminders[currentIndex].category }}</div>
+        <div>“{{ reminders[currentIndex].text }}”</div>
+        <div class="reference">📖 {{ reminders[currentIndex].reference }}</div>
+      </div>
       <p v-else>No more reminders today. Come back tomorrow inshaAllah 🤍</p>
     </div>
 
@@ -86,7 +103,11 @@
             this.reminders = data;
             this.currentIndex = 0;
           } catch (error) {
-            this.reminders = ["Error loading reminders. Please try again later."];
+            this.reminders = [{
+              category: "Error",
+              text: "Error loading reminders. Please try again later.",
+              reference: ""
+            }];
           }
         },
         nextReminder() {
