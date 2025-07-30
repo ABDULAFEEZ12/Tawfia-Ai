@@ -4,49 +4,71 @@
   <meta charset="UTF-8" />
   <title>Talk to Tawfiq</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#009688" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
+      background: linear-gradient(to bottom right, #0f172a, #1e293b);
       margin: 0;
       padding: 0;
       display: flex;
       justify-content: center;
-      min-height: 100vh;
       align-items: center;
+      min-height: 100vh;
+      color: white;
     }
 
     .container {
       max-width: 480px;
       width: 90%;
-      background: white;
-      padding: 20px;
-      border-radius: 1rem;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+      background: #111827;
+      padding: 30px;
+      border-radius: 1.5rem;
+      border: 2px solid #00ffe1;
+      box-shadow: 0 0 25px rgba(0, 255, 225, 0.3);
       text-align: center;
     }
 
     h2 {
-      font-size: 1.5rem;
-      color: #009688;
-      margin-bottom: 10px;
+      font-size: 1.6rem;
+      color: #38fdfc;
+      margin-bottom: 12px;
     }
 
     .text {
       font-size: 1rem;
-      margin-bottom: 1rem;
-      color: #555;
+      margin-bottom: 1.5rem;
+      color: #cbd5e1;
     }
 
-    input, select, button {
+    select, input, button {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
       font-size: 1rem;
+      background: #1e293b;
+      color: #e2e8f0;
+      box-shadow: 0 0 8px rgba(0,255,255,0.2);
+    }
+
+    select option {
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+
+    button {
+      background: #00ffe1;
+      color: #0f172a;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: #38fdfc;
+      box-shadow: 0 0 15px #38fdfc;
     }
 
     .orb-wrapper {
@@ -58,12 +80,11 @@
     .orb {
       width: 80px;
       height: 80px;
-      background: #009688;
+      background: #00ffe1;
       border-radius: 50%;
-      box-shadow: 0 0 20px #009688;
+      box-shadow: 0 0 20px #00ffe1;
       position: relative;
       animation: pulse 2s infinite;
-      transition: box-shadow 0.3s ease;
     }
 
     .orb.listening {
@@ -109,50 +130,37 @@
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 10px #009688; }
-      50% { box-shadow: 0 0 20px #009688; }
-      100% { box-shadow: 0 0 10px #009688; }
+      0% { box-shadow: 0 0 10px #00ffe1; }
+      50% { box-shadow: 0 0 25px #00ffe1; }
+      100% { box-shadow: 0 0 10px #00ffe1; }
     }
 
     .log {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 10px;
+      background: #1f2937;
+      border-radius: 12px;
+      padding: 15px;
       font-size: 0.95rem;
       white-space: pre-line;
-      margin-bottom: 1rem;
-    }
-
-    .info {
-      font-size: 0.85rem;
-      color: #666;
-      margin-top: 1rem;
-    }
-
-    .info button {
-      background: #009688;
-      color: white;
-      border: none;
-      margin-top: 0.5rem;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 0.9rem;
+      margin-top: 20px;
+      color: #e0f2fe;
+      text-align: left;
+      max-height: 250px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.2);
     }
 
     @media (max-width: 480px) {
       h2 { font-size: 1.3rem; }
       .orb { width: 70px; height: 70px; }
-      input, select { font-size: 0.95rem; }
+      input, select, button { font-size: 0.95rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>🎙️ Talk to Tawfiq</h2>
-    <div class="text">Enter your name, pick a voice, then click the glowing orb to speak or type below</div>
+    <div class="text">Choose your voice, click the orb to speak or type below</div>
 
-    <input type="text" id="username" placeholder="Enter your name (optional)">
     <select id="voiceSelect" aria-label="Voice Selection"><option>Loading voices...</option></select>
 
     <div class="orb-wrapper" id="mic">
@@ -167,22 +175,15 @@
     <button onclick="handleTypedInput()">Ask Tawfiq</button>
 
     <div class="log" id="log">No conversation yet.</div>
-
-    <div class="info">
-      🌍 <strong>Multilingual Support:</strong> Arabic, French, Hausa, Yoruba and more (Coming Soon, in shaa Allah)<br>
-      🔊 <strong>Real Scholar Voices:</strong> Authentic recitations (Coming Soon, in shaa Allah)<br>
-      📱 <strong>Install App:</strong> Use browser menu to "Add to Home Screen"<br>
-      📥 <button onclick="downloadChat()">Download Full Chat</button>
-    </div>
   </div>
 
+  <!-- Your script stays same – just remove username usage if present -->
   <script>
     const micBtn = document.getElementById('mic');
     const orb = document.getElementById('orb');
     const logDiv = document.getElementById('log');
     const wave = document.getElementById('wave');
     const voiceSelect = document.getElementById('voiceSelect');
-    const usernameInput = document.getElementById('username');
     const typedInput = document.getElementById('typedQuestion');
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -210,22 +211,7 @@
       localStorage.setItem('tawfiqHistory', JSON.stringify(conversationHistory));
     }
 
-    function downloadChat() {
-      const chatText = conversationHistory.map(entry => {
-        const time = new Date().toLocaleTimeString();
-        const who = entry.role === 'user' ? "🧑 You" : "🧠 Tawfiq";
-        return `[${time}] ${who}: ${entry.content}`;
-      }).join('\n\n');
-
-      const blob = new Blob([chatText], { type: 'text/plain' });
-      const link = document.createElement('a');
-      link.download = 'tawfiq_chat.txt';
-      link.href = URL.createObjectURL(blob);
-      link.click();
-    }
-
     async function sendToTawfiq(userText) {
-      const username = usernameInput.value.trim() || "Guest";
       conversationHistory.push({ role: 'user', content: userText });
       saveHistory();
       logDiv.innerHTML = `<strong>You:</strong> ${userText}\n<em>Tawfiq is thinking...</em>`;
@@ -235,7 +221,7 @@
         const res = await fetch('/ask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ history: conversationHistory, username })
+          body: JSON.stringify({ history: conversationHistory })
         });
 
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
