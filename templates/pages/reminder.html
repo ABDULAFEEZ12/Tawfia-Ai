@@ -7,52 +7,66 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 600px;
+      padding: 30px;
+      max-width: 700px;
       margin: auto;
-      background-color: #f9f9f9;
+      background-color: #f0fdfa;
+      text-align: center;
     }
+
     h1 {
-      text-align: center;
+      color: #00695c;
+      margin-bottom: 30px;
     }
-    .reminder {
-      margin-top: 30px;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    .reminder-box {
+      background: linear-gradient(145deg, #ffffff, #d7fce6);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 40px 20px;
+      border-radius: 20px;
+      font-size: 1.4rem;
+      color: #004d40;
+      line-height: 2;
+      transition: all 0.3s ease;
+      min-height: 180px;
+      max-height: 400px;
+      overflow-y: auto;
     }
+
     button {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      font-size: 1em;
+      margin-top: 30px;
+      background-color: #009688;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1rem;
+      border-radius: 10px;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
     }
-    input[type="time"] {
-      padding: 8px;
-      font-size: 1em;
-      width: 150px;
-    }
-    #status {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
+
+    button:hover {
+      background-color: #00796b;
     }
   </style>
 </head>
 <body>
 
-  <h1>Daily Reminder</h1>
+  <h1>🌙 Your Daily Quran Reminder</h1>
 
-  <div class="reminder">
-    <h2>Set a Reminder Time</h2>
-    <input type="time" v-model="reminderTime" />
-    <button @click="saveReminder">Save Reminder</button>
-    <div id="status">{{ statusMessage }}</div>
+  <div id="app">
+    <div class="reminder-box">
+      <p v-if="currentIndex < reminders.length" v-text="reminders[currentIndex]"></p>
+      <p v-else>No more reminders today. Come back tomorrow inshaAllah 🤍</p>
+    </div>
+
+    <button @click="nextReminder" :disabled="currentIndex >= reminders.length">
+      Get Another Reminder
+    </button>
   </div>
 
-  <!-- Include Vue.js from CDN -->
+  <!-- Vue.js -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
   <script>
     const { createApp } = Vue;
@@ -60,34 +74,31 @@
     createApp({
       data() {
         return {
-          reminderTime: '',
-          statusMessage: ''
+          reminders: [],
+          currentIndex: 0
         };
       },
       methods: {
-        saveReminder() {
-          if (!this.reminderTime) {
-            this.statusMessage = 'Please select a time.';
-            return;
+        async fetchReminders() {
+          try {
+            const res = await fetch('/api/reminders');
+            const data = await res.json();
+            this.reminders = data;
+            this.currentIndex = 0;
+          } catch (error) {
+            this.reminders = ["Error loading reminders. Please try again later."];
           }
-          // Save the reminder time in local storage (or send to backend)
-          localStorage.setItem('dailyReminderTime', this.reminderTime);
-          this.statusMessage = `Reminder set for ${this.reminderTime}`;
-          
-          // Optional: Implement logic to trigger reminder (e.g., notifications)
         },
-        loadReminder() {
-          const savedTime = localStorage.getItem('dailyReminderTime');
-          if (savedTime) {
-            this.reminderTime = savedTime;
-            this.statusMessage = `Current reminder set for ${savedTime}`;
+        nextReminder() {
+          if (this.currentIndex < this.reminders.length) {
+            this.currentIndex++;
           }
         }
       },
       mounted() {
-        this.loadReminder();
+        this.fetchReminders();
       }
-    }).mount('body');
+    }).mount('#app');
   </script>
 </body>
 </html>
