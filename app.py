@@ -1302,6 +1302,19 @@ def daily_dua():
 def reminder():
     return render_template('pages/reminder.html')
 
+
+@app.route('/api/reminders')
+def get_reminders():
+    # Get current UTC day, cycle through 1–30
+    day = (datetime.datetime.utcnow().day % 30) or 30
+
+    # Load reminders from JSON
+    with open('data/reminders.json', encoding='utf-8') as f:
+        all_reminders = json.load(f)
+
+    # Return reminders for the current day
+    return jsonify(all_reminders.get(f'day{day}', []))
+
 @app.route('/dashboard')
 def dashboard():
     # Your dashboard logic here
