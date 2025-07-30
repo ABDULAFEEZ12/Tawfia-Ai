@@ -3,49 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily Reminder</title>
+  <title>Daily Islamic Reminder</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #e0f2f1;
       padding: 30px;
-      max-width: 700px;
-      margin: auto;
-      background-color: #f0fdfa;
       text-align: center;
     }
-
-    h1 {
-      color: #00695c;
-      margin-bottom: 30px;
-    }
-
     .reminder-box {
       background: linear-gradient(145deg, #ffffff, #d7fce6);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       padding: 40px 20px;
       border-radius: 20px;
-      font-size: 1.2rem;
+      max-width: 600px;
+      margin: auto;
+      font-size: 1.4rem;
       color: #004d40;
-      line-height: 1.8;
+      line-height: 2;
       transition: all 0.3s ease;
       min-height: 180px;
-      max-height: 400px;
       overflow-y: auto;
+      max-height: 400px;
     }
-
-    .category {
-      font-weight: bold;
-      font-size: 1.2rem;
-      margin-bottom: 10px;
-      color: #00796b;
-    }
-
-    .reference {
-      margin-top: 15px;
-      color: #00695c;
-      font-size: 0.95rem;
-    }
-
     button {
       margin-top: 30px;
       background-color: #009688;
@@ -55,10 +35,9 @@
       font-size: 1rem;
       border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       transition: background-color 0.3s ease;
     }
-
     button:hover {
       background-color: #00796b;
     }
@@ -66,21 +45,15 @@
 </head>
 <body>
 
-  <h1>🌙 Your Daily Quran Reminder</h1>
+  <h1 style="color:#00695c; margin-bottom: 20px;">🌙 Your Daily Islamic Reminder</h1>
 
   <div id="app">
     <div class="reminder-box">
-      <div v-if="currentIndex < reminders.length">
-        <div class="category">📌 {{ reminders[currentIndex].category }}</div>
-        <div>“{{ reminders[currentIndex].text }}”</div>
-        <div class="reference">📖 {{ reminders[currentIndex].reference }}</div>
-      </div>
-      <p v-else>No more reminders today. Come back tomorrow inshaAllah 🤍</p>
+      <p v-if="currentReminder !== null" v-text="reminders[currentReminder]"></p>
+      <p v-else>No more reminders for now. Refresh to start again!</p>
     </div>
 
-    <button @click="nextReminder" :disabled="currentIndex >= reminders.length">
-      Get Another Reminder
-    </button>
+    <button @click="nextReminder" :disabled="currentReminder === null">Get Another Reminder</button>
   </div>
 
   <!-- Vue.js -->
@@ -92,32 +65,86 @@
       data() {
         return {
           reminders: [],
-          currentIndex: 0
+          currentIndex: 0,
+          currentReminder: 0
         };
       },
+      mounted() {
+        this.loadReminders();
+      },
       methods: {
-        async fetchReminders() {
-          try {
-            const res = await fetch('/api/reminders');
-            const data = await res.json();
-            this.reminders = data;
-            this.currentIndex = 0;
-          } catch (error) {
-            this.reminders = [{
-              category: "Error",
-              text: "Error loading reminders. Please try again later.",
-              reference: ""
-            }];
-          }
+        loadReminders() {
+          const list = [
+  // 1️⃣ Allah Loves You
+  "Indeed, Allah loves those who rely upon Him. — Surah Aal-Imran (3:159)",
+  "Indeed, Allah loves the doers of good. — Surah Al-Baqarah (2:195)",
+  "Indeed, Allah loves those who repent and those who purify themselves. — Surah Al-Baqarah (2:222)",
+  "And Allah is full of kindness to the believers. — Surah Aal-Imran (3:30)",
+  "Say, [O Muhammad], 'If you love Allah, then follow me, and Allah will love you.' — Surah Aal-Imran (3:31)",
+
+  // 2️⃣ Oneness of Allah
+  "Say, He is Allah, [Who is] One. — Surah Al-Ikhlas (112:1)",
+  "There is no deity except Him, the Ever-Living, the Sustainer of existence. — Surah Al-Baqarah (2:255)",
+  "Allah – there is no deity except Him. To Him belong the best names. — Surah Ta-Ha (20:8)",
+  "Your God is one God. There is no deity [worthy of worship] except Him. — Surah Al-Baqarah (2:163)",
+  "Never did We send a messenger before you but We revealed to him: There is no deity except Me, so worship Me. — Surah Al-Anbiya (21:25)",
+
+  // 3️⃣ Repentance
+  "Indeed, Allah loves those who repent. — Surah Al-Baqarah (2:222)",
+  "And turn to Allah in repentance, all of you, O believers, that you might succeed. — Surah An-Nur (24:31)",
+  "O My servants who have transgressed against themselves, do not despair of the mercy of Allah. — Surah Az-Zumar (39:53)",
+  "And whoever repents and does righteousness — indeed, he turns to Allah with [accepted] repentance. — Surah Al-Furqan (25:71)",
+  "Ask forgiveness of your Lord and then repent to Him. — Surah Hud (11:3)",
+
+  // 4️⃣ Mercy & Hope
+  "My Mercy encompasses all things. — Surah Al-A'raf (7:156)",
+  "And your Lord is the Forgiving, Full of Mercy. — Surah Al-Kahf (18:58)",
+  "Indeed, the mercy of Allah is near to the doers of good. — Surah Al-A'raf (7:56)",
+  "Say, 'My Lord has commanded justice and that you maintain yourselves [in worship]...and call upon Him, making your religion sincere to Him.' — Surah Al-A'raf (7:29)",
+  "Indeed, with hardship comes ease. — Surah Ash-Sharh (94:6)",
+
+  // 5️⃣ Gratitude / Alhamdulillah
+  "If you are grateful, I will surely increase you [in favor]. — Surah Ibrahim (14:7)",
+  "So remember Me; I will remember you. Be grateful to Me and do not deny Me. — Surah Al-Baqarah (2:152)",
+  "And few of My servants are grateful. — Surah Saba (34:13)",
+  "Indeed, this is from the favor of my Lord. — Surah An-Naml (27:40)",
+  "And your Lord proclaimed, 'If you are grateful, I will surely increase you.' — Surah Ibrahim (14:7)",
+
+  // 6️⃣ Reliance on Allah (Tawakkul)
+  "And rely upon Allah; and sufficient is Allah as Disposer of affairs. — Surah Al-Ahzab (33:3)",
+  "Whoever relies upon Allah — then He is sufficient for him. — Surah At-Talaq (65:3)",
+  "Indeed, Allah loves those who rely [upon Him]. — Surah Aal-Imran (3:159)",
+  "Upon Allah let the believers rely. — Surah Aal-Imran (3:122)",
+  "And whoever fears Allah — He will make for him a way out. — Surah At-Talaq (65:2)",
+
+  // 7️⃣ Reminder of Akhirah
+  "Every soul will taste death. — Surah Aal-Imran (3:185)",
+  "And the Hereafter is better for you than the first [life]. — Surah Ad-Duha (93:4)",
+  "And what is the life of this world except the enjoyment of delusion. — Surah Aal-Imran (3:185)",
+  "Whoever does an atom’s weight of good will see it. — Surah Az-Zalzalah (99:7)",
+  "So whoever is drawn away from the Fire and admitted to Paradise has certainly attained [success]. — Surah Aal-Imran (3:185)",
+
+  // 8️⃣ Call to Action
+  "Establish prayer and give zakah and obey the Messenger. — Surah An-Nur (24:56)",
+  "Recite what has been revealed to you of the Book and establish prayer. — Surah Al-Ankabut (29:45)",
+  "O you who have believed, remember Allah with much remembrance. — Surah Al-Ahzab (33:41)",
+  "Indeed, this Qur’an guides to that which is most just. — Surah Al-Isra (17:9)",
+  "And hasten to forgiveness from your Lord and a garden as wide as the heavens and earth. — Surah Aal-Imran (3:133)"
+];
+
+
+          this.reminders = list.sort(() => 0.5 - Math.random()); // Shuffle
+          this.currentIndex = 0;
+          this.currentReminder = 0;
         },
         nextReminder() {
-          if (this.currentIndex < this.reminders.length) {
-            this.currentIndex++;
+          this.currentIndex++;
+          if (this.currentIndex >= this.reminders.length) {
+            this.currentReminder = null;
+          } else {
+            this.currentReminder = this.currentIndex;
           }
         }
-      },
-      mounted() {
-        this.fetchReminders();
       }
     }).mount('#app');
   </script>
