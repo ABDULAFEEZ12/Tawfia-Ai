@@ -4,10 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Prayer Times - Tawfiq AI</title>
-
-  <!-- ✅ Corrected CSS path -->
-  <link rel="stylesheet" href="/static/css/style.css" />
-
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -16,7 +13,6 @@
       padding: 20px;
       text-align: center;
     }
-
     .container {
       max-width: 400px;
       margin: auto;
@@ -25,13 +21,11 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       padding: 30px;
     }
-
     h2 {
       font-size: 24px;
       margin-bottom: 20px;
       color: #10b981;
     }
-
     .prayer-time {
       margin: 10px 0;
       font-size: 18px;
@@ -41,23 +35,19 @@
       padding: 10px;
       border-radius: 8px;
     }
-
     .back-link {
       display: inline-block;
       margin-top: 20px;
       text-decoration: none;
       color: #3b82f6;
     }
-
     .controls {
       margin-top: 20px;
     }
-
     .controls label {
       display: block;
       margin-bottom: 10px;
     }
-
     .btn-play {
       padding: 10px 20px;
       background-color: #10b981;
@@ -66,23 +56,26 @@
       border-radius: 6px;
       cursor: pointer;
     }
-
     .btn-play:hover {
       background-color: #0e9e6e;
     }
-
     #sound-warning {
       color: red;
       margin-top: 15px;
       font-size: 14px;
       display: none;
     }
+    #next-prayer {
+      font-size: 16px;
+      color: #374151;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>🕌 Prayer Times</h2>
+    <h2>🌽 Prayer Times</h2>
 
     <div class="prayer-time" id="fajr">Fajr: ...</div>
     <div class="prayer-time" id="dhuhr">Dhuhr: ...</div>
@@ -91,41 +84,66 @@
     <div class="prayer-time" id="isha">Isha: ...</div>
 
     <div class="controls">
+      <label><input type="checkbox" id="adhan-toggle" checked /> Play Adhan at prayer times</label>
       <label>
-        <input type="checkbox" id="adhan-toggle" checked />
-        Play Adhan at prayer times
+        🔊 Volume:
+        <input type="range" min="0" max="1" step="0.1" value="1" onchange="adhanAudio.volume = this.value" />
       </label>
+      <label>
+        🎷 Adhan Voice:
+        <select id="voice-select" onchange="changeAdhanVoice(this.value)">
+          <option value="makkah">Makkah</option>
+          <option value="madinah">Madinah</option>
+          <option value="egypt">Egypt</option>
+        </select>
+      </label>
+      <div>
+        🔔 Notification Preferences:
+        <label><input type="checkbox" class="prayer-pref" data-prayer="Fajr" checked /> Fajr</label>
+        <label><input type="checkbox" class="prayer-pref" data-prayer="Dhuhr" checked /> Dhuhr</label>
+        <label><input type="checkbox" class="prayer-pref" data-prayer="Asr" checked /> Asr</label>
+        <label><input type="checkbox" class="prayer-pref" data-prayer="Maghrib" checked /> Maghrib</label>
+        <label><input type="checkbox" class="prayer-pref" data-prayer="Isha" checked /> Isha</label>
+      </div>
       <button class="btn-play" onclick="playAdhan()">🔊 Play Adhan Now</button>
       <div id="sound-warning">❗️Tap anywhere to enable sound</div>
     </div>
+
+    <div id="next-prayer">⏳ Next: ...</div>
 
     <a href="/" class="btn btn-secondary back-link">🏠 Home</a>
   </div>
 
   <script>
-    const adhanAudio = new Audio("/static/audio/adhan-makkah.mp3");
+    let adhanAudio = new Audio("/static/audio/adhan-makkah.mp3");
     adhanAudio.load();
     const prayerTimes = {};
+    let nextPrayerName = '';
+    let nextPrayerTime = '';
 
     function playAdhan() {
       const adhanEnabled = document.getElementById("adhan-toggle").checked;
       if (!adhanEnabled) return;
 
       adhanAudio.currentTime = 0;
-      adhanAudio.play()
-        .then(() => {
-          console.log("✅ Adhan is playing");
-          document.getElementById("sound-warning").style.display = "none";
-        })
-        .catch(err => {
-          console.warn("🔒 Playback blocked:", err);
-          document.getElementById("sound-warning").style.display = "block";
-        });
+      adhanAudio.play().catch(err => {
+        document.getElementById("sound-warning").style.display = "block";
+      });
+    }
+
+    function changeAdhanVoice(voice) {
+      const audioMap = {
+        makkah: "/static/audio/adhan-makkah.mp3",
+        madinah: "/static/audio/adhan-madinah.mp3",
+        egypt: "/static/audio/adhan-egypt.mp3"
+      };
+      adhanAudio.pause();
+      adhanAudio = new Audio(audioMap[voice]);
+      adhanAudio.load();
     }
 
     function getPrayerTimes(lat, lon) {
       const url = `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=2`;
-
       fetch(url)
         .then(res => res.json())
         .then(data => {
@@ -136,54 +154,70 @@
           prayerTimes.Maghrib = times.Maghrib;
           prayerTimes.Isha = times.Isha;
 
-          document.getElementById('fajr').textContent = 'Fajr: ' + times.Fajr;
-          document.getElementById('dhuhr').textContent = 'Dhuhr: ' + times.Dhuhr;
-          document.getElementById('asr').textContent = 'Asr: ' + times.Asr;
-          document.getElementById('maghrib').textContent = 'Maghrib: ' + times.Maghrib;
-          document.getElementById('isha').textContent = 'Isha: ' + times.Isha;
+          for (let key in prayerTimes) {
+            document.getElementById(key.toLowerCase()).textContent = `${key}: ${prayerTimes[key]}`;
+          }
 
+          findNextPrayer();
           checkAdhanEveryMinute();
-        })
-        .catch(() => {
-          alert("Failed to fetch prayer times. Please try again later.");
         });
     }
 
-    function getLocationAndFetchTimes() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
-          getPrayerTimes(position.coords.latitude, position.coords.longitude);
-        }, () => {
-          alert("Location access denied. Please allow location access to see accurate prayer times.");
-        });
-      } else {
-        alert("Geolocation is not supported by your browser.");
+    function findNextPrayer() {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      let minDiff = Infinity;
+
+      for (let [name, timeStr] of Object.entries(prayerTimes)) {
+        const fullTime = new Date(`${today}T${timeStr}:00`);
+        const diff = fullTime - now;
+        if (diff > 0 && diff < minDiff) {
+          minDiff = diff;
+          nextPrayerName = name;
+          nextPrayerTime = timeStr;
+        }
+      }
+
+      if (nextPrayerName) {
+        document.getElementById("next-prayer").textContent = `⏳ Next: ${nextPrayerName} at ${nextPrayerTime}`;
       }
     }
 
     function checkAdhanEveryMinute() {
       setInterval(() => {
         const now = new Date();
-        const currentTime = now.getHours().toString().padStart(2, '0') + ':' +
-                            now.getMinutes().toString().padStart(2, '0');
+        const current = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
         for (let key in prayerTimes) {
-          if (prayerTimes[key] === currentTime) {
+          const checkbox = document.querySelector(`.prayer-pref[data-prayer='${key}']`);
+          if (checkbox && checkbox.checked && prayerTimes[key] === current) {
+            if (Notification.permission === "granted") {
+              new Notification(`🔔 It's time for ${key}`, { body: `Adhan is now playing for ${key}` });
+            }
             playAdhan();
+            setTimeout(findNextPrayer, 1000);
           }
         }
-      }, 60000);
+      }, 1000);
     }
 
-    // Unlock audio by any user interaction (Chrome autoplay fix)
     document.body.addEventListener("click", () => {
       adhanAudio.play().then(() => {
         adhanAudio.pause();
         adhanAudio.currentTime = 0;
         document.getElementById("sound-warning").style.display = "none";
-        console.log("🔓 Audio unlocked");
       }).catch(() => {});
     }, { once: true });
+
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
+    function getLocationAndFetchTimes() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => getPrayerTimes(pos.coords.latitude, pos.coords.longitude));
+      }
+    }
 
     getLocationAndFetchTimes();
   </script>
