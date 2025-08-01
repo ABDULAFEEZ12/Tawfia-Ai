@@ -33,14 +33,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
 <link rel="icon" href="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" type="image/jpeg">
-  
+
 body {
-  <header style="text-align: center; padding: 30px;">
-  <img src="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" alt="Tawfiq AI Logo" style="height: 120px; max-width: 100%;">
-  <h1 style="font-family: sans-serif; font-size: 2rem; margin-top: 10px;">Tawfiq AI</h1>
-  <p style="font-style: italic; color: #555;">Smart Islamic Companion</p>
-</header>
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f4f4f4;
@@ -64,7 +59,6 @@ body.light-mode .messages { background-color: #fff; }
 body.light-mode .user-message { background-color: #dcf8c6; color: #000; }
 body.light-mode .ai-message { background-color: #ececec; color: #000; }
 body.light-mode #menu-toggle { background: #fff; color: #000; }
-body.light-mode #menu-toggle:hover { background: #eee; }
 
 /* Dark Mode Styles */
 body.dark-mode {
@@ -406,7 +400,7 @@ body {
 <body class="light-mode">
 
 <!-- Theme Toggle Button -->
-<button id="theme-toggle" onclick="toggleMode()">☀️</button>
+<button id="theme-toggle">☀️</button>
 
 <div class="auth-status">
   {% if user %}
@@ -523,7 +517,6 @@ body {
     document.body.classList.add('dark-mode');
     themeToggleBtn.innerText = '🌙'; // Show moon when in dark mode
   } else {
-    // Default is light mode
     document.body.classList.remove('dark-mode');
     document.body.classList.add('light-mode');
     themeToggleBtn.innerText = '☀️'; // Show sun when in light mode
@@ -533,15 +526,18 @@ body {
     document.body.classList.toggle('light-mode');
     document.body.classList.toggle('dark-mode');
 
-    const toggleBtn = document.getElementById('theme-toggle');
-
     if (document.body.classList.contains('dark-mode')) {
       localStorage.setItem('theme', 'dark');
-      toggleBtn.innerText = '🌙'; // Moon icon for dark mode
+      themeToggleBtn.innerText = '🌙'; // Moon icon for dark mode
     } else {
       localStorage.setItem('theme', 'light');
-      toggleBtn.innerText = '☀️'; // Sun icon for light mode
+      themeToggleBtn.innerText = '☀️'; // Sun icon for light mode
     }
+  }
+
+  // Attach event listener to the theme toggle button
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", toggleMode);
   }
 
   let chatHistory = [];
@@ -586,31 +582,29 @@ body {
   }
 
   // Load Surah list
-function loadSurahList() {
-  fetch('/get-surah-list')
-    .then(res => res.json())
-    .then(data => {
-      const select = document.getElementById('surahList');
-      select.innerHTML = '<option value="">-- Or Select Surah --</option>';
-      
-      // ✅ Use the correct key returned from Flask: surah_list
-      if (data && data.surah_list && Array.isArray(data.surah_list)) {
-        data.surah_list.forEach((surahName, index) => {
-          const option = document.createElement('option');
-          option.value = index + 1; // Surah numbers start from 1
-          option.textContent = `${index + 1}. ${surahName}`;
-          select.appendChild(option);
-        });
-      } else {
-        loadHardcodedSurahList(); // fallback
-      }
-    })
-    .catch(error => {
-      console.error('Error loading Surah list:', error);
-      loadHardcodedSurahList(); // fallback
-    });
-}
+  function loadSurahList() {
+    fetch('/get-surah-list')
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById('surahList');
+        select.innerHTML = '<option value="">-- Or Select Surah --</option>';
 
+        if (data && data.surah_list && Array.isArray(data.surah_list)) {
+          data.surah_list.forEach((surahName, index) => {
+            const option = document.createElement('option');
+            option.value = index + 1; // Surah numbers start from 1
+            option.textContent = `${index + 1}. ${surahName}`;
+            select.appendChild(option);
+          });
+        } else {
+          loadHardcodedSurahList(); // fallback
+        }
+      })
+      .catch(error => {
+        console.error('Error loading Surah list:', error);
+        loadHardcodedSurahList(); // fallback
+      });
+  }
 
   function loadHardcodedSurahList() {
     const surahs = [
@@ -768,101 +762,108 @@ function loadSurahList() {
   }
 
   // Search Quran
- // Surah name → number map (must match dropdown list!)
-const surahNameToNumber = {
-  "Al-Fatihah": 1, "Al-Baqarah": 2, "Aali Imran": 3, "An-Nisa": 4, "Al-Ma'idah": 5,
-  "Al-An'am": 6, "Al-A'raf": 7, "Al-Anfal": 8, "At-Tawbah": 9, "Yunus": 10,
-  "Hud": 11, "Yusuf": 12, "Ar-Ra'd": 13, "Ibrahim": 14, "Al-Hijr": 15,
-  "An-Nahl": 16, "Al-Isra": 17, "Al-Kahf": 18, "Maryam": 19, "Ta-Ha": 20,
-  "Al-Anbiya": 21, "Al-Hajj": 22, "Al-Mu’minun": 23, "An-Nur": 24, "Al-Furqan": 25,
-  // 🔁 Add the rest later or ask me to paste full map
-};
+  // Surah name → number map (must match dropdown list!)
+  const surahNameToNumber = {
+    "Al-Fatihah": 1, "Al-Baqarah": 2, "Aali Imran": 3, "An-Nisa": 4, "Al-Ma'idah": 5,
+    "Al-An'am": 6, "Al-A'raf": 7, "Al-Anfal": 8, "At-Tawbah": 9, "Yunus": 10,
+    "Hud": 11, "Yusuf": 12, "Ar-Ra'd": 13, "Ibrahim": 14, "Al-Hijr": 15,
+    "An-Nahl": 16, "Al-Isra": 17, "Al-Kahf": 18, "Maryam": 19, "Ta-Ha": 20,
+    "Al-Anbiya": 21, "Al-Hajj": 22, "Al-Mu'minun": 23, "An-Nur": 24, "Al-Furqan": 25,
+    // Add the rest as needed
+  };
 
-function searchQuran() {
-  const query = document.getElementById("quranInput").value.trim();
-  const selectedSurah = document.getElementById("surahList").value;
-  const surahName = query || selectedSurah;
-  const resultDiv = document.getElementById("quranResult");
-  const quranSearchBtn = document.getElementById("quranSearchButton");
+  function searchQuran() {
+    const query = document.getElementById("quranInput").value.trim();
+    const selectedSurah = document.getElementById("surahList").value;
+    const surahName = query || selectedSurah;
+    const resultDiv = document.getElementById("quranResult");
+    const quranSearchBtn = document.getElementById("quranSearchButton");
 
-  if (!surahName || !surahNameToNumber[surahName]) {
-    resultDiv.innerHTML = `<div class="user-message">Please select a valid Surah from the list.</div>`;
-    return;
+    if (!surahName || !surahNameToNumber[surahName]) {
+      resultDiv.innerHTML = `<div class="user-message">Please select a valid Surah from the list.</div>`;
+      return;
+    }
+
+    const surahNumber = surahNameToNumber[surahName];
+
+    resultDiv.innerHTML = `<div class="user-message">Searching Surah: ${surahName}</div>`;
+    const loading = document.createElement("div");
+    loading.className = "loading-indicator";
+    loading.textContent = "Searching Quran...";
+    resultDiv.appendChild(loading);
+    quranSearchBtn.disabled = true;
+
+    fetch('/quran-surah', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ surah_number: surahNumber })
+    })
+    .then(res => res.json())
+    .then(data => {
+      resultDiv.innerHTML = '';
+
+      if (data.surah_name) {
+        const titleEl = document.createElement("div");
+        titleEl.innerHTML = `<strong>Surah ${surahNumber}: ${data.surah_name}</strong>`;
+        titleEl.style.fontSize = '18px';
+        titleEl.style.marginBottom = '10px';
+        resultDiv.appendChild(titleEl);
+      }
+
+      if (data.ayahs && Array.isArray(data.ayahs) && data.ayahs.length > 0) {
+        data.ayahs.forEach(verse => {
+          const verseEl = document.createElement("div");
+          verseEl.className = "verse-block";
+          verseEl.style.marginBottom = '25px';
+          verseEl.style.borderBottom = "1px solid #ccc";
+          verseEl.style.paddingBottom = "15px";
+
+          const info = document.createElement("p");
+          info.innerHTML = `<strong>Ayah ${verse.ayah_number}</strong>`;
+          verseEl.appendChild(info);
+
+          const arabic = document.createElement("p");
+          arabic.textContent = verse.arabic;
+          arabic.style.textAlign = 'right';
+          arabic.style.fontWeight = 'bold';
+          arabic.style.direction = 'rtl';
+          verseEl.appendChild(arabic);
+
+          const trans = document.createElement("p");
+          trans.textContent = verse.english;
+          verseEl.appendChild(trans);
+
+          if (verse.transliteration) {
+            const translitPara = document.createElement("p");
+            translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
+            translitPara.style.fontSize = '0.9em';
+            verseEl.appendChild(translitPara);
+          }
+
+          // Add audio playback
+          const audioUrl = verse.audio || `https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, '0')}${String(verse.ayah_number).padStart(3, '0')}.mp3`;
+          const audio = document.createElement("audio");
+          audio.controls = true;
+          audio.src = audioUrl;
+          verseEl.appendChild(audio);
+
+          resultDiv.appendChild(verseEl);
+        });
+      } else {
+        resultDiv.innerHTML = `<div>No verses found for Surah ${surahNumber}.</div>`;
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      resultDiv.innerHTML = `<div>Error searching Quran. Please try again.</div>`;
+    })
+    .finally(() => {
+      const loadingEl = resultDiv.querySelector('.loading-indicator');
+      if (loadingEl) loadingEl.remove();
+      quranSearchBtn.disabled = false;
+    });
   }
 
-  const surahNumber = surahNameToNumber[surahName];
-
-  resultDiv.innerHTML = `<div class="user-message">Searching Surah: ${surahName}</div>`;
-  
-  const loading = document.createElement("div");
-  loading.className = "loading-indicator";
-  loading.textContent = "Searching Quran...";
-  resultDiv.appendChild(loading);
-  quranSearchBtn.disabled = true;
-
-  fetch('/quran-surah', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ surah_number: surahNumber })
-  })
-  .then(res => res.json())
-  .then(data => {
-    resultDiv.innerHTML = ''; // Clear previous results
-
-    if (data.surah_name) {
-      const titleEl = document.createElement("div");
-      titleEl.innerHTML = `<strong>Surah ${surahNumber}: ${data.surah_name}</strong>`;
-      titleEl.style.fontSize = '18px';
-      titleEl.style.marginBottom = '10px';
-      resultDiv.appendChild(titleEl);
-    }
-
-    if (data.ayahs && Array.isArray(data.ayahs) && data.ayahs.length > 0) {
-      data.ayahs.forEach(verse => {
-        const verseEl = document.createElement("div");
-        verseEl.className = "verse-block";
-        verseEl.style.marginBottom = '20px';
-
-        const info = document.createElement("p");
-        info.innerHTML = `<strong>Ayah ${verse.ayah_number}</strong>`;
-        verseEl.appendChild(info);
-
-        const arabic = document.createElement("p");
-        arabic.textContent = verse.arabic;
-        arabic.style.textAlign = 'right';
-        arabic.style.fontWeight = 'bold';
-        arabic.style.direction = 'rtl';
-        verseEl.appendChild(arabic);
-
-        const trans = document.createElement("p");
-        trans.textContent = verse.english;
-        verseEl.appendChild(trans);
-
-        if (verse.transliteration) {
-          const translitPara = document.createElement("p");
-          translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
-          translitPara.style.fontSize = '0.9em';
-          verseEl.appendChild(translitPara);
-        }
-
-        resultDiv.appendChild(verseEl);
-      });
-    } else {
-      resultDiv.innerHTML = `<div>No verses found for Surah ${surahName}.</div>`;
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    resultDiv.innerHTML = `<div>Error searching Quran. Please try again.</div>`;
-  })
-  .finally(() => {
-    const loadingEl = resultDiv.querySelector('.loading-indicator');
-    if (loadingEl) loadingEl.remove();
-    quranSearchBtn.disabled = false;
-  });
-}
-
-  // Search Hadith
   function searchHadith() {
     const inputQuery = document.getElementById("hadithInput").value.trim();
     const dropdownQuery = document.getElementById("hadithDropdown").value;
@@ -945,6 +946,5 @@ function searchQuran() {
     if (sectionId === 'prayerTimes') loadPrayerTimes();
   }
 </script>
-
 </body>
 </html>
