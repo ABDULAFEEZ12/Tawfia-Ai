@@ -1,21 +1,22 @@
 <style>
   body {
     font-family: 'Quicksand', sans-serif;
-    background-color: #e0f2f1;
-    padding: 30px;
+    background-color: #ffffff;
+    padding: 20px;
     text-align: center;
+    margin: 0;
   }
 
   .reminder-box {
-    background: linear-gradient(135deg, #ffffff, #d0f4e8);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    padding: 30px 25px;
-    border-radius: 20px;
-    max-width: 700px;
-    margin: 30px auto;
-    font-size: 1.3rem;
+    background: linear-gradient(135deg, #ffffff, #f0fdf9);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    border-radius: 18px;
+    max-width: 95%;
+    margin: 20px auto;
+    font-size: 1.1rem;
     color: #004d40;
-    line-height: 2;
+    line-height: 1.8;
     position: relative;
     overflow: hidden;
     transition: transform 0.3s ease;
@@ -27,9 +28,9 @@
 
   .watermark {
     position: absolute;
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #00796b;
-    opacity: 0.3;
+    opacity: 0.25;
     font-weight: bold;
     pointer-events: none;
     user-select: none;
@@ -37,48 +38,47 @@
 
   .watermark-bottom {
     bottom: 10px;
-    right: 15px;
-    font-size: 1rem;
+    right: 12px;
   }
 
   .watermark-center {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 1.8rem;
-    opacity: 0.15;
+    font-size: 1.5rem;
+    opacity: 0.12;
   }
 
   .reminder-category {
     display: block;
-    color: #00695c;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
+    color: #00796b;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 8px;
   }
 
   .reminder-text {
     color: #004d40;
-    font-size: 1.3rem;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
   }
 
   .reminder-reference {
-    font-size: 0.95rem;
-    color: #555;
+    font-size: 0.9rem;
+    color: #666;
   }
 
   button {
     background-color: #009688;
-    color: white;
+    color: #fff;
     border: none;
-    padding: 10px 20px;
-    font-size: 0.95rem;
-    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    border-radius: 6px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: background-color 0.3s ease;
-    margin-top: 20px;
+    margin-top: 18px;
   }
 
   button:hover {
@@ -92,6 +92,29 @@
   @media print {
     .no-print {
       display: none !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .reminder-box {
+      padding: 18px 15px;
+      font-size: 1rem;
+    }
+
+    .reminder-category {
+      font-size: 1rem;
+    }
+
+    .reminder-text {
+      font-size: 1rem;
+    }
+
+    .reminder-reference {
+      font-size: 0.85rem;
+    }
+
+    .watermark-center {
+      font-size: 1.2rem;
     }
   }
 </style>
