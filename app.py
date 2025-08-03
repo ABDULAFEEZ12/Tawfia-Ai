@@ -1298,9 +1298,29 @@ def daily_dua_json(day):
     index = (day - 1) % len(all_duas)  # Safe loop
     return jsonify(all_duas[index])
 
+import os
+import json
+from flask import render_template
+from datetime import datetime
+
 @app.route('/reminder')
 def reminder():
-    return render_template('pages/reminder.html')
+    # Get the full absolute path to reminders.json
+    json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "reminders.json")
+
+    # Load reminders
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # Use current day as index (1-based), fallback to day1 if not found
+    today = datetime.now().day
+    day_key = f"day{today}"
+
+    # Fallback to "day1" if today is out of range
+    reminders = data.get(day_key) or data.get("day1", [])
+
+    return render_template('pages/reminder.html', reminders=reminders)
+
 
 @app.route('/api/reminders')
 def get_reminders():
