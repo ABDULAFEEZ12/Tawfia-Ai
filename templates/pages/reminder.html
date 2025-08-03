@@ -33,6 +33,7 @@
       overflow-y: auto;
       max-height: 450px;
       display: none;
+      position: relative;
     }
 
     .reminder-box.active {
@@ -78,6 +79,16 @@
       background-color: #00796b;
     }
 
+    .no-print {
+      display: inline-block;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+    }
+
     @media (max-width: 480px) {
       .reminder-box {
         padding: 30px 18px;
@@ -101,7 +112,7 @@
       <div class="reminder-text">{{ reminder.text }}</div>
       <div class="reminder-reference">{{ reminder.reference }}</div>
 
-      <div class="button-group">
+      <div class="button-group no-print">
         <button onclick="downloadReminder('reminder-{{ loop.index0 }}')">Download 📥</button>
         {% if not loop.last %}
         <button onclick="showNextReminder({{ loop.index0 }})">Next Reminder ➡️</button>
@@ -126,11 +137,36 @@
 
     function downloadReminder(id) {
       const element = document.getElementById(id);
+
+      // Hide interactive buttons
+      const buttons = element.querySelectorAll('.no-print');
+      buttons.forEach(btn => btn.style.display = 'none');
+
+      // Create temporary watermark
+      const watermark = document.createElement('div');
+      watermark.innerText = "Tawfiq AI 📿 - www.tawfiqai.com";
+      watermark.style.position = "absolute";
+      watermark.style.bottom = "15px";
+      watermark.style.right = "20px";
+      watermark.style.opacity = "1";
+      watermark.style.fontSize = "1rem";
+      watermark.style.fontWeight = "bold";
+      watermark.style.fontFamily = "Segoe UI, sans-serif";
+      watermark.style.color = "#004d40";
+      watermark.classList.add("temp-watermark");
+
+      // Add watermark only for the screenshot
+      element.appendChild(watermark);
+
       html2canvas(element).then(canvas => {
         const link = document.createElement('a');
         link.download = `${id}_Tawfiq_Reminder.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
+
+        // Show buttons again and remove watermark
+        buttons.forEach(btn => btn.style.display = 'inline-block');
+        watermark.remove();
       });
     }
   </script>
