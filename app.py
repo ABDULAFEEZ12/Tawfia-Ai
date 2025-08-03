@@ -1279,48 +1279,52 @@ def get_surah_by_id(surah_id):
         surah_data = json.load(f)
 
     return jsonify(surah_data)
-    
+
+import os
+import json
+from flask import render_template, jsonify
+from datetime import datetime
+
+# Get base directory (where app.py is located)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# ----------- DAILY DUA HTML ROUTE -----------
 @app.route("/daily-dua")
 def daily_dua_html():
     today = datetime.now()
     day_key = f"day{(today.day % 30) or 30}"
-    with open("static/data/duas.json", "r", encoding="utf-8") as f:
+
+    json_path = os.path.join(BASE_DIR, "static", "data", "duas.json")
+    with open(json_path, "r", encoding="utf-8") as f:
         duas_data = json.load(f)
+
     duas = duas_data.get(day_key, [])
     return render_template("daily_dua.html", duas=duas, day=day_key)
 
-
+# ----------- DAILY DUA JSON API ROUTE -----------
 @app.route("/daily-dua/<int:day>")
 def daily_dua_json(day):
-    with open("static/data/duas.json", "r", encoding="utf-8") as f:
+    json_path = os.path.join(BASE_DIR, "static", "data", "duas.json")
+    with open(json_path, "r", encoding="utf-8") as f:
         all_duas = json.load(f)
-    
-    index = (day - 1) % len(all_duas)  # Safe loop
-    return jsonify(all_duas[index])
 
-import os
-import json
-from flask import render_template
-from datetime import datetime
+    # Get key like "day1", "day2", ...
+    day_key = f"day{(day % 30) or 30}"
+    return jsonify(all_duas.get(day_key, []))
 
+# ----------- DAILY REMINDER ROUTE -----------
 @app.route('/reminder')
 def reminder():
-    # Get the full absolute path to reminders.json
-    json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "reminders.json")
+    json_path = os.path.join(BASE_DIR, "DATA", "reminders.json")
 
-    # Load reminders
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
-    # Use current day as index (1-based), fallback to day1 if not found
     today = datetime.now().day
     day_key = f"day{today}"
-
-    # Fallback to "day1" if today is out of range
-    reminders = data.get(day_key) or data.get("day1", [])
+    reminders = data.get(day_key, data.get("day1", []))
 
     return render_template('pages/reminder.html', reminders=reminders)
-
 
 @app.route('/api/reminders')
 def get_reminders():
