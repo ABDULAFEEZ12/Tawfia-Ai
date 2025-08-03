@@ -1,152 +1,163 @@
-<style>
-  body {
-    font-family: 'Quicksand', sans-serif;
-    background-color: #ffffff;
-    padding: 20px;
-    text-align: center;
-    margin: 0;
-  }
-
-  .reminder-box {
-    background: linear-gradient(135deg, #ffffff, #f0fdf9);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    padding: 20px;
-    border-radius: 18px;
-    max-width: 95%;
-    margin: 20px auto;
-    font-size: 1.1rem;
-    color: #004d40;
-    line-height: 1.8;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-  }
-
-  .reminder-box:hover {
-    transform: scale(1.01);
-  }
-
-  .watermark {
-    position: absolute;
-    font-size: 0.9rem;
-    color: #00796b;
-    opacity: 0.25;
-    font-weight: bold;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .watermark-bottom {
-    bottom: 10px;
-    right: 12px;
-  }
-
-  .watermark-center {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.5rem;
-    opacity: 0.12;
-  }
-
-  .reminder-category {
-    display: block;
-    color: #00796b;
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-
-  .reminder-text {
-    color: #004d40;
-    font-size: 1.1rem;
-    margin-bottom: 8px;
-  }
-
-  .reminder-reference {
-    font-size: 0.9rem;
-    color: #666;
-  }
-
-  button {
-    background-color: #009688;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    border-radius: 6px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: background-color 0.3s ease;
-    margin-top: 18px;
-  }
-
-  button:hover {
-    background-color: #00796b;
-  }
-
-  .no-print {
-    display: block;
-  }
-
-  @media print {
-    .no-print {
-      display: none !important;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tawfiq AI - Daily Islamic Reminders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background-color: #ffffff;
+      padding: 20px;
+      text-align: center;
+      margin: 0;
     }
-  }
 
-  @media (max-width: 480px) {
     .reminder-box {
-      padding: 18px 15px;
-      font-size: 1rem;
+      background: linear-gradient(135deg, #ffffff, #f0fdf9);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      border-radius: 18px;
+      max-width: 95%;
+      margin: 20px auto;
+      font-size: 1.1rem;
+      color: #004d40;
+      line-height: 1.8;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease;
     }
 
-    .reminder-category {
-      font-size: 1rem;
+    .reminder-box:hover {
+      transform: scale(1.01);
     }
 
-    .reminder-text {
-      font-size: 1rem;
+    .watermark {
+      position: absolute;
+      font-size: 0.9rem;
+      color: #00796b;
+      opacity: 0.25;
+      font-weight: bold;
+      pointer-events: none;
+      user-select: none;
     }
 
-    .reminder-reference {
-      font-size: 0.85rem;
+    .watermark-bottom {
+      bottom: 10px;
+      right: 12px;
     }
 
     .watermark-center {
-      font-size: 1.2rem;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      opacity: 0.12;
     }
-  }
-</style>
+
+    .reminder-category {
+      display: block;
+      color: #00796b;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .reminder-text {
+      color: #004d40;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .reminder-reference {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    button {
+      background-color: #009688;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: background-color 0.3s ease;
+      margin-top: 18px;
+    }
+
+    button:hover {
+      background-color: #00796b;
+    }
+
+    .no-print {
+      display: inline-block;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .reminder-box {
+        padding: 18px 15px;
+        font-size: 1rem;
+      }
+
+      .reminder-category {
+        font-size: 1rem;
+      }
+
+      .reminder-text {
+        font-size: 1rem;
+      }
+
+      .reminder-reference {
+        font-size: 0.85rem;
+      }
+
+      .watermark-center {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <h1 style="color:#00695c; margin-bottom: 20px;">🌙 Today's Islamic Reminders</h1>
 
-  {% for reminder in reminders %}
-  <div class="reminder-box" id="reminder-{{ loop.index }}">
-    <strong class="reminder-category">{{ reminder.category }}</strong>
-    <div class="reminder-text">{{ reminder.text }}</div>
-    <em class="reminder-reference">{{ reminder.reference }}</em>
+  <div id="reminders-container">
+    {% for reminder in reminders %}
+    <div class="reminder-box" id="reminder-{{ loop.index0 }}" style="{% if not loop.first %}display: none;{% endif %}">
+      <strong class="reminder-category">{{ reminder.category }}</strong>
+      <div class="reminder-text">{{ reminder.text }}</div>
+      <em class="reminder-reference">{{ reminder.reference }}</em>
 
-    <!-- Watermarks -->
-    <div class="watermark watermark-bottom">search www.tawfiqai.com for more Daily Reminders</div>
-    <div class="watermark watermark-center">Tawfiq AI 📿</div>
+      <!-- Watermarks -->
+      <div class="watermark watermark-bottom">search www.tawfiqai.com for more Daily Reminders</div>
+      <div class="watermark watermark-center">Tawfiq AI 📿</div>
 
-    <!-- Download button for this specific reminder -->
-    <button class="no-print" onclick="downloadReminder('reminder-{{ loop.index }}')">
-      Download 📥
-    </button>
+      <!-- Download button -->
+      <button class="no-print" onclick="downloadReminder('reminder-{{ loop.index0 }}')">
+        Download 📥
+      </button>
+
+      {% if not loop.last %}
+      <button class="no-print" onclick="showNextReminder({{ loop.index0 }})" style="margin-left: 10px;">
+        Next Reminder ➡️
+      </button>
+      {% endif %}
+    </div>
+    {% endfor %}
   </div>
-  {% endfor %}
 
-  <!-- html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
     function downloadReminder(id) {
       const element = document.getElementById(id);
       const buttons = element.querySelectorAll('.no-print');
-
-      // Hide buttons before capture
       buttons.forEach(btn => btn.style.display = 'none');
 
       html2canvas(element).then(canvas => {
@@ -154,10 +165,18 @@
         link.download = `${id}_Tawfiq_Reminder.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
-
-        // Restore buttons
-        buttons.forEach(btn => btn.style.display = 'block');
+        buttons.forEach(btn => btn.style.display = 'inline-block');
       });
+    }
+
+    function showNextReminder(currentIndex) {
+      const current = document.getElementById(`reminder-${currentIndex}`);
+      const next = document.getElementById(`reminder-${currentIndex + 1}`);
+      if (next) {
+        current.style.display = 'none';
+        next.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   </script>
 </body>
