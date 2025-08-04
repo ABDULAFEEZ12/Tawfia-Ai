@@ -1293,14 +1293,13 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def daily_dua_html():
     today = datetime.now()
     day_key = f"day{(today.day % 30) or 30}"
+    json_path = os.path.join("static", "data", "duas.json")
 
-    json_path = os.path.join(BASE_DIR, "static", "data", "duas.json")
     with open(json_path, "r", encoding="utf-8") as f:
         duas_data = json.load(f)
 
     duas = duas_data.get(day_key, [])
     return render_template("daily_dua.html", duas=duas, day=day_key)
-
 # ----------- DAILY DUA JSON API ROUTE -----------
 @app.route("/daily-dua/<int:day>")
 def daily_dua_json(day):
