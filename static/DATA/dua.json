@@ -1,0 +1,3062 @@
+{
+  "day1": [
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    }
+  ],
+  "day2": [
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    }
+  ],
+  "day3": [
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    }
+  ],
+  "day4": [
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    }
+  ],
+  "day5": [
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    }
+  ],
+  "day6": [
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    }
+  ],
+  "day7": [
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    }
+  ],
+  "day8": [
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    }
+  ],
+  "day9": [
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    }
+  ],
+  "day10": [
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    }
+  ],
+  "day11": [
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    }
+  ],
+  "day12": [
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    }
+  ],
+  "day13": [
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    }
+  ],
+  "day14": [
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    }
+  ],
+  "day15": [
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    }
+  ],
+  "day16": [
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    }
+  ],
+  "day17": [
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    }
+  ],
+  "day18": [
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    }
+  ],
+  "day19": [
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    }
+  ],
+  "day20": [
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    }
+  ],
+  "day21": [
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    }
+  ],
+  "day22": [
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    }
+  ],
+  "day23": [
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    }
+  ],
+  "day24": [
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    }
+  ],
+  "day25": [
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    }
+  ],
+  "day26": [
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    }
+  ],
+  "day27": [
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    }
+  ],
+  "day28": [
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    }
+  ],
+  "day29": [
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    }
+  ],
+  "day30": [
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    },
+    {
+      "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا",
+      "transliteration": "Rabbana zalamna anfusana",
+      "english": "Our Lord, we have wronged ourselves. (7:23)"
+    },
+    {
+      "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+      "transliteration": "Rabbanaa aatinaa fid-dunyaa hasanatan wa fil-aakhirati hasanatan wa qinaa 'adhaaban-naar",
+      "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire. (2:201)"
+    },
+    {
+      "arabic": "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+      "transliteration": "Rabbi ighfir li wa li-walidayya wa lil-mu’mineena yawma yaqoomul hisaab",
+      "english": "My Lord, forgive me and my parents and the believers the Day the account is established. (14:41)"
+    },
+    {
+      "arabic": "رَبِّ زِدْنِي عِلْمًا",
+      "transliteration": "Rabbi zidni ‘ilma",
+      "english": "My Lord, increase me in knowledge. (20:114)"
+    },
+    {
+      "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+      "transliteration": "Rabbana la tuzigh quloobana ba’da idh hadaytana wa hab lana min ladunka rahmah innaka anta al-Wahhab",
+      "english": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower. (3:8)"
+    },
+    {
+      "arabic": "رَبَّنَا فَاغْفِرْ لَنَا ذُنُوبَنَا وَكَفِّرْ عَنَّا سَيِّئَاتِنَا وَتَوَفَّنَا مَعَ الْأَبْرَارِ",
+      "transliteration": "Rabbana faghfir lana dhunoobana wa kaffir ‘anna sayyi’atina wa tawaffana ma’al abraar",
+      "english": "Our Lord, forgive us our sins and remove from us our misdeeds and cause us to die with the righteous. (3:193)"
+    },
+    {
+      "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي",
+      "transliteration": "Rabbi ishrah li sadri",
+      "english": "My Lord, expand for me my chest. (20:25)"
+    },
+    {
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ",
+      "transliteration": "Allahumma inni as’aluka al-jannah",
+      "english": "O Allah, I ask You for Paradise."
+    },
+    {
+      "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+      "transliteration": "Allahumma ajirni min an-naar",
+      "english": "O Allah, save me from the Fire."
+    },
+    {
+      "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً",
+      "transliteration": "Rabbi hab li min ladunka dhurriyatan tayyibah",
+      "english": "My Lord, grant me from Yourself a good offspring. (3:38)"
+    }
+  ]
+}
