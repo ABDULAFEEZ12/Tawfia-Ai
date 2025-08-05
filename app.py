@@ -1325,6 +1325,25 @@ def reminder():
 
     return render_template('pages/reminder.html', reminders=reminders)
 
+@app.route('/story-time')
+def story_time():
+    # Get the full absolute path to stories.json
+    json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "stories.json")
+
+    # Load stories
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # Use current day as index (1-based), fallback to day1
+    today = datetime.now().day
+    day_key = f"day{today}"
+
+    # Fallback to "day1" if today is out of range
+    stories = data.get(day_key) or data.get("day1", [])
+
+    return render_template('pages/story_time.html', stories=stories)
+
+
 @app.route('/api/stories')
 def get_stories():
     today = (datetime.utcnow().day % 30) or 30
