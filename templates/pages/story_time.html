@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Story Time • Tawfiq AI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0fdf9;
+      padding: 25px;
+      text-align: center;
+      margin: 0;
+    }
+
+    h1 {
+      color: #00695c;
+      margin-bottom: 25px;
+    }
+
+    .story-box {
+      background: linear-gradient(135deg, #ffffff, #dcfef0);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      padding: 25px 20px;
+      border-radius: 18px;
+      max-width: 700px;
+      margin: auto;
+      font-size: 1.1rem;
+      color: #004d40;
+      line-height: 1.9;
+      position: relative;
+      transition: transform 0.3s ease;
+      min-height: 200px;
+    }
+
+    .story-title {
+      font-size: 1.4rem;
+      color: #00796b;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .story-text {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .story-source {
+      font-size: 0.9rem;
+      color: #555;
+      font-style: italic;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    button {
+      background-color: #009688;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    button:hover {
+      background-color: #00796b;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 0.9rem;
+      color: #00796b;
+      font-weight: bold;
+      opacity: 0.25;
+      pointer-events: none;
+      user-select: none;
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      .story-box {
+        padding: 18px 16px;
+        font-size: 1rem;
+      }
+
+      .story-title {
+        font-size: 1.2rem;
+      }
+
+      .story-text {
+        font-size: 1rem;
+      }
+
+      .story-source {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>📖 Real Muslim Stories</h1>
+
+  <div class="story-box" id="story-container">
+    <div class="story-title" id="story-title">{{ stories[0].title }}</div>
+    <div class="story-text" id="story-text">{{ stories[0].story }}</div>
+    <div class="story-source" id="story-source">{{ stories[0].source }}</div>
+
+    <!-- Hidden Watermark (only visible on download) -->
+    <div class="watermark" id="story-watermark">TawfiqAI.com 🕌</div>
+  </div>
+
+  <div class="controls">
+    <button onclick="nextStory()">Next Story ➡️</button>
+    <button onclick="downloadStory()">Download 📥</button>
+  </div>
+
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+  const stories = {{ stories|tojson }};
+  let currentIndex = 0;
+  let finished = false; // Track if all stories have been shown
+
+  function updateStory() {
+    if (finished) return; // Do nothing if finished
+
+    const current = stories[currentIndex];
+    document.getElementById("story-title").textContent = current.title;
+    document.getElementById("story-text").textContent = current.story;
+    document.getElementById("story-source").textContent = current.source;
+  }
+
+  function nextStory() {
+    if (finished) return; // Do nothing if finished
+
+    if (currentIndex < stories.length - 1) {
+      currentIndex++;
+      updateStory();
+    } else {
+      // Reached the end of stories
+      showFinalMessage();
+    }
+  }
+
+  function showFinalMessage() {
+    // Display a closing message
+    document.getElementById("story-title").textContent = "That's all for today!";
+    document.getElementById("story-text").innerHTML = "Come again tomorrow to see more inspiring stories.";
+    document.getElementById("story-source").textContent = "";
+    finished = true;
+
+    // Optionally disable the Next button
+    document.querySelector("button[onclick='nextStory()']").disabled = true;
+  }
+
+  function downloadStory() {
+    const box = document.getElementById("story-container");
+    const watermark = document.getElementById("story-watermark");
+
+    // Show watermark
+    watermark.style.display = "block";
+
+    html2canvas(box).then(canvas => {
+      const link = document.createElement("a");
+      link.download = `Story_TawfiqAI_${currentIndex + 1}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+
+      // Hide watermark again
+      watermark.style.display = "none";
+    });
+  }
+
+  // Initialize with first story
+  updateStory();
+</script>
+</body>
+</html>
