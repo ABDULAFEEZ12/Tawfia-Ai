@@ -1328,7 +1328,7 @@ def reminder():
 @app.route('/story-time')
 def story_time():
     # Get the full absolute path to stories.json
-    json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "stories.json")
+    json_path = os.path.join(BASE_DIR "DATA", "stories.json")
 
     # Load stories
     with open(json_path, 'r', encoding='utf-8') as f:
