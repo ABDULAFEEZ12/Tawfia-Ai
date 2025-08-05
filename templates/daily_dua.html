@@ -6,118 +6,161 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: #f0f4f3;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #e0f2f1;
+      padding: 30px 20px;
       margin: 0;
-      padding: 1.5rem;
-      color: #333;
-    }
-
-    h2 {
       text-align: center;
-      color: #00796B;
-      margin-bottom: 1.5rem;
-      font-size: 1.8rem;
     }
 
-    .dua-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 1.8rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    h1 {
+      color: #00695c;
+      margin-bottom: 30px;
+    }
+
+    .dua-box {
+      background: linear-gradient(145deg, #ffffff, #d7fce6);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 40px 25px;
+      border-radius: 20px;
+      max-width: 600px;
+      margin: auto;
+      font-size: 1.2rem;
+      color: #004d40;
+      line-height: 1.8;
       transition: all 0.3s ease;
+      min-height: 200px;
+      overflow-y: auto;
+      max-height: 450px;
+      display: none;
+      position: relative;
     }
 
-    .dua-card:hover {
-      transform: translateY(-3px);
+    .dua-box.active {
+      display: block;
     }
 
     .arabic {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       direction: rtl;
       text-align: right;
-      color: #222;
-      margin-bottom: 1rem;
-      line-height: 2.2rem;
+      color: #333;
+      margin-bottom: 15px;
     }
 
     .translit, .english {
+      text-align: left;
+      margin-bottom: 10px;
       font-size: 1rem;
-      margin-bottom: 0.6rem;
     }
 
-    .translit strong, .english strong {
-      color: #009688;
-    }
-
-    .controls {
+    .button-group {
       display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 2rem;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+      gap: 15px;
     }
 
-    .btn {
+    button, .btn {
       background-color: #009688;
       color: white;
-      padding: 0.75rem 1.5rem;
       border: none;
-      border-radius: 30px;
-      cursor: pointer;
+      padding: 14px 28px;
       font-size: 1rem;
-      transition: background-color 0.2s ease;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
     }
 
-    .btn:hover {
-      background-color: #00796B;
+    button:hover, .btn:hover {
+      background-color: #00796b;
     }
 
-    @media (max-width: 600px) {
-      .arabic {
-        font-size: 1.3rem;
-        line-height: 1.8rem;
+    .no-print {
+      display: inline-block;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dua-box {
+        padding: 30px 18px;
+        font-size: 1.1rem;
       }
 
-      .btn {
-        font-size: 0.9rem;
-        padding: 0.6rem 1.2rem;
+      button {
+        padding: 12px 24px;
       }
     }
   </style>
 </head>
 <body>
 
-  <h2>🕌 Daily Duas – {{ day|capitalize }}</h2>
+  <h1>🤲 Daily Duas</h1>
 
-  {% for dua in duas %}
-  <div class="dua-card">
-    <div class="arabic">{{ dua.arabic }}</div>
-    <div class="translit"><strong>Transliteration:</strong> {{ dua.transliteration }}</div>
-    <div class="english"><strong>Translation:</strong> {{ dua.english }}</div>
+  <div id="duas-container">
+    {% for dua in duas %}
+    <div class="dua-box {% if loop.first %}active{% endif %}" id="dua-{{ loop.index0 }}">
+      <div class="arabic">{{ dua.arabic }}</div>
+      <div class="translit"><strong>Transliteration:</strong> {{ dua.transliteration }}</div>
+      <div class="english"><strong>Translation:</strong> {{ dua.english }}</div>
+
+      <div class="button-group no-print">
+        <button onclick="downloadDua('dua-{{ loop.index0 }}')">Download 📥</button>
+        {% if not loop.last %}
+        <button onclick="showNextDua({{ loop.index0 }})">Next Dua ➡️</button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
   </div>
-  {% endfor %}
 
-  <div class="controls">
-    <button class="btn" onclick="nextDua()">🔁 Next Dua</button>
-    <button class="btn" onclick="downloadDua()">⬇️ Download Dua</button>
-  </div>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script>
-    function nextDua() {
-      alert("Next Dua functionality coming soon, In shaa Allah 🚀");
+    function showNextDua(currentIndex) {
+      const current = document.getElementById(`dua-${currentIndex}`);
+      const next = document.getElementById(`dua-${currentIndex + 1}`);
+      if (next) {
+        current.classList.remove('active');
+        next.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
-    function downloadDua() {
-      const text = document.querySelector('.dua-card')?.innerText;
-      const blob = new Blob([text], { type: "text/plain" });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = "daily_dua.txt";
-      link.click();
+    function downloadDua(id) {
+      const element = document.getElementById(id);
+      const buttons = element.querySelectorAll('.no-print');
+      buttons.forEach(btn => btn.style.display = 'none');
+
+      const watermark = document.createElement('div');
+      watermark.innerText = "Tawfiq AI 📿 - www.tawfiqai.com";
+      watermark.style.position = "absolute";
+      watermark.style.bottom = "15px";
+      watermark.style.right = "20px";
+      watermark.style.opacity = "1";
+      watermark.style.fontSize = "1rem";
+      watermark.style.fontWeight = "bold";
+      watermark.style.fontFamily = "Segoe UI, sans-serif";
+      watermark.style.color = "#004d40";
+      watermark.classList.add("temp-watermark");
+      element.appendChild(watermark);
+
+      html2canvas(element).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `${id}_Tawfiq_Dua.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        buttons.forEach(btn => btn.style.display = 'inline-block');
+        watermark.remove();
+      });
     }
   </script>
-
 </body>
 </html>
