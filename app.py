@@ -1325,6 +1325,13 @@ def reminder():
 
     return render_template('pages/reminder.html', reminders=reminders)
 
+@app.route('/api/stories')
+def get_stories():
+    today = (datetime.utcnow().day % 30) or 30
+    with open('data/stories.json', encoding='utf-8') as f:
+        data = json.load(f)
+    return jsonify(data.get(f'day{today}', []))
+    
 @app.route('/api/reminders')
 def get_reminders():
     import datetime, json
