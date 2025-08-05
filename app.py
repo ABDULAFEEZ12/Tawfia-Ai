@@ -1311,6 +1311,39 @@ def daily_dua_json(day):
     day_key = f"day{(day % 30) or 30}"
     return jsonify(all_duas.get(day_key, []))
 
+import os
+from datetime import datetime
+import json
+from flask import Flask, render_template, jsonify
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+@app.route('/story-time')
+def story_time():
+    # Correct path
+    json_path = os.path.join(BASE_DIR, "DATA", "stories.json")
+
+    # Load stories
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # Get day key (e.g. "day4")
+    today = datetime.now().day
+    day_key = f"day{today}"
+
+    # Fallback to "day1" if key not found
+    stories = data.get(day_key, data.get("day1", []))
+
+    return render_template('pages/story_time.html', stories=stories)
+
+@app.route('/api/stories')
+def get_stories():
+    json_path = os.path.join(BASE_DIR, "DATA", "stories.json")
+    today = datetime.utcnow().day
+    with open(json_path, encoding='utf-8') as f:
+        data = json.load(f)
+    return jsonify(data.get(f'day{today}', []))
+
 # ----------- DAILY REMINDER ROUTE -----------
 @app.route('/reminder')
 def reminder():
@@ -1325,32 +1358,6 @@ def reminder():
 
     return render_template('pages/reminder.html', reminders=reminders)
 
-@app.route('/story-time')
-def story_time():
-    # Get the full absolute path to stories.json
-    json_path = os.path.join(BASE_DIR "DATA", "stories.json")
-
-    # Load stories
-    with open(json_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-
-    # Use current day as index (1-based), fallback to day1
-    today = datetime.now().day
-    day_key = f"day{today}"
-
-    # Fallback to "day1" if today is out of range
-    stories = data.get(day_key) or data.get("day1", [])
-
-    return render_template('pages/story_time.html', stories=stories)
-
-
-@app.route('/api/stories')
-def get_stories():
-    today = (datetime.utcnow().day % 30) or 30
-    with open('data/stories.json', encoding='utf-8') as f:
-        data = json.load(f)
-    return jsonify(data.get(f'day{today}', []))
-    
 @app.route('/api/reminders')
 def get_reminders():
     import datetime, json
