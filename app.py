@@ -1320,29 +1320,20 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @app.route('/story-time')
 def story_time():
-    # Correct path
     json_path = os.path.join(BASE_DIR, "DATA", "stories.json")
-
-    # Load stories
     with open(json_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+        all_stories = json.load(f)
+    
+    print("STORIES PASSED TO TEMPLATE:", all_stories)  # Debug here
+    return render_template('pages/story_time.html', stories=all_stories)
 
-    # Get day key (e.g. "day4")
-    today = datetime.now().day
-    day_key = f"day{today}"
-
-    # Fallback to "day1" if key not found
-    stories = data.get(day_key, data.get("day1", []))
-
-    return render_template('pages/story_time.html', stories=stories)
 
 @app.route('/api/stories')
 def get_stories():
-    json_path = os.path.join(BASE_DIR, "DATA", "stories.json")
-    today = datetime.utcnow().day
-    with open(json_path, encoding='utf-8') as f:
+    today = (datetime.utcnow().day % 30) or 30
+    with open('data/stories.json', encoding='utf-8') as f:
         data = json.load(f)
-    return jsonify(data.get(f'day{today}', []))
+    return jsonify(data.get(f'day{today}', []))  # ❌ wrong structure
 
 # ----------- DAILY REMINDER ROUTE -----------
 @app.route('/reminder')
