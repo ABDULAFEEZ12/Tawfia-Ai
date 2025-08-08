@@ -1282,15 +1282,7 @@ def get_surah_by_id(surah_id):
 
 import os
 import json
-from flask import render_template, jsonify
-from datetime import datetime
-
-# Get base directory (where app.py is located)
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# ----------- DAILY DUA HTML ROUTE -----------
-import os
-import json
+import re
 from flask import render_template, jsonify
 from datetime import datetime
 
@@ -1300,34 +1292,32 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def daily_dua_html():
     today = datetime.now()
     day_key = f"day{(today.day % 30) or 30}"
+    json_path = os.path.join(BASE_DIR, "DATA", "daily_duas.json")
 
-    # Load daily duas
-    duas_path = os.path.join(BASE_DIR, "DATA", "daily_duas.json")
-    with open(duas_path, "r", encoding="utf-8") as f:
-        duas_data = json.load(f)
+    with open(json_path, "r", encoding="utf-8") as f:
+        raw_data = f.read()
+
+    # Auto-fix: remove stray { before "dayX"
+    fixed_data = re.sub(r",\s*\{(\s*\"day\d+\":)", r",\1", raw_data)
+
+    duas_data = json.loads(fixed_data)
     duas = duas_data.get(day_key, [])
 
-    # Load stories
-    stories_path = os.path.join(BASE_DIR, "DATA", "stories.json")
-    with open(stories_path, "r", encoding="utf-8") as f:
-        stories_data = json.load(f)
+    return render_template("daily_dua.html", duas=duas, day=day_key)
 
-    return render_template(
-        "daily_dua.html",
-        duas=duas,
-        day=day_key,
-        stories=stories_data  # ✅ so |tojson works
-    )
 
-# ----------- DAILY DUA JSON API ROUTE -----------
 @app.route("/daily-dua/<int:day>")
 def daily_dua_json(day):
     json_path = os.path.join(BASE_DIR, "DATA", "daily_duas.json")
     with open(json_path, "r", encoding="utf-8") as f:
-        all_duas = json.load(f)
+        raw_data = f.read()
 
+    fixed_data = re.sub(r",\s*\{(\s*\"day\d+\":)", r",\1", raw_data)
+
+    all_duas = json.loads(fixed_data)
     day_key = f"day{(day % 30) or 30}"
     return jsonify(all_duas.get(day_key, []))
+
     
 import os
 from datetime import datetime
