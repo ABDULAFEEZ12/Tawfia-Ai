@@ -1288,37 +1288,44 @@ from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-@app.route("/daily-dua")
-def daily_dua_html():
-    today = datetime.now()
-    day_key = f"day{(today.day % 30) or 30}"
-    json_path = os.path.join(BASE_DIR, "DATA", "daily_duas.json")
+@app.route("/duas")
+def all_duas_html():
+    if not os.path.exists(DUA_FILE_PATH):
+        abort(404, description="Dua file not found")
 
-    with open(json_path, "r", encoding="utf-8") as f:
-        raw_data = f.read()
+    with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
+        try:
+            duas_data = json.load(f)
+        except json.JSONDecodeError:
+            abort(500, description="Error reading duas.json file")
 
-    # Auto-fix: remove stray { before "dayX"
-    fixed_data = re.sub(r",\s*\{(\s*\"day\d+\":)", r",\1", raw_data)
+    # Flatten JSON regardless of structure
+    if isinstance(duas_data, dict):
+        all_duas = []
+        for key, duas in duas_data.items():
+            if isinstance(duas, list):
+                for dua in duas:
+                    dua["category"] = key
+                    all_duas.append(dua)
+    else:
+        all_duas = duas_data  # Already a flat list
 
-    duas_data = json.loads(fixed_data)
-    duas = duas_data.get(day_key, [])
-
-    return render_template("daily_dua.html", duas=duas, day=day_key)
+    return render_template("duas.html", duas=all_duas)
 
 
-@app.route("/daily-dua/<int:day>")
-def daily_dua_json(day):
-    json_path = os.path.join(BASE_DIR, "DATA", "daily_duas.json")
-    with open(json_path, "r", encoding="utf-8") as f:
-        raw_data = f.read()
+@app.route("/duas/json")
+def all_duas_json():
+    if not os.path.exists(DUA_FILE_PATH):
+        abort(404, description="Dua file not found")
 
-    fixed_data = re.sub(r",\s*\{(\s*\"day\d+\":)", r",\1", raw_data)
+    with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
+        try:
+            duas_data = json.load(f)
+        except json.JSONDecodeError:
+            abort(500, description="Error reading duas.json file")
 
-    all_duas = json.loads(fixed_data)
-    day_key = f"day{(day % 30) or 30}"
-    return jsonify(all_duas.get(day_key, []))
+    return jsonify(duas_data)
 
-    
 import os
 from datetime import datetime
 import json
