@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dua Detail — Tawfiq AI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #e0f2f1;
+      padding: 30px 15px;
+      margin: 0;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+    .arabic {
+      direction: rtl;
+      font-size: 1.8rem;
+      color: #004d40;
+      margin-bottom: 18px;
+      text-align: right;
+      line-height: 1.3;
+    }
+    .translit {
+      font-style: italic;
+      color: #00695c;
+      margin-bottom: 14px;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+    .translation {
+      color: #004d40;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      font-size: 1rem;
+    }
+    .watermark {
+      font-weight: 700;
+      color: rgba(0, 105, 92, 0.6);
+      font-size: 13px;
+      text-align: right;
+      border-top: 1px solid #b2dfdb;
+      padding-top: 8px;
+    }
+    .btn-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      background-color: #00695c;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease;
+      flex: 1 1 140px;
+      max-width: 48%;
+      box-sizing: border-box;
+    }
+    button:hover {
+      background-color: #004d40;
+    }
+
+    /* Mobile responsive tweaks */
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 10px;
+      }
+      .arabic {
+        font-size: 1.6rem;
+      }
+      .translit,
+      .translation {
+        font-size: 0.95rem;
+      }
+      button {
+        padding: 14px 20px;
+        font-size: 1rem;
+        max-width: 100%;
+      }
+      .btn-container {
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="dua-container">
+    <div class="arabic" id="dua-arabic"></div>
+    <div class="translit" id="dua-translit"></div>
+    <div class="translation" id="dua-translation"></div>
+
+    <div class="btn-container">
+      <button id="download-btn">Download as Image</button>
+      <button id="share-btn">Share</button>
+    </div>
+
+    <div class="watermark">Tawfiq AI 📿 – www.tawfiqai.com</div>
+  </div>
+
+  <!-- html2canvas to capture container as image -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    // All dua details here - keep arabic/translit/translation in sync with your real data
+    const duas = {
+      "Dua for Hope": {
+        "arabic": "لَا إِلَٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+        "transliteration": "La ilaha illa anta subhanaka inni kuntu minaz-zalimin",
+        "translation": "There is no deity except You; exalted are You. Indeed, I have been of the wrongdoers."
+      },
+      "Dua for Forgiveness": {
+        "arabic": "رَبِّ اغْفِرْ لِي وَارْحَمْنِي",
+        "transliteration": "Rabbi ighfir li warhamni",
+        "translation": "My Lord, forgive me and have mercy on me."
+      },
+      "Dua for Parents": {
+        "arabic": "رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
+        "transliteration": "Rabbi irhamhuma kama rabbayani saghira",
+        "translation": "My Lord, have mercy upon them as they brought me up when I was small."
+      },
+      "Dua for Protection from Hellfire": {
+        "arabic": "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+        "transliteration": "Allahumma ajirni min an-naar",
+        "translation": "O Allah, save me from the Fire."
+      },
+      "Dua for Guidance": {
+        "arabic": "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+        "transliteration": "Ihdinas-siratal-mustaqeem",
+        "translation": "Guide us to the Straight Path."
+      },
+      "Dua for Success": {
+        "arabic": "رَبِّ زِدْنِي عِلْمًا وَوَفِّقْنِي",
+        "transliteration": "Rabbi zidni 'ilman wa waffiqni",
+        "translation": "My Lord, increase me in knowledge and grant me success."
+      },
+      "Dua for Health": {
+        "arabic": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي",
+        "transliteration": "Allahumma 'afini fi badani, Allahumma 'afini fi sam'i, Allahumma 'afini fi basari",
+        "translation": "O Allah, grant me health in my body, O Allah, grant me health in my hearing, O Allah, grant me health in my sight."
+      },
+      "Dua for Wealth": {
+        "arabic": "اللَّهُمَّ اكْفِنِي بِحَلالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+        "transliteration": "Allahumma-kfini bihalalika 'an haramik, wa aghnini bifadlika 'amman siwak",
+        "translation": "O Allah, suffice me with what You have made lawful instead of what You have made unlawful, and enrich me by Your bounty so that I have no need of anyone but You."
+      },
+      "Dua for Marriage": {
+        "arabic": "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
+        "transliteration": "Rabbana hab lana min azwajina wa dhurriyatina qurrata a'yunin waj'alna lil-muttaqina imama",
+        "translation": "Our Lord, grant us from among our wives and offspring comfort to our eyes and make us an example for the righteous."
+      },
+      "Dua for Children": {
+        "arabic": "رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِنْ ذُرِّيَّتِي ۚ رَبَّنَا وَتَقَبَّلْ دُعَاءِ",
+        "transliteration": "Rabbi ij'alni muqeemas-salati wa min dhurriyyati, Rabbana wa taqabbal du'a",
+        "translation": "My Lord, make me and my descendants establishers of prayer. Our Lord, accept my supplication."
+      },
+      "Dua for Employment": {
+        "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي",
+        "transliteration": "Rabbi ishrah li sadri wa yassir li amri",
+        "translation": "My Lord, expand my breast for me and make my task easy for me."
+      },
+      "Dua for Travel": {
+        "arabic": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ",
+        "transliteration": "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinin, wa inna ila Rabbina lamunqalibun",
+        "translation": "Glory to Him who has subjected this to us, for we could never have done it by ourselves. Indeed, to our Lord we will return."
+      },
+      "Dua for Protection": {
+        "arabic": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+        "transliteration": "A'udhu bi kalimatillahi at-tammati min sharri ma khalaq",
+        "translation": "I seek refuge in the perfect words of Allah from the evil of what He has created."
+      },
+      "Dua for Patience": {
+        "arabic": "رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا وَثَبِّتْ أَقْدَامَنَا وَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+        "transliteration": "Rabbana afrigh 'alayna sabran wa thabbit aqdamana wansurna 'alal-qawmil-kafirin",
+        "translation": "Our Lord, pour upon us patience and plant firmly our feet and give us victory over the disbelieving people."
+      },
+      "Dua for Sustenance": {
+        "arabic": "اللَّهُمَّ ارْزُقْنَا رِزْقًا حَلَالًا طَيِّبًا وَاسِعًا مِنْ غَيْرِ تَعَبٍ",
+        "transliteration": "Allahumma arzuqna rizqan halalan tayyiban wasi'an min ghayri ta'ab",
+        "translation": "O Allah, provide us with lawful, pure, abundant sustenance without hardship."
+      },
+      "Dua for Recovery": {
+        "arabic": "اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَأْسَ اشْفِ أَنْتَ الشَّافِي لَا شِفَاءَ إِلَّا شِفَاؤُكَ شِفَاءً لَا يُغَادِرُ سَقَمًا",
+        "transliteration": "Allahumma Rabban-nas adhhibil-ba'sa ishfi antash-shafi la shifa'a illa shifa'uka shifa'an la yughadiru saqama",
+        "translation": "O Allah, Lord of mankind, remove the harm and heal, You are the Healer. There is no healing except Your healing, a healing that leaves no illness."
+      },
+      "Dua for Sickness": {
+        "arabic": "بِسْمِ اللَّهِ أَرْقِيكَ مِنْ كُلِّ شَيْءٍ يُؤْذِيكَ مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ اللَّهُ يَشْفِيكَ",
+        "transliteration": "Bismillahi arqika min kulli shay'in yu'dhika, min sharri kulli nafsin aw 'ayni hasidin, Allahu yashfika",
+        "translation": "In the name of Allah I perform ruqyah for you, from everything that harms you, from the evil of every soul or envious eye, may Allah heal you."
+      },
+      "Dua for Gratitude": {
+        "arabic": "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+        "transliteration": "Allahumma a'inni 'ala dhikrika wa shukrika wa husni 'ibadatika",
+        "translation": "O Allah, help me to remember You, to thank You, and to worship You in the best manner."
+      },
+      "Dua for Repentance": {
+        "arabic": "رَبِّ إِنِّي ظَلَمْتُ نَفْسِي فَاغْفِرْ لِي",
+        "transliteration": "Rabbi inni zalamtu nafsi faghfir li",
+        "translation": "My Lord, indeed I have wronged myself, so forgive me."
+      },
+      "Dua for Knowledge": {
+        "arabic": "رَّبِّ زِدْنِي عِلْمًا",
+        "transliteration": "Rabbi zidni 'ilma",
+        "translation": "My Lord, increase me in knowledge."
+      },
+      "Dua for Exams": {
+        "arabic": "اللَّهُمَّ لاَ سَهْلَ إِلاَّ مَا جَعَلْتَهُ سَهْلاً وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلاً",
+        "transliteration": "Allahumma la sahla illa ma ja'altahu sahla, wa anta taj'alul-hazna idha shi'ta sahla",
+        "translation": "O Allah, there is nothing easy except what You make easy, and You make the difficult easy if You will."
+      },
+      "Dua for Parents' Long Life": {
+        "arabic": "رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
+        "transliteration": "Rabbi irhamhuma kama rabbayani saghira",
+        "translation": "My Lord, have mercy upon them as they brought me up when I was small."
+      },
+      "Dua for Forgiveness of Parents": {
+        "arabic": "رَّبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ",
+        "transliteration": "Rabbi ighfir li wa liwalidayya wa lilmu'mineena yawma yaqumul-hisab",
+        "translation": "My Lord, forgive me and my parents and the believers the Day the account is established."
+      },
+      "Dua for Relief from Anxiety": {
+        "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ",
+        "transliteration": "Allahumma inni a'udhu bika minal-hammi wal-hazan",
+        "translation": "O Allah, I seek refuge in You from grief and sorrow."
+      },
+      "Dua for Calm Heart": {
+        "arabic": "اللَّهُمَّ مُقَلِّبَ الْقُلُوبِ ثَبِّتْ قَلْبِي عَلَى دِينِكَ",
+        "transliteration": "Allahumma muqallibal-qulub thabbit qalbi 'ala dinik",
+        "translation": "O Allah, Turner of the hearts, make my heart firm upon Your religion."
+      },
+      "Dua for Strength": {
+        "arabic": "رَبَّنَا آتِنَا مِن لَّدُنكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا",
+        "transliteration": "Rabbana atina min ladunka rahmatan wa hayyi' lana min amrina rashada",
+        "translation": "Our Lord, grant us from Yourself mercy and prepare for us from our affair right guidance."
+      },
+      "Dua for Unity": {
+        "arabic": "وَاعْتَصِمُوا بِحَبْلِ اللَّهِ جَمِيعًا وَلَا تَفَرَّقُوا",
+        "transliteration": "Wa'tasimu bihablillahi jami'an wa la tafarraq",
+        "translation": "And hold firmly to the rope of Allah all together and do not become divided."
+      },
+      "Dua for Ummah": {
+        "arabic": "رَبَّنَا اغْفِرْ لَنَا وَلِإِخْوَانِنَا الَّذِينَ سَبَقُونَا بِالْإِيمَانِ وَلَا تَجْعَلْ فِي قُلُوبِنَا غِلًّا لِّلَّذِينَ آمَنُوا",
+        "transliteration": "Rabbana ighfir lana wa li-ikhwaninalladhina sabaquna bil-imani wa la taj'al fi qulubina ghillan lilladhina amanu",
+        "translation": "Our Lord, forgive us and our brothers who preceded us in faith and put not in our hearts any resentment toward those who have believed."
+      },
+      "Dua for Reconciliation": {
+        "arabic": "إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ فَأَصْلِحُوا بَيْنَ أَخَوَيْكُمْ",
+        "transliteration": "Innamal-mu'minuna ikhwatun fa-aslihu bayna akhawaykum",
+        "translation": "The believers are but brothers, so make reconciliation between your brothers."
+      },
+      "Dua for Family": {
+        "arabic": "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
+        "transliteration": "Rabbana hab lana min azwajina wa dhurriyatina qurrata a'yunin waj'alna lil-muttaqina imama",
+        "translation": "Our Lord, grant us from among our wives and offspring comfort to our eyes and make us an example for the righteous."
+      },
+      "Dua for Home": {
+        "arabic": "اللَّهُمَّ بَارِكْ لِي فِي بَيْتِي وَفِي مَا رَزَقْتَنِي",
+        "transliteration": "Allahumma barik li fi bayti wa fi ma razaqtani",
+        "translation": "O Allah, bless me in my home and in what You have provided me."
+      },
+      "Dua for Blessings in Work": {
+        "arabic": "اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ",
+        "transliteration": "Allahumma barik lana fi ma razaqtana wa qina 'adhaban-nar",
+        "translation": "O Allah, bless us in what You have provided us and protect us from the punishment of the Fire."
+      },
+      "Dua for Blessings in Business": {
+        "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا وَرِزْقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا",
+        "transliteration": "Allahumma inni as'aluka 'ilman nafi'an wa rizqan tayyiban wa 'amalan mutaqabbalan",
+        "translation": "O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds."
+      },
+      "Dua for Barakah in Time": {
+        "arabic": "اللَّهُمَّ بَارِكْ لِي فِي وَقْتِي وَاجْعَلْهُ مُثْمِرًا فِي طَاعَتِكَ",
+        "transliteration": "Allahumma barik li fi waqti waj'alhu muthmiran fi ta'atik",
+        "translation": "O Allah, bless me in my time and make it fruitful in Your obedience."
+      },
+      "Dua for Good Spouse": {
+        "arabic": "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
+        "transliteration": "Rabbana hab lana min azwajina wa dhurriyatina qurrata a'yunin waj'alna lil-muttaqina imama",
+        "translation": "Our Lord, grant us from among our wives and offspring comfort to our eyes and make us an example for the righteous."
+      },
+      "Dua for Good Children": {
+        "arabic": "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
+        "transliteration": "Rabbi hab li minas-saliheen",
+        "translation": "My Lord, grant me [a child] from among the righteous."
+      },
+      "Dua for Hifz of Quran": {
+        "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي وَاحْلُلْ عُقْدَةً مِّن لِّسَانِي يَفْقَهُوا قَوْلِي",
+        "transliteration": "Rabbi ishrah li sadri wa yassir li amri wahlul 'uqdatan min lisani yafqahu qawli",
+        "translation": "My Lord, expand my breast for me and make my task easy for me, and untie the knot from my tongue that they may understand my speech."
+      },
+      "Dua for Success in Dunya and Akhirah": {
+        "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+        "transliteration": "Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar",
+        "translation": "Our Lord, give us in this world good and in the Hereafter good and protect us from the punishment of the Fire."
+      },
+      "Dua for Guidance to Truth": {
+        "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+        "transliteration": "Rabbana la tuzigh qulubana ba'da idh hadaytana wa hab lana min ladunka rahmah, innaka antal-Wahhab",
+        "translation": "Our Lord, do not let our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower."
+      },
+      "Dua for Protection from Evil Eye": {
+        "arabic": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+        "transliteration": "A'udhu bi kalimatillahi at-tammati min sharri ma khalaq",
+        "translation": "I seek refuge in the perfect words of Allah from the evil of what He has created."
+      },
+      "Dua for Relief from Debt": {
+        "arabic": "اللَّهُمَّ اكْفِنِي بِحَلالِكَ عَنْ حَرَامِكَ وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+        "transliteration": "Allahumma-kfini bihalalika 'an haramik, wa aghnini bifadlika 'amman siwak",
+        "translation": "O Allah, suffice me with what You have made lawful instead of what You have made unlawful, and enrich me by Your bounty so that I have no need of anyone but You."
+      },
+      "Dua for Safety on Journey": {
+        "arabic": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ",
+        "transliteration": "Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinin, wa inna ila Rabbina lamunqalibun",
+        "translation": "Glory to Him who has subjected this to us, for we could never have done it by ourselves. Indeed, to our Lord we will return."
+      },
+      "Dua for Ease in Childbirth": {
+        "arabic": "رَبِّ هَبْ لِي مِن لَّدُنكَ ذُرِّيَّةً طَيِّبَةً ۖ إِنَّكَ سَمِيعُ الدُّعَاءِ",
+        "transliteration": "Rabbi hab li min ladunka dhurriyyatan tayyibah, innaka samee'ud-du'a",
+        "translation": "My Lord, grant me from Yourself a good offspring. Indeed, You are the Hearer of supplication."
+      },
+      "Dua for Protection of Youth": {
+        "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَى وَالتُّقَى وَالْعَفَافَ وَالْغِنَى",
+        "transliteration": "Allahumma inni as'alukal-huda wat-tuqa wal-'afaf wal-ghina",
+        "translation": "O Allah, I ask You for guidance, piety, chastity, and self-sufficiency."
+      },
+      "Dua for Return to Islam": {
+        "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً ۚ إِنَّكَ أَنتَ الْوَهَّابُ",
+        "transliteration": "Rabbana la tuzigh qulubana ba'da idh hadaytana wa hab lana min ladunka rahmah, innaka antal-Wahhab",
+        "translation": "Our Lord, do not let our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower."
+      },
+      "Dua for Sincerity": {
+        "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ إِخْلَاصَ النِّيَّةِ وَصِدْقَ الْعَزِيمَةِ",
+        "transliteration": "Allahumma inni as'aluka ikhlasan-niyyah wa sidqal-'azimah",
+        "translation": "O Allah, I ask You for sincerity in intention and firmness in resolution."
+      },
+      "Dua for Good End": {
+        "arabic": "اللَّهُمَّ اخْتِمْ لَنَا بِحُسْنِ الْخَاتِمَةِ وَلَا تَخْتِمْ عَلَيْنَا بِسُوءِ الْعَاقِبَةِ",
+        "transliteration": "Allahumma-khtim lana bihusnil-khatimah wa la takhtim 'alayna bisu'il-'aqibah",
+        "translation": "O Allah, seal our lives with a good end and do not seal them with a bad outcome."
+      },
+      "Dua for Ease in Grief": {
+        "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ وَالْعَجْزِ وَالْكَسَلِ",
+        "transliteration": "Allahumma inni a'udhu bika minal-hammi wal-hazani wal-'ajzi wal-kasali",
+        "translation": "O Allah, I seek refuge in You from grief and sorrow, from incapacity and laziness."
+      },
+      "Dua for Provision for Orphans": {
+        "arabic": "رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا وَثَبِّتْ أَقْدَامَنَا وَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+        "transliteration": "Rabbana afrigh 'alayna sabran wa thabbit aqdamana wansurna 'alal-qawmil-kafirin",
+        "translation": "Our Lord, pour upon us patience and plant firmly our feet and give us victory over the disbelieving people."
+      },
+      "Dua for Relief for the Oppressed": {
+        "arabic": "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+        "transliteration": "Hasbunallahu wa ni'mal-wakil",
+        "translation": "Sufficient for us is Allah, and [He is] the best Disposer of affairs."
+      },
+      "Dua for Cure for Addiction": {
+        "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ",
+        "transliteration": "Allahumma inni as'alukal-'afiyata fid-dunya wal-akhirati",
+        "translation": "O Allah, I ask You for well-being in this world and the Hereafter."
+      },
+      "Dua for Blessings for Teachers": {
+        "arabic": "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي وَاحْلُلْ عُقْدَةً مِّن لِّسَانِي يَفْقَهُوا قَوْلِي",
+        "transliteration": "Rabbi ishrah li sadri wa yassir li amri wahlul 'uqdatan min lisani yafqahu qawli",
+        "translation": "My Lord, expand my breast for me and make my task easy for me, and untie the knot from my tongue that they may understand my speech."
+      },
+      "Dua for Acceptance of Deeds": {
+        "arabic": "اللَّهُمَّ تَقَبَّلْ مِنَّا إِنَّكَ أَنْتَ السَّمِيعُ الْعَلِيمُ",
+        "transliteration": "Allahumma taqabbal minna innaka antas-Sami'ul-'Alim",
+        "translation": "O Allah, accept from us. Indeed, You are the Hearing, the Knowing."
+      },
+      "Dua for Forgiveness after Sin": {
+        "arabic": "رَبَّنَا ظَلَمْنَا أَنفُسَنَا وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
+        "transliteration": "Rabbana zalamna anfusana wa illam taghfir lana wa tarhamna lanakunanna minal-khasirin",
+        "translation": "Our Lord, we have wronged ourselves, and if You do not forgive us and have mercy upon us, we will surely be among the losers."
+      },
+      "Dua for Good Neighbours": {
+        "arabic": "اللَّهُمَّ بَارِكْ لِي فِي جِيرَانِي وَاجْعَلْهُمْ صَالِحِينَ",
+        "transliteration": "Allahumma barik li fi jirani waj'alhum salihin",
+        "translation": "O Allah, bless me in my neighbors and make them righteous."
+      },
+      "Dua for Blessings in Food": {
+        "arabic": "اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ",
+        "transliteration": "Allahumma barik lana fi ma razaqtana wa qina 'adhaban-nar",
+        "translation": "O Allah, bless us in what You have provided us and protect us from the punishment of the Fire."
+      },
+      "Dua for Protection from Trials": {
+        "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ فِتْنَةِ الدُّنْيَا وَعَذَابِ الْقَبْرِ",
+        "transliteration": "Allahumma inni a'udhu bika min fitnatid-dunya wa 'adhabil-qabr",
+        "translation": "O Allah, I seek refuge in You from the trials of this world and the punishment of the grave."
+      },
+      "Dua for Right Counsel": {
+        "arabic": "رَبَّنَا أَتْمِمْ لَنَا نُورَنَا وَاغْفِرْ لَنَا ۖ إِنَّكَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+        "transliteration": "Rabbana atmim lana nurana waghfir lana, innaka 'ala kulli shay'in qadir",
+        "translation": "Our Lord, perfect for us our light and forgive us. Indeed, You are over all things competent."
+      },
+      "Dua for Clarity of Mind": {
+        "arabic": "اللَّهُمَّ نَوِّرْ قَلْبِي وَاجْعَلْ فِي بَصَرِي نُورًا وَفِي سَمْعِي نُورًا",
+        "transliteration": "Allahumma nawwir qalbi waj'al fi basari nura wa fi sam'i nura",
+        "translation": "O Allah, enlighten my heart and place light in my sight and in my hearing."
+      },
+      "Dua for Courage": {
+        "arabic": "رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا وَثَبِّتْ أَقْدَامَنَا وَانصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+        "transliteration": "Rabbana afrigh 'alayna sabran wa thabbit aqdamana wansurna 'alal-qawmil-kafirin",
+        "translation": "Our Lord, pour upon us patience and plant firmly our feet and give us victory over the disbelieving people."
+      }
+    };
+
+ function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    const title = getQueryParam('title');
+    const dua = duas[title];
+
+    if (!dua) {
+      document.getElementById('dua-container').innerHTML = '<p style="color:#bf360c;">Dua not found.</p>';
+    } else {
+      document.getElementById('dua-arabic').textContent = dua.arabic;
+      document.getElementById('dua-translit').textContent = dua.transliteration;
+      document.getElementById('dua-translation').textContent = dua.translation;
+      document.title = title + " — Tawfiq AI";
+    }
+
+    // Download as image
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const container = document.getElementById('dua-container');
+
+      // Hide buttons for clean capture
+      const btnContainer = container.querySelector('.btn-container');
+      btnContainer.style.display = 'none';
+
+      html2canvas(container, {backgroundColor: null}).then(canvas => {
+        btnContainer.style.display = 'flex';
+
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = title ? title.replace(/\s+/g, '_').toLowerCase() + '.png' : 'dua.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+      }).catch(() => {
+        alert('Failed to generate image.');
+        btnContainer.style.display = 'flex';
+      });
+    });
+
+    // Share button logic
+    document.getElementById('share-btn').addEventListener('click', async () => {
+      if (!dua) return;
+      const shareData = {
+        title: title,
+        text: `${title}\n\n${dua.arabic}\n\n${dua.transliteration}\n\n${dua.translation}\n\n— Tawfiq AI`
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          alert('Sharing was cancelled or failed.');
+        }
+      } else {
+        try {
+          await navigator.clipboard.writeText(shareData.text);
+          alert('Dua copied to clipboard! You can now share it.');
+        } catch (err) {
+          alert('Failed to copy to clipboard.');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
