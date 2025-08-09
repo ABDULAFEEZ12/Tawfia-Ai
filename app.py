@@ -1290,41 +1290,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @app.route("/duas")
 def all_duas_html():
-    if not os.path.exists(DUA_FILE_PATH):
-        abort(404, description="Dua file not found")
-
-    with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
-        try:
-            duas_data = json.load(f)
-        except json.JSONDecodeError:
-            abort(500, description="Error reading duas.json file")
-
-    # Flatten JSON regardless of structure
-    if isinstance(duas_data, dict):
-        all_duas = []
-        for key, duas in duas_data.items():
-            if isinstance(duas, list):
-                for dua in duas:
-                    dua["category"] = key
-                    all_duas.append(dua)
-    else:
-        all_duas = duas_data  # Already a flat list
-
-    return render_template("duas.html", duas=all_duas)
-
-
-@app.route("/duas/json")
-def all_duas_json():
-    if not os.path.exists(DUA_FILE_PATH):
-        abort(404, description="Dua file not found")
-
-    with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
-        try:
-            duas_data = json.load(f)
-        except json.JSONDecodeError:
-            abort(500, description="Error reading duas.json file")
-
-    return jsonify(duas_data)
+    return render_template("duas.html")
 
 import os
 from datetime import datetime
