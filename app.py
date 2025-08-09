@@ -1292,6 +1292,17 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def all_duas_html():
     return render_template("duas.html")
 
+@app.route("/dua/<dua_id>")
+def dua_view(dua_id):
+    dua = DUAS.get(dua_id)
+    if not dua:
+        abort(404)
+    return render_template("dua_detail.html", dua=dua)
+
+@app.route('/dua.html')
+def serve_dua():
+    return send_from_directory('templates', 'dua.html')
+
 import os
 from datetime import datetime
 import json
