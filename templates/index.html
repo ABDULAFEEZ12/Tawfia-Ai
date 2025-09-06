@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,6 +113,63 @@ body.dark-mode #dailyDuaSection h2 {
 }
 body.dark-mode #dailyDuaContent {
   color: #80cbc4;
+}
+
+/* Audio player styling */
+.audio-player {
+  margin-top: 15px;
+  width: 100%;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 10px;
+}
+body.dark-mode .audio-player {
+  background-color: #333;
+}
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.play-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.play-button:hover {
+  background-color: #45a049;
+}
+.play-button.playing {
+  background-color: #f44336;
+}
+.play-button.playing:hover {
+  background-color: #d32f2f;
+}
+.audio-progress {
+  flex-grow: 1;
+  height: 5px;
+  background-color: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.audio-progress-bar {
+  height: 100%;
+  background-color: #4CAF50;
+  width: 0%;
+}
+.audio-time {
+  font-size: 12px;
+  color: #666;
+  min-width: 80px;
+  text-align: right;
+}
+body.dark-mode .audio-time {
+  color: #ccc;
 }
 
 /* Additional styles as per your original stylesheet... */
@@ -377,6 +433,13 @@ body {
     padding: 10px 16px;
     font-size: 0.95em;
   }
+  .audio-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .audio-time {
+    text-align: center;
+  }
 }
 
 /* Specific styles for the Dua section */
@@ -465,7 +528,20 @@ body {
   <select id="surahList">
     <option value="">-- Or Select Surah --</option>
   </select>
-  <button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
+  <div style="display: flex; gap: 10px; margin-top: 10px;">
+    <button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
+    <button id="playSurahButton" onclick="playSurah()" style="background-color: #4CAF50;">🎵 Play Surah</button>
+  </div>
+  <div class="audio-player" id="audioPlayer" style="display: none;">
+    <audio id="surahAudio" controls style="width: 100%;"></audio>
+    <div class="audio-controls">
+      <button class="play-button" id="playPauseBtn" onclick="togglePlayPause()">Play</button>
+      <div class="audio-progress">
+        <div class="audio-progress-bar" id="progressBar"></div>
+      </div>
+      <div class="audio-time" id="timeDisplay">0:00 / 0:00</div>
+    </div>
+  </div>
   <div class="results" id="quranResult"></div>
 </div>
 
@@ -547,6 +623,7 @@ body {
   }
 
   let chatHistory = [];
+  let audioPlayer = null;
 
   // Load Daily Dua
   function loadDailyDua() {
@@ -688,7 +765,173 @@ function loadSurahList() {
     loadDailyDua();
     loadHadithTopics();
     loadSurahList();
+    initializeAudioPlayer();
   });
+
+  // Initialize audio player
+  function initializeAudioPlayer() {
+    audioPlayer = document.getElementById('surahAudio');
+    if (!audioPlayer) return;
+    
+    audioPlayer.addEventListener('timeupdate', updateProgress);
+    audioPlayer.addEventListener('loadedmetadata', function() {
+      updateTimeDisplay();
+    });
+    audioPlayer.addEventListener('ended', function() {
+      document.getElementById('playPauseBtn').classList.remove('playing');
+      document.getElementById('playPauseBtn').textContent = 'Play';
+    });
+  }
+
+  // Toggle play/pause for audio
+  function togglePlayPause() {
+    const btn = document.getElementById('playPauseBtn');
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+      btn.classList.add('playing');
+      btn.textContent = 'Pause';
+    } else {
+      audioPlayer.pause();
+      btn.classList.remove('playing');
+      btn.textContent = 'Play';
+    }
+  }
+
+  // Update progress bar
+  function updateProgress() {
+    const progressBar = document.getElementById('progressBar');
+    const value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    progressBar.style.width = value + '%';
+    updateTimeDisplay();
+  }
+
+  // Update time display
+  function updateTimeDisplay() {
+    const timeDisplay = document.getElementById('timeDisplay');
+    const currentTime = formatTime(audioPlayer.currentTime);
+    const duration = formatTime(audioPlayer.duration);
+    timeDisplay.textContent = `${currentTime} / ${duration}`;
+  }
+
+  // Format time in minutes:seconds
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+
+  // Play Surah function
+  function playSurah() {
+    const query = document.getElementById("quranInput").value.trim();
+    const selectedSurah = document.getElementById("surahList").value;
+    const surahName = query || selectedSurah;
+    
+    if (!surahName || !surahNameToNumber[surahName]) {
+      alert("Please select a valid Surah from the list.");
+      return;
+    }
+
+    const surahNumber = surahNameToNumber[surahName];
+    const audioPlayerContainer = document.getElementById('audioPlayer');
+    const audioElement = document.getElementById('surahAudio');
+    
+    // Show audio player
+    audioPlayerContainer.style.display = 'block';
+    
+    // Set audio source (using a free Quran API)
+    audioElement.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`;
+    
+    // Update UI
+    document.getElementById('playPauseBtn').textContent = 'Loading...';
+    document.getElementById('playPauseBtn').disabled = true;
+    
+    // When audio is loaded
+    audioElement.oncanplay = function() {
+      document.getElementById('playPauseBtn').textContent = 'Play';
+      document.getElementById('playPauseBtn').disabled = false;
+      document.getElementById('timeDisplay').textContent = '0:00 / ' + formatTime(audioElement.duration);
+    };
+    
+    // Handle errors
+    audioElement.onerror = function() {
+      alert("Could not load audio for this Surah. Please try another one.");
+      document.getElementById('playPauseBtn').textContent = 'Play';
+      document.getElementById('playPauseBtn').disabled = false;
+    };
+  }
+function playSurah() {
+  const query = document.getElementById("quranInput").value.trim();
+  const selectedSurah = document.getElementById("surahList").value;
+  const surahName = query || selectedSurah;
+  
+  if (!surahName || !surahNameToNumber[surahName]) {
+    alert("Please select a valid Surah from the list.");
+    return;
+  }
+
+  const surahNumber = surahNameToNumber[surahName];
+  const audioPlayerContainer = document.getElementById('audioPlayer');
+  const audioElement = document.getElementById('surahAudio');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+
+  // Show audio player
+  audioPlayerContainer.style.display = 'block';
+
+  // Set audio source (using Quran API)
+  audioElement.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`;
+
+  // Update UI
+  playPauseBtn.textContent = 'Loading...';
+  playPauseBtn.disabled = true;
+
+  // When audio is ready
+  audioElement.oncanplay = function() {
+    playPauseBtn.textContent = 'Play';
+    playPauseBtn.disabled = false;
+    document.getElementById('timeDisplay').textContent =
+      '0:00 / ' + formatTime(audioElement.duration);
+  };
+
+  // Handle errors
+  audioElement.onerror = function() {
+    alert("Could not load audio for this Surah. Please try another one.");
+    playPauseBtn.textContent = 'Play';
+    playPauseBtn.disabled = false;
+  };
+
+  /** 🎵 BUTTON HANDLERS **/
+
+  // Play/Pause toggle
+  playPauseBtn.onclick = function () {
+    if (audioElement.paused) {
+      audioElement.play();
+      playPauseBtn.textContent = "Pause";
+    } else {
+      audioElement.pause();
+      playPauseBtn.textContent = "Play";
+    }
+  };
+
+  // Next Surah
+  nextBtn.onclick = function () {
+    const nextSurah = surahNumber + 1;
+    if (nextSurah <= 114) {
+      document.getElementById("surahList").value = getSurahName(nextSurah);
+      playSurah();
+    }
+  };
+
+  // Previous Surah
+  prevBtn.onclick = function () {
+    const prevSurah = surahNumber - 1;
+    if (prevSurah >= 1) {
+      document.getElementById("surahList").value = getSurahName(prevSurah);
+      playSurah();
+    }
+  };
+}
 
   // Main function to send question
   async function sendQuestion() {
@@ -772,12 +1015,120 @@ function loadSurahList() {
   // Search Quran
  // Surah name → number map (must match dropdown list!)
 const surahNameToNumber = {
-  "Al-Fatihah": 1, "Al-Baqarah": 2, "Aali Imran": 3, "An-Nisa": 4, "Al-Ma'idah": 5,
-  "Al-An'am": 6, "Al-A'raf": 7, "Al-Anfal": 8, "At-Tawbah": 9, "Yunus": 10,
-  "Hud": 11, "Yusuf": 12, "Ar-Ra'd": 13, "Ibrahim": 14, "Al-Hijr": 15,
-  "An-Nahl": 16, "Al-Isra": 17, "Al-Kahf": 18, "Maryam": 19, "Ta-Ha": 20,
-  "Al-Anbiya": 21, "Al-Hajj": 22, "Al-Mu’minun": 23, "An-Nur": 24, "Al-Furqan": 25,
-  // 🔁 Add the rest later or ask me to paste full map
+  "Al-Fatihah": 1, 
+"Al-Baqarah": 2, 
+"Aali Imran": 3, 
+"An-Nisa": 4, 
+"Al-Ma'idah": 5,
+"Al-An'am": 6, 
+"Al-A'raf": 7, 
+"Al-Anfal": 8, 
+"At-Tawbah": 9, 
+"Yunus": 10,
+"Hud": 11, 
+"Yusuf": 12, 
+"Ar-Ra'd": 13, 
+"Ibrahim": 14, 
+"Al-Hijr": 15,
+"An-Nahl": 16, 
+"Al-Isra": 17, 
+"Al-Kahf": 18, 
+"Maryam": 19, 
+"Ta-Ha": 20,
+"Al-Anbiya": 21, 
+"Al-Hajj": 22, 
+"Al-Mu’minun": 23, 
+"An-Nur": 24, 
+"Al-Furqan": 25,
+"Ash-Shu'ara": 26,
+"An-Naml": 27,
+"Al-Qasas": 28,
+"Al-Ankabut": 29,
+"Ar-Rum": 30,
+"Luqman": 31,
+"As-Sajda": 32,
+"Al-Ahzab": 33,
+"Saba": 34,
+"Fatir": 35,
+"Ya-Sin": 36,
+"As-Saffat": 37,
+"Sad": 38,
+"Az-Zumar": 39,
+"Ghafir": 40,
+"Fussilat": 41,
+"Ash-Shura": 42,
+"Az-Zukhruf": 43,
+"Ad-Dukhan": 44,
+"Al-Jathiya": 45,
+"Al-Ahqaf": 46,
+"Muhammad": 47,
+"Al-Fath": 48,
+"Al-Hujurat": 49,
+"Qaf": 50,
+"Adh-Dhariyat": 51,
+"At-Tur": 52,
+"An-Najm": 53,
+"Al-Qamar": 54,
+"Ar-Rahman": 55,
+"Al-Waqia": 56,
+"Al-Hadid": 57,
+"Al-Mujadila": 58,
+"Al-Hashr": 59,
+"Al-Mumtahina": 60,
+"As-Saff": 61,
+"Al-Jumu'a": 62,
+"Al-Munafiqun": 63,
+"At-Taghabun": 64,
+"At-Talaq": 65,
+"At-Tahrim": 66,
+"Al-Mulk": 67,
+"Al-Qalam": 68,
+"Al-Haqqa": 69,
+"Al-Ma'arij": 70,
+"Nuh": 71,
+"Al-Jinn": 72,
+"Al-Muzzammil": 73,
+"Al-Muddathir": 74,
+"Al-Qiyama": 75,
+"Al-Insan": 76,
+"Al-Mursalat": 77,
+"An-Naba": 78,
+"An-Nazi'at": 79,
+"Abasa": 80,
+"At-Takwir": 81,
+"Al-Infitar": 82,
+"Al-Mutaffifin": 83,
+"Al-Inshiqaq": 84,
+"Al-Buruj": 85,
+"At-Tariq": 86,
+"Al-A'la": 87,
+"Al-Gashiya": 88,
+"Al-Fajr": 89,
+"Al-Balad": 90,
+"Ash-Shams": 91,
+"Al-Lail": 92,
+"Ad-Duha": 93,
+"Ash-Sharh": 94,
+"At-Tin": 95,
+"Al-'Alaq": 96,
+"Al-Qadr": 97,
+"Al-Bayyina": 98,
+"Az-Zalzala": 99,
+"Al-Adiyat": 100,
+"Al-Qari'a": 101,
+"At-Takathur": 102,
+"Al-Asr": 103,
+"Al-Humaza": 104,
+"Al-Fil": 105,
+"Quraish": 106,
+"Al-Ma'un": 107,
+"Al-Kawthar": 108,
+"Al-Kafirun": 109,
+"An-Nasr": 110,
+"Al-Masad": 111,
+"Al-Ikhlas": 112,
+"Al-Falaq": 113,
+"An-Nas": 114
 };
 
 function searchQuran() {
