@@ -1,126 +1,513 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Tawfiq AI – The World's First Halal AI Assistant</title>
-  <meta name="description" content="Tawfiq AI is the world's first halal AI assistant, designed to help Muslims access the Quran, Hadith, and Islamic guidance while enjoying modern AI-powered tools in a safe and trusted way.">
-  <meta name="keywords" content="Tawfiq AI, halal AI, Islamic AI, Muslim AI, Quran AI, Hadith Chatbot, Muslim Chatbot, AI for Muslims, Islamic ChatGPT">
+<meta charset="UTF-8" />
+<title>Tawfiq AI – Smart Islamic AI for Muslims Worldwide</title>
+<meta name="description" content="Tawfiq AI is the smartest Muslim AI that helps with Quran, Hadith, Islamic questions, games, and more – built for Muslims, by Muslims.">
+<meta name="keywords" content="Tawfiq AI, Islamic AI, Muslim AI, Quran AI, Hadith Chatbot, Muslim Chatbot, AI for Muslims, Halal AI, Islamic ChatGPT">
 
-  <!-- Viewport (mobile-first) -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- Viewport (mobile-first) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Tawfiq AI – The World's First Halal AI Assistant" />
-  <meta property="og:description" content="Tawfiq AI helps Muslims access Quran, Hadith, and Islamic guidance through modern AI-powered tools in a safe, halal environment." />
-  <meta property="og:image" content="https://www.tawfiqai.com/static/logo.png" />
-  <meta property="og:url" content="https://www.tawfiqai.com/" />
-  <meta property="og:type" content="website" />
+<!-- Open Graph -->
+<meta property="og:title" content="Tawfiq AI – Islamic AI Chatbot & Quran Helper" />
+<meta property="og:description" content="Ask Islamic questions, get Quran answers, and play Muslim games with the smartest Islamic AI – Tawfiq AI." />
+<meta property="og:image" content="https://www.tawfiqai.com/static/logo.png" />
+<meta property="og:url" content="https://www.tawfiqai.com/" />
+<meta property="og:type" content="website" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Tawfiq AI – Built for Muslims" />
-  <meta name="twitter:description" content="The world's first halal AI assistant. Quran, Hadith, and Islamic guidance in one place." />
-  <meta name="twitter:image" content="https://www.tawfiqai.com/static/logo.png" />
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tawfiq AI – Built for Muslims" />
+<meta name="twitter:description" content="The world's friendliest halal AI. Quran, Hadith, and fun, all in one place." />
+<meta name="twitter:image" content="https://www.tawfiqai.com/static/logo.png" />
 
-  <!-- External CSS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <link rel="icon" href="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" type="image/jpeg">
+<!-- Force update -->
+<meta name="version" content="1.0.1">
 
-  <!-- Inline CSS -->
-  <style>
-    /* All your CSS styles go here */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-    body {
-      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      color: #333;
-      line-height: 1.6;
-      scroll-behavior: smooth;
-      overflow-x: hidden;
-    }
-    
-    /* All your other CSS rules... */
-    
-    /* Mission Section Styles */
-    .mission-section {
-      text-align: center;
-      margin: 30px auto;
-      max-width: 800px;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .mission-section h2 {
-      color: #00695c;
-      margin-bottom: 15px;
-    }
-    
-    .mission-section p {
-      margin-bottom: 15px;
-      line-height: 1.8;
-    }
-  </style>
+<!-- External CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<!-- Updated and Enhanced CSS for Mobile & Aesthetics, including Light/Dark Mode -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+<link rel="icon" href="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" type="image/jpeg">
+  
+body {
+  <header style="text-align: center; padding: 30px;">
+  <img src="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" alt="Tawfiq AI Logo" style="height: 120px; max-width: 100%;">
+  <h1 style="font-family: sans-serif; font-size: 2rem; margin-top: 10px;">Tawfiq AI</h1>
+  <p style="font-style: italic; color: #555;">Smart Islamic Companion</p>
+</header>
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* Light Mode Styles (default) */
+body.light-mode {
+  background-color: #f4f4f4;
+  color: #333;
+}
+body.light-mode header h1 { color: #222; }
+body.light-mode header h3 { color: #555; }
+body.light-mode .tab { background-color: #fff; color: #000; }
+body.light-mode .tab.active, body.light-mode .tab:hover { background-color: #ddd; }
+body.light-mode .section { background-color: #fff; color: #000; }
+body.light-mode .messages { background-color: #fff; }
+body.light-mode .user-message { background-color: #dcf8c6; color: #000; }
+body.light-mode .ai-message { background-color: #ececec; color: #000; }
+body.light-mode #menu-toggle { background: #fff; color: #000; }
+body.light-mode #menu-toggle:hover { background: #eee; }
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+body.dark-mode header h1 { color: #ffffff; }
+body.dark-mode header h3 { color: #cccccc; }
+body.dark-mode .tab {
+  background-color: #333;
+  color: #fff;
+}
+body.dark-mode .tab.active,
+body.dark-mode .tab:hover {
+  background-color: #555;
+}
+body.dark-mode .section {
+  background-color: #2c2c2c;
+  color: #e0e0e0;
+}
+body.dark-mode .messages {
+  background-color: #2c2c2c;
+}
+body.dark-mode .user-message {
+  background-color: #4caf50;
+  color: #fff;
+}
+body.dark-mode .ai-message {
+  background-color: #424242;
+  color: #fff;
+}
+body.dark-mode #menu-toggle {
+  background: #333;
+  color: #fff;
+}
+body.dark-mode #menu-toggle:hover {
+  background: #444;
+}
+/* Daily Dua Section Dark Mode */
+body.dark-mode #dailyDuaSection {
+  background-color: #263238;
+  color: #b2dfdb;
+}
+body.dark-mode #dailyDuaSection h2 {
+  color: #4dd0e1;
+}
+body.dark-mode #dailyDuaContent {
+  color: #80cbc4;
+}
+
+/* Audio player styling */
+.audio-player {
+  margin-top: 15px;
+  width: 100%;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 10px;
+}
+body.dark-mode .audio-player {
+  background-color: #333;
+}
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.play-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.play-button:hover {
+  background-color: #45a049;
+}
+.play-button.playing {
+  background-color: #f44336;
+}
+.play-button.playing:hover {
+  background-color: #d32f2f;
+}
+.audio-progress {
+  flex-grow: 1;
+  height: 5px;
+  background-color: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.audio-progress-bar {
+  height: 100%;
+  background-color: #4CAF50;
+  width: 0%;
+}
+.audio-time {
+  font-size: 12px;
+  color: #666;
+  min-width: 80px;
+  text-align: right;
+}
+body.dark-mode .audio-time {
+  color: #ccc;
+}
+
+/* Additional styles as per your original stylesheet... */
+
+h1, h3 {
+  text-align: center;
+  margin: 20px 10px;
+  font-weight: 600;
+}
+header h1 {
+  font-size: 1.8em;
+  color: #222;
+}
+header h3 {
+  font-size: 1.2em;
+  color: #555;
+}
+
+/* Menu toggle button style */
+#menu-toggle {
+  font-size: 28px;
+  cursor: pointer;
+  position: fixed;
+  top: 20px;
+  left: 15px;
+  z-index: 1001;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+#menu-toggle:hover {
+  background: #eee;
+  transform: scale(1.05);
+}
+
+/* Theme toggle button style */
+#theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 15px;
+  z-index: 1001;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  background-color: #fff;
+  color: #000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+#theme-toggle:hover {
+  transform: scale(1.1);
+}
+body.dark-mode #theme-toggle {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Sidebar menu styles */
+#side-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100%;
+  background-color: #121212;
+  color: #fff;
+  padding-top: 70px;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+#side-menu.hidden {
+  left: -280px;
+}
+#side-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#side-menu li {
+  padding: 16px 20px;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background 0.2s, transform 0.1s;
+}
+#side-menu li:hover {
+  background-color: #333;
+  transform: translateX(2px);
+}
+#side-menu a {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+}
+
+/* Tabs styles */
+.tabs {
+  margin-top: 100px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tab {
+  padding: 10px 20px;
+  border-radius: 25px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1em;
+  transition: background 0.3s, transform 0.2s;
+}
+.tab.active, .tab:hover {
+  background-color: #ddd;
+  transform: scale(1.02);
+}
+
+/* Sections styling */
+.section {
+  display: none;
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 20px;
+  width: 100%;
+}
+.section.active {
+  display: block;
+}
+
+/* Input styles */
+input[type="text"], select {
+  width: 100%;
+  padding: 12px 15px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  transition: border-color 0.2s;
+}
+input[type="text"]:focus, select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Buttons styling */
+button {
+  margin-top: 12px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 1em;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.2s;
+}
+button:hover {
+  background-color: #0056b3;
+  transform: scale(1.02);
+}
+
+/* Messages container styles (for chat bubbles) */
+.messages {
+  margin-top: 20px;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+/* User message style */
+.user-message {
+  align-self: flex-end;
+  background-color: #dcf8c6; /* WhatsApp greenish */
+  color: #000;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  max-width: 80%;
+  font-weight: normal;
+  word-wrap: break-word;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* AI message style */
+.ai-message {
+  align-self: flex-start;
+  background-color: #ececec; /* Light gray/white bubble */
+  color: #000;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  max-width: 80%;
+  font-weight: 400;
+  word-wrap: break-word;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Optional hover effect on chat bubbles */
+.user-message:hover, .ai-message:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Scrollbar styles for WebKit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0,0,0,0.4);
+}
+
+/* Firefox scrollbar */
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.2) transparent;
+}
+
+/* Responsive font sizes and layout adjustments for small screens */
+@media(max-width: 600px) {
+  body {
+    font-size: 0.95em;
+  }
+  header h1 {
+    font-size: 1.4em;
+  }
+  header h3 {
+    font-size: 1em;
+  }
+  #menu-toggle {
+    font-size: 24px;
+    padding: 6px 10px;
+  }
+  .tab {
+    padding: 8px 16px;
+    font-size: 0.95em;
+  }
+  button {
+    padding: 10px 16px;
+    font-size: 0.95em;
+  }
+  .audio-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .audio-time {
+    text-align: center;
+  }
+}
+
+/* Specific styles for the Dua section */
+#duaSection {
+  margin-top: 20px;
+  padding: 20px;
+}
+#dailyDuaSection {
+  background-color: #e0f7fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+#dailyDuaSection h2 {
+  margin-bottom: 15px;
+  font-size: 1.4em;
+  color: #00695c;
+}
+#dailyDuaContent {
+  font-size: 1.2em;
+  font-family: 'Poppins', sans-serif;
+  color: #004d40;
+}
+</style>
 </head>
 <body class="light-mode">
 
-  <!-- Theme Toggle Button -->
-  <button id="theme-toggle" onclick="toggleMode()">☀️</button>
+<!-- Theme Toggle Button -->
+<button id="theme-toggle" onclick="toggleMode()">☀️</button>
 
-  <div class="auth-status">
-    {% if user %}
-      <p>Welcome, {{ user.username }}! <a href="/logout">Logout</a></p>
-    {% else %}
-      <p><a href="/login">Login</a> | <a href="/signup">Sign Up</a></p>
-    {% endif %}
-  </div>
+<div class="auth-status">
+  {% if user %}
+    <p>Welcome, {{ user.username }}! <a href="/logout">Logout</a></p>
+  {% else %}
+    <p><a href="/login">Login</a> | <a href="/signup">Sign Up</a></p>
+  {% endif %}
+</div>
 
-  <!-- MENU TOGGLE BUTTON -->
-  <div id="menu-toggle" onclick="toggleMenu()">☰</div>
+<!-- MENU TOGGLE BUTTON -->
+<div id="menu-toggle" onclick="toggleMenu()">☰</div>
 
-  <!-- SIDEBAR MENU -->
-  <div id="side-menu" class="hidden">
-    <ul>
-      <li><a href="/profile">👤 Profile</a></li>
-      <li><a href="/talk-to-tawfiq">🎙️ Talk to Tawfiq</a></li>
-      <li><a href="/prayer-times">🕌 Prayer Times</a></li>
-      <li><a href="/duas">🕌 Dua</a></li>
-      <li><a href="/reminder">📅 Daily Reminder</a></li>
-      <li><a href="/motivation">✨ Islamic Motivation</a></li>
-      <li><a href="/story-time">📖 Story Time</a></li>
-      <li><a href="/reels">📱 Reels</a></li>
-      <li><a href="/trivia">🎮 Play Game</a></li>
-      <li><a href="/settings">⚙️ Settings</a></li>
-      <li><a href="/privacy">🔒 Privacy & Policy</a></li>
-      <li><a href="/about">ℹ️ About Tawfiq AI</a></li>
-      <li><a href="/feedback">📢 Feedback / Report</a></li>
-    </ul>
-  </div>
+<!-- SIDEBAR MENU -->
+<div id="side-menu" class="hidden">
+  <ul>
+  <li><a href="/profile">👤 Profile</a></li>
+  <li><a href="/talk-to-tawfiq">🎙️ Talk to Tawfiq</a></li>
+  <li><a href="/prayer-times">🕌 Prayer Times</a></li>
+  <li><a href="/duas">🕌 Dua</a></li>
+  <li><a href="/reminder">📅 Daily Reminder</a></li>
+  <li><a href="/motivation">✨ Islamic Motivation</a></li>
+  <li><a href="/story-time">📖 Story Time</a></li> <!-- 🔥 Added here -->
+  <li><a href="/reels">📱 Reels</a></li>
+  <li><a href="/trivia">🎮 Play Game</a></li>
+  <li><a href="/settings">⚙️ Settings</a></li>
+  <li><a href="/privacy">🔒 Privacy & Policy</a></li>
+  <li><a href="/about">ℹ️ About Tawfiq AI</a></li>
+  <li><a href="/feedback">📢 Feedback / Report</a></li>
+</ul>
+</div>
 
-  <!-- Main Header -->
-  <header>
-    <img src="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" alt="Tawfiq AI Logo" style="height: 120px; max-width: 100%;">
-    <h1>Tawfiq AI</h1>
-    <p style="font-style: italic; color: #555;">Smart Islamic Companion</p>
-  </header>
-
-  <!-- Mission Section - ADDED IN THE RIGHT PLACE -->
-  <section class="mission-section">
-    <h2>Welcome to Tawfiq AI</h2>
-    <p>
-      Tawfiq AI is the world's first halal AI assistant, designed to help Muslims access 
-      the Quran, Hadith, and Islamic guidance while enjoying modern AI-powered tools 
-      in a safe and trusted way.
-    </p>
-    <p>
-      <strong>Our Mission:</strong> Tawfiq AI exists to make Islamic knowledge accessible, 
-      engaging, and practical for Muslims everywhere, by blending authentic sources 
-      with advanced artificial intelligence — always within halal boundaries.
-    </p>
-  </section>
+<!-- Main Header -->
+<header>
+<h1>🌙 Tawfiq AI - Smart Islamic Companion 🌙</h1>
+<h3>✨ Ask me anything about Islam ✨</h3>
+</header>
 
 <!-- TABS -->
 <div class="tabs">
