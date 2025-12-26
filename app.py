@@ -14,11 +14,9 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from difflib import get_close_matches
-from flask_socketio import SocketIO, join_room, emit
-import requests
 from flask_sqlalchemy import SQLAlchemy
-import speech_recognition as sr
-import sqlite3
+import requests
+from flask_socketio import SocketIO, join_room, emit
 
 # Load environment variables
 load_dotenv()
@@ -29,63 +27,18 @@ print("✅ CX:", os.getenv("GOOGLE_CX"))
 # Initialize Flask app
 app = Flask(__name__)
 
-# Configurations
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
-app.config['SECRET_KEY'] = 'tawfiq-ai-secret-key-2024'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Database Configuration - SQLite as primary, PostgreSQL as optional fallback
-DATABASE_URL = os.getenv('DATABASE_URL')
-USE_POSTGRES = False
-
-if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
-    try:
-        # Test PostgreSQL connection
-        import psycopg2
-        from urllib.parse import urlparse
-        
-        # Parse the database URL
-        parsed = urlparse(DATABASE_URL)
-        
-        # Reconstruct URL for psycopg2
-        dbname = parsed.path[1:]
-        user = parsed.username
-        password = parsed.password
-        host = parsed.hostname
-        port = parsed.port or 5432
-        
-        # Test connection
-        conn = psycopg2.connect(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host,
-            port=port,
-            connect_timeout=5
-        )
-        conn.close()
-        
-        app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-        USE_POSTGRES = True
-        print("✅ PostgreSQL database connected successfully")
-    except Exception as e:
-        print(f"⚠️ PostgreSQL connection failed, falling back to SQLite: {e}")
-        # Fallback to SQLite
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(base_dir, "tawfiqai.db")}'
-        print("✅ Using SQLite database as fallback")
-else:
-    # Use SQLite by default
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(base_dir, "tawfiqai.db")}'
-    print("✅ Using SQLite database")
-
-# Initialize SQLAlchemy
-db = SQLAlchemy(app)
-
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Configurations
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Allow cookies in fetch
+app.config['SESSION_COOKIE_SECURE'] = False    # Only True if HTTPS
+app.config['SECRET_KEY'] = 'your-secret-key'   # Required for session to work
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+# Initialize SQLAlchemy
+db = SQLAlchemy()
+db.init_app(app)
 
 # --- Models ---
 class User(db.Model):
@@ -110,109 +63,36 @@ class UserQuestions(db.Model):
     answer = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Create database tables
+# --- Create a default user (optional testing/demo) ---
 with app.app_context():
-    try:
-        db.create_all()
-        print("✅ Database tables created successfully")
-        
-        # Create default user if not exists
-        user = User.query.filter_by(username='zayd').first()
-        if not user:
-            user = User(username='zayd', email='zayd@example.com')
-            user.set_password('secure123')
-            db.session.add(user)
-            db.session.commit()
-            print("✅ Default user created")
-    except Exception as e:
-        print(f"⚠️ Database error: {e}")
-        # If SQLAlchemy fails, try direct SQLite connection
-        try:
-            if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
-                conn = sqlite3.connect('tawfiqai.db')
-                cursor = conn.cursor()
-                
-                # Create users table
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS user (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        username TEXT UNIQUE NOT NULL,
-                        email TEXT UNIQUE NOT NULL,
-                        password_hash TEXT NOT NULL,
-                        level INTEGER DEFAULT 1,
-                        joined_on DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        last_login DATETIME
-                    )
-                ''')
-                
-                # Create user_questions table
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS user_questions (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        username TEXT NOT NULL,
-                        question TEXT NOT NULL,
-                        answer TEXT NOT NULL,
-                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-                
-                # Check for default user
-                cursor.execute("SELECT * FROM user WHERE username = 'zayd'")
-                if not cursor.fetchone():
-                    cursor.execute(
-                        "INSERT INTO user (username, email, password_hash) VALUES (?, ?, ?)",
-                        ('zayd', 'zayd@example.com', generate_password_hash('secure123'))
-                    )
-                
-                conn.commit()
-                conn.close()
-                print("✅ SQLite database initialized directly")
-        except Exception as sqlite_error:
-            print(f"⚠️ SQLite initialization also failed: {sqlite_error}")
+    user = User.query.filter_by(username='zayd').first()
+    if not user:
+        user = User(username='zayd', email='zayd@example.com')
+        user.set_password('secure123')
+        db.session.add(user)
+        db.session.commit()
 
-# --- Get Questions for User ---
+# --- Get Questions for User (static demo for now) ---
 def get_questions_for_user(username):
-    try:
-        with app.app_context():
-            questions = UserQuestions.query \
-                .filter(func.lower(UserQuestions.username) == username.lower()) \
-                .order_by(UserQuestions.timestamp.desc()) \
-                .all()
-            return [
-                {
-                    "question": q.question,
-                    "answer": q.answer,
-                    "timestamp": q.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-                }
-                for q in questions
-            ]
-    except Exception as e:
-        print(f"⚠️ Error getting questions for user: {e}")
-        # Try direct SQLite query
-        try:
-            conn = sqlite3.connect('tawfiqai.db')
-            cursor = conn.cursor()
-            cursor.execute(
-                "SELECT question, answer, timestamp FROM user_questions WHERE username = ? ORDER BY timestamp DESC",
-                (username,)
-            )
-            rows = cursor.fetchall()
-            conn.close()
-            return [
-                {
-                    "question": row[0],
-                    "answer": row[1],
-                    "timestamp": row[2]
-                }
-                for row in rows
-            ]
-        except:
-            return []
+    with app.app_context():
+        questions = UserQuestions.query \
+            .filter(func.lower(UserQuestions.username) == username.lower()) \
+            .order_by(UserQuestions.timestamp.desc()) \
+            .all()
+        return [
+            {
+                "question": q.question,
+                "answer": q.answer,
+                "timestamp": q.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            }
+            for q in questions
+        ]
+
 
 # --- Save a Question and Answer for a User ---
 def save_question_and_answer(username, question, answer):
-    try:
-        with app.app_context():
+    with app.app_context():
+        try:
             # Check if this question already exists for this user
             existing_entry = UserQuestions.query.filter_by(username=username, question=question).first()
 
@@ -231,40 +111,10 @@ def save_question_and_answer(username, question, answer):
                 print(f"✅ Saved new Q&A for '{username}'")
 
             db.session.commit()
-    except Exception as e:
-        print(f"❌ Failed to save Q&A via SQLAlchemy: {e}")
-        # Try direct SQLite save
-        try:
-            conn = sqlite3.connect('tawfiqai.db')
-            cursor = conn.cursor()
-            
-            # Check if question exists
-            cursor.execute(
-                "SELECT id FROM user_questions WHERE username = ? AND question = ?",
-                (username, question)
-            )
-            existing = cursor.fetchone()
-            
-            if existing:
-                cursor.execute(
-                    "UPDATE user_questions SET answer = ?, timestamp = ? WHERE id = ?",
-                    (answer, datetime.utcnow().isoformat(), existing[0])
-                )
-                print(f"🔁 Updated existing Q&A for '{username}' via SQLite")
-            else:
-                cursor.execute(
-                    "INSERT INTO user_questions (username, question, answer, timestamp) VALUES (?, ?, ?, ?)",
-                    (username, question, answer, datetime.utcnow().isoformat())
-                )
-                print(f"✅ Saved new Q&A for '{username}' via SQLite")
-            
-            conn.commit()
-            conn.close()
-        except Exception as sqlite_error:
-            print(f"❌ SQLite save also failed: {sqlite_error}")
 
-# Continue with the rest of your app.py (Redis setup, JSON loading, routes, etc.)
-# ... [Rest of your code remains the same from the previous version]
+        except Exception as e:
+            print(f"❌ Failed to save Q&A for '{username}': {e}")
+            db.session.rollback()
 
 # --- Redis Cache Setup ---
 redis_host = os.getenv("REDIS_HOST", "localhost")
@@ -272,13 +122,7 @@ redis_port = int(os.getenv("REDIS_PORT", 6379))
 redis_db = int(os.getenv("REDIS_DB", 0))
 redis_password = os.getenv("REDIS_PASSWORD", None)
 
-try:
-    r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_password, decode_responses=True)
-    r.ping()
-    print("✅ Redis connected successfully")
-except Exception as e:
-    print(f"⚠️ Redis connection failed: {e}")
-    r = None
+r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_password, decode_responses=True)
 
 # --- File-Based Cache ---
 CACHE_FILE = "tawfiq_cache.json"
@@ -288,41 +132,30 @@ if os.path.exists(CACHE_FILE):
     try:
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
             question_cache = json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError):
+    except json.JSONDecodeError:
         question_cache = {}
 else:
     question_cache = {}
 
 def save_cache():
-    try:
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(question_cache, f, indent=2, ensure_ascii=False)
-    except Exception as e:
-        print(f"⚠️ Error saving cache: {e}")
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump(question_cache, f, indent=2, ensure_ascii=False)
 
 # --- Load JSON datasets ---
 def load_json_data(file_name, data_variable_name):
     data = {}
-    # Try multiple paths
-    paths_to_try = [
-        os.path.join(os.path.dirname(__file__), 'DATA', file_name),
-        os.path.join(os.path.dirname(__file__), 'static', 'DATA', file_name),
-        os.path.join(os.path.dirname(__file__), 'static', 'data', file_name),
-        file_name  # Try direct path
-    ]
-    
-    for file_path in paths_to_try:
-        print(f"Trying to load {data_variable_name} from: {file_path}")
-        if os.path.exists(file_path):
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                print(f"✅ Successfully loaded {data_variable_name} data from {file_path}")
-                return data
-            except Exception as e:
-                print(f"❌ Error loading {file_path}: {e}")
-    
-    print(f"❌ Could not load {data_variable_name} data from any path")
+    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
+    print(f"Attempting to load {data_variable_name} data from: {file_path}")
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        print(f"✅ Successfully loaded {data_variable_name} data")
+    except FileNotFoundError:
+        print(f"❌ ERROR: {data_variable_name} data file not found at {file_path}")
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON Decode Error in {file_path}: {e}")
+    except Exception as e:
+        print(f"❌ Unexpected error while loading {file_name}: {e}")
     return data
 
 # Load datasets
@@ -335,110 +168,72 @@ islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivati
 # --- OpenRouter API Key ---
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openrouter_api_key:
-    print("⚠️ OPENROUTER_API_KEY environment variable not set.")
-    print("⚠️ Some AI features may not work properly.")
+    raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
 
-# --- Flask Routes ---
-# ... [All your routes remain exactly the same as in the previous version]
-# I'll include the most critical ones, but you should copy all your routes from the previous working version
+def load_users():
+    if os.path.exists('users.json'):
+        with open('users.json', 'r') as f:
+            return json.load(f)
+    return {}
 
-@app.route('/')
-def index():
-    user = session.get('user')
-    if not user:
-        return redirect(url_for('login'))
+def save_users(users):
+    with open('users.json', 'w') as f:
+        json.dump(users, f)
 
-    username = user['username']
-    questions = get_questions_for_user(username)
-
-    return render_template('index.html', user=user, questions=questions)
+users = load_users()
+# --- Flask Routes and Logic ---
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '').strip()
+        username = request.form.get('username').strip()
+        email = request.form.get('email').strip()
+        password = request.form.get('password').strip()
 
+        # Validate input
         if not username or not password or not email:
             flash('Please fill out all fields.')
             return redirect(url_for('signup'))
 
-        try:
-            # Check if username or email already exists
-            if User.query.filter_by(username=username).first():
-                flash('Username already exists.')
-                return redirect(url_for('signup'))
+        # Check if username or email already exists
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists.')
+            return redirect(url_for('signup'))
 
-            if User.query.filter_by(email=email).first():
-                flash('Email already registered.')
-                return redirect(url_for('signup'))
+        if User.query.filter_by(email=email).first():
+            flash('Email already registered.')
+            return redirect(url_for('signup'))
 
-            # Create user
-            new_user = User(
-                username=username,
-                email=email,
-                joined_on=datetime.utcnow()
-            )
-            new_user.set_password(password)
+        # Create user
+        new_user = User(
+            username=username,
+            email=email,
+            joined_on=datetime.utcnow()
+        )
+        new_user.set_password(password)
 
-            # Save to database
-            db.session.add(new_user)
-            db.session.commit()
+        # Save to database
+        db.session.add(new_user)
+        db.session.commit()
 
-            # Store user info in session
-            session['user'] = {
-                'username': username,
-                'email': email,
-                'joined_on': new_user.joined_on.strftime('%Y-%m-%d'),
-                'preferred_language': 'English',
-                'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            }
+        # Store user info in session
+        session['user'] = {
+            'username': username,
+            'email': email,
+            'joined_on': new_user.joined_on.strftime('%Y-%m-%d'),
+            'preferred_language': 'English',
+            'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        }
 
-            flash('Account created successfully!')
-            return redirect(url_for('index'))
-        except Exception as e:
-            print(f"Signup error: {e}")
-            # Try direct SQLite insert
-            try:
-                conn = sqlite3.connect('tawfiqai.db')
-                cursor = conn.cursor()
-                
-                # Check if user exists
-                cursor.execute("SELECT id FROM user WHERE username = ? OR email = ?", (username, email))
-                if cursor.fetchone():
-                    flash('Username or email already exists.')
-                    conn.close()
-                    return redirect(url_for('signup'))
-                
-                # Insert new user
-                cursor.execute(
-                    "INSERT INTO user (username, email, password_hash, joined_on) VALUES (?, ?, ?, ?)",
-                    (username, email, generate_password_hash(password), datetime.utcnow().isoformat())
-                )
-                conn.commit()
-                conn.close()
-                
-                # Store in session
-                session['user'] = {
-                    'username': username,
-                    'email': email,
-                    'joined_on': datetime.utcnow().strftime('%Y-%m-%d'),
-                    'preferred_language': 'English',
-                    'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                
-                flash('Account created successfully!')
-                return redirect(url_for('index'))
-            except Exception as sqlite_error:
-                flash(f'Error creating account: {sqlite_error}')
-                return redirect(url_for('signup'))
+        flash('Account created successfully!')
+        return redirect(url_for('index'))
 
     return render_template('signup.html', user=session.get('user'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        # Support both JSON and form data
         if request.is_json:
             data = request.get_json()
             username = data.get('username', '').strip()
@@ -447,65 +242,32 @@ def login():
             username = request.form.get('username', '').strip()
             password = request.form.get('password', '').strip()
 
-        try:
-            # Try SQLAlchemy first
-            user = User.query.filter_by(username=username).first()
-            if user and user.check_password(password):
-                user.last_login = datetime.utcnow()
-                db.session.commit()
-                
-                session.permanent = True
-                session['user'] = {
-                    'username': user.username,
-                    'email': user.email,
-                    'joined_on': user.joined_on.strftime('%Y-%m-%d'),
-                    'preferred_language': 'English',
-                    'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S')
-                }
+        # Check user
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):  # Assuming .check_password() method exists
+            user.last_login = datetime.utcnow()
+            db.session.commit()
 
-                if request.is_json:
-                    return jsonify({'success': True, 'message': 'Login successful', 'user': session['user']})
-                else:
-                    flash('Logged in successfully!')
-                    return redirect(url_for('index'))
-            else:
-                # Try SQLite fallback
-                conn = sqlite3.connect('tawfiqai.db')
-                cursor = conn.cursor()
-                cursor.execute(
-                    "SELECT username, email, password_hash, joined_on FROM user WHERE username = ?",
-                    (username,)
-                )
-                row = cursor.fetchone()
-                conn.close()
-                
-                if row and check_password_hash(row[2], password):
-                    session.permanent = True
-                    session['user'] = {
-                        'username': row[0],
-                        'email': row[1],
-                        'joined_on': row[3][:10] if row[3] else datetime.utcnow().strftime('%Y-%m-%d'),
-                        'preferred_language': 'English',
-                        'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-                    }
-                    
-                    if request.is_json:
-                        return jsonify({'success': True, 'message': 'Login successful', 'user': session['user']})
-                    else:
-                        flash('Logged in successfully!')
-                        return redirect(url_for('index'))
-                else:
-                    if request.is_json:
-                        return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
-                    else:
-                        flash('Invalid username or password.')
-                        return redirect(url_for('login'))
-        except Exception as e:
-            print(f"Login error: {e}")
+            session.permanent = True  # Login persists beyond browser close
+            session['user'] = {
+                'username': user.username,
+                'email': user.email,
+                'joined_on': user.joined_on.strftime('%Y-%m-%d'),
+                'preferred_language': 'English',
+                'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S')
+            }
+
             if request.is_json:
-                return jsonify({'success': False, 'error': f'Database error: {str(e)}'}), 500
+                return jsonify({'success': True, 'message': 'Login successful', 'user': session['user']})
             else:
-                flash('Database error. Please try again.')
+                flash('Logged in successfully!')
+                return redirect(url_for('index'))
+
+        else:
+            if request.is_json:
+                return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
+            else:
+                flash('Invalid username or password.')
                 return redirect(url_for('login'))
 
     return render_template('login.html')
@@ -520,9 +282,15 @@ def logout():
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    return render_template('forgot_password.html')
+    return render_template('forgot_password.html')  # make sure this template exists
 
-# Questions and levels data
+# Read the secret key from environment variable
+app.secret_key = os.getenv('MY_SECRET')
+
+# Optional: if the environment variable is not set, use a fallback (not recommended for production)
+if not app.secret_key:
+    app.secret_key = 'fallback_secret_key_for_dev_only'
+
 levels = {
     1: [
         {
@@ -551,6 +319,7 @@ levels = {
             "answer": "Khadijah"
         }
     ],
+
     2: [
         {
             "question": "What is the name of the Islamic month of fasting?",
@@ -578,6 +347,7 @@ levels = {
             "answer": "Israfil"
         }
     ],
+
     3: [
         {
             "question": "What is the name of the well in Mecca that appeared for Hajar and Ismail?",
@@ -605,6 +375,7 @@ levels = {
             "answer": "Nuh"
         }
     ],
+
     4: [
         {
             "question": "What is the name of the black stone in the Kaaba?",
@@ -632,6 +403,7 @@ levels = {
             "answer": "37"
         }
     ],
+
     5: [
         {
             "question": "What is the name of the Prophet's night journey from Mecca to Jerusalem?",
@@ -659,6 +431,7 @@ levels = {
             "answer": "114"
         }
     ],
+
     6: [
         {
             "question": "Which prophet is known for his patience in the face of illness?",
@@ -686,6 +459,7 @@ levels = {
             "answer": "Medina"
         }
     ],
+
     7: [
         {
             "question": "What is the name of the Islamic festival marking the end of Ramadan?",
@@ -713,6 +487,7 @@ levels = {
             "answer": "Abu Bakr"
         }
     ],
+
     8: [
         {
             "question": "What is the name of the Islamic festival of sacrifice?",
@@ -740,6 +515,7 @@ levels = {
             "answer": "Halimah"
         }
     ],
+
     9: [
         {
             "question": "What is the name of the Islamic prayer performed at dawn?",
@@ -767,6 +543,7 @@ levels = {
             "answer": "Sumayyah"
         }
     ],
+
     10: [
         {
             "question": "What is the name of the Islamic prayer performed at midday?",
@@ -794,6 +571,7 @@ levels = {
             "answer": "Abu Bakr"
         }
     ],
+
     11: [
         {
             "question": "What is the name of the Islamic prayer performed in the late afternoon?",
@@ -821,6 +599,7 @@ levels = {
             "answer": "Aisha"
         }
     ],
+
     12: [
         {
             "question": "What is the name of the Islamic prayer performed after sunset?",
@@ -848,6 +627,7 @@ levels = {
             "answer": "Abu Bakr"
         }
     ],
+
     13: [
         {
             "question": "What is the name of the Islamic prayer performed at night?",
@@ -875,6 +655,7 @@ levels = {
             "answer": "Hafsa"
         }
     ],
+
     14: [
         {
             "question": "What is the name of the Islamic prayer performed during funerals?",
@@ -902,6 +683,7 @@ levels = {
             "answer": "Abu Bakr"
         }
     ],
+
     15: [
         {
             "question": "What is the name of the Islamic prayer performed during Eid?",
@@ -929,6 +711,7 @@ levels = {
             "answer": "Imam Malik"
         }
     ],
+
     16: [
         {
             "question": "What is the name of the Islamic prayer performed during Hajj at Arafat?",
@@ -956,6 +739,7 @@ levels = {
             "answer": "Salman al-Farsi"
         }
     ],
+
     17: [
         {
             "question": "What is the name of the Islamic prayer performed during Laylat al-Qadr?",
@@ -983,6 +767,7 @@ levels = {
             "answer": "Umar"
         }
     ],
+
     18: [
         {
             "question": "What is the name of the Islamic prayer performed during the eclipse?",
@@ -1010,6 +795,7 @@ levels = {
             "answer": "Shifa bint Abdullah"
         }
     ],
+
     19: [
         {
             "question": "What is the name of the Islamic prayer performed for rain?",
@@ -1037,6 +823,7 @@ levels = {
             "answer": "Imam Abu Hanifa"
         }
     ],
+
     20: [
         {
             "question": "What is the name of the Islamic prayer performed for forgiveness?",
@@ -1069,35 +856,71 @@ levels = {
 def get_questions_for_level(level):
     return levels.get(level, [])
 
+
+
+@app.route('/')
+def index():
+    user = session.get('user')
+    if not user:
+        return redirect(url_for('login'))
+
+    username = user['username']
+    # Fetch user-specific data, e.g., questions, using username
+    questions = get_questions_for_user(username)  # Your function
+
+    return render_template('index.html', user=user, questions=questions)
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('static', 'sitemap.xml')
+
+@app.route('/google76268f26b118dad1.html')
+def google_verification():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'google76268f26b118dad1.html'
+    )
+
+@app.route('/BingSiteAuth.xml')
+def bing_verification():
+    return send_from_directory('static', 'BingSiteAuth.xml')
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/my-questions')
+@login_required
 def my_questions():
     username = session['user']['username']
-    try:
-        questions = UserQuestions.query.filter_by(username=username).order_by(UserQuestions.timestamp.desc()).all()
-        return render_template('my_questions.html', questions=questions)
-    except Exception as e:
-        flash(f'Error loading questions: {str(e)}')
-        return render_template('my_questions.html', questions=[])
+    questions = UserQuestions.query.filter_by(username=username).order_by(UserQuestions.timestamp.desc()).all()
+    print(f"Fetched questions for {username}: {[q.question for q in questions]}")
+    return render_template('my_questions.html', questions=questions)
 
 @app.route('/admin/questions')
 def admin_questions():
-    try:
-        questions = UserQuestions.query.all()
-        return render_template('questions.html', questions=questions)
-    except Exception as e:
-        return f'Error loading questions: {str(e)}'
-
+    questions = UserQuestions.query.all()
+    if not questions:
+        print("No questions found")
+    else:
+        for q in questions:
+            print(f"{q.username} - {q.question}")
+    return render_template('questions.html', questions=questions)
+    
 @app.route('/debug/questions')
 def debug_questions():
-    try:
-        questions = UserQuestions.query.all()
-        return '<br>'.join([f"{q.username}: {q.question}" for q in questions])
-    except Exception as e:
-        return f'Error: {str(e)}'
-
+    questions = UserQuestions.query.all()
+    return '<br>'.join([f"{q.username}: {q.question}" for q in questions])
+    
 @app.route('/profile')
+@login_required
 def profile():
-    user = session.get('user', {})
+    user = session.get('user', {})  # Get the user dictionary or an empty one
+
     return render_template('profile.html',
                            username=user.get('username', 'Guest'),
                            email=user.get('email', 'not_set@example.com'),
@@ -1105,17 +928,19 @@ def profile():
                            preferred_language=user.get('preferred_language', 'English'),
                            last_login=user.get('last_login', 'N/A'))
 
+# Example:
+user_data = users.get('username')
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
 
-        # Update session data
-        if 'user' in session:
-            session['user']['username'] = username
-            session['user']['email'] = email
+        # Save data to dictionary (or database later)
+        user_data['username'] = username
+        user_data['email'] = email
 
+        # Redirect to profile page after update
         return redirect(url_for('profile'))
 
     return render_template('pages/edit_profile.html')
@@ -1155,6 +980,7 @@ def get_halal_news():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/memorize_quran")
 def memorize_quran():
     return render_template("pages/memorize_quran.html")
@@ -1193,7 +1019,7 @@ def reels():
             'description': 'Step-by-step learning of Salah, starting with Fajr prayer.'
         },
         {
-            'title': 'What Happens Right After You Die? 😳 | The Truth From Qur\'an & Hadith',
+            'title': 'What Happens Right After You Die? 😳 | The Truth From Qur’an & Hadith',
             'youtube_id': 's1CiAtviydg',
             'description': 'Explanation of what happens after death, based on Quran and Hadith.'
         },
@@ -1202,58 +1028,59 @@ def reels():
             'youtube_id': 'hj8eYLUViQI',
             'description': 'Guide on how to protect yourself using Ruqyah against evil influences.'
         },
-        {
-            'title': 'Story Of Prophet Ibrahim (AS) Part-1  by Mufti Menk',
-            'youtube_id': 'v_KgFBrpx4o',
-            'description': 'An inspiring account of Prophet Ibrahim (AS) and his life story.'
-        },
-        {
-            'title': 'Stories Of The Prophets Ibraheem (AS) by Mufti Menk- (Part 2)',
-            'youtube_id': 'IcKEwfygNS4',
-            'description': 'Continuing the inspiring stories of Prophet Ibraheem (AS).'
-        },
-        {
-            'title': 'The King Chosen by Allah – Prophet Dawud (AS) & His Divine Gift by Mufti Menk',
-            'youtube_id': 'OTDxgNsffOQ',
-            'description': 'Exploring the life of Prophet Dawud (AS), his divine gift, and his significance.'
-        },
-        {
-            'title': 'Two Ways To Invite People To Islam',
-            'youtube_id': '3qlHV-0U87I',
-            'description': 'Guidance on inviting others to Islam effectively.'
-        },
-        {
-            'title': 'Have I Fulfilled Her Rights?',
-            'youtube_id': 'TT0_zjp9vcg',
-            'description': 'Important reflections on fulfilling the rights of others.'
-        },
-        {
-            'title': 'In the End You Will Return to Allah',
-            'youtube_id': 'O2XuvXRFiqc',
-            'description': 'A reminder of our return to Allah.'
-        },
-        {
-            'title': 'Marriage, Mahr, and Finding the One',
-            'youtube_id': 'XLOJ2WlGUNw',
-            'description': 'Discussing the aspects of marriage and finding the right partner.'
-        },
-        {
-            'title': 'How Can We Benefit More From Lectures?',
-            'youtube_id': 'FDmz4nnWQIo',
-            'description': 'Insightful discussion on maximizing the benefits of lectures.'
-        },
-        {
-            'title': 'We All Have This Urge',
-            'youtube_id': '54IRtLoxBsw',
-            'description': 'Addressing common urges and how to manage them.'
-        },
-        {
-            'title': 'Deception & Fake Accounts',
-            'youtube_id': 'a_fSK_PLoBQ',
-            'description': 'Discussing the dangers of deception and fake accounts.'
-        }
-    ]
+       {
+        'title': 'Story Of Prophet Ibrahim (AS) Part-1  by Mufti Menk',
+        'youtube_id': 'v_KgFBrpx4o',
+        'description': 'An inspiring account of Prophet Ibrahim (AS) and his life story.'
+    },
+    {
+        'title': 'Stories Of The Prophets Ibraheem (AS) by Mufti Menk- (Part 2)',
+        'youtube_id': 'IcKEwfygNS4',
+        'description': 'Continuing the inspiring stories of Prophet Ibraheem (AS).'
+    },
+    {
+        'title': 'The King Chosen by Allah – Prophet Dawud (AS) & His Divine Gift by Mufti Menk',
+        'youtube_id': 'OTDxgNsffOQ',
+        'description': 'Exploring the life of Prophet Dawud (AS), his divine gift, and his significance.'
+    },
+    {
+        'title': 'Two Ways To Invite People To Islam',
+        'youtube_id': '3qlHV-0U87I',
+        'description': 'Guidance on inviting others to Islam effectively.'
+    },
+    {
+        'title': 'Have I Fulfilled Her Rights?',
+        'youtube_id': 'TT0_zjp9vcg',
+        'description': 'Important reflections on fulfilling the rights of others.'
+    },
+    {
+        'title': 'In the End You Will Return to Allah',
+        'youtube_id': 'O2XuvXRFiqc',
+        'description': 'A reminder of our return to Allah.'
+    },
+    {
+        'title': 'Marriage, Mahr, and Finding the One',
+        'youtube_id': 'XLOJ2WlGUNw',
+        'description': 'Discussing the aspects of marriage and finding the right partner.'
+    },
+    {
+        'title': 'How Can We Benefit More From Lectures?',
+        'youtube_id': 'FDmz4nnWQIo',
+        'description': 'Insightful discussion on maximizing the benefits of lectures.'
+    },
+    {
+        'title': 'We All Have This Urge',
+        'youtube_id': '54IRtLoxBsw',
+        'description': 'Addressing common urges and how to manage them.'
+    },
+    {
+        'title': 'Deception & Fake Accounts',
+        'youtube_id': 'a_fSK_PLoBQ',
+        'description': 'Discussing the dangers of deception and fake accounts.'
+    }
+]
     return render_template('pages/reels.html', reels=reels_data)
+
 
 @app.route('/trivia', methods=['GET', 'POST'])
 def trivia():
@@ -1287,6 +1114,7 @@ def trivia():
     else:
         return redirect(url_for('trivia_result'))
 
+
 @app.route('/trivia_result')
 def trivia_result():
     score = session.get('score', 0)
@@ -1296,21 +1124,26 @@ def trivia_result():
     passed = score == total
 
     if passed:
+        # Advance to next level only if passed
         session['level'] = level + 1
 
+    # Reset score and question index whether passed or not
     session['score'] = 0
     session['question_index'] = 0
 
     return render_template('result.html', score=score, total=total, passed=passed, level=level)
 
+
 @app.route('/restart')
 def restart():
+    # Do NOT clear level; just reset current level's questions
     level = session.get('level', 1)
     session['score'] = 0
     session['question_index'] = 0
     questions = get_questions_for_level(level)
     session['questions'] = random.sample(questions, len(questions))
     return redirect(url_for('trivia'))
+
 
 @app.route('/next_level')
 def next_level():
@@ -1334,7 +1167,9 @@ def surah_list():
         {"id": 1, "name": "الفاتحة", "english_name": "Al-Fatihah"},
         {"id": 2, "name": "البقرة", "english_name": "Al-Baqarah"},
         {"id": 3, "name": "آل عمران", "english_name": "Aali Imran"},
+        # ... up to 114
     ])
+
 
 @app.route('/api/surah/<int:surah_id>')
 def get_surah_by_id(surah_id):
@@ -1468,19 +1303,21 @@ def get_surah_by_id(surah_id):
         surah_data = json.load(f)
 
     return jsonify(surah_data)
+    
+DUA_FILE_PATH = os.path.join("static", "data", "duas.json")
 
 @app.route("/duas")
 def all_duas_html():
-    DUA_FILE_PATH = os.path.join("static", "data", "duas.json")
     if not os.path.exists(DUA_FILE_PATH):
-        return "Dua file not found", 404
+        abort(404, description="Dua file not found")
 
     with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
         try:
             duas_data = json.load(f)
         except json.JSONDecodeError:
-            return "Error reading duas.json file", 500
+            abort(500, description="Error reading duas.json file")
 
+    # Flatten JSON regardless of structure
     if isinstance(duas_data, dict):
         all_duas = []
         for key, duas in duas_data.items():
@@ -1489,9 +1326,27 @@ def all_duas_html():
                     dua["category"] = key
                     all_duas.append(dua)
     else:
-        all_duas = duas_data
+        all_duas = duas_data  # Already a flat list
 
     return render_template("duas.html", duas=all_duas)
+
+@app.route("/dua/<dua_id>")
+def dua_view(dua_id):
+    dua = DUAS.get(dua_id)
+    if not dua:
+        abort(404)
+    return render_template("dua_detail.html", dua=dua)
+
+@app.route('/dua.html')
+def serve_dua():
+    return send_from_directory('templates', 'dua.html')
+
+@app.route("/live-meeting")
+def live_meeting_landing():
+    # Create a random room ID or show available rooms
+    import uuid
+    room_id = str(uuid.uuid4())[:8]
+    return redirect(url_for('live_meeting', room_id=room_id))
 
 @app.route("/live-meeting/<room_id>")
 def live_meeting(room_id):
@@ -1507,80 +1362,69 @@ def handle_join(data):
 def handle_signal(data):
     emit("signal", data, room=data["room"], include_self=False)
 
-@socketio.on("leave")
-def handle_leave(data):
-    room = data["room"]
-    user_id = data["id"]
-    emit("user-left", {"id": user_id}, room=room, include_self=False)
-
 @app.route("/duas/json")
 def all_duas_json():
-    DUA_FILE_PATH = os.path.join("static", "data", "duas.json")
     if not os.path.exists(DUA_FILE_PATH):
-        return jsonify({"error": "Dua file not found"}), 404
+        abort(404, description="Dua file not found")
 
     with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
         try:
             duas_data = json.load(f)
         except json.JSONDecodeError:
-            return jsonify({"error": "Error reading duas.json file"}), 500
+            abort(500, description="Error reading duas.json file")
 
     return jsonify(duas_data)
 
+
 @app.route('/reminder')
 def reminder():
+    # Get the full absolute path to reminders.json
     json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "reminders.json")
-    
-    if not os.path.exists(json_path):
-        json_path = os.path.join(os.path.dirname(__file__), "DATA", "reminders.json")
-    
-    if not os.path.exists(json_path):
-        return "Reminders file not found", 404
 
+    # Load reminders
     with open(json_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
+    # Use current day as index (1-based), fallback to day1 if not found
     today = datetime.now().day
     day_key = f"day{today}"
+
+    # Fallback to "day1" if today is out of range
     reminders = data.get(day_key) or data.get("day1", [])
+
     return render_template('pages/reminder.html', reminders=reminders)
+
 
 @app.route('/api/reminders')
 def get_reminders():
-    today = (datetime.utcnow().day % 30) or 30
-    json_path = os.path.join(os.path.dirname(__file__), "DATA", "reminders.json")
-    
-    if os.path.exists(json_path):
-        with open(json_path) as f:
-            data = json.load(f)
-        return jsonify(data.get(f'day{today}', []))
-    return jsonify([])
+    import datetime, json
+    today = (datetime.datetime.utcnow().day % 30) or 30
+    with open('data/reminders.json') as f:
+        data = json.load(f)
+    return jsonify(data.get(f'day{today}', []))
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @app.route('/story-time')
 def story_time():
     json_path = os.path.join("static", "data", "stories.json")
-    if not os.path.exists(json_path):
-        json_path = os.path.join(os.path.dirname(__file__), "DATA", "stories.json")
+    with open(json_path, 'r', encoding='utf-8') as f:
+        all_stories = json.load(f)
     
-    if os.path.exists(json_path):
-        with open(json_path, 'r', encoding='utf-8') as f:
-            all_stories = json.load(f)
-        return render_template('pages/story_time.html', stories=all_stories)
-    return render_template('pages/story_time.html', stories=[])
+    print("STORIES PASSED TO TEMPLATE:", all_stories)  # Debug here
+    return render_template('pages/story_time.html', stories=all_stories)
+
 
 @app.route('/api/stories')
 def get_stories():
     today = (datetime.utcnow().day % 30) or 30
-    json_path = os.path.join(os.path.dirname(__file__), "DATA", "stories.json")
-    
-    if os.path.exists(json_path):
-        with open(json_path, encoding='utf-8') as f:
-            data = json.load(f)
-        return jsonify(data.get(f'day{today}', []))
-    return jsonify([])
+    with open('data/stories.json', encoding='utf-8') as f:
+        data = json.load(f)
+    return jsonify(data.get(f'day{today}', []))  # ❌ wrong structure
 
 @app.route('/dashboard')
 def dashboard():
+    # Your dashboard logic here
     return render_template('dashboard.html')
 
 @app.route('/talk-to-tawfiq')
@@ -1591,20 +1435,17 @@ def talk_to_tawfiq():
 def islamic_motivation():
     try:
         data_path = os.path.join('DATA', 'islamic_motivation.json')
-        if not os.path.exists(data_path):
-            data_path = os.path.join(os.path.dirname(__file__), "DATA", "islamic_motivation.json")
-        
-        if os.path.exists(data_path):
-            with open(data_path, 'r', encoding='utf-8') as f:
-                motivation_data = json.load(f)
+        with open(data_path, 'r', encoding='utf-8') as f:
+            motivation_data = json.load(f)
 
-            if not motivation_data or 'motivations' not in motivation_data:
-                return render_template('pages/islamic_motivation.html', motivations=[])
+        if not motivation_data or 'motivations' not in motivation_data:
+            return render_template('pages/islamic_motivation.html', motivations=[])
 
-            return render_template('pages/islamic_motivation.html', motivations=motivation_data['motivations'])
+        return render_template('pages/islamic_motivation.html', motivations=motivation_data['motivations'])
+
     except Exception as e:
         print(f"Islamic Motivation Error: {e}")
-    return render_template('pages/islamic_motivation.html', motivations=[])
+        return render_template('pages/islamic_motivation.html', motivations=[])
 
 @app.route('/settings')
 def settings():
@@ -1616,15 +1457,20 @@ def privacy():
 
 @app.route('/about')
 def about():
+    # About page - in templates/pages/about.html
     return render_template('pages/about.html')
 
 @app.route('/feedback')
 def feedback():
     return render_template('pages/feedback.html')
 
+
 # --- Ask API endpoint ---
 @app.route('/ask', methods=['POST'])
 def ask():
+    import re
+    from datetime import datetime
+
     data = request.get_json()
     username = session.get('user', {}).get('username')
     history = data.get('history')
@@ -1809,6 +1655,7 @@ def hadith_search():
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
+    # Normalize query
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     if not hadith_data:
@@ -1878,7 +1725,7 @@ def quran_surah():
     except requests.RequestException as e:
         print(f"Surah Fetch Error: {e}")
         return jsonify({'ayahs': []})
-
+        
 # --- Additional API: Islamic Motivation ---
 @app.route('/islamic-motivation')
 def get_islamic_motivation():
@@ -1894,45 +1741,6 @@ def get_islamic_motivation():
         print(f"Islamic Motivation Error: {e}")
         return jsonify({'error': 'Failed to fetch motivational quote.'}), 500
 
-# --- Get Surah List for dropdown ---
-@app.route('/get-surah-list')
-def get_surah_list():
-    surah_list = [
-        "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf",
-        "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr",
-        "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun",
-        "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
-        "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad",
-        "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya",
-        "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur",
-        "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr",
-        "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
-        "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
-        "Al-Muzzammil", "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba",
-        "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq",
-        "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams",
-        "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina",
-        "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humazah",
-        "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad",
-        "Al-Ikhlas", "Al-Falaq", "An-Nas"
-    ]
-    return jsonify({'surah_list': surah_list})
-
-# --- Get Prayer Times ---
-@app.route('/get-prayer-times')
-def get_prayer_times():
-    # For now, return sample prayer times
-    # In production, you would integrate with a prayer time API
-    sample_times = {
-        "Fajr": "05:30 AM",
-        "Sunrise": "06:45 AM",
-        "Dhuhr": "12:30 PM",
-        "Asr": "04:00 PM",
-        "Maghrib": "06:45 PM",
-        "Isha": "08:00 PM"
-    }
-    return jsonify({'prayer_times': sample_times})
-
 # --- Speech Recognition ---
 @app.route('/recognize-speech', methods=['POST'])
 def recognize_speech():
@@ -1943,7 +1751,11 @@ def recognize_speech():
     temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
 
     try:
+        # Save uploaded audio temporarily
         audio_file.save(temp_path)
+
+        # Recognize speech
+        import speech_recognition as sr
         recognizer = sr.Recognizer()
         with sr.AudioFile(temp_path) as source:
             audio_data = recognizer.record(source)
@@ -1959,23 +1771,5 @@ def recognize_speech():
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
-# --- Visual Quran ---
-@app.route('/visual-quran')
-def visual_quran():
-    return render_template('pages/visual_quran.html')
-
-# --- Dua Section ---
-@app.route('/duas')
-def duas():
-    return render_template('pages/duas.html')
-
-# --- Live Meeting route without room_id ---
-@app.route('/live-meeting')
-def live_meeting_default():
-    import uuid
-    room_id = str(uuid.uuid4())[:8]
-    return redirect(f'/live-meeting/{room_id}')
-
-
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    socketio.run(app, debug=True)
