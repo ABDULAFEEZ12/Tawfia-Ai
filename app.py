@@ -1352,6 +1352,369 @@ def live_meeting_landing():
 def live_meeting(room_id):
     return render_template("live_meeting.html", room_id=room_id)
 
+# ============================================
+# LIVE MEETING SOCKET.IO HANDLERS
+# ============================================
+
+# Store room state in memory (or Redis for production)
+active_rooms = {}
+waiting_students = {}
+connected_students = {}
+
+@socketio.on('teacher-join')
+def handle_teacher_join(data):
+    """Teacher joins a room"""
+    room_id = data['room']
+    user_id = data['userId']
+    username = data.get('username', 'Teacher')
+    
+    print(f"👨‍🏫 Teacher {username} ({user_id}) joining room {room_id}")
+    
+    # Create room if it doesn't exist
+    if room_id not in active_rooms:
+        active_rooms[room_id] = {
+            'state': 'waiting',  # waiting, live, ended
+            'teacher_id': user_id,
+            'students': [],
+            'waiting': [],
+            'recording': False
+        }
+        waiting_students[room_id] = []
+        connected_students[room_id] = []
+    
+    join_room(room_id)
+    session['room'] = room_id
+    session['user_id'] = user_id
+    session['username'] = username
+    session['is_teacher'] = True
+    
+    # Send current room state to teacher
+    emit('room-state', {
+        'state': active_rooms[room_id]['state'],
+        'waitingStudents': len(waiting_students[room_id]),
+        'connectedStudents': len(connected_students[room_id])
+    })
+
+@socketio.on('teacher-rejoin')
+def handle_teacher_rejoin(data):
+    """Teacher reconnects to a room"""
+    room_id = data['room']
+    user_id = data['userId']
+    
+    if room_id in active_rooms:
+        join_room(room_id)
+        session['room'] = room_id
+        session['user_id'] = user_id
+        session['is_teacher'] = True
+        
+        emit('room-state', {
+            'state': active_rooms[room_id]['state'],
+            'waitingStudents': len(waiting_students[room_id]),
+            'connectedStudents': len(connected_students[room_id])
+        })
+    else:
+        emit('error', {'message': 'Room not found'})
+
+@socketio.on('student-join')
+def handle_student_join(data):
+    """Student joins a room"""
+    room_id = data['room']
+    user_id = data['userId']
+    username = data.get('username', 'Student')
+    
+    print(f"👨‍🎓 Student {username} ({user_id}) joining room {room_id}")
+    
+    if room_id not in active_rooms:
+        emit('error', {'message': 'Room does not exist'})
+        return
+    
+    join_room(room_id)
+    session['room'] = room_id
+    session['user_id'] = user_id
+    session['username'] = username
+    session['is_teacher'] = False
+    
+    # Add to waiting or connected based on room state
+    if active_rooms[room_id]['state'] == 'waiting':
+        if user_id not in waiting_students[room_id]:
+            waiting_students[room_id].append(user_id)
+        
+        # Notify teacher about waiting student
+        emit('student-waiting', {
+            'userId': user_id,
+            'username': username
+        }, room=room_id, include_self=False)
+    else:
+        if user_id not in connected_students[room_id]:
+            connected_students[room_id].append(user_id)
+        
+        # Notify teacher and other students
+        emit('student-joined', {
+            'userId': user_id,
+            'username': username
+        }, room=room_id, include_self=False)
+    
+    # Send room state to student
+    emit('room-state', {
+        'state': active_rooms[room_id]['state']
+    })
+
+@socketio.on('start-meeting')
+def handle_start_meeting(data):
+    """Teacher starts the meeting"""
+    room_id = data['room']
+    user_id = session.get('user_id')
+    
+    if not user_id or not session.get('is_teacher'):
+        emit('error', {'message': 'Only teacher can start meeting'})
+        return
+    
+    if room_id not in active_rooms:
+        emit('error', {'message': 'Room not found'})
+        return
+    
+    # Update room state
+    active_rooms[room_id]['state'] = 'live'
+    
+    # Move waiting students to connected
+    for student_id in waiting_students[room_id]:
+        if student_id not in connected_students[room_id]:
+            connected_students[room_id].append(student_id)
+    waiting_students[room_id] = []
+    
+    print(f"🚀 Meeting started in room {room_id}")
+    
+    # Notify everyone in room
+    emit('room-started', {
+        'room': room_id,
+        'teacherId': user_id,
+        'students': [{'userId': sid} for sid in connected_students[room_id]]
+    }, room=room_id)
+    
+    # Send updated state
+    emit('room-state', {
+        'state': 'live',
+        'waitingStudents': 0,
+        'connectedStudents': len(connected_students[room_id])
+    }, room=room_id)
+
+@socketio.on('end-meeting')
+def handle_end_meeting(data):
+    """Teacher ends the meeting"""
+    room_id = data['room']
+    user_id = session.get('user_id')
+    
+    if not user_id or not session.get('is_teacher'):
+        emit('error', {'message': 'Only teacher can end meeting'})
+        return
+    
+    if room_id not in active_rooms:
+        emit('error', {'message': 'Room not found'})
+        return
+    
+    # Update room state
+    active_rooms[room_id]['state'] = 'ended'
+    
+    print(f"🛑 Meeting ended in room {room_id}")
+    
+    # Notify everyone in room
+    emit('room-ended', {
+        'room': room_id,
+        'teacherId': user_id
+    }, room=room_id)
+    
+    # Clean up room data
+    if room_id in waiting_students:
+        del waiting_students[room_id]
+    if room_id in connected_students:
+        del connected_students[room_id]
+    if room_id in active_rooms:
+        del active_rooms[room_id]
+
+@socketio.on('webrtc-signal')
+def handle_webrtc_signal(data):
+    """Forward WebRTC signaling data between peers"""
+    room_id = data['room']
+    to_user = data['to']
+    from_user = data['from']
+    signal = data['signal']
+    
+    # Forward the signal to the target user
+    emit('webrtc-signal', {
+        'from': from_user,
+        'signal': signal
+    }, room=room_id, include_self=False)
+
+@socketio.on('start-webrtc')
+def handle_start_webrtc(data):
+    """Teacher requests to start WebRTC connections"""
+    room_id = data['room']
+    user_id = session.get('user_id')
+    
+    if not user_id or not session.get('is_teacher'):
+        emit('error', {'message': 'Only teacher can start WebRTC'})
+        return
+    
+    if room_id not in connected_students:
+        emit('error', {'message': 'No students connected'})
+        return
+    
+    emit('webrtc-start', {
+        'students': [{'userId': sid} for sid in connected_students[room_id]]
+    }, room=room_id)
+
+@socketio.on('mute-student')
+def handle_mute_student(data):
+    """Teacher mutes a student"""
+    room_id = data['room']
+    student_id = data['userId']
+    
+    if not session.get('is_teacher'):
+        emit('error', {'message': 'Only teacher can mute students'})
+        return
+    
+    emit('student-muted', {
+        'userId': student_id,
+        'muted': True
+    }, room=room_id, include_self=False)
+
+@socketio.on('unmute-student')
+def handle_unmute_student(data):
+    """Teacher unmutes a student"""
+    room_id = data['room']
+    student_id = data['userId']
+    
+    if not session.get('is_teacher'):
+        emit('error', {'message': 'Only teacher can unmute students'})
+        return
+    
+    emit('student-muted', {
+        'userId': student_id,
+        'muted': False
+    }, room=room_id, include_self=False)
+
+@socketio.on('disable-camera')
+def handle_disable_camera(data):
+    """Teacher disables student camera"""
+    room_id = data['room']
+    student_id = data['userId']
+    
+    if not session.get('is_teacher'):
+        emit('error', {'message': 'Only teacher can disable cameras'})
+        return
+    
+    emit('student-camera-disabled', {
+        'userId': student_id,
+        'disabled': True
+    }, room=room_id, include_self=False)
+
+@socketio.on('enable-camera')
+def handle_enable_camera(data):
+    """Teacher enables student camera"""
+    room_id = data['room']
+    student_id = data['userId']
+    
+    if not session.get('is_teacher'):
+        emit('error', {'message': 'Only teacher can enable cameras'})
+        return
+    
+    emit('student-camera-disabled', {
+        'userId': student_id,
+        'disabled': False
+    }, room=room_id, include_self=False)
+
+@socketio.on('mic-request')
+def handle_mic_request(data):
+    """Student requests to unmute"""
+    room_id = data['room']
+    user_id = session.get('user_id')
+    username = session.get('username', 'Student')
+    
+    if session.get('is_teacher'):
+        emit('error', {'message': 'Teachers cannot request mic access'})
+        return
+    
+    # Forward request to teacher
+    emit('mic-request', {
+        'userId': user_id,
+        'username': username
+    }, room=room_id, include_self=False)
+
+@socketio.on('mic-response')
+def handle_mic_response(data):
+    """Teacher responds to mic request"""
+    room_id = data['room']
+    student_id = data['userId']
+    allowed = data.get('allowed', False)
+    
+    if not session.get('is_teacher'):
+        emit('error', {'message': 'Only teacher can respond to mic requests'})
+        return
+    
+    # Send response to student
+    emit('mic-response', {
+        'allowed': allowed
+    }, room=room_id, include_self=False)
+
+@socketio.on('student-question')
+def handle_student_question(data):
+    """Student asks a question"""
+    room_id = data['room']
+    user_id = session.get('user_id')
+    username = session.get('username', 'Student')
+    question = data.get('question', '')
+    question_id = f"q_{user_id}_{int(datetime.now().timestamp())}"
+    
+    if session.get('is_teacher'):
+        emit('error', {'message': 'Teachers cannot ask questions'})
+        return
+    
+    # Forward question to teacher
+    emit('student-question', {
+        'userId': user_id,
+        'username': username,
+        'question': question,
+        'questionId': question_id
+    }, room=room_id, include_self=False)
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    """Handle user disconnection"""
+    room_id = session.get('room')
+    user_id = session.get('user_id')
+    username = session.get('username')
+    is_teacher = session.get('is_teacher', False)
+    
+    if room_id and user_id:
+        print(f"❌ User {username} ({user_id}) disconnected from room {room_id}")
+        
+        # Remove from appropriate lists
+        if is_teacher:
+            # Teacher left - end the meeting
+            if room_id in active_rooms:
+                active_rooms[room_id]['state'] = 'ended'
+                emit('room-ended', {
+                    'room': room_id,
+                    'teacherId': user_id
+                }, room=room_id)
+        else:
+            # Student left
+            if room_id in waiting_students and user_id in waiting_students[room_id]:
+                waiting_students[room_id].remove(user_id)
+            
+            if room_id in connected_students and user_id in connected_students[room_id]:
+                connected_students[room_id].remove(user_id)
+            
+            # Notify others
+            emit('student-left', {
+                'userId': user_id,
+                'username': username
+            }, room=room_id, include_self=False)
+        
+        # Clean up session
+        for key in ['room', 'user_id', 'username', 'is_teacher']:
+            session.pop(key, None)
+
 @socketio.on("join")
 def handle_join(data):
     room = data["room"]
