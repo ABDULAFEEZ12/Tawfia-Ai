@@ -13,4 +13,4 @@ Flask-SQLAlchemy
 psycopg2
 Flask-SocketIO
 eventlet
-speech_recognition
+SpeechRecognition
