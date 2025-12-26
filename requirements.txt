@@ -11,3 +11,5 @@ huggingface_hub
 redis
 Flask-SQLAlchemy
 psycopg2
+Flask-SocketIO
+eventlet
