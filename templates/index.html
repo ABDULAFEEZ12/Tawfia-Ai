@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Tawfiq AI – Halal AI Assistant for Muslims</title>
-<meta name="description" content="Tawfiq AI is the world’s first halal AI assistant that helps Muslims learn, practice, and live Islam in the digital age. Combining Quran, Hadith, and modern technology, Tawfiq AI guides Muslims in faith and daily life.">
+<title>Tawfiq AI – Smart Islamic AI for Muslims Worldwide</title>
+<meta name="description" content="Tawfiq AI is the smartest Muslim AI that helps with Quran, Hadith, Islamic questions, games, and more – built for Muslims, by Muslims.">
 <meta name="keywords" content="Tawfiq AI, Islamic AI, Muslim AI, Quran AI, Hadith Chatbot, Muslim Chatbot, AI for Muslims, Halal AI, Islamic ChatGPT">
 
 <!-- Viewport (mobile-first) -->
@@ -28,6 +27,7 @@
 
 <!-- External CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='live_meeting.css') }}">
 
 <!-- Updated and Enhanced CSS for Mobile & Aesthetics, including Light/Dark Mode -->
 <style>
@@ -51,6 +51,91 @@ body {
   overflow-x: hidden;
 }
 
+/* Live Meeting Section Specific Styles */
+#liveMeetingSection {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+#liveMeetingSection h2 {
+  text-align: center;
+  color: #00695c;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+}
+
+.video-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.video-wrapper {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.video-wrapper h3 {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  margin: 0;
+}
+
+.meeting-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.control-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#toggleVideo {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#toggleAudio {
+  background-color: #2196F3;
+  color: white;
+}
+
+#endCall {
+  background-color: #f44336;
+  color: white;
+}
+
 /* Light Mode Styles (default) */
 body.light-mode {
   background-color: #f4f4f4;
@@ -66,6 +151,7 @@ body.light-mode .user-message { background-color: #dcf8c6; color: #000; }
 body.light-mode .ai-message { background-color: #ececec; color: #000; }
 body.light-mode #menu-toggle { background: #fff; color: #000; }
 body.light-mode #menu-toggle:hover { background: #eee; }
+body.light-mode #liveMeetingSection { background-color: #fff; }
 
 /* Dark Mode Styles */
 body.dark-mode {
@@ -103,6 +189,16 @@ body.dark-mode #menu-toggle {
 }
 body.dark-mode #menu-toggle:hover {
   background: #444;
+}
+body.dark-mode #liveMeetingSection {
+  background-color: #2c2c2c;
+  color: #e0e0e0;
+}
+body.dark-mode .meeting-controls {
+  background: #333;
+}
+body.dark-mode video {
+  border: 2px solid #555;
 }
 /* Daily Dua Section Dark Mode */
 body.dark-mode #dailyDuaSection {
@@ -411,6 +507,31 @@ body {
   scrollbar-color: rgba(0,0,0,0.2) transparent;
 }
 
+/* Video styles */
+video {
+  width: 300px;
+  height: 225px;
+  margin: 8px;
+  border-radius: 10px;
+  background: black;
+  object-fit: cover;
+}
+
+#remoteVideos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+
+#localVideo {
+  border: 3px solid #4CAF50;
+}
+
+#remoteVideos video {
+  border: 3px solid #2196F3;
+}
+
 /* Responsive font sizes and layout adjustments for small screens */
 @media(max-width: 600px) {
   body {
@@ -440,6 +561,18 @@ body {
   }
   .audio-time {
     text-align: center;
+  }
+  video {
+    width: 250px;
+    height: 188px;
+  }
+  .meeting-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  .control-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -489,10 +622,12 @@ body {
   <ul>
   <li><a href="/profile">👤 Profile</a></li>
   <li><a href="/talk-to-tawfiq">🎙️ Talk to Tawfiq</a></li>
+  <li><a href="/live-meeting">🎙️ Live Meeting</a></li>
   <li><a href="/prayer-times">🕌 Prayer Times</a></li>
   <li><a href="/duas">🕌 Dua</a></li>
   <li><a href="/reminder">📅 Daily Reminder</a></li>
   <li><a href="/motivation">✨ Islamic Motivation</a></li>
+  <li><a href="/visual-quran">✨ Visual Quran</a></li>
   <li><a href="/story-time">📖 Story Time</a></li> <!-- 🔥 Added here -->
   <li><a href="/reels">📱 Reels</a></li>
   <li><a href="/trivia">🎮 Play Game</a></li>
@@ -556,6 +691,7 @@ body {
   <div class="results" id="hadithResult"></div>
 </div>
 
+
 <!-- Dua Section (Main) -->
 <div class="section" id="duaSection">
   <h3>Today's Dua</h3>
@@ -592,6 +728,10 @@ body {
   Tawfiq AI is the leading Islamic AI built for Muslims who want smart, halal answers about Quran, Hadith, Fiqh, and life. It's like ChatGPT for Muslims – helping with Islamic learning, daily dua, games, and more. Built with love for the ummah.
 </div>
 
+<!-- WebRTC Dependencies -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="https://unpkg.com/simple-peer@9.11.1/simplepeer.min.js"></script>
+
 <script>
   // Theme toggle button logic
   const themeToggleBtn = document.getElementById('theme-toggle');
@@ -625,6 +765,178 @@ body {
 
   let chatHistory = [];
   let audioPlayer = null;
+  
+  // WebRTC Variables
+  let socket;
+  let localStream;
+  let peers = {};
+  let isVideoEnabled = true;
+  let isAudioEnabled = true;
+  let ROOM_ID = null;
+
+  // Initialize WebRTC when Live Meeting section is active
+  function initializeWebRTC() {
+    const localVideo = document.getElementById("localVideo");
+    const remoteVideos = document.getElementById("remoteVideos");
+    
+    // Generate or get room ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    ROOM_ID = urlParams.get('room') || "default-islamic-room";
+    
+    // Initialize Socket.IO
+    socket = io();
+    
+    // Request media access
+    navigator.mediaDevices.getUserMedia({ 
+      video: true, 
+      audio: true 
+    }).then(stream => {
+      localStream = stream;
+      localVideo.srcObject = stream;
+      
+      // Join the room
+      socket.emit("join", { 
+        room: ROOM_ID, 
+        id: socket.id,
+        username: "{{ user.username if user else 'Guest' }}"
+      });
+      
+      console.log("Joined room:", ROOM_ID);
+    }).catch(error => {
+      console.error("Error accessing media devices:", error);
+      alert("Unable to access camera/microphone. Please check permissions.");
+    });
+    
+    // Socket event handlers
+    socket.on("user-joined", data => {
+      console.log("User joined:", data.id);
+      createPeer(data.id, true);
+    });
+    
+    socket.on("signal", data => {
+      if (!peers[data.from]) {
+        createPeer(data.from, false);
+      }
+      if (peers[data.from]) {
+        peers[data.from].signal(data.signal);
+      }
+    });
+    
+    socket.on("user-left", userId => {
+      console.log("User left:", userId);
+      if (peers[userId]) {
+        peers[userId].destroy();
+        delete peers[userId];
+        
+        // Remove video element
+        const videoElement = document.getElementById(`video-${userId}`);
+        if (videoElement) {
+          videoElement.remove();
+        }
+      }
+    });
+  }
+  
+  function createPeer(id, initiator) {
+    const peer = new SimplePeer({
+      initiator: initiator,
+      trickle: false,
+      stream: localStream
+    });
+    
+    peer.on("signal", signal => {
+      socket.emit("signal", {
+        room: ROOM_ID,
+        signal: signal,
+        from: socket.id,
+        to: id
+      });
+    });
+    
+    peer.on("stream", stream => {
+      // Check if video already exists
+      if (document.getElementById(`video-${id}`)) return;
+      
+      const video = document.createElement("video");
+      video.id = `video-${id}`;
+      video.srcObject = stream;
+      video.autoplay = true;
+      video.playsInline = true;
+      
+      const wrapper = document.createElement("div");
+      wrapper.className = "video-wrapper";
+      wrapper.appendChild(video);
+      
+      const name = document.createElement("h3");
+      name.textContent = `User ${id.substring(0, 5)}`;
+      wrapper.appendChild(name);
+      
+      document.getElementById("remoteVideos").appendChild(wrapper);
+    });
+    
+    peer.on("close", () => {
+      peer.destroy();
+      delete peers[id];
+      
+      const videoElement = document.getElementById(`video-${id}`);
+      if (videoElement) {
+        videoElement.parentElement.remove();
+      }
+    });
+    
+    peers[id] = peer;
+  }
+  
+  function toggleVideo() {
+    if (!localStream) return;
+    
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      isVideoEnabled = videoTrack.enabled;
+      document.getElementById("toggleVideo").innerHTML = 
+        isVideoEnabled ? '<span>📹</span> Video ON' : '<span>📴</span> Video OFF';
+    }
+  }
+  
+  function toggleAudio() {
+    if (!localStream) return;
+    
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      isAudioEnabled = audioTrack.enabled;
+      document.getElementById("toggleAudio").innerHTML = 
+        isAudioEnabled ? '<span>🎤</span> Audio ON' : '<span>🔇</span> Audio OFF';
+    }
+  }
+  
+  function endCall() {
+    // Stop all tracks
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+    }
+    
+    // Destroy all peers
+    Object.values(peers).forEach(peer => peer.destroy());
+    peers = {};
+    
+    // Clear videos
+    document.getElementById("remoteVideos").innerHTML = "";
+    const localVideo = document.getElementById("localVideo");
+    localVideo.srcObject = null;
+    
+    // Leave room
+    if (socket) {
+      socket.emit("leave", { room: ROOM_ID, id: socket.id });
+    }
+    
+    // Reset buttons
+    document.getElementById("toggleVideo").innerHTML = '<span>📹</span> Toggle Video';
+    document.getElementById("toggleAudio").innerHTML = '<span>🎤</span> Toggle Audio';
+    
+    alert("Call ended. You can start a new call by refreshing the page.");
+  }
 
   // Load Daily Dua
   function loadDailyDua() {
@@ -666,31 +978,29 @@ body {
   }
 
   // Load Surah list
-function loadSurahList() {
-  fetch('/get-surah-list')
-    .then(res => res.json())
-    .then(data => {
-      const select = document.getElementById('surahList');
-      select.innerHTML = '<option value="">-- Or Select Surah --</option>';
-      
-      // ✅ Use the correct key returned from Flask: surah_list
-      if (data && data.surah_list && Array.isArray(data.surah_list)) {
-        data.surah_list.forEach((surahName, index) => {
-          const option = document.createElement('option');
-          option.value = index + 1; // Surah numbers start from 1
-          option.textContent = `${index + 1}. ${surahName}`;
-          select.appendChild(option);
-        });
-      } else {
-        loadHardcodedSurahList(); // fallback
-      }
-    })
-    .catch(error => {
-      console.error('Error loading Surah list:', error);
-      loadHardcodedSurahList(); // fallback
-    });
-}
-
+  function loadSurahList() {
+    fetch('/get-surah-list')
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById('surahList');
+        select.innerHTML = '<option value="">-- Or Select Surah --</option>';
+        
+        if (data && data.surah_list && Array.isArray(data.surah_list)) {
+          data.surah_list.forEach((surahName, index) => {
+            const option = document.createElement('option');
+            option.value = index + 1;
+            option.textContent = `${index + 1}. ${surahName}`;
+            select.appendChild(option);
+          });
+        } else {
+          loadHardcodedSurahList();
+        }
+      })
+      .catch(error => {
+        console.error('Error loading Surah list:', error);
+        loadHardcodedSurahList();
+      });
+  }
 
   function loadHardcodedSurahList() {
     const surahs = [
@@ -836,103 +1146,25 @@ function loadSurahList() {
     const audioPlayerContainer = document.getElementById('audioPlayer');
     const audioElement = document.getElementById('surahAudio');
     
-    // Show audio player
     audioPlayerContainer.style.display = 'block';
     
-    // Set audio source (using a free Quran API)
     audioElement.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`;
     
-    // Update UI
     document.getElementById('playPauseBtn').textContent = 'Loading...';
     document.getElementById('playPauseBtn').disabled = true;
     
-    // When audio is loaded
     audioElement.oncanplay = function() {
       document.getElementById('playPauseBtn').textContent = 'Play';
       document.getElementById('playPauseBtn').disabled = false;
       document.getElementById('timeDisplay').textContent = '0:00 / ' + formatTime(audioElement.duration);
     };
     
-    // Handle errors
     audioElement.onerror = function() {
       alert("Could not load audio for this Surah. Please try another one.");
       document.getElementById('playPauseBtn').textContent = 'Play';
       document.getElementById('playPauseBtn').disabled = false;
     };
   }
-function playSurah() {
-  const query = document.getElementById("quranInput").value.trim();
-  const selectedSurah = document.getElementById("surahList").value;
-  const surahName = query || selectedSurah;
-  
-  if (!surahName || !surahNameToNumber[surahName]) {
-    alert("Please select a valid Surah from the list.");
-    return;
-  }
-
-  const surahNumber = surahNameToNumber[surahName];
-  const audioPlayerContainer = document.getElementById('audioPlayer');
-  const audioElement = document.getElementById('surahAudio');
-  const playPauseBtn = document.getElementById('playPauseBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const prevBtn = document.getElementById('prevBtn');
-
-  // Show audio player
-  audioPlayerContainer.style.display = 'block';
-
-  // Set audio source (using Quran API)
-  audioElement.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`;
-
-  // Update UI
-  playPauseBtn.textContent = 'Loading...';
-  playPauseBtn.disabled = true;
-
-  // When audio is ready
-  audioElement.oncanplay = function() {
-    playPauseBtn.textContent = 'Play';
-    playPauseBtn.disabled = false;
-    document.getElementById('timeDisplay').textContent =
-      '0:00 / ' + formatTime(audioElement.duration);
-  };
-
-  // Handle errors
-  audioElement.onerror = function() {
-    alert("Could not load audio for this Surah. Please try another one.");
-    playPauseBtn.textContent = 'Play';
-    playPauseBtn.disabled = false;
-  };
-
-  /** 🎵 BUTTON HANDLERS **/
-
-  // Play/Pause toggle
-  playPauseBtn.onclick = function () {
-    if (audioElement.paused) {
-      audioElement.play();
-      playPauseBtn.textContent = "Pause";
-    } else {
-      audioElement.pause();
-      playPauseBtn.textContent = "Play";
-    }
-  };
-
-  // Next Surah
-  nextBtn.onclick = function () {
-    const nextSurah = surahNumber + 1;
-    if (nextSurah <= 114) {
-      document.getElementById("surahList").value = getSurahName(nextSurah);
-      playSurah();
-    }
-  };
-
-  // Previous Surah
-  prevBtn.onclick = function () {
-    const prevSurah = surahNumber - 1;
-    if (prevSurah >= 1) {
-      document.getElementById("surahList").value = getSurahName(prevSurah);
-      playSurah();
-    }
-  };
-}
 
   // Main function to send question
   async function sendQuestion() {
@@ -942,7 +1174,6 @@ function playSurah() {
 
     const messagesDiv = document.getElementById("messages");
 
-    // 🧍 User message display
     const userMsg = document.createElement("p");
     userMsg.className = "user-message";
     userMsg.innerHTML = `You: ${question}`;
@@ -950,10 +1181,8 @@ function playSurah() {
     inputEl.value = "";
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-    // Add to chat history
     chatHistory.push({ role: "user", content: question });
 
-    // Show loading indicator
     const loadingMsg = document.createElement("p");
     loadingMsg.className = "loading-indicator";
     loadingMsg.textContent = "Tawfiq AI is thinking...";
@@ -969,22 +1198,18 @@ function playSurah() {
       });
       const data = await response.json();
 
-      // Remove loading
       loadingMsg.remove?.();
 
       const messageContent = data.choices?.[0]?.message?.content;
       const answerText = messageContent || "Sorry, couldn't answer.";
 
-      // Save reply
       chatHistory.push({ role: "assistant", content: answerText });
 
-      // Display AI message
       const aiMsg = document.createElement("p");
       aiMsg.className = "ai-message";
       messagesDiv.appendChild(aiMsg);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-      // Typing effect
       function typeText(element, text, speed = 20) {
         let i = 0;
         const interval = setInterval(() => {
@@ -1013,208 +1238,207 @@ function playSurah() {
     }
   }
 
-  // Search Quran
- // Surah name → number map (must match dropdown list!)
-const surahNameToNumber = {
-  "Al-Fatihah": 1, 
-"Al-Baqarah": 2, 
-"Aali Imran": 3, 
-"An-Nisa": 4, 
-"Al-Ma'idah": 5,
-"Al-An'am": 6, 
-"Al-A'raf": 7, 
-"Al-Anfal": 8, 
-"At-Tawbah": 9, 
-"Yunus": 10,
-"Hud": 11, 
-"Yusuf": 12, 
-"Ar-Ra'd": 13, 
-"Ibrahim": 14, 
-"Al-Hijr": 15,
-"An-Nahl": 16, 
-"Al-Isra": 17, 
-"Al-Kahf": 18, 
-"Maryam": 19, 
-"Ta-Ha": 20,
-"Al-Anbiya": 21, 
-"Al-Hajj": 22, 
-"Al-Mu’minun": 23, 
-"An-Nur": 24, 
-"Al-Furqan": 25,
-"Ash-Shu'ara": 26,
-"An-Naml": 27,
-"Al-Qasas": 28,
-"Al-Ankabut": 29,
-"Ar-Rum": 30,
-"Luqman": 31,
-"As-Sajda": 32,
-"Al-Ahzab": 33,
-"Saba": 34,
-"Fatir": 35,
-"Ya-Sin": 36,
-"As-Saffat": 37,
-"Sad": 38,
-"Az-Zumar": 39,
-"Ghafir": 40,
-"Fussilat": 41,
-"Ash-Shura": 42,
-"Az-Zukhruf": 43,
-"Ad-Dukhan": 44,
-"Al-Jathiya": 45,
-"Al-Ahqaf": 46,
-"Muhammad": 47,
-"Al-Fath": 48,
-"Al-Hujurat": 49,
-"Qaf": 50,
-"Adh-Dhariyat": 51,
-"At-Tur": 52,
-"An-Najm": 53,
-"Al-Qamar": 54,
-"Ar-Rahman": 55,
-"Al-Waqia": 56,
-"Al-Hadid": 57,
-"Al-Mujadila": 58,
-"Al-Hashr": 59,
-"Al-Mumtahina": 60,
-"As-Saff": 61,
-"Al-Jumu'a": 62,
-"Al-Munafiqun": 63,
-"At-Taghabun": 64,
-"At-Talaq": 65,
-"At-Tahrim": 66,
-"Al-Mulk": 67,
-"Al-Qalam": 68,
-"Al-Haqqa": 69,
-"Al-Ma'arij": 70,
-"Nuh": 71,
-"Al-Jinn": 72,
-"Al-Muzzammil": 73,
-"Al-Muddathir": 74,
-"Al-Qiyama": 75,
-"Al-Insan": 76,
-"Al-Mursalat": 77,
-"An-Naba": 78,
-"An-Nazi'at": 79,
-"Abasa": 80,
-"At-Takwir": 81,
-"Al-Infitar": 82,
-"Al-Mutaffifin": 83,
-"Al-Inshiqaq": 84,
-"Al-Buruj": 85,
-"At-Tariq": 86,
-"Al-A'la": 87,
-"Al-Gashiya": 88,
-"Al-Fajr": 89,
-"Al-Balad": 90,
-"Ash-Shams": 91,
-"Al-Lail": 92,
-"Ad-Duha": 93,
-"Ash-Sharh": 94,
-"At-Tin": 95,
-"Al-'Alaq": 96,
-"Al-Qadr": 97,
-"Al-Bayyina": 98,
-"Az-Zalzala": 99,
-"Al-Adiyat": 100,
-"Al-Qari'a": 101,
-"At-Takathur": 102,
-"Al-Asr": 103,
-"Al-Humaza": 104,
-"Al-Fil": 105,
-"Quraish": 106,
-"Al-Ma'un": 107,
-"Al-Kawthar": 108,
-"Al-Kafirun": 109,
-"An-Nasr": 110,
-"Al-Masad": 111,
-"Al-Ikhlas": 112,
-"Al-Falaq": 113,
-"An-Nas": 114
-};
+  // Surah name → number map
+  const surahNameToNumber = {
+    "Al-Fatihah": 1,
+    "Al-Baqarah": 2,
+    "Aali Imran": 3,
+    "An-Nisa": 4,
+    "Al-Ma'idah": 5,
+    "Al-An'am": 6,
+    "Al-A'raf": 7,
+    "Al-Anfal": 8,
+    "At-Tawbah": 9,
+    "Yunus": 10,
+    "Hud": 11,
+    "Yusuf": 12,
+    "Ar-Ra'd": 13,
+    "Ibrahim": 14,
+    "Al-Hijr": 15,
+    "An-Nahl": 16,
+    "Al-Isra": 17,
+    "Al-Kahf": 18,
+    "Maryam": 19,
+    "Ta-Ha": 20,
+    "Al-Anbiya": 21,
+    "Al-Hajj": 22,
+    "Al-Mu'minun": 23,
+    "An-Nur": 24,
+    "Al-Furqan": 25,
+    "Ash-Shu'ara": 26,
+    "An-Naml": 27,
+    "Al-Qasas": 28,
+    "Al-Ankabut": 29,
+    "Ar-Rum": 30,
+    "Luqman": 31,
+    "As-Sajda": 32,
+    "Al-Ahzab": 33,
+    "Saba": 34,
+    "Fatir": 35,
+    "Ya-Sin": 36,
+    "As-Saffat": 37,
+    "Sad": 38,
+    "Az-Zumar": 39,
+    "Ghafir": 40,
+    "Fussilat": 41,
+    "Ash-Shura": 42,
+    "Az-Zukhruf": 43,
+    "Ad-Dukhan": 44,
+    "Al-Jathiya": 45,
+    "Al-Ahqaf": 46,
+    "Muhammad": 47,
+    "Al-Fath": 48,
+    "Al-Hujurat": 49,
+    "Qaf": 50,
+    "Adh-Dhariyat": 51,
+    "At-Tur": 52,
+    "An-Najm": 53,
+    "Al-Qamar": 54,
+    "Ar-Rahman": 55,
+    "Al-Waqi'a": 56,
+    "Al-Hadid": 57,
+    "Al-Mujadila": 58,
+    "Al-Hashr": 59,
+    "Al-Mumtahina": 60,
+    "As-Saff": 61,
+    "Al-Jumu'a": 62,
+    "Al-Munafiqun": 63,
+    "At-Taghabun": 64,
+    "At-Talaq": 65,
+    "At-Tahrim": 66,
+    "Al-Mulk": 67,
+    "Al-Qalam": 68,
+    "Al-Haqqa": 69,
+    "Al-Ma'arij": 70,
+    "Nuh": 71,
+    "Al-Jinn": 72,
+    "Al-Muzzammil": 73,
+    "Al-Muddathir": 74,
+    "Al-Qiyama": 75,
+    "Al-Insan": 76,
+    "Al-Mursalat": 77,
+    "An-Naba": 78,
+    "An-Nazi'at": 79,
+    "Abasa": 80,
+    "At-Takwir": 81,
+    "Al-Infitar": 82,
+    "Al-Mutaffifin": 83,
+    "Al-Inshiqaq": 84,
+    "Al-Buruj": 85,
+    "At-Tariq": 86,
+    "Al-A'la": 87,
+    "Al-Ghashiya": 88,
+    "Al-Fajr": 89,
+    "Al-Balad": 90,
+    "Ash-Shams": 91,
+    "Al-Lail": 92,
+    "Ad-Duha": 93,
+    "Ash-Sharh": 94,
+    "At-Tin": 95,
+    "Al-'Alaq": 96,
+    "Al-Qadr": 97,
+    "Al-Bayyina": 98,
+    "Az-Zalzala": 99,
+    "Al-Adiyat": 100,
+    "Al-Qari'a": 101,
+    "At-Takathur": 102,
+    "Al-Asr": 103,
+    "Al-Humaza": 104,
+    "Al-Fil": 105,
+    "Quraysh": 106,
+    "Al-Ma'un": 107,
+    "Al-Kawthar": 108,
+    "Al-Kafirun": 109,
+    "An-Nasr": 110,
+    "Al-Masad": 111,
+    "Al-Ikhlas": 112,
+    "Al-Falaq": 113,
+    "An-Nas": 114
+  };
 
-function searchQuran() {
-  const query = document.getElementById("quranInput").value.trim();
-  const selectedSurah = document.getElementById("surahList").value;
-  const surahName = query || selectedSurah;
-  const resultDiv = document.getElementById("quranResult");
-  const quranSearchBtn = document.getElementById("quranSearchButton");
+  function searchQuran() {
+    const query = document.getElementById("quranInput").value.trim();
+    const selectedSurah = document.getElementById("surahList").value;
+    const surahName = query || selectedSurah;
+    const resultDiv = document.getElementById("quranResult");
+    const quranSearchBtn = document.getElementById("quranSearchButton");
 
-  if (!surahName || !surahNameToNumber[surahName]) {
-    resultDiv.innerHTML = `<div class="user-message">Please select a valid Surah from the list.</div>`;
-    return;
+    if (!surahName || !surahNameToNumber[surahName]) {
+      resultDiv.innerHTML = `<div class="user-message">Please select a valid Surah from the list.</div>`;
+      return;
+    }
+
+    const surahNumber = surahNameToNumber[surahName];
+
+    resultDiv.innerHTML = `<div class="user-message">Searching Surah: ${surahName}</div>`;
+    
+    const loading = document.createElement("div");
+    loading.className = "loading-indicator";
+    loading.textContent = "Searching Quran...";
+    resultDiv.appendChild(loading);
+    quranSearchBtn.disabled = true;
+
+    fetch('/quran-surah', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ surah_number: surahNumber })
+    })
+    .then(res => res.json())
+    .then(data => {
+      resultDiv.innerHTML = '';
+
+      if (data.surah_name) {
+        const titleEl = document.createElement("div");
+        titleEl.innerHTML = `<strong>Surah ${surahNumber}: ${data.surah_name}</strong>`;
+        titleEl.style.fontSize = '18px';
+        titleEl.style.marginBottom = '10px';
+        resultDiv.appendChild(titleEl);
+      }
+
+      if (data.ayahs && Array.isArray(data.ayahs) && data.ayahs.length > 0) {
+        data.ayahs.forEach(verse => {
+          const verseEl = document.createElement("div");
+          verseEl.className = "verse-block";
+          verseEl.style.marginBottom = '20px';
+
+          const info = document.createElement("p");
+          info.innerHTML = `<strong>Ayah ${verse.ayah_number}</strong>`;
+          verseEl.appendChild(info);
+
+          const arabic = document.createElement("p");
+          arabic.textContent = verse.arabic;
+          arabic.style.textAlign = 'right';
+          arabic.style.fontWeight = 'bold';
+          arabic.style.direction = 'rtl';
+          verseEl.appendChild(arabic);
+
+          const trans = document.createElement("p");
+          trans.textContent = verse.english;
+          verseEl.appendChild(trans);
+
+          if (verse.transliteration) {
+            const translitPara = document.createElement("p");
+            translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
+            translitPara.style.fontSize = '0.9em';
+            verseEl.appendChild(translitPara);
+          }
+
+          resultDiv.appendChild(verseEl);
+        });
+      } else {
+        resultDiv.innerHTML = `<div>No verses found for Surah ${surahName}.</div>`;
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      resultDiv.innerHTML = `<div>Error searching Quran. Please try again.</div>`;
+    })
+    .finally(() => {
+      const loadingEl = resultDiv.querySelector('.loading-indicator');
+      if (loadingEl) loadingEl.remove();
+      quranSearchBtn.disabled = false;
+    });
   }
-
-  const surahNumber = surahNameToNumber[surahName];
-
-  resultDiv.innerHTML = `<div class="user-message">Searching Surah: ${surahName}</div>`;
-  
-  const loading = document.createElement("div");
-  loading.className = "loading-indicator";
-  loading.textContent = "Searching Quran...";
-  resultDiv.appendChild(loading);
-  quranSearchBtn.disabled = true;
-
-  fetch('/quran-surah', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ surah_number: surahNumber })
-  })
-  .then(res => res.json())
-  .then(data => {
-    resultDiv.innerHTML = ''; // Clear previous results
-
-    if (data.surah_name) {
-      const titleEl = document.createElement("div");
-      titleEl.innerHTML = `<strong>Surah ${surahNumber}: ${data.surah_name}</strong>`;
-      titleEl.style.fontSize = '18px';
-      titleEl.style.marginBottom = '10px';
-      resultDiv.appendChild(titleEl);
-    }
-
-    if (data.ayahs && Array.isArray(data.ayahs) && data.ayahs.length > 0) {
-      data.ayahs.forEach(verse => {
-        const verseEl = document.createElement("div");
-        verseEl.className = "verse-block";
-        verseEl.style.marginBottom = '20px';
-
-        const info = document.createElement("p");
-        info.innerHTML = `<strong>Ayah ${verse.ayah_number}</strong>`;
-        verseEl.appendChild(info);
-
-        const arabic = document.createElement("p");
-        arabic.textContent = verse.arabic;
-        arabic.style.textAlign = 'right';
-        arabic.style.fontWeight = 'bold';
-        arabic.style.direction = 'rtl';
-        verseEl.appendChild(arabic);
-
-        const trans = document.createElement("p");
-        trans.textContent = verse.english;
-        verseEl.appendChild(trans);
-
-        if (verse.transliteration) {
-          const translitPara = document.createElement("p");
-          translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
-          translitPara.style.fontSize = '0.9em';
-          verseEl.appendChild(translitPara);
-        }
-
-        resultDiv.appendChild(verseEl);
-      });
-    } else {
-      resultDiv.innerHTML = `<div>No verses found for Surah ${surahName}.</div>`;
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    resultDiv.innerHTML = `<div>Error searching Quran. Please try again.</div>`;
-  })
-  .finally(() => {
-    const loadingEl = resultDiv.querySelector('.loading-indicator');
-    if (loadingEl) loadingEl.remove();
-    quranSearchBtn.disabled = false;
-  });
-}
 
   // Search Hadith
   function searchHadith() {
@@ -1296,6 +1520,12 @@ function searchQuran() {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(sectionId).classList.add('active');
     event.target.classList.add('active');
+    
+    // Initialize WebRTC when Live Meeting tab is selected
+    if (sectionId === 'liveMeetingSection' && !socket) {
+      initializeWebRTC();
+    }
+    
     if (sectionId === 'prayerTimes') loadPrayerTimes();
   }
 </script>
