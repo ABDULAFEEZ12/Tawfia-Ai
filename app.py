@@ -37,8 +37,8 @@ if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
 
 # Configurations
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Allow cookies in fetch
-app.config['SESSION_COOKIE_SECURE'] = False    # Only True if HTTPS
-app.config['SECRET_KEY'] = os.getenv('MY_SECRET', 'your-secret-key-here')
+app.config['SESSION_COOKIE_SECURE'] = True    # Must be True for HTTPS on Render
+app.config['SECRET_KEY'] = os.getenv('MY_SECRET', os.environ.get('SECRET_KEY', 'your-secret-key-here'))
 
 # Use SQLite locally, PostgreSQL on Render with proper SSL
 if DATABASE_URL:
@@ -64,15 +64,22 @@ else:
 db = SQLAlchemy()
 db.init_app(app)
 
-# Initialize SocketIO with proper settings
+# ============================================
+# SOCKET.IO CONFIGURATION - UPDATED FOR PRODUCTION
+# ============================================
+# Use 'eventlet' for production (Render), 'threading' for local development
+async_mode = 'eventlet' if os.environ.get('RENDER') else 'threading'
+
 socketio = SocketIO(
     app, 
     cors_allowed_origins="*",
-    async_mode='threading',
+    async_mode=async_mode,  # ✅ Changed: 'eventlet' for production
     ping_timeout=60,
     ping_interval=25,
     logger=True,
-    engineio_logger=True
+    engineio_logger=True,
+    manage_session=False,   # ✅ Added: Important for WebSocket sessions
+    message_queue='redis://' if os.environ.get('REDIS_URL') else None  # ✅ For scaling
 )
 
 # --- Models ---
@@ -1431,12 +1438,13 @@ def live_meeting(room_id):
     return render_template("live_meeting.html", room_id=room_id)
 
 # ============================================
-# SOCKET.IO HANDLERS
+# SOCKET.IO HANDLERS - UPDATED FOR PRODUCTION
 # ============================================
 
 active_rooms = {}
 waiting_students = {}
 connected_students = {}
+student_details = {}
 
 @socketio.on('connect')
 def handle_connect():
@@ -1445,9 +1453,46 @@ def handle_connect():
 @socketio.on('disconnect')
 def handle_disconnect():
     print(f"❌ Client disconnected: {request.sid}")
+    # Clean up disconnected users from all rooms
     for room_id in list(active_rooms.keys()):
-        if 'connections' in active_rooms[room_id] and request.sid in active_rooms[room_id]['connections']:
-            active_rooms[room_id]['connections'].remove(request.sid)
+        if 'teacher_sid' in active_rooms[room_id] and active_rooms[room_id]['teacher_sid'] == request.sid:
+            # Teacher disconnected
+            emit('room-ended', {
+                'room': room_id,
+                'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+                'reason': 'Teacher disconnected'
+            }, room=room_id)
+            
+            # Clean up room
+            if room_id in active_rooms:
+                del active_rooms[room_id]
+            if room_id in waiting_students:
+                del waiting_students[room_id]
+            if room_id in connected_students:
+                del connected_students[room_id]
+            
+        else:
+            # Student disconnected
+            for user_id, details in list(student_details.items()):
+                if details.get('sid') == request.sid:
+                    # Remove from connected students
+                    if room_id in connected_students and user_id in connected_students[room_id]:
+                        connected_students[room_id].remove(user_id)
+                    
+                    # Remove from waiting students
+                    if room_id in waiting_students and user_id in waiting_students[room_id]:
+                        waiting_students[room_id].remove(user_id)
+                    
+                    # Remove details
+                    if user_id in student_details:
+                        del student_details[user_id]
+                    
+                    # Notify room
+                    emit('student-left', {
+                        'userId': user_id,
+                        'username': details.get('username', 'Student')
+                    }, room=room_id)
+                    break
 
 @socketio.on('teacher-join')
 def handle_teacher_join(data):
@@ -1458,26 +1503,35 @@ def handle_teacher_join(data):
         
         print(f"👨‍🏫 Teacher {username} ({user_id}) joining room {room_id}")
         
+        # Initialize room if it doesn't exist
         if room_id not in active_rooms:
             active_rooms[room_id] = {
                 'state': 'waiting',
                 'teacher_id': user_id,
                 'teacher_sid': request.sid,
+                'teacher_name': username,
                 'connections': [request.sid],
-                'created_at': datetime.utcnow().isoformat()
+                'created_at': datetime.utcnow().isoformat(),
+                'webrtc_started': False
             }
             waiting_students[room_id] = []
             connected_students[room_id] = []
+        else:
+            # Update existing room
+            active_rooms[room_id]['teacher_sid'] = request.sid
+            active_rooms[room_id]['teacher_id'] = user_id
+            active_rooms[room_id]['teacher_name'] = username
+            if request.sid not in active_rooms[room_id]['connections']:
+                active_rooms[room_id]['connections'].append(request.sid)
         
         join_room(room_id)
-        
-        if request.sid not in active_rooms[room_id]['connections']:
-            active_rooms[room_id]['connections'].append(request.sid)
         
         emit('room-state', {
             'state': active_rooms[room_id]['state'],
             'waitingStudents': len(waiting_students.get(room_id, [])),
-            'connectedStudents': len(connected_students.get(room_id, []))
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': user_id,
+            'teacherName': username
         })
         
         print(f"✅ Teacher joined room {room_id}")
@@ -1496,31 +1550,63 @@ def handle_student_join(data):
         print(f"👨‍🎓 Student {username} ({user_id}) joining room {room_id}")
         
         if room_id not in active_rooms:
-            emit('error', {'message': 'Room does not exist'})
+            emit('error', {'message': 'Room does not exist or teacher has not joined yet'})
             return
+        
+        # Store student details
+        student_details[user_id] = {
+            'sid': request.sid,
+            'username': username,
+            'room': room_id,
+            'joined_at': datetime.utcnow().isoformat()
+        }
         
         join_room(room_id)
         
         if active_rooms[room_id]['state'] == 'waiting':
+            # Add to waiting students
             if user_id not in waiting_students[room_id]:
                 waiting_students[room_id].append(user_id)
             
             emit('student-waiting', {
                 'userId': user_id,
-                'username': username
+                'username': username,
+                'socketId': request.sid
             }, room=room_id, include_self=False)
+            
+            # Send student-waiting-ack to the student
+            emit('student-waiting-ack', {
+                'status': 'waiting',
+                'room': room_id,
+                'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher')
+            })
+            
         else:
+            # Add to connected students
             if user_id not in connected_students[room_id]:
                 connected_students[room_id].append(user_id)
             
             emit('student-joined', {
                 'userId': user_id,
-                'username': username
+                'username': username,
+                'socketId': request.sid
             }, room=room_id, include_self=False)
+            
+            # Send student-joined-ack to the student
+            emit('student-joined-ack', {
+                'status': 'joined',
+                'room': room_id,
+                'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher')
+            })
         
+        # Update room state for teacher
         emit('room-state', {
-            'state': active_rooms[room_id]['state']
-        })
+            'state': active_rooms[room_id]['state'],
+            'waitingStudents': len(waiting_students.get(room_id, [])),
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': active_rooms[room_id].get('teacher_id'),
+            'teacherName': active_rooms[room_id].get('teacher_name')
+        }, room=room_id)
         
     except Exception as e:
         print(f"❌ Error in student-join: {e}")
@@ -1537,24 +1623,46 @@ def handle_start_meeting(data):
         
         active_rooms[room_id]['state'] = 'live'
         
+        # Move all waiting students to connected
         for student_id in waiting_students.get(room_id, []):
             if student_id not in connected_students[room_id]:
                 connected_students[room_id].append(student_id)
+                
+                # Notify the student
+                student_sid = student_details.get(student_id, {}).get('sid')
+                if student_sid:
+                    emit('meeting-started', {
+                        'room': room_id,
+                        'teacherId': active_rooms[room_id].get('teacher_id'),
+                        'teacherName': active_rooms[room_id].get('teacher_name')
+                    }, room=student_sid)
         
         waiting_students[room_id] = []
         
-        print(f"🚀 Meeting started in room {room_id}")
+        print(f"🚀 Meeting started in room {room_id} with {len(connected_students.get(room_id, []))} students")
         
+        # Notify all in room
         emit('room-started', {
             'room': room_id,
             'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
-            'students': [{'userId': sid} for sid in connected_students.get(room_id, [])]
+            'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher'),
+            'students': [
+                {
+                    'userId': sid,
+                    'username': student_details.get(sid, {}).get('username', 'Student'),
+                    'socketId': student_details.get(sid, {}).get('sid')
+                }
+                for sid in connected_students.get(room_id, [])
+            ]
         }, room=room_id)
         
+        # Update room state
         emit('room-state', {
             'state': 'live',
             'waitingStudents': 0,
-            'connectedStudents': len(connected_students.get(room_id, []))
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': active_rooms[room_id].get('teacher_id'),
+            'teacherName': active_rooms[room_id].get('teacher_name')
         }, room=room_id)
         
     except Exception as e:
@@ -1574,17 +1682,26 @@ def handle_end_meeting(data):
         
         print(f"🛑 Meeting ended in room {room_id}")
         
+        # Notify all participants
         emit('room-ended', {
             'room': room_id,
-            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown')
+            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+            'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher'),
+            'message': 'Meeting has ended'
         }, room=room_id)
         
+        # Clean up
         if room_id in waiting_students:
             del waiting_students[room_id]
         if room_id in connected_students:
             del connected_students[room_id]
         if room_id in active_rooms:
             del active_rooms[room_id]
+        
+        # Clean up student details for this room
+        for user_id in list(student_details.keys()):
+            if student_details[user_id].get('room') == room_id:
+                del student_details[user_id]
         
     except Exception as e:
         print(f"❌ Error in end-meeting: {e}")
@@ -1595,13 +1712,33 @@ def handle_webrtc_signal(data):
     try:
         room_id = data.get('room', 'default')
         from_user = data.get('from')
+        to_user = data.get('to')
         signal = data.get('signal')
+        type = data.get('type', 'signal')  # 'offer', 'answer', 'candidate'
         
-        emit('webrtc-signal', {
-            'from': from_user,
-            'signal': signal
-        }, room=room_id, include_self=False)
+        print(f"📡 WebRTC {type} from {from_user} to {to_user} in room {room_id}")
         
+        # Find target socket ID
+        target_sid = None
+        if to_user.startswith('teacher_'):
+            # Send to teacher
+            if room_id in active_rooms:
+                target_sid = active_rooms[room_id].get('teacher_sid')
+        else:
+            # Send to student
+            if to_user in student_details:
+                target_sid = student_details[to_user].get('sid')
+        
+        if target_sid:
+            emit('webrtc-signal', {
+                'from': from_user,
+                'to': to_user,
+                'signal': signal,
+                'type': type
+            }, room=target_sid)
+        else:
+            print(f"⚠️ Target user {to_user} not found")
+            
     except Exception as e:
         print(f"❌ Error in webrtc-signal: {e}")
 
@@ -1610,13 +1747,39 @@ def handle_start_webrtc(data):
     try:
         room_id = data.get('room', 'default')
         
-        if room_id not in connected_students:
+        if room_id not in connected_students or not connected_students[room_id]:
             emit('error', {'message': 'No students connected'})
             return
         
-        emit('webrtc-start', {
-            'students': [{'userId': sid} for sid in connected_students.get(room_id, [])]
-        }, room=room_id)
+        active_rooms[room_id]['webrtc_started'] = True
+        
+        print(f"🎥 Starting WebRTC in room {room_id} with {len(connected_students.get(room_id, []))} students")
+        
+        # Get teacher info
+        teacher_id = active_rooms[room_id].get('teacher_id')
+        teacher_name = active_rooms[room_id].get('teacher_name', 'Teacher')
+        
+        # Notify teacher
+        emit('webrtc-start-teacher', {
+            'students': [
+                {
+                    'userId': student_id,
+                    'username': student_details.get(student_id, {}).get('username', 'Student'),
+                    'socketId': student_details.get(student_id, {}).get('sid')
+                }
+                for student_id in connected_students.get(room_id, [])
+            ]
+        })
+        
+        # Notify each student
+        for student_id in connected_students.get(room_id, []):
+            student_sid = student_details.get(student_id, {}).get('sid')
+            if student_sid:
+                emit('webrtc-start-student', {
+                    'teacherId': teacher_id,
+                    'teacherName': teacher_name,
+                    'room': room_id
+                }, room=student_sid)
         
     except Exception as e:
         print(f"❌ Error in start-webrtc: {e}")
@@ -1626,29 +1789,57 @@ def handle_start_webrtc(data):
 def handle_mute_student(data):
     room_id = data.get('room')
     student_id = data.get('userId')
-    emit('student-muted', {
-        'userId': student_id,
-        'muted': True
-    }, room=room_id, include_self=False)
+    
+    # Find student socket ID
+    if student_id in student_details:
+        student_sid = student_details[student_id].get('sid')
+        if student_sid:
+            emit('student-muted', {
+                'userId': student_id,
+                'muted': True
+            }, room=student_sid)
+            
+            # Notify teacher
+            emit('student-muted-confirm', {
+                'userId': student_id,
+                'muted': True
+            })
 
 @socketio.on('unmute-student')
 def handle_unmute_student(data):
     room_id = data.get('room')
     student_id = data.get('userId')
-    emit('student-muted', {
-        'userId': student_id,
-        'muted': False
-    }, room=room_id, include_self=False)
+    
+    # Find student socket ID
+    if student_id in student_details:
+        student_sid = student_details[student_id].get('sid')
+        if student_sid:
+            emit('student-muted', {
+                'userId': student_id,
+                'muted': False
+            }, room=student_sid)
+            
+            # Notify teacher
+            emit('student-muted-confirm', {
+                'userId': student_id,
+                'muted': False
+            })
 
 @socketio.on('mic-request')
 def handle_mic_request(data):
     room_id = data.get('room')
     user_id = data.get('userId', 'unknown')
     username = data.get('username', 'Student')
-    emit('mic-request', {
-        'userId': user_id,
-        'username': username
-    }, room=room_id, include_self=False)
+    
+    # Send to teacher
+    if room_id in active_rooms:
+        teacher_sid = active_rooms[room_id].get('teacher_sid')
+        if teacher_sid:
+            emit('mic-request', {
+                'userId': user_id,
+                'username': username,
+                'socketId': request.sid
+            }, room=teacher_sid)
 
 @socketio.on('student-question')
 def handle_student_question(data):
@@ -1658,12 +1849,37 @@ def handle_student_question(data):
     question = data.get('question', '')
     question_id = f"q_{user_id}_{int(datetime.utcnow().timestamp())}"
     
-    emit('student-question', {
-        'userId': user_id,
-        'username': username,
-        'question': question,
-        'questionId': question_id
-    }, room=room_id, include_self=False)
+    # Send to teacher
+    if room_id in active_rooms:
+        teacher_sid = active_rooms[room_id].get('teacher_sid')
+        if teacher_sid:
+            emit('student-question', {
+                'userId': user_id,
+                'username': username,
+                'question': question,
+                'questionId': question_id
+            }, room=teacher_sid)
+
+@socketio.on('teacher-leave')
+def handle_teacher_leave(data):
+    room_id = data.get('room')
+    user_id = data.get('userId')
+    
+    if room_id in active_rooms:
+        # Notify all students
+        emit('room-ended', {
+            'room': room_id,
+            'teacherId': user_id,
+            'reason': 'Teacher left the meeting'
+        }, room=room_id)
+        
+        # Clean up
+        if room_id in active_rooms:
+            del active_rooms[room_id]
+        if room_id in waiting_students:
+            del waiting_students[room_id]
+        if room_id in connected_students:
+            del connected_students[room_id]
 
 @app.route('/socket-test')
 def socket_test():
@@ -1700,18 +1916,294 @@ def socket_test():
 @app.route('/static/live_meeting.css')
 def serve_live_meeting_css():
     return """
-    /* Minimal live meeting CSS to prevent 404 errors */
-    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-    .video-container { background: #000; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-    video { width: 100%; height: auto; }
-    .controls { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-                background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; 
-                display: flex; gap: 10px; z-index: 1000; }
-    .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; 
-           font-weight: bold; color: white; }
-    .btn-primary { background: #3498db; }
-    .btn-danger { background: #e74c3c; }
-    .btn-success { background: #27ae60; }
+    /* Complete live meeting CSS */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        padding: 40px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 20px;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .header h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .header p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .room-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .room-id {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+    
+    .share-link {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .share-link input {
+        flex: 1;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+    
+    .share-link button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    .share-link button:hover {
+        background: #5a67d8;
+    }
+    
+    .controls {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin: 30px 0;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+    }
+    
+    .btn-success {
+        background: #48bb78;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #38a169;
+        transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+        background: #f56565;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #e53e3e;
+        transform: translateY(-2px);
+    }
+    
+    .video-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+    
+    .video-box {
+        background: #1a202c;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        aspect-ratio: 16/9;
+    }
+    
+    .video-box video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .video-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .status {
+        text-align: center;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+        background: #f0f4ff;
+    }
+    
+    .status.waiting {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status.live {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+    
+    .status.error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .students-list {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 30px;
+    }
+    
+    .students-list h3 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .student-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background: white;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .student-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .action-btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    
+    .action-btn.mute {
+        background: #f56565;
+        color: white;
+    }
+    
+    .action-btn.unmute {
+        background: #48bb78;
+        color: white;
+    }
+    
+    .questions-panel {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 30px;
+    }
+    
+    .question-item {
+        background: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 4px solid #48bb78;
+    }
+    
+    .question-meta {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+        }
+        
+        .controls {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .video-container {
+            grid-template-columns: 1fr;
+        }
+    }
     """, 200, {'Content-Type': 'text/css'}
 
 # Additional routes (kept from original but with error handling)
@@ -2108,20 +2600,40 @@ def temp_login():
     <p><a href="/login">Back to real login</a></p>
     '''
 
+# ============================================
+# APPLICATION STARTUP - UPDATED FOR PRODUCTION
+# ============================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_ENV") == "development"
     
-    print(f"🚀 Starting server on port {port} (debug={debug})")
-    print(f"🌐 Server URL: http://localhost:{port}")
-    print(f"📡 Socket.IO enabled: True")
-    print(f"💾 Database URL: {DATABASE_URL[:50]}..." if DATABASE_URL else "💾 Using SQLite database")
-    
-    socketio.run(
-        app,
-        host="0.0.0.0",
-        port=port,
-        debug=debug,
-        allow_unsafe_werkzeug=True,
-        log_output=True
-    )
+    # Check if we're running on Render
+    if os.environ.get("RENDER"):
+        print("🌐 Running on Render Production Server")
+        print(f"📡 WebSocket Server: Ready with async_mode='{async_mode}'")
+        print(f"💾 Database: {'Connected' if DATABASE_URL else 'SQLite (Local)'}")
+        
+        # On Render, we need to run with socketio.run() with proper production settings
+        socketio.run(
+            app,
+            host="0.0.0.0",
+            port=port,
+            debug=False,  # Always False in production
+            allow_unsafe_werkzeug=False,
+            log_output=True
+        )
+    else:
+        # Local development
+        print(f"🚀 Starting LOCAL development server on port {port}")
+        print(f"🌐 Local URL: http://localhost:{port}")
+        print(f"📡 Socket.IO enabled: True (async_mode='{async_mode}')")
+        print(f"💾 Database: {'SQLite' if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI'] else 'PostgreSQL'}")
+        
+        socketio.run(
+            app,
+            host="0.0.0.0",
+            port=port,
+            debug=debug,
+            allow_unsafe_werkzeug=True,
+            log_output=True
+        )
