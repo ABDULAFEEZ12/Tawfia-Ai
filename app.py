@@ -16,7 +16,8 @@ import random
 from difflib import get_close_matches
 from flask_sqlalchemy import SQLAlchemy
 import requests
-from flask_socketio import SocketIO, join_room, emit
+from flask_socketio import SocketIO, join_room, emit, disconnect
+import ssl
 
 # Load environment variables
 load_dotenv()
@@ -27,18 +28,39 @@ print("✅ CX:", os.getenv("GOOGLE_CX"))
 # Initialize Flask app
 app = Flask(__name__)
 
-# Initialize SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Fix for Render PostgreSQL SSL issues
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # Configurations
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Allow cookies in fetch
 app.config['SESSION_COOKIE_SECURE'] = False    # Only True if HTTPS
-app.config['SECRET_KEY'] = 'your-secret-key'   # Required for session to work
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SECRET_KEY'] = os.getenv('MY_SECRET', 'your-secret-key-here')
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+
+# Fix SSL connection for PostgreSQL on Render
+if os.getenv('RENDER'):
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'connect_args': {
+            'sslmode': 'require'
+        }
+    }
 
 # Initialize SQLAlchemy
 db = SQLAlchemy()
 db.init_app(app)
+
+# Initialize SocketIO with proper settings
+socketio = SocketIO(
+    app, 
+    cors_allowed_origins="*",
+    async_mode='threading',
+    ping_timeout=60,
+    ping_interval=25,
+    logger=True,
+    engineio_logger=True
+)
 
 # --- Models ---
 class User(db.Model):
@@ -63,37 +85,48 @@ class UserQuestions(db.Model):
     answer = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-# --- Create a default user (optional testing/demo) ---
+# Create database tables
 with app.app_context():
-    user = User.query.filter_by(username='zayd').first()
-    if not user:
-        user = User(username='zayd', email='zayd@example.com')
-        user.set_password('secure123')
-        db.session.add(user)
-        db.session.commit()
+    try:
+        db.create_all()
+        print("✅ Database tables created successfully")
+        
+        # Create default user if not exists
+        user = User.query.filter_by(username='zayd').first()
+        if not user:
+            user = User(username='zayd', email='zayd@example.com')
+            user.set_password('secure123')
+            db.session.add(user)
+            db.session.commit()
+            print("✅ Default user created")
+    except Exception as e:
+        print(f"⚠️ Database initialization error: {e}")
 
-# --- Get Questions for User (static demo for now) ---
+# --- Get Questions for User with error handling ---
 def get_questions_for_user(username):
-    with app.app_context():
-        questions = UserQuestions.query \
-            .filter(func.lower(UserQuestions.username) == username.lower()) \
-            .order_by(UserQuestions.timestamp.desc()) \
-            .all()
-        return [
-            {
-                "question": q.question,
-                "answer": q.answer,
-                "timestamp": q.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-            }
-            for q in questions
-        ]
-
+    try:
+        with app.app_context():
+            questions = UserQuestions.query \
+                .filter(func.lower(UserQuestions.username) == username.lower()) \
+                .order_by(UserQuestions.timestamp.desc()) \
+                .limit(10) \
+                .all()
+            return [
+                {
+                    "question": q.question,
+                    "answer": q.answer,
+                    "timestamp": q.timestamp.strftime("%Y-%m-%d %H:%M:%S") if q.timestamp else "Unknown"
+                }
+                for q in questions
+            ]
+    except Exception as e:
+        print(f"⚠️ Database error in get_questions_for_user: {e}")
+        return []
 
 # --- Save a Question and Answer for a User ---
 def save_question_and_answer(username, question, answer):
-    with app.app_context():
-        try:
-            # Check if this question already exists for this user
+    try:
+        with app.app_context():
             existing_entry = UserQuestions.query.filter_by(username=username, question=question).first()
 
             if existing_entry:
@@ -112,9 +145,12 @@ def save_question_and_answer(username, question, answer):
 
             db.session.commit()
 
-        except Exception as e:
-            print(f"❌ Failed to save Q&A for '{username}': {e}")
+    except Exception as e:
+        print(f"❌ Failed to save Q&A for '{username}': {e}")
+        try:
             db.session.rollback()
+        except:
+            pass
 
 # --- Redis Cache Setup ---
 redis_host = os.getenv("REDIS_HOST", "localhost")
@@ -122,12 +158,17 @@ redis_port = int(os.getenv("REDIS_PORT", 6379))
 redis_db = int(os.getenv("REDIS_DB", 0))
 redis_password = os.getenv("REDIS_PASSWORD", None)
 
-r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_password, decode_responses=True)
+try:
+    r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_password, decode_responses=True)
+    r.ping()
+    print("✅ Redis connected successfully")
+except:
+    print("⚠️ Redis not available, using in-memory cache")
+    r = None
 
 # --- File-Based Cache ---
 CACHE_FILE = "tawfiq_cache.json"
 
-# Load cache from file
 if os.path.exists(CACHE_FILE):
     try:
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
@@ -154,6 +195,8 @@ def load_json_data(file_name, data_variable_name):
         print(f"❌ ERROR: {data_variable_name} data file not found at {file_path}")
     except json.JSONDecodeError as e:
         print(f"❌ JSON Decode Error in {file_path}: {e}")
+        if 'daily_duas' in file_name:
+            data = {"duas": []}
     except Exception as e:
         print(f"❌ Unexpected error while loading {file_name}: {e}")
     return data
@@ -168,20 +211,32 @@ islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivati
 # --- OpenRouter API Key ---
 openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openrouter_api_key:
-    raise RuntimeError("OPENROUTER_API_KEY environment variable not set.")
+    print("⚠️ OPENROUTER_API_KEY environment variable not set.")
 
-def load_users():
-    if os.path.exists('users.json'):
-        with open('users.json', 'r') as f:
-            return json.load(f)
-    return {}
-
-def save_users(users):
-    with open('users.json', 'w') as f:
-        json.dump(users, f)
-
-users = load_users()
 # --- Flask Routes and Logic ---
+
+@app.route('/')
+def index():
+    user = session.get('user')
+    if not user:
+        return redirect(url_for('login'))
+
+    username = user['username']
+    questions = get_questions_for_user(username)
+    
+    if questions is None:
+        questions = []
+
+    return render_template('index.html', user=user, questions=questions)
+
+@app.route('/test-db')
+def test_db():
+    try:
+        with app.app_context():
+            db.session.execute("SELECT 1")
+            return "✅ Database connection successful"
+    except Exception as e:
+        return f"❌ Database connection failed: {e}"
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -190,50 +245,49 @@ def signup():
         email = request.form.get('email').strip()
         password = request.form.get('password').strip()
 
-        # Validate input
         if not username or not password or not email:
             flash('Please fill out all fields.')
             return redirect(url_for('signup'))
 
-        # Check if username or email already exists
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists.')
+        try:
+            if User.query.filter_by(username=username).first():
+                flash('Username already exists.')
+                return redirect(url_for('signup'))
+
+            if User.query.filter_by(email=email).first():
+                flash('Email already registered.')
+                return redirect(url_for('signup'))
+
+            new_user = User(
+                username=username,
+                email=email,
+                joined_on=datetime.utcnow()
+            )
+            new_user.set_password(password)
+
+            db.session.add(new_user)
+            db.session.commit()
+
+            session['user'] = {
+                'username': username,
+                'email': email,
+                'joined_on': new_user.joined_on.strftime('%Y-%m-%d'),
+                'preferred_language': 'English',
+                'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            }
+
+            flash('Account created successfully!')
+            return redirect(url_for('index'))
+
+        except Exception as e:
+            flash(f'Error creating account: {str(e)}')
             return redirect(url_for('signup'))
-
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered.')
-            return redirect(url_for('signup'))
-
-        # Create user
-        new_user = User(
-            username=username,
-            email=email,
-            joined_on=datetime.utcnow()
-        )
-        new_user.set_password(password)
-
-        # Save to database
-        db.session.add(new_user)
-        db.session.commit()
-
-        # Store user info in session
-        session['user'] = {
-            'username': username,
-            'email': email,
-            'joined_on': new_user.joined_on.strftime('%Y-%m-%d'),
-            'preferred_language': 'English',
-            'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        }
-
-        flash('Account created successfully!')
-        return redirect(url_for('index'))
 
     return render_template('signup.html', user=session.get('user'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Support both JSON and form data
         if request.is_json:
             data = request.get_json()
             username = data.get('username', '').strip()
@@ -242,32 +296,39 @@ def login():
             username = request.form.get('username', '').strip()
             password = request.form.get('password', '').strip()
 
-        # Check user
-        user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):  # Assuming .check_password() method exists
-            user.last_login = datetime.utcnow()
-            db.session.commit()
+        try:
+            user = User.query.filter_by(username=username).first()
+            if user and user.check_password(password):
+                user.last_login = datetime.utcnow()
+                db.session.commit()
 
-            session.permanent = True  # Login persists beyond browser close
-            session['user'] = {
-                'username': user.username,
-                'email': user.email,
-                'joined_on': user.joined_on.strftime('%Y-%m-%d'),
-                'preferred_language': 'English',
-                'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S')
-            }
+                session.permanent = True
+                session['user'] = {
+                    'username': user.username,
+                    'email': user.email,
+                    'joined_on': user.joined_on.strftime('%Y-%m-%d'),
+                    'preferred_language': 'English',
+                    'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S')
+                }
 
-            if request.is_json:
-                return jsonify({'success': True, 'message': 'Login successful', 'user': session['user']})
+                if request.is_json:
+                    return jsonify({'success': True, 'message': 'Login successful', 'user': session['user']})
+                else:
+                    flash('Logged in successfully!')
+                    return redirect(url_for('index'))
+
             else:
-                flash('Logged in successfully!')
-                return redirect(url_for('index'))
+                if request.is_json:
+                    return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
+                else:
+                    flash('Invalid username or password.')
+                    return redirect(url_for('login'))
 
-        else:
+        except Exception as e:
             if request.is_json:
-                return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
+                return jsonify({'success': False, 'error': f'Database error: {str(e)}'}), 500
             else:
-                flash('Invalid username or password.')
+                flash(f'Database error: {str(e)}')
                 return redirect(url_for('login'))
 
     return render_template('login.html')
@@ -282,15 +343,9 @@ def logout():
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
-    return render_template('forgot_password.html')  # make sure this template exists
+    return render_template('forgot_password.html')
 
-# Read the secret key from environment variable
-app.secret_key = os.getenv('MY_SECRET')
-
-# Optional: if the environment variable is not set, use a fallback (not recommended for production)
-if not app.secret_key:
-    app.secret_key = 'fallback_secret_key_for_dev_only'
-
+# --- Trivia Levels ---
 levels = {
     1: [
         {
@@ -856,19 +911,35 @@ levels = {
 def get_questions_for_level(level):
     return levels.get(level, [])
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
 
+@app.route('/my-questions')
+@login_required
+def my_questions():
+    try:
+        username = session['user']['username']
+        questions = UserQuestions.query.filter_by(username=username).order_by(UserQuestions.timestamp.desc()).all()
+        return render_template('my_questions.html', questions=questions)
+    except Exception as e:
+        flash(f'Error loading questions: {str(e)}')
+        return render_template('my_questions.html', questions=[])
 
-@app.route('/')
-def index():
-    user = session.get('user')
-    if not user:
-        return redirect(url_for('login'))
-
-    username = user['username']
-    # Fetch user-specific data, e.g., questions, using username
-    questions = get_questions_for_user(username)  # Your function
-
-    return render_template('index.html', user=user, questions=questions)
+@app.route('/profile')
+@login_required
+def profile():
+    user = session.get('user', {})
+    return render_template('profile.html',
+                           username=user.get('username', 'Guest'),
+                           email=user.get('email', 'not_set@example.com'),
+                           joined_on=user.get('joined_on', 'Unknown'),
+                           preferred_language=user.get('preferred_language', 'English'),
+                           last_login=user.get('last_login', 'N/A'))
 
 @app.route('/sitemap.xml')
 def sitemap():
@@ -885,64 +956,16 @@ def google_verification():
 def bing_verification():
     return send_from_directory('static', 'BingSiteAuth.xml')
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user' not in session:
-            return redirect(url_for('login', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
-
-@app.route('/my-questions')
-@login_required
-def my_questions():
-    username = session['user']['username']
-    questions = UserQuestions.query.filter_by(username=username).order_by(UserQuestions.timestamp.desc()).all()
-    print(f"Fetched questions for {username}: {[q.question for q in questions]}")
-    return render_template('my_questions.html', questions=questions)
-
-@app.route('/admin/questions')
-def admin_questions():
-    questions = UserQuestions.query.all()
-    if not questions:
-        print("No questions found")
-    else:
-        for q in questions:
-            print(f"{q.username} - {q.question}")
-    return render_template('questions.html', questions=questions)
-    
-@app.route('/debug/questions')
-def debug_questions():
-    questions = UserQuestions.query.all()
-    return '<br>'.join([f"{q.username}: {q.question}" for q in questions])
-    
-@app.route('/profile')
-@login_required
-def profile():
-    user = session.get('user', {})  # Get the user dictionary or an empty one
-
-    return render_template('profile.html',
-                           username=user.get('username', 'Guest'),
-                           email=user.get('email', 'not_set@example.com'),
-                           joined_on=user.get('joined_on', 'Unknown'),
-                           preferred_language=user.get('preferred_language', 'English'),
-                           last_login=user.get('last_login', 'N/A'))
-
-# Example:
-user_data = users.get('username')
 @app.route('/edit-profile', methods=['GET', 'POST'])
 def edit_profile():
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
-
-        # Save data to dictionary (or database later)
+        user_data = session.get('user', {})
         user_data['username'] = username
         user_data['email'] = email
-
-        # Redirect to profile page after update
+        session['user'] = user_data
         return redirect(url_for('profile'))
-
     return render_template('pages/edit_profile.html')
 
 @app.route('/prayer-times')
@@ -979,7 +1002,6 @@ def get_halal_news():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route("/memorize_quran")
 def memorize_quran():
@@ -1019,7 +1041,7 @@ def reels():
             'description': 'Step-by-step learning of Salah, starting with Fajr prayer.'
         },
         {
-            'title': 'What Happens Right After You Die? 😳 | The Truth From Qur’an & Hadith',
+            'title': 'What Happens Right After You Die? 😳 | The Truth From Qur\'an & Hadith',
             'youtube_id': 's1CiAtviydg',
             'description': 'Explanation of what happens after death, based on Quran and Hadith.'
         },
@@ -1081,7 +1103,6 @@ def reels():
 ]
     return render_template('pages/reels.html', reels=reels_data)
 
-
 @app.route('/trivia', methods=['GET', 'POST'])
 def trivia():
     if 'level' not in session:
@@ -1114,7 +1135,6 @@ def trivia():
     else:
         return redirect(url_for('trivia_result'))
 
-
 @app.route('/trivia_result')
 def trivia_result():
     score = session.get('score', 0)
@@ -1124,26 +1144,21 @@ def trivia_result():
     passed = score == total
 
     if passed:
-        # Advance to next level only if passed
         session['level'] = level + 1
 
-    # Reset score and question index whether passed or not
     session['score'] = 0
     session['question_index'] = 0
 
     return render_template('result.html', score=score, total=total, passed=passed, level=level)
 
-
 @app.route('/restart')
 def restart():
-    # Do NOT clear level; just reset current level's questions
     level = session.get('level', 1)
     session['score'] = 0
     session['question_index'] = 0
     questions = get_questions_for_level(level)
     session['questions'] = random.sample(questions, len(questions))
     return redirect(url_for('trivia'))
-
 
 @app.route('/next_level')
 def next_level():
@@ -1167,9 +1182,7 @@ def surah_list():
         {"id": 1, "name": "الفاتحة", "english_name": "Al-Fatihah"},
         {"id": 2, "name": "البقرة", "english_name": "Al-Baqarah"},
         {"id": 3, "name": "آل عمران", "english_name": "Aali Imran"},
-        # ... up to 114
     ])
-
 
 @app.route('/api/surah/<int:surah_id>')
 def get_surah_by_id(surah_id):
@@ -1309,15 +1322,16 @@ DUA_FILE_PATH = os.path.join("static", "data", "duas.json")
 @app.route("/duas")
 def all_duas_html():
     if not os.path.exists(DUA_FILE_PATH):
+        from flask import abort
         abort(404, description="Dua file not found")
 
     with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
         try:
             duas_data = json.load(f)
         except json.JSONDecodeError:
+            from flask import abort
             abort(500, description="Error reading duas.json file")
 
-    # Flatten JSON regardless of structure
     if isinstance(duas_data, dict):
         all_duas = []
         for key, duas in duas_data.items():
@@ -1326,24 +1340,27 @@ def all_duas_html():
                     dua["category"] = key
                     all_duas.append(dua)
     else:
-        all_duas = duas_data  # Already a flat list
+        all_duas = duas_data
 
     return render_template("duas.html", duas=all_duas)
 
-@app.route("/dua/<dua_id>")
-def dua_view(dua_id):
-    dua = DUAS.get(dua_id)
-    if not dua:
-        abort(404)
-    return render_template("dua_detail.html", dua=dua)
+@app.route("/duas/json")
+def all_duas_json():
+    if not os.path.exists(DUA_FILE_PATH):
+        from flask import abort
+        abort(404, description="Dua file not found")
 
-@app.route('/dua.html')
-def serve_dua():
-    return send_from_directory('templates', 'dua.html')
+    with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
+        try:
+            duas_data = json.load(f)
+        except json.JSONDecodeError:
+            from flask import abort
+            abort(500, description="Error reading duas.json file")
+
+    return jsonify(duas_data)
 
 @app.route("/live-meeting")
 def live_meeting_landing():
-    # Create a random room ID or show available rooms
     import uuid
     room_id = str(uuid.uuid4())[:8]
     return redirect(url_for('live_meeting', room_id=room_id))
@@ -1353,226 +1370,201 @@ def live_meeting(room_id):
     return render_template("live_meeting.html", room_id=room_id)
 
 # ============================================
-# LIVE MEETING SOCKET.IO HANDLERS
+# SOCKET.IO HANDLERS
 # ============================================
 
-# Store room state in memory (or Redis for production)
 active_rooms = {}
 waiting_students = {}
 connected_students = {}
 
+@socketio.on('connect')
+def handle_connect():
+    print(f"✅ New client connected: {request.sid}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print(f"❌ Client disconnected: {request.sid}")
+    for room_id in list(active_rooms.keys()):
+        if 'connections' in active_rooms[room_id] and request.sid in active_rooms[room_id]['connections']:
+            active_rooms[room_id]['connections'].remove(request.sid)
+
 @socketio.on('teacher-join')
 def handle_teacher_join(data):
-    """Teacher joins a room"""
-    room_id = data['room']
-    user_id = data['userId']
-    username = data.get('username', 'Teacher')
-    
-    print(f"👨‍🏫 Teacher {username} ({user_id}) joining room {room_id}")
-    
-    # Create room if it doesn't exist
-    if room_id not in active_rooms:
-        active_rooms[room_id] = {
-            'state': 'waiting',  # waiting, live, ended
-            'teacher_id': user_id,
-            'students': [],
-            'waiting': [],
-            'recording': False
-        }
-        waiting_students[room_id] = []
-        connected_students[room_id] = []
-    
-    join_room(room_id)
-    session['room'] = room_id
-    session['user_id'] = user_id
-    session['username'] = username
-    session['is_teacher'] = True
-    
-    # Send current room state to teacher
-    emit('room-state', {
-        'state': active_rooms[room_id]['state'],
-        'waitingStudents': len(waiting_students[room_id]),
-        'connectedStudents': len(connected_students[room_id])
-    })
-
-@socketio.on('teacher-rejoin')
-def handle_teacher_rejoin(data):
-    """Teacher reconnects to a room"""
-    room_id = data['room']
-    user_id = data['userId']
-    
-    if room_id in active_rooms:
+    try:
+        room_id = data.get('room', 'default')
+        user_id = data.get('userId', f'teacher_{request.sid}')
+        username = data.get('username', 'Teacher')
+        
+        print(f"👨‍🏫 Teacher {username} ({user_id}) joining room {room_id}")
+        
+        if room_id not in active_rooms:
+            active_rooms[room_id] = {
+                'state': 'waiting',
+                'teacher_id': user_id,
+                'teacher_sid': request.sid,
+                'connections': [request.sid],
+                'created_at': datetime.utcnow().isoformat()
+            }
+            waiting_students[room_id] = []
+            connected_students[room_id] = []
+        
         join_room(room_id)
-        session['room'] = room_id
-        session['user_id'] = user_id
-        session['is_teacher'] = True
+        
+        if request.sid not in active_rooms[room_id]['connections']:
+            active_rooms[room_id]['connections'].append(request.sid)
         
         emit('room-state', {
             'state': active_rooms[room_id]['state'],
-            'waitingStudents': len(waiting_students[room_id]),
-            'connectedStudents': len(connected_students[room_id])
+            'waitingStudents': len(waiting_students.get(room_id, [])),
+            'connectedStudents': len(connected_students.get(room_id, []))
         })
-    else:
-        emit('error', {'message': 'Room not found'})
+        
+        print(f"✅ Teacher joined room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in teacher-join: {e}")
+        emit('error', {'message': f'Failed to join room: {str(e)}'})
 
 @socketio.on('student-join')
 def handle_student_join(data):
-    """Student joins a room"""
-    room_id = data['room']
-    user_id = data['userId']
-    username = data.get('username', 'Student')
-    
-    print(f"👨‍🎓 Student {username} ({user_id}) joining room {room_id}")
-    
-    if room_id not in active_rooms:
-        emit('error', {'message': 'Room does not exist'})
-        return
-    
-    join_room(room_id)
-    session['room'] = room_id
-    session['user_id'] = user_id
-    session['username'] = username
-    session['is_teacher'] = False
-    
-    # Add to waiting or connected based on room state
-    if active_rooms[room_id]['state'] == 'waiting':
-        if user_id not in waiting_students[room_id]:
-            waiting_students[room_id].append(user_id)
+    try:
+        room_id = data.get('room', 'default')
+        user_id = data.get('userId', f'student_{request.sid}')
+        username = data.get('username', 'Student')
         
-        # Notify teacher about waiting student
-        emit('student-waiting', {
-            'userId': user_id,
-            'username': username
-        }, room=room_id, include_self=False)
-    else:
-        if user_id not in connected_students[room_id]:
-            connected_students[room_id].append(user_id)
+        print(f"👨‍🎓 Student {username} ({user_id}) joining room {room_id}")
         
-        # Notify teacher and other students
-        emit('student-joined', {
-            'userId': user_id,
-            'username': username
-        }, room=room_id, include_self=False)
-    
-    # Send room state to student
-    emit('room-state', {
-        'state': active_rooms[room_id]['state']
-    })
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room does not exist'})
+            return
+        
+        join_room(room_id)
+        
+        if active_rooms[room_id]['state'] == 'waiting':
+            if user_id not in waiting_students[room_id]:
+                waiting_students[room_id].append(user_id)
+            
+            emit('student-waiting', {
+                'userId': user_id,
+                'username': username
+            }, room=room_id, include_self=False)
+        else:
+            if user_id not in connected_students[room_id]:
+                connected_students[room_id].append(user_id)
+            
+            emit('student-joined', {
+                'userId': user_id,
+                'username': username
+            }, room=room_id, include_self=False)
+        
+        emit('room-state', {
+            'state': active_rooms[room_id]['state']
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in student-join: {e}")
+        emit('error', {'message': f'Failed to join as student: {str(e)}'})
 
 @socketio.on('start-meeting')
 def handle_start_meeting(data):
-    """Teacher starts the meeting"""
-    room_id = data['room']
-    user_id = session.get('user_id')
-    
-    if not user_id or not session.get('is_teacher'):
-        emit('error', {'message': 'Only teacher can start meeting'})
-        return
-    
-    if room_id not in active_rooms:
-        emit('error', {'message': 'Room not found'})
-        return
-    
-    # Update room state
-    active_rooms[room_id]['state'] = 'live'
-    
-    # Move waiting students to connected
-    for student_id in waiting_students[room_id]:
-        if student_id not in connected_students[room_id]:
-            connected_students[room_id].append(student_id)
-    waiting_students[room_id] = []
-    
-    print(f"🚀 Meeting started in room {room_id}")
-    
-    # Notify everyone in room
-    emit('room-started', {
-        'room': room_id,
-        'teacherId': user_id,
-        'students': [{'userId': sid} for sid in connected_students[room_id]]
-    }, room=room_id)
-    
-    # Send updated state
-    emit('room-state', {
-        'state': 'live',
-        'waitingStudents': 0,
-        'connectedStudents': len(connected_students[room_id])
-    }, room=room_id)
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        active_rooms[room_id]['state'] = 'live'
+        
+        for student_id in waiting_students.get(room_id, []):
+            if student_id not in connected_students[room_id]:
+                connected_students[room_id].append(student_id)
+        
+        waiting_students[room_id] = []
+        
+        print(f"🚀 Meeting started in room {room_id}")
+        
+        emit('room-started', {
+            'room': room_id,
+            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+            'students': [{'userId': sid} for sid in connected_students.get(room_id, [])]
+        }, room=room_id)
+        
+        emit('room-state', {
+            'state': 'live',
+            'waitingStudents': 0,
+            'connectedStudents': len(connected_students.get(room_id, []))
+        }, room=room_id)
+        
+    except Exception as e:
+        print(f"❌ Error in start-meeting: {e}")
+        emit('error', {'message': f'Failed to start meeting: {str(e)}'})
 
 @socketio.on('end-meeting')
 def handle_end_meeting(data):
-    """Teacher ends the meeting"""
-    room_id = data['room']
-    user_id = session.get('user_id')
-    
-    if not user_id or not session.get('is_teacher'):
-        emit('error', {'message': 'Only teacher can end meeting'})
-        return
-    
-    if room_id not in active_rooms:
-        emit('error', {'message': 'Room not found'})
-        return
-    
-    # Update room state
-    active_rooms[room_id]['state'] = 'ended'
-    
-    print(f"🛑 Meeting ended in room {room_id}")
-    
-    # Notify everyone in room
-    emit('room-ended', {
-        'room': room_id,
-        'teacherId': user_id
-    }, room=room_id)
-    
-    # Clean up room data
-    if room_id in waiting_students:
-        del waiting_students[room_id]
-    if room_id in connected_students:
-        del connected_students[room_id]
-    if room_id in active_rooms:
-        del active_rooms[room_id]
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        active_rooms[room_id]['state'] = 'ended'
+        
+        print(f"🛑 Meeting ended in room {room_id}")
+        
+        emit('room-ended', {
+            'room': room_id,
+            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown')
+        }, room=room_id)
+        
+        if room_id in waiting_students:
+            del waiting_students[room_id]
+        if room_id in connected_students:
+            del connected_students[room_id]
+        if room_id in active_rooms:
+            del active_rooms[room_id]
+        
+    except Exception as e:
+        print(f"❌ Error in end-meeting: {e}")
+        emit('error', {'message': f'Failed to end meeting: {str(e)}'})
 
 @socketio.on('webrtc-signal')
 def handle_webrtc_signal(data):
-    """Forward WebRTC signaling data between peers"""
-    room_id = data['room']
-    to_user = data['to']
-    from_user = data['from']
-    signal = data['signal']
-    
-    # Forward the signal to the target user
-    emit('webrtc-signal', {
-        'from': from_user,
-        'signal': signal
-    }, room=room_id, include_self=False)
+    try:
+        room_id = data.get('room', 'default')
+        from_user = data.get('from')
+        signal = data.get('signal')
+        
+        emit('webrtc-signal', {
+            'from': from_user,
+            'signal': signal
+        }, room=room_id, include_self=False)
+        
+    except Exception as e:
+        print(f"❌ Error in webrtc-signal: {e}")
 
 @socketio.on('start-webrtc')
 def handle_start_webrtc(data):
-    """Teacher requests to start WebRTC connections"""
-    room_id = data['room']
-    user_id = session.get('user_id')
-    
-    if not user_id or not session.get('is_teacher'):
-        emit('error', {'message': 'Only teacher can start WebRTC'})
-        return
-    
-    if room_id not in connected_students:
-        emit('error', {'message': 'No students connected'})
-        return
-    
-    emit('webrtc-start', {
-        'students': [{'userId': sid} for sid in connected_students[room_id]]
-    }, room=room_id)
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in connected_students:
+            emit('error', {'message': 'No students connected'})
+            return
+        
+        emit('webrtc-start', {
+            'students': [{'userId': sid} for sid in connected_students.get(room_id, [])]
+        }, room=room_id)
+        
+    except Exception as e:
+        print(f"❌ Error in start-webrtc: {e}")
+        emit('error', {'message': f'Failed to start WebRTC: {str(e)}'})
 
 @socketio.on('mute-student')
 def handle_mute_student(data):
-    """Teacher mutes a student"""
-    room_id = data['room']
-    student_id = data['userId']
-    
-    if not session.get('is_teacher'):
-        emit('error', {'message': 'Only teacher can mute students'})
-        return
-    
+    room_id = data.get('room')
+    student_id = data.get('userId')
     emit('student-muted', {
         'userId': student_id,
         'muted': True
@@ -1580,96 +1572,31 @@ def handle_mute_student(data):
 
 @socketio.on('unmute-student')
 def handle_unmute_student(data):
-    """Teacher unmutes a student"""
-    room_id = data['room']
-    student_id = data['userId']
-    
-    if not session.get('is_teacher'):
-        emit('error', {'message': 'Only teacher can unmute students'})
-        return
-    
+    room_id = data.get('room')
+    student_id = data.get('userId')
     emit('student-muted', {
         'userId': student_id,
         'muted': False
     }, room=room_id, include_self=False)
 
-@socketio.on('disable-camera')
-def handle_disable_camera(data):
-    """Teacher disables student camera"""
-    room_id = data['room']
-    student_id = data['userId']
-    
-    if not session.get('is_teacher'):
-        emit('error', {'message': 'Only teacher can disable cameras'})
-        return
-    
-    emit('student-camera-disabled', {
-        'userId': student_id,
-        'disabled': True
-    }, room=room_id, include_self=False)
-
-@socketio.on('enable-camera')
-def handle_enable_camera(data):
-    """Teacher enables student camera"""
-    room_id = data['room']
-    student_id = data['userId']
-    
-    if not session.get('is_teacher'):
-        emit('error', {'message': 'Only teacher can enable cameras'})
-        return
-    
-    emit('student-camera-disabled', {
-        'userId': student_id,
-        'disabled': False
-    }, room=room_id, include_self=False)
-
 @socketio.on('mic-request')
 def handle_mic_request(data):
-    """Student requests to unmute"""
-    room_id = data['room']
-    user_id = session.get('user_id')
-    username = session.get('username', 'Student')
-    
-    if session.get('is_teacher'):
-        emit('error', {'message': 'Teachers cannot request mic access'})
-        return
-    
-    # Forward request to teacher
+    room_id = data.get('room')
+    user_id = data.get('userId', 'unknown')
+    username = data.get('username', 'Student')
     emit('mic-request', {
         'userId': user_id,
         'username': username
     }, room=room_id, include_self=False)
 
-@socketio.on('mic-response')
-def handle_mic_response(data):
-    """Teacher responds to mic request"""
-    room_id = data['room']
-    student_id = data['userId']
-    allowed = data.get('allowed', False)
-    
-    if not session.get('is_teacher'):
-        emit('error', {'message': 'Only teacher can respond to mic requests'})
-        return
-    
-    # Send response to student
-    emit('mic-response', {
-        'allowed': allowed
-    }, room=room_id, include_self=False)
-
 @socketio.on('student-question')
 def handle_student_question(data):
-    """Student asks a question"""
-    room_id = data['room']
-    user_id = session.get('user_id')
-    username = session.get('username', 'Student')
+    room_id = data.get('room')
+    user_id = data.get('userId', 'unknown')
+    username = data.get('username', 'Student')
     question = data.get('question', '')
-    question_id = f"q_{user_id}_{int(datetime.now().timestamp())}"
+    question_id = f"q_{user_id}_{int(datetime.utcnow().timestamp())}"
     
-    if session.get('is_teacher'):
-        emit('error', {'message': 'Teachers cannot ask questions'})
-        return
-    
-    # Forward question to teacher
     emit('student-question', {
         'userId': user_id,
         'username': username,
@@ -1677,117 +1604,83 @@ def handle_student_question(data):
         'questionId': question_id
     }, room=room_id, include_self=False)
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    """Handle user disconnection"""
-    room_id = session.get('room')
-    user_id = session.get('user_id')
-    username = session.get('username')
-    is_teacher = session.get('is_teacher', False)
-    
-    if room_id and user_id:
-        print(f"❌ User {username} ({user_id}) disconnected from room {room_id}")
-        
-        # Remove from appropriate lists
-        if is_teacher:
-            # Teacher left - end the meeting
-            if room_id in active_rooms:
-                active_rooms[room_id]['state'] = 'ended'
-                emit('room-ended', {
-                    'room': room_id,
-                    'teacherId': user_id
-                }, room=room_id)
-        else:
-            # Student left
-            if room_id in waiting_students and user_id in waiting_students[room_id]:
-                waiting_students[room_id].remove(user_id)
-            
-            if room_id in connected_students and user_id in connected_students[room_id]:
-                connected_students[room_id].remove(user_id)
-            
-            # Notify others
-            emit('student-left', {
-                'userId': user_id,
-                'username': username
-            }, room=room_id, include_self=False)
-        
-        # Clean up session
-        for key in ['room', 'user_id', 'username', 'is_teacher']:
-            session.pop(key, None)
+@app.route('/socket-test')
+def socket_test():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    </head>
+    <body>
+        <h1>Socket.IO Test</h1>
+        <div id="status">Disconnected</div>
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+        <script>
+            let socket;
+            function connect() {
+                socket = io();
+                socket.on('connect', () => {
+                    document.getElementById('status').textContent = 'Connected: ' + socket.id;
+                });
+                socket.on('disconnect', () => {
+                    document.getElementById('status').textContent = 'Disconnected';
+                });
+            }
+            function disconnect() {
+                if (socket) socket.disconnect();
+            }
+        </script>
+    </body>
+    </html>
+    """
 
-@socketio.on("join")
-def handle_join(data):
-    room = data["room"]
-    join_room(room)
-    emit("user-joined", data, room=room, include_self=False)
+@app.route('/static/live_meeting.css')
+def serve_live_meeting_css():
+    return """
+    /* Minimal live meeting CSS to prevent 404 errors */
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+    .video-container { background: #000; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+    video { width: 100%; height: auto; }
+    .controls { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+                background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; 
+                display: flex; gap: 10px; z-index: 1000; }
+    .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; 
+           font-weight: bold; color: white; }
+    .btn-primary { background: #3498db; }
+    .btn-danger { background: #e74c3c; }
+    .btn-success { background: #27ae60; }
+    """, 200, {'Content-Type': 'text/css'}
 
-@socketio.on("signal")
-def handle_signal(data):
-    emit("signal", data, room=data["room"], include_self=False)
-
-@app.route("/duas/json")
-def all_duas_json():
-    if not os.path.exists(DUA_FILE_PATH):
-        abort(404, description="Dua file not found")
-
-    with open(DUA_FILE_PATH, "r", encoding="utf-8") as f:
-        try:
-            duas_data = json.load(f)
-        except json.JSONDecodeError:
-            abort(500, description="Error reading duas.json file")
-
-    return jsonify(duas_data)
-
-
+# Additional routes (kept from original but with error handling)
 @app.route('/reminder')
 def reminder():
-    # Get the full absolute path to reminders.json
     json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "reminders.json")
-
-    # Load reminders
-    with open(json_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-
-    # Use current day as index (1-based), fallback to day1 if not found
-    today = datetime.now().day
-    day_key = f"day{today}"
-
-    # Fallback to "day1" if today is out of range
-    reminders = data.get(day_key) or data.get("day1", [])
-
-    return render_template('pages/reminder.html', reminders=reminders)
-
-
-@app.route('/api/reminders')
-def get_reminders():
-    import datetime, json
-    today = (datetime.datetime.utcnow().day % 30) or 30
-    with open('data/reminders.json') as f:
-        data = json.load(f)
-    return jsonify(data.get(f'day{today}', []))
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        today = datetime.now().day
+        day_key = f"day{today}"
+        reminders = data.get(day_key) or data.get("day1", [])
+        return render_template('pages/reminder.html', reminders=reminders)
+    except Exception as e:
+        print(f"Error loading reminders: {e}")
+        return render_template('pages/reminder.html', reminders=[])
 
 @app.route('/story-time')
 def story_time():
     json_path = os.path.join("static", "data", "stories.json")
-    with open(json_path, 'r', encoding='utf-8') as f:
-        all_stories = json.load(f)
-    
-    print("STORIES PASSED TO TEMPLATE:", all_stories)  # Debug here
-    return render_template('pages/story_time.html', stories=all_stories)
-
-
-@app.route('/api/stories')
-def get_stories():
-    today = (datetime.utcnow().day % 30) or 30
-    with open('data/stories.json', encoding='utf-8') as f:
-        data = json.load(f)
-    return jsonify(data.get(f'day{today}', []))  # ❌ wrong structure
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            all_stories = json.load(f)
+        return render_template('pages/story_time.html', stories=all_stories)
+    except Exception as e:
+        print(f"Error loading stories: {e}")
+        return render_template('pages/story_time.html', stories=[])
 
 @app.route('/dashboard')
 def dashboard():
-    # Your dashboard logic here
     return render_template('dashboard.html')
 
 @app.route('/talk-to-tawfiq')
@@ -1800,12 +1693,9 @@ def islamic_motivation():
         data_path = os.path.join('DATA', 'islamic_motivation.json')
         with open(data_path, 'r', encoding='utf-8') as f:
             motivation_data = json.load(f)
-
         if not motivation_data or 'motivations' not in motivation_data:
             return render_template('pages/islamic_motivation.html', motivations=[])
-
         return render_template('pages/islamic_motivation.html', motivations=motivation_data['motivations'])
-
     except Exception as e:
         print(f"Islamic Motivation Error: {e}")
         return render_template('pages/islamic_motivation.html', motivations=[])
@@ -1820,20 +1710,15 @@ def privacy():
 
 @app.route('/about')
 def about():
-    # About page - in templates/pages/about.html
     return render_template('pages/about.html')
 
 @app.route('/feedback')
 def feedback():
     return render_template('pages/feedback.html')
 
-
 # --- Ask API endpoint ---
 @app.route('/ask', methods=['POST'])
 def ask():
-    import re
-    from datetime import datetime
-
     data = request.get_json()
     username = session.get('user', {}).get('username')
     history = data.get('history')
@@ -1947,7 +1832,7 @@ def ask():
                 }]
             })
 
-    # 🧠 Default Islamic AI fallback
+    # Default Islamic AI fallback
     tawfiq_ai_prompt = {
         "role": "system",
         "content": (
@@ -2018,7 +1903,6 @@ def hadith_search():
     if not query:
         return jsonify({'result': 'Please provide a Hadith search keyword.', 'results': []})
 
-    # Normalize query
     query = query.replace('hadith on ', '').replace('hadith by ', '').replace('hadith talking about ', '')
 
     if not hadith_data:
@@ -2114,10 +1998,7 @@ def recognize_speech():
     temp_path = os.path.join(os.path.dirname(__file__), 'temp_audio.wav')
 
     try:
-        # Save uploaded audio temporarily
         audio_file.save(temp_path)
-
-        # Recognize speech
         import speech_recognition as sr
         recognizer = sr.Recognizer()
         with sr.AudioFile(temp_path) as source:
@@ -2135,4 +2016,19 @@ def recognize_speech():
             os.remove(temp_path)
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_ENV") == "development"
+    
+    print(f"🚀 Starting server on port {port} (debug={debug})")
+    print(f"🌐 Server URL: http://localhost:{port}")
+    print(f"📡 Socket.IO enabled: True")
+    print(f"💾 Database URL: {DATABASE_URL[:50]}..." if DATABASE_URL else "💾 No database configured")
+    
+    socketio.run(
+        app,
+        host="0.0.0.0",
+        port=port,
+        debug=debug,
+        allow_unsafe_werkzeug=True,
+        log_output=True
+    )
