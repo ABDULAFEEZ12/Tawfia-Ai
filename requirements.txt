@@ -15,4 +15,3 @@ SpeechRecognition==3.10.1
 transliterate==1.10.2
 pyarabic==0.6.15
 gunicorn==21.2.0
-EOF
