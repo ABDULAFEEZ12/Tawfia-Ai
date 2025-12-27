@@ -825,28 +825,29 @@ def ask():
 # Keep all your @app.route() functions from your original code
 
 # ============================================
-# APPLICATION STARTUP
+# APPLICATION STARTUP - GUNICORN COMPATIBLE
 # ============================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_ENV") == "development"
     
     print(f"\n{'='*60}")
-    print("🚀 TAWFIQ AI - COMPLETE WITH ALL HANDLERS")
+    print("🚀 TAWFIQ AI - PRODUCTION READY")
     print(f"{'='*60}")
-    print(f"📡 Running on port: {port}")
-    print(f"⚡ Async Mode: eventlet (WebSocket ready)")
-    print(f"💾 Redis: {'✅ Connected' if REDIS_AVAILABLE else '❌ Not available'}")
-    print(f"🗄️  Database: {'✅ Connected'}")
-    print(f"🎥 Live Meeting: ✅ READY WITH ALL HANDLERS")
-    print(f"👥 Socket Handlers: ✅ COMPLETE")
+    print(f"📡 Port: {port}")
+    print(f"⚡ Async: eventlet")
+    print(f"🎥 WebSocket: READY")
+    print(f"💾 Redis: {'✅' if REDIS_AVAILABLE else '❌'}")
+    print(f"👥 Handlers: ✅ COMPLETE")
     print(f"{'='*60}\n")
     
+    # For Render production: let gunicorn handle it
+    # This is just for local development
     socketio.run(
         app,
         host="0.0.0.0",
         port=port,
         debug=debug,
-        log_output=True,
-        use_reloader=debug
+        allow_unsafe_werkzeug=True,
+        log_output=True
     )
