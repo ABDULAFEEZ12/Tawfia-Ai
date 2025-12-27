@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Live Class - Student</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            padding: 40px;
+            background: linear-gradient(to right, #4299e1, #667eea);
+            color: white;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        .join-section {
+            margin-bottom: 40px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 150px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #48bb78, #38a169);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(to right, #38a169, #2f855a);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #ed8936, #dd6b20);
+            color: white;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: linear-gradient(to right, #dd6b20, #c05621);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .status-section {
+            margin-bottom: 40px;
+        }
+        
+        .status-card {
+            background: #f0f4ff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-joined {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .dot-waiting {
+            background: #856404;
+            animation: pulse 2s infinite;
+        }
+        
+        .dot-joined {
+            background: #0f5132;
+            animation: pulse 1s infinite;
+        }
+        
+        .dot-disconnected {
+            background: #721c24;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .class-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .info-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4299e1;
+        }
+        
+        .video-section {
+            margin-top: 40px;
+        }
+        
+        .video-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .video-box {
+            background: #1a202c;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+        }
+        
+        .video-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-label {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .controls-section {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .control-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-btn-mic {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .control-btn-mic:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+        
+        .control-btn-camera {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .control-btn-camera:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        
+        .control-btn-muted {
+            background: #f56565 !important;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #48bb78;
+        }
+        
+        .notification.error {
+            background: #f56565;
+        }
+        
+        .notification.info {
+            background: #4299e1;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .controls-section {
+                flex-direction: column;
+            }
+            
+            .control-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Join Live Class</h1>
+            <p>Enter your name to join the virtual classroom</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Join Section -->
+            <div class="join-section">
+                <div class="input-group">
+                    <input type="text" 
+                           id="usernameInput" 
+                           class="input-field" 
+                           placeholder="Enter your name"
+                           value="Student">
+                    <button id="joinBtn" class="btn btn-primary" onclick="joinClass()">
+                        <span id="joinText">🎯 Join Class</span>
+                        <span id="joinLoading" class="loading" style="display: none;"></span>
+                    </button>
+                </div>
+                
+                <div id="rejoinSection" style="display: none; margin-top: 20px;">
+                    <button id="rejoinBtn" class="btn btn-secondary" onclick="rejoinClass()">
+                        🔄 Rejoin Class
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Status Section -->
+            <div class="status-section">
+                <div class="status-card">
+                    <div id="statusIndicator" class="status-indicator status-disconnected">
+                        <span class="status-dot dot-disconnected"></span>
+                        <span id="statusText">Disconnected</span>
+                    </div>
+                    
+                    <div id="classInfo" class="class-info" style="display: none;">
+                        <div class="info-card">
+                            <div class="info-label">Teacher</div>
+                            <div class="info-value" id="teacherName">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">Room</div>
+                            <div class="info-value" id="roomCode">{{ room_id }}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">Status</div>
+                            <div class="info-value" id="connectionStatus">-</div>
+                        </div>
+                    </div>
+                    
+                    <div id="waitingMessage" style="display: none; margin-top: 20px;">
+                        <div style="font-size: 1.2rem; color: #856404; margin-bottom: 10px;">
+                            ⏳ Waiting for teacher to start the meeting...
+                        </div>
+                        <p style="color: #666;">You'll be connected as soon as the teacher starts the class.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Video Section -->
+            <div class="video-section">
+                <h2 style="margin-bottom: 20px; color: #333;">🎥 Live Stream</h2>
+                
+                <div class="video-container">
+                    <div class="video-box">
+                        <video id="teacherVideo" autoplay playsinline></video>
+                        <div class="video-label" id="teacherVideoLabel">Teacher</div>
+                    </div>
+                    
+                    <div class="video-box">
+                        <video id="studentVideo" autoplay playsinline muted></video>
+                        <div class="video-label" id="studentVideoLabel">You</div>
+                    </div>
+                </div>
+                
+                <div class="controls-section">
+                    <button id="micBtn" class="control-btn control-btn-mic" onclick="toggleMic()" disabled>
+                        🎤 Microphone
+                    </button>
+                    <button id="cameraBtn" class="control-btn control-btn-camera" onclick="toggleCamera()" disabled>
+                        📷 Camera
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        // ============================================
+        // GLOBAL VARIABLES
+        // ============================================
+        const roomId = "{{ room_id }}";
+        let socket = null;
+        let studentId = null;
+        let studentName = null;
+        let isJoined = false;
+        let isWaiting = false;
+        let meetingStarted = false;
+        
+        // WebRTC variables
+        let peerConnection = null;
+        let localStream = null;
+        let teacherStream = null;
+        const configuration = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+        };
+        
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function updateUI() {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const joinBtn = document.getElementById('joinBtn');
+            const classInfo = document.getElementById('classInfo');
+            const waitingMessage = document.getElementById('waitingMessage');
+            
+            if (isJoined) {
+                if (meetingStarted) {
+                    // Joined and meeting is live
+                    statusIndicator.className = 'status-indicator status-joined';
+                    statusIndicator.innerHTML = `
+                        <span class="status-dot dot-joined"></span>
+                        <span>Connected to Live Class</span>
+                    `;
+                    waitingMessage.style.display = 'none';
+                } else {
+                    // Joined but waiting
+                    statusIndicator.className = 'status-indicator status-waiting';
+                    statusIndicator.innerHTML = `
+                        <span class="status-dot dot-waiting"></span>
+                        <span>Waiting for Teacher</span>
+                    `;
+                    waitingMessage.style.display = 'block';
+                }
+                classInfo.style.display = 'grid';
+                joinBtn.disabled = true;
+            } else {
+                // Not joined
+                statusIndicator.className = 'status-indicator status-disconnected';
+                statusIndicator.innerHTML = `
+                    <span class="status-dot dot-disconnected"></span>
+                    <span>Not Connected</span>
+                `;
+                classInfo.style.display = 'none';
+                waitingMessage.style.display = 'none';
+                joinBtn.disabled = false;
+            }
+        }
+        
+        // ============================================
+        // SOCKET.IO FUNCTIONS - INSTANT CONNECTION
+        // ============================================
+        function connectSocket() {
+            console.log('🔌 Connecting to Socket.IO...');
+            
+            socket = io({
+                transports: ['websocket', 'polling'],
+                upgrade: true,
+                forceNew: true,
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                reconnectionAttempts: Infinity
+            });
+            
+            // Connection events
+            socket.on('connect', () => {
+                console.log('✅ Socket connected:', socket.id);
+                showNotification('Connected to server', 'success');
+                
+                // If we have student credentials, auto-rejoin
+                if (studentId && studentName) {
+                    rejoinClass();
+                }
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.error('❌ Socket connection error:', error);
+                showNotification('Connection error. Reconnecting...', 'error');
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('❌ Socket disconnected');
+                showNotification('Disconnected from server', 'error');
+                isJoined = false;
+                updateUI();
+            });
+            
+            // ========== CRITICAL: JOIN RESPONSES ==========
+            socket.on('student-waiting-ack', (data) => {
+                console.log('⏳ Student waiting acknowledged:', data);
+                isJoined = true;
+                isWaiting = true;
+                meetingStarted = false;
+                
+                // IMMEDIATE UI UPDATE
+                document.getElementById('teacherName').textContent = data.teacherName || 'Teacher';
+                document.getElementById('connectionStatus').textContent = 'Waiting';
+                
+                updateUI();
+                showNotification(`Joined as ${studentName}. Waiting for teacher...`, 'info');
+                
+                // Hide join loading
+                document.getElementById('joinText').style.display = 'inline';
+                document.getElementById('joinLoading').style.display = 'none';
+                document.getElementById('joinBtn').disabled = true;
+                document.getElementById('rejoinSection').style.display = 'block';
+            });
+            
+            socket.on('student-joined-ack', (data) => {
+                console.log('✅ Student joined acknowledged:', data);
+                isJoined = true;
+                isWaiting = false;
+                meetingStarted = true;
+                
+                // IMMEDIATE UI UPDATE
+                document.getElementById('teacherName').textContent = data.teacherName || 'Teacher';
+                document.getElementById('connectionStatus').textContent = 'Connected';
+                
+                updateUI();
+                showNotification(`Joined live class with ${data.teacherName}!`, 'success');
+                
+                // Start WebRTC
+                startWebRTC();
+                
+                // Hide join loading
+                document.getElementById('joinText').style.display = 'inline';
+                document.getElementById('joinLoading').style.display = 'none';
+                document.getElementById('joinBtn').disabled = true;
+                document.getElementById('rejoinSection').style.display = 'block';
+            });
+            
+            // ========== CRITICAL: MEETING EVENTS ==========
+            socket.on('meeting-started', (data) => {
+                console.log('🚀 Meeting started:', data);
+                meetingStarted = true;
+                isWaiting = false;
+                
+                document.getElementById('teacherName').textContent = data.teacherName || 'Teacher';
+                document.getElementById('connectionStatus').textContent = 'Live';
+                
+                updateUI();
+                showNotification('Teacher started the meeting!', 'success');
+                
+                // Start WebRTC when meeting starts
+                startWebRTC();
+            });
+            
+            socket.on('room-ended', (data) => {
+                console.log('🛑 Meeting ended:', data);
+                isJoined = false;
+                meetingStarted = false;
+                
+                // Reset everything
+                stopWebRTC();
+                updateUI();
+                
+                showNotification('Meeting has ended', 'info');
+                document.getElementById('rejoinSection').style.display = 'none';
+            });
+            
+            // ========== CRITICAL: WEBRTC SIGNALS ==========
+            socket.on('webrtc-start-student', (data) => {
+                console.log('🎥 WebRTC starting:', data);
+                startWebRTC();
+            });
+            
+            socket.on('webrtc-signal', (data) => {
+                console.log('📡 WebRTC signal received:', data.type || 'signal');
+                handleWebRTCSignal(data);
+            });
+            
+            // ========== CRITICAL: ERROR HANDLING ==========
+            socket.on('error', (data) => {
+                console.error('❌ Socket error:', data);
+                showNotification(`Error: ${data.message}`, 'error');
+                
+                // Re-enable join button on error
+                document.getElementById('joinText').style.display = 'inline';
+                document.getElementById('joinLoading').style.display = 'none';
+                document.getElementById('joinBtn').disabled = false;
+            });
+        }
+        
+        // ============================================
+        // CLASS JOIN FUNCTIONS - INSTANT RESPONSE
+        // ============================================
+        function joinClass() {
+            const usernameInput = document.getElementById('usernameInput');
+            studentName = usernameInput.value.trim() || 'Student';
+            studentId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            if (!studentName) {
+                showNotification('Please enter your name', 'error');
+                return;
+            }
+            
+            if (!socket || !socket.connected) {
+                showNotification('Not connected to server', 'error');
+                connectSocket();
+                return;
+            }
+            
+            console.log('🎯 Joining class as:', studentName);
+            
+            // IMMEDIATE UI FEEDBACK
+            const joinBtn = document.getElementById('joinBtn');
+            const joinText = document.getElementById('joinText');
+            const joinLoading = document.getElementById('joinLoading');
+            
+            joinText.style.display = 'none';
+            joinLoading.style.display = 'inline-block';
+            joinBtn.disabled = true;
+            
+            // IMMEDIATELY send join - NO DELAY
+            socket.emit('student-join', {
+                room: roomId,
+                userId: studentId,
+                username: studentName
+            });
+            
+            // Force UI update immediately
+            isJoined = true;
+            updateUI();
+            
+            showNotification(`Joining as ${studentName}...`, 'info');
+            
+            // Timeout fallback
+            setTimeout(() => {
+                if (joinText.style.display === 'none' && !meetingStarted) {
+                    joinText.style.display = 'inline';
+                    joinLoading.style.display = 'none';
+                    joinBtn.disabled = false;
+                    showNotification('Join request timed out', 'error');
+                }
+            }, 3000);
+        }
+        
+        function rejoinClass() {
+            if (!studentId || !studentName) {
+                joinClass();
+                return;
+            }
+            
+            console.log('🔄 Rejoining class:', studentName);
+            
+            if (!socket || !socket.connected) {
+                connectSocket();
+                return;
+            }
+            
+            // IMMEDIATE UI FEEDBACK
+            const rejoinBtn = document.getElementById('rejoinBtn');
+            const originalText = rejoinBtn.innerHTML;
+            rejoinBtn.innerHTML = '<span class="loading"></span> Rejoining...';
+            rejoinBtn.disabled = true;
+            
+            socket.emit('student-join', {
+                room: roomId,
+                userId: studentId,
+                username: studentName
+            });
+            
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                rejoinBtn.innerHTML = originalText;
+                rejoinBtn.disabled = false;
+            }, 3000);
+        }
+        
+        // ============================================
+        // WEBRTC FUNCTIONS
+        // ============================================
+        async function startWebRTC() {
+            try {
+                // Get user media
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                // Show local video
+                const studentVideo = document.getElementById('studentVideo');
+                studentVideo.srcObject = localStream;
+                
+                // Enable controls
+                document.getElementById('micBtn').disabled = false;
+                document.getElementById('cameraBtn').disabled = false;
+                
+                // Create peer connection
+                peerConnection = new RTCPeerConnection(configuration);
+                
+                // Add local stream
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+                
+                // Handle ICE candidates
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate && socket) {
+                        socket.emit('webrtc-signal', {
+                            room: roomId,
+                            from: studentId,
+                            to: 'teacher',
+                            signal: event.candidate,
+                            type: 'candidate'
+                        });
+                    }
+                };
+                
+                // Handle remote stream
+                peerConnection.ontrack = (event) => {
+                    const teacherVideo = document.getElementById('teacherVideo');
+                    if (teacherVideo.srcObject !== event.streams[0]) {
+                        teacherVideo.srcObject = event.streams[0];
+                        teacherStream = event.streams[0];
+                    }
+                };
+                
+                // Create and send offer
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                
+                socket.emit('webrtc-signal', {
+                    room: roomId,
+                    from: studentId,
+                    to: 'teacher',
+                    signal: offer,
+                    type: 'offer'
+                });
+                
+                console.log('✅ WebRTC started');
+                
+            } catch (error) {
+                console.error('❌ WebRTC error:', error);
+                showNotification('Camera/microphone access required', 'error');
+            }
+        }
+        
+        function handleWebRTCSignal(data) {
+            if (!peerConnection) return;
+            
+            try {
+                const signal = data.signal;
+                
+                if (signal.type === 'answer') {
+                    peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
+                } else if (signal.candidate) {
+                    peerConnection.addIceCandidate(new RTCIceCandidate(signal));
+                }
+            } catch (error) {
+                console.error('❌ WebRTC signal error:', error);
+            }
+        }
+        
+        function stopWebRTC() {
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            const studentVideo = document.getElementById('studentVideo');
+            const teacherVideo = document.getElementById('teacherVideo');
+            
+            studentVideo.srcObject = null;
+            teacherVideo.srcObject = null;
+            
+            document.getElementById('micBtn').disabled = true;
+            document.getElementById('cameraBtn').disabled = true;
+        }
+        
+        function toggleMic() {
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    audioTrack.enabled = !audioTrack.enabled;
+                    const micBtn = document.getElementById('micBtn');
+                    micBtn.classList.toggle('control-btn-muted');
+                    micBtn.innerHTML = audioTrack.enabled ? '🎤 Mute' : '🔇 Unmute';
+                }
+            }
+        }
+        
+        function toggleCamera() {
+            if (localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    const cameraBtn = document.getElementById('cameraBtn');
+                    cameraBtn.classList.toggle('control-btn-muted');
+                    cameraBtn.innerHTML = videoTrack.enabled ? '📷 Stop Camera' : '📷 Start Camera';
+                }
+            }
+        }
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Initializing Student View...');
+            console.log('Room ID:', roomId);
+            
+            // Auto-focus name input
+            document.getElementById('usernameInput').focus();
+            
+            // Connect immediately
+            connectSocket();
+            
+            // Show initial state
+            updateUI();
+            
+            // Enter key to join
+            document.getElementById('usernameInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    joinClass();
+                }
+            });
+            
+            // Keep connection alive
+            setInterval(() => {
+                if (socket && socket.connected) {
+                    socket.emit('ping', { timestamp: Date.now() });
+                }
+            }, 25000);
+        });
+    </script>
+</body>
+</html>
