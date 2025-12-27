@@ -246,6 +246,7 @@ def handle_connect():
         'room': None,
         'user_type': None,
         'user_id': None,
+        'username': None,
         'last_ping': datetime.utcnow().isoformat()
     }
 
@@ -257,7 +258,7 @@ def handle_disconnect():
         room_id = session_data.get('room')
         user_id = session_data.get('user_id')
         
-        print(f"❌ Client disconnected: {sid} (room: {room_id})")
+        print(f"❌ Client disconnected: {sid} (room: {room_id}, user: {user_id})")
         
         # Clean up room connections
         if room_id and room_id in room_connections:
@@ -268,6 +269,7 @@ def handle_disconnect():
             if session_data.get('user_type') == 'teacher':
                 emit('teacher-disconnected', {
                     'teacherId': user_id,
+                    'teacherName': session_data.get('username', 'Teacher'),
                     'reason': 'Teacher left'
                 }, room=room_id)
                 
@@ -276,14 +278,12 @@ def handle_disconnect():
             elif session_data.get('user_type') == 'student':
                 # Notify teacher about student leaving
                 room_state = get_room_state(room_id)
-                if room_state:
-                    teacher_sid = room_state.get('teacher_sid')
-                    if teacher_sid:
-                        emit('student-left', {
-                            'userId': user_id,
-                            'username': 'Student',
-                            'socketId': sid
-                        }, room=teacher_sid)
+                if room_state and room_state.get('teacher_sid'):
+                    emit('student-left', {
+                        'userId': user_id,
+                        'username': session_data.get('username', 'Student'),
+                        'socketId': sid
+                    }, room=room_state['teacher_sid'])
         
         del active_sessions[sid]
 
@@ -311,7 +311,8 @@ def handle_teacher_join(data):
                 'teacher_sid': sid,
                 'created_at': datetime.utcnow().isoformat(),
                 'waiting_students': [],
-                'connected_students': []
+                'connected_students': [],
+                'students': {}
             }
         
         # Update room state
@@ -326,6 +327,7 @@ def handle_teacher_join(data):
         active_sessions[sid]['room'] = room_id
         active_sessions[sid]['user_type'] = 'teacher'
         active_sessions[sid]['user_id'] = user_id
+        active_sessions[sid]['username'] = username
         
         # Room connections
         if room_id not in room_connections:
@@ -340,7 +342,8 @@ def handle_teacher_join(data):
             'waitingStudents': len(room_state['waiting_students']),
             'connectedStudents': len(room_state['connected_students']),
             'teacherId': user_id,
-            'teacherName': username
+            'teacherName': username,
+            'roomId': room_id
         })
         
         print(f"✅ Teacher joined room {room_id}")
@@ -373,6 +376,7 @@ def handle_student_join(data):
         active_sessions[sid]['room'] = room_id
         active_sessions[sid]['user_type'] = 'student'
         active_sessions[sid]['user_id'] = user_id
+        active_sessions[sid]['username'] = username
         
         # Room connections
         if room_id not in room_connections:
@@ -398,6 +402,14 @@ def handle_student_join(data):
             if user_id not in [s['user_id'] for s in room_state['connected_students']]:
                 room_state['connected_students'].append(student_data)
         
+        # Store student in students dict
+        room_state['students'][user_id] = {
+            'sid': sid,
+            'username': username,
+            'user_id': user_id,
+            'joined_at': datetime.utcnow().isoformat()
+        }
+        
         save_room_state(room_id, room_state)
         
         # Notify teacher
@@ -406,7 +418,8 @@ def handle_student_join(data):
             emit('student-joined', {
                 'userId': user_id,
                 'username': username,
-                'socketId': sid
+                'socketId': sid,
+                'meetingStarted': room_state['state'] == 'live'
             }, room=teacher_sid)
         
         # Send response to student
@@ -422,7 +435,8 @@ def handle_student_join(data):
                 'status': 'joined',
                 'room': room_id,
                 'teacherName': room_state['teacher_name'],
-                'message': 'Successfully joined the live meeting'
+                'message': 'Successfully joined the live meeting',
+                'meetingStarted': True
             })
         
         # Update room state for all
@@ -431,7 +445,8 @@ def handle_student_join(data):
             'waitingStudents': len(room_state['waiting_students']),
             'connectedStudents': len(room_state['connected_students']),
             'teacherId': room_state['teacher_id'],
-            'teacherName': room_state['teacher_name']
+            'teacherName': room_state['teacher_name'],
+            'roomId': room_id
         }, room=room_id)
         
         print(f"✅ Student joined room {room_id}")
@@ -491,7 +506,8 @@ def handle_start_meeting(data):
             'waitingStudents': 0,
             'connectedStudents': len(room_state['connected_students']),
             'teacherId': room_state['teacher_id'],
-            'teacherName': room_state['teacher_name']
+            'teacherName': room_state['teacher_name'],
+            'roomId': room_id
         }, room=room_id)
         
         print(f"✅ Meeting started in room {room_id} with {len(room_state['connected_students'])} students")
@@ -543,11 +559,13 @@ def handle_webrtc_signal(data):
         signal = data.get('signal')
         signal_type = data.get('type', 'signal')
         
+        print(f"📡 WebRTC signal: {from_user} -> {to_user} ({signal_type})")
+        
         # Find target socket ID
         target_sid = None
         
         # Check if target is teacher
-        if to_user.startswith('teacher_'):
+        if to_user.startswith('teacher_') or to_user == 'teacher':
             room_state = get_room_state(room_id)
             if room_state:
                 target_sid = room_state.get('teacher_sid')
@@ -563,8 +581,10 @@ def handle_webrtc_signal(data):
                 'from': from_user,
                 'to': to_user,
                 'signal': signal,
-                'type': signal_type
+                'type': signal_type,
+                'room': room_id
             }, room=target_sid)
+            print(f"📤 Forwarded signal to {target_sid}")
         else:
             print(f"⚠️ Target user {to_user} not found in room {room_id}")
             
@@ -572,7 +592,103 @@ def handle_webrtc_signal(data):
         print(f"❌ Error in webrtc-signal: {e}")
 
 # ============================================
-# NEW: ADD THESE MISSING HANDLERS
+# NEW: WEBRTC SPECIFIC HANDLERS
+# ============================================
+
+@socketio.on('webrtc-offer')
+def handle_webrtc_offer(data):
+    """Handle WebRTC offer from teacher to student"""
+    try:
+        room_id = data.get('room')
+        to_student = data.get('to')
+        offer = data.get('offer')
+        
+        print(f"🎥 WebRTC offer from teacher to student {to_student}")
+        
+        # Find student socket
+        for sid, session in active_sessions.items():
+            if session.get('user_id') == to_student and session.get('room') == room_id:
+                emit('webrtc-offer', {
+                    'from': 'teacher',
+                    'to': to_student,
+                    'offer': offer,
+                    'room': room_id
+                }, room=sid)
+                print(f"📤 Forwarded offer to student {to_student}")
+                return
+        
+        print(f"⚠️ Student {to_student} not found in room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in webrtc-offer: {e}")
+
+@socketio.on('webrtc-answer')
+def handle_webrtc_answer(data):
+    """Handle WebRTC answer from student to teacher"""
+    try:
+        room_id = data.get('room')
+        from_student = data.get('from')
+        answer = data.get('answer')
+        
+        print(f"🎥 WebRTC answer from student {from_student} to teacher")
+        
+        # Find teacher socket
+        room_state = get_room_state(room_id)
+        if room_state and room_state.get('teacher_sid'):
+            emit('webrtc-answer', {
+                'from': from_student,
+                'to': 'teacher',
+                'answer': answer,
+                'room': room_id
+            }, room=room_state['teacher_sid'])
+            print(f"📤 Forwarded answer to teacher")
+        else:
+            print(f"⚠️ Teacher not found in room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in webrtc-answer: {e}")
+
+@socketio.on('webrtc-ice-candidate')
+def handle_webrtc_ice_candidate(data):
+    """Handle ICE candidate exchange"""
+    try:
+        room_id = data.get('room')
+        from_user = data.get('from')
+        to_user = data.get('to')
+        candidate = data.get('candidate')
+        
+        print(f"❄️ ICE candidate from {from_user} to {to_user}")
+        
+        # Find target socket
+        target_sid = None
+        
+        if to_user == 'teacher':
+            room_state = get_room_state(room_id)
+            if room_state:
+                target_sid = room_state.get('teacher_sid')
+        else:
+            # Find student
+            for sid, session in active_sessions.items():
+                if session.get('user_id') == to_user and session.get('room') == room_id:
+                    target_sid = sid
+                    break
+        
+        if target_sid:
+            emit('webrtc-ice-candidate', {
+                'from': from_user,
+                'to': to_user,
+                'candidate': candidate,
+                'room': room_id
+            }, room=target_sid)
+            print(f"📤 Forwarded ICE candidate to {to_user}")
+        else:
+            print(f"⚠️ Target {to_user} not found in room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in webrtc-ice-candidate: {e}")
+
+# ============================================
+# NEW: CONTROL HANDLERS
 # ============================================
 
 @socketio.on('mute-student')
@@ -639,6 +755,28 @@ def handle_unmute_student(data):
     except Exception as e:
         print(f"❌ Error in unmute-student: {e}")
 
+@socketio.on('toggle-camera')
+def handle_toggle_camera(data):
+    """Toggle student's camera"""
+    try:
+        room_id = data.get('room')
+        student_id = data.get('userId')
+        enabled = data.get('enabled', True)
+        
+        print(f"📷 Toggling camera for student {student_id}: {enabled}")
+        
+        # Find student socket
+        for sid, session in active_sessions.items():
+            if session.get('user_id') == student_id and session.get('room') == room_id:
+                emit('camera-toggled', {
+                    'userId': student_id,
+                    'enabled': enabled
+                }, room=sid)
+                break
+                
+    except Exception as e:
+        print(f"❌ Error in toggle-camera: {e}")
+
 @socketio.on('ping')
 def handle_ping(data):
     """Handle keep-alive ping"""
@@ -665,7 +803,7 @@ def handle_start_webrtc(data):
             emit('error', {'message': 'Room not found'})
             return
         
-        print(f"🎥 Starting WebRTC in room {room_id}")
+        print(f"🎥 Starting WebRTC in room {room_id} for {len(room_state['connected_students'])} students")
         
         # Notify teacher
         teacher_sid = room_state.get('teacher_sid')
@@ -696,6 +834,25 @@ def handle_start_webrtc(data):
     except Exception as e:
         print(f"❌ Error in start-webrtc: {e}")
         emit('error', {'message': str(e)})
+
+@socketio.on('send-message')
+def handle_send_message(data):
+    """Handle chat messages"""
+    try:
+        room_id = data.get('room')
+        from_user = data.get('from')
+        message = data.get('message')
+        username = data.get('username', 'User')
+        
+        emit('receive-message', {
+            'from': from_user,
+            'username': username,
+            'message': message,
+            'timestamp': datetime.utcnow().isoformat()
+        }, room=room_id)
+        
+    except Exception as e:
+        print(f"❌ Error in send-message: {e}")
 
 # ============================================
 # FLASK ROUTES - YOUR EXISTING ROUTES
@@ -805,6 +962,14 @@ def student_live(room_id):
 def join_live(room_id):
     return redirect(url_for('student_live', room_id=room_id))
 
+@app.route("/teacher-dashboard/<room_id>")
+def teacher_dashboard(room_id):
+    return render_template("teacher_dashboard.html", room_id=room_id)
+
+@app.route("/student-dashboard/<room_id>")
+def student_dashboard(room_id):
+    return render_template("student_dashboard.html", room_id=room_id)
+
 # API ENDPOINTS
 @app.route('/ask', methods=['POST'])
 @login_required
@@ -821,8 +986,43 @@ def ask():
         'question': question
     })
 
-# Add ALL your other existing routes here...
-# Keep all your @app.route() functions from your original code
+# API to get room state
+@app.route('/api/room/<room_id>', methods=['GET'])
+def get_room_info(room_id):
+    room_state = get_room_state(room_id)
+    if not room_state:
+        return jsonify({'error': 'Room not found'}), 404
+    
+    return jsonify({
+        'room_id': room_id,
+        'teacher': room_state.get('teacher_name'),
+        'state': room_state.get('state'),
+        'students': len(room_state.get('connected_students', [])),
+        'waiting': len(room_state.get('waiting_students', [])),
+        'created_at': room_state.get('created_at')
+    })
+
+# API to get active rooms
+@app.route('/api/rooms', methods=['GET'])
+def get_active_rooms():
+    rooms_list = []
+    try:
+        with app.app_context():
+            active_rooms = MeetingRoom.query.filter_by(state='live').all()
+            rooms_list = [{
+                'room_id': room.room_id,
+                'teacher': room.teacher_name,
+                'created_at': room.created_at.isoformat() if room.created_at else None
+            } for room in active_rooms]
+    except:
+        pass
+    
+    return jsonify({'rooms': rooms_list})
+
+# Static files
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('static', 'favicon.ico')
 
 # ============================================
 # APPLICATION STARTUP - GUNICORN COMPATIBLE
@@ -839,6 +1039,9 @@ if __name__ == "__main__":
     print(f"⚡ Server: Socket.IO with eventlet")
     print(f"🎥 WebSocket: READY")
     print(f"💾 Redis: {'✅ Connected' if REDIS_AVAILABLE else '❌ Not available'}")
+    print(f"🎬 Video Chat: ENABLED")
+    print(f"🎤 Audio: ENABLED")
+    print(f"📝 Chat: ENABLED")
     print(f"{'='*60}\n")
     
     # Run Socket.IO server directly
@@ -846,6 +1049,6 @@ if __name__ == "__main__":
         app,
         host="0.0.0.0",
         port=port,
-        debug=False,
+        debug=True,
         log_output=True
     )
