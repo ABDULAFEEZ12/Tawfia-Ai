@@ -828,26 +828,25 @@ def ask():
 # APPLICATION STARTUP - GUNICORN COMPATIBLE
 # ============================================
 if __name__ == "__main__":
+    import os
+    
     port = int(os.environ.get("PORT", 5000))
-    debug = os.environ.get("FLASK_ENV") == "development"
     
     print(f"\n{'='*60}")
-    print("🚀 TAWFIQ AI - PRODUCTION READY")
+    print("🚀 TAWFIQ AI - PRODUCTION MODE")
     print(f"{'='*60}")
     print(f"📡 Port: {port}")
-    print(f"⚡ Async: eventlet")
+    print(f"⚡ Server: Socket.IO with eventlet")
     print(f"🎥 WebSocket: READY")
-    print(f"💾 Redis: {'✅' if REDIS_AVAILABLE else '❌'}")
-    print(f"👥 Handlers: ✅ COMPLETE")
+    print(f"💾 Redis: {'✅ Connected' if REDIS_AVAILABLE else '❌ Not available'}")
     print(f"{'='*60}\n")
     
-    # For Render production: let gunicorn handle it
-    # This is just for local development
+    # Run Socket.IO server directly
     socketio.run(
         app,
         host="0.0.0.0",
         port=port,
-        debug=debug,
-        allow_unsafe_werkzeug=True,
-        log_output=True
+        debug=False,
+        log_output=True,
+        allow_unsafe_werkzeug=True
     )
