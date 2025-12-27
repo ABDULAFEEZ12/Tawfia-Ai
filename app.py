@@ -1,6 +1,17 @@
+"""
+app.py - COMPLETE FIXED VERSION WITH ALL HANDLERS
+"""
+
+# ============================================
+# CRITICAL: Eventlet monkey patch MUST BE FIRST
+# ============================================
 import eventlet
 eventlet.monkey_patch()
 print("✅ Eventlet monkey patch applied (FIRST THING)")
+
+# ============================================
+# NOW import everything else
+# ============================================
 import os
 import json
 from dotenv import load_dotenv
@@ -223,8 +234,9 @@ def delete_room_state(room_id):
         pass
 
 # ============================================
-# SOCKET.IO EVENT HANDLERS
+# SOCKET.IO EVENT HANDLERS - COMPLETE SET
 # ============================================
+
 @socketio.on('connect')
 def handle_connect():
     sid = request.sid
@@ -233,7 +245,8 @@ def handle_connect():
         'connected_at': datetime.utcnow().isoformat(),
         'room': None,
         'user_type': None,
-        'user_id': None
+        'user_id': None,
+        'last_ping': datetime.utcnow().isoformat()
     }
 
 @socketio.on('disconnect')
@@ -260,6 +273,17 @@ def handle_disconnect():
                 
                 # Clean up room state
                 delete_room_state(room_id)
+            elif session_data.get('user_type') == 'student':
+                # Notify teacher about student leaving
+                room_state = get_room_state(room_id)
+                if room_state:
+                    teacher_sid = room_state.get('teacher_sid')
+                    if teacher_sid:
+                        emit('student-left', {
+                            'userId': user_id,
+                            'username': 'Student',
+                            'socketId': sid
+                        }, room=teacher_sid)
         
         del active_sessions[sid]
 
@@ -294,6 +318,7 @@ def handle_teacher_join(data):
         room_state['teacher_id'] = user_id
         room_state['teacher_name'] = username
         room_state['teacher_sid'] = sid
+        room_state['updated_at'] = datetime.utcnow().isoformat()
         
         save_room_state(room_id, room_state)
         
@@ -362,7 +387,8 @@ def handle_student_join(data):
             'user_id': user_id,
             'username': username,
             'sid': sid,
-            'joined_at': datetime.utcnow().isoformat()
+            'joined_at': datetime.utcnow().isoformat(),
+            'connected': room_state['state'] == 'live'
         }
         
         if room_state['state'] == 'waiting':
@@ -388,13 +414,15 @@ def handle_student_join(data):
             emit('student-waiting-ack', {
                 'status': 'waiting',
                 'room': room_id,
-                'teacherName': room_state['teacher_name']
+                'teacherName': room_state['teacher_name'],
+                'message': 'Waiting for teacher to start the meeting'
             })
         else:
             emit('student-joined-ack', {
                 'status': 'joined',
                 'room': room_id,
-                'teacherName': room_state['teacher_name']
+                'teacherName': room_state['teacher_name'],
+                'message': 'Successfully joined the live meeting'
             })
         
         # Update room state for all
@@ -433,6 +461,7 @@ def handle_start_meeting(data):
         # Move waiting to connected
         for student in room_state['waiting_students']:
             if student['user_id'] not in [s['user_id'] for s in room_state['connected_students']]:
+                student['connected'] = True
                 room_state['connected_students'].append(student)
         room_state['waiting_students'] = []
         
@@ -442,7 +471,8 @@ def handle_start_meeting(data):
         emit('room-started', {
             'room': room_id,
             'teacherId': room_state['teacher_id'],
-            'teacherName': room_state['teacher_name']
+            'teacherName': room_state['teacher_name'],
+            'startedAt': room_state['started_at']
         }, room=room_id)
         
         # Notify individual students
@@ -451,7 +481,8 @@ def handle_start_meeting(data):
             if student_sid:
                 emit('meeting-started', {
                     'room': room_id,
-                    'teacherName': room_state['teacher_name']
+                    'teacherName': room_state['teacher_name'],
+                    'message': 'The meeting has started!'
                 }, room=student_sid)
         
         # Update room state
@@ -463,7 +494,7 @@ def handle_start_meeting(data):
             'teacherName': room_state['teacher_name']
         }, room=room_id)
         
-        print(f"✅ Meeting started in room {room_id}")
+        print(f"✅ Meeting started in room {room_id} with {len(room_state['connected_students'])} students")
         
     except Exception as e:
         print(f"❌ Error in start-meeting: {e}")
@@ -485,7 +516,8 @@ def handle_end_meeting(data):
                 'room': room_id,
                 'teacherId': room_state.get('teacher_id'),
                 'teacherName': room_state.get('teacher_name'),
-                'message': 'Meeting ended'
+                'message': 'Meeting has ended',
+                'endedAt': datetime.utcnow().isoformat()
             }, room=room_id)
         
         delete_room_state(room_id)
@@ -496,7 +528,7 @@ def handle_end_meeting(data):
                     active_sessions[sid]['room'] = None
             del room_connections[room_id]
         
-        print(f"✅ Meeting ended in room {room_id}")
+        print(f"✅ Meeting ended and cleaned up for room {room_id}")
         
     except Exception as e:
         print(f"❌ Error in end-meeting: {e}")
@@ -509,15 +541,20 @@ def handle_webrtc_signal(data):
         from_user = data.get('from')
         to_user = data.get('to')
         signal = data.get('signal')
+        signal_type = data.get('type', 'signal')
         
+        # Find target socket ID
         target_sid = None
+        
+        # Check if target is teacher
         if to_user.startswith('teacher_'):
             room_state = get_room_state(room_id)
             if room_state:
                 target_sid = room_state.get('teacher_sid')
         else:
-            for sid, session in active_sessions.items():
-                if session.get('user_id') == to_user and session.get('room') == room_id:
+            # Check if target is student in active sessions
+            for sid, session_data in active_sessions.items():
+                if session_data.get('user_id') == to_user and session_data.get('room') == room_id:
                     target_sid = sid
                     break
         
@@ -525,11 +562,140 @@ def handle_webrtc_signal(data):
             emit('webrtc-signal', {
                 'from': from_user,
                 'to': to_user,
-                'signal': signal
+                'signal': signal,
+                'type': signal_type
             }, room=target_sid)
+        else:
+            print(f"⚠️ Target user {to_user} not found in room {room_id}")
             
     except Exception as e:
         print(f"❌ Error in webrtc-signal: {e}")
+
+# ============================================
+# NEW: ADD THESE MISSING HANDLERS
+# ============================================
+
+@socketio.on('mute-student')
+def handle_mute_student(data):
+    """Mute a student's microphone"""
+    try:
+        room_id = data.get('room')
+        student_id = data.get('userId')
+        
+        print(f"🔇 Muting student {student_id} in room {room_id}")
+        
+        # Find student socket
+        for sid, session in active_sessions.items():
+            if session.get('user_id') == student_id and session.get('room') == room_id:
+                emit('student-muted', {
+                    'userId': student_id,
+                    'muted': True
+                }, room=sid)
+                
+                # Confirm to teacher
+                room_state = get_room_state(room_id)
+                if room_state:
+                    teacher_sid = room_state.get('teacher_sid')
+                    if teacher_sid:
+                        emit('student-muted-confirm', {
+                            'userId': student_id,
+                            'muted': True
+                        }, room=teacher_sid)
+                
+                break
+                
+    except Exception as e:
+        print(f"❌ Error in mute-student: {e}")
+
+@socketio.on('unmute-student')
+def handle_unmute_student(data):
+    """Unmute a student's microphone"""
+    try:
+        room_id = data.get('room')
+        student_id = data.get('userId')
+        
+        print(f"🔊 Unmuting student {student_id} in room {room_id}")
+        
+        # Find student socket
+        for sid, session in active_sessions.items():
+            if session.get('user_id') == student_id and session.get('room') == room_id:
+                emit('student-muted', {
+                    'userId': student_id,
+                    'muted': False
+                }, room=sid)
+                
+                # Confirm to teacher
+                room_state = get_room_state(room_id)
+                if room_state:
+                    teacher_sid = room_state.get('teacher_sid')
+                    if teacher_sid:
+                        emit('student-muted-confirm', {
+                            'userId': student_id,
+                            'muted': False
+                        }, room=teacher_sid)
+                
+                break
+                
+    except Exception as e:
+        print(f"❌ Error in unmute-student: {e}")
+
+@socketio.on('ping')
+def handle_ping(data):
+    """Handle keep-alive ping"""
+    sid = request.sid
+    if sid in active_sessions:
+        # Update last activity
+        active_sessions[sid]['last_ping'] = datetime.utcnow().isoformat()
+    
+    # Send pong back
+    emit('pong', {'timestamp': data.get('timestamp', datetime.utcnow().isoformat())})
+
+@socketio.on('start-webrtc')
+def handle_start_webrtc(data):
+    """Start WebRTC for all connected students"""
+    try:
+        room_id = data.get('room')
+        
+        if not room_id:
+            emit('error', {'message': 'Room ID required'})
+            return
+        
+        room_state = get_room_state(room_id)
+        if not room_state:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        print(f"🎥 Starting WebRTC in room {room_id}")
+        
+        # Notify teacher
+        teacher_sid = room_state.get('teacher_sid')
+        if teacher_sid:
+            emit('webrtc-start-teacher', {
+                'students': [
+                    {
+                        'userId': student['user_id'],
+                        'username': student['username'],
+                        'socketId': student.get('sid')
+                    }
+                    for student in room_state['connected_students']
+                ]
+            }, room=teacher_sid)
+        
+        # Notify each student
+        for student in room_state['connected_students']:
+            student_sid = student.get('sid')
+            if student_sid:
+                emit('webrtc-start-student', {
+                    'teacherId': room_state['teacher_id'],
+                    'teacherName': room_state['teacher_name'],
+                    'room': room_id
+                }, room=student_sid)
+        
+        print(f"✅ WebRTC started for {len(room_state['connected_students'])} students")
+        
+    except Exception as e:
+        print(f"❌ Error in start-webrtc: {e}")
+        emit('error', {'message': str(e)})
 
 # ============================================
 # FLASK ROUTES - YOUR EXISTING ROUTES
@@ -666,13 +832,14 @@ if __name__ == "__main__":
     debug = os.environ.get("FLASK_ENV") == "development"
     
     print(f"\n{'='*60}")
-    print("🚀 TAWFIQ AI - SINGLE FILE SOLUTION")
+    print("🚀 TAWFIQ AI - COMPLETE WITH ALL HANDLERS")
     print(f"{'='*60}")
     print(f"📡 Running on port: {port}")
     print(f"⚡ Async Mode: eventlet (WebSocket ready)")
     print(f"💾 Redis: {'✅ Connected' if REDIS_AVAILABLE else '❌ Not available'}")
     print(f"🗄️  Database: {'✅ Connected'}")
-    print(f"🎥 Live Meeting: ✅ READY")
+    print(f"🎥 Live Meeting: ✅ READY WITH ALL HANDLERS")
+    print(f"👥 Socket Handlers: ✅ COMPLETE")
     print(f"{'='*60}\n")
     
     socketio.run(
