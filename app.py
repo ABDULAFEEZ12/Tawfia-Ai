@@ -37,8 +37,8 @@ if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
 
 # Configurations
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Allow cookies in fetch
-app.config['SESSION_COOKIE_SECURE'] = True    # Must be True for HTTPS on Render
-app.config['SECRET_KEY'] = os.getenv('MY_SECRET', os.environ.get('SECRET_KEY', 'your-secret-key-here'))
+app.config['SESSION_COOKIE_SECURE'] = False    # Only True if HTTPS
+app.config['SECRET_KEY'] = os.getenv('MY_SECRET', 'your-secret-key-here')
 
 # Use SQLite locally, PostgreSQL on Render with proper SSL
 if DATABASE_URL:
@@ -64,22 +64,15 @@ else:
 db = SQLAlchemy()
 db.init_app(app)
 
-# ============================================
-# SOCKET.IO CONFIGURATION - UPDATED FOR PRODUCTION
-# ============================================
-# Use 'eventlet' for production (Render), 'threading' for local development
-async_mode = 'eventlet' if os.environ.get('RENDER') else 'threading'
-
+# Initialize SocketIO with proper settings
 socketio = SocketIO(
     app, 
     cors_allowed_origins="*",
-    async_mode=async_mode,  # ✅ Changed: 'eventlet' for production
+    async_mode='threading',
     ping_timeout=60,
     ping_interval=25,
     logger=True,
-    engineio_logger=True,
-    manage_session=False,   # ✅ Added: Important for WebSocket sessions
-    message_queue='redis://' if os.environ.get('REDIS_URL') else None  # ✅ For scaling
+    engineio_logger=True
 )
 
 # --- Models ---
@@ -1427,6 +1420,10 @@ def all_duas_json():
 
     return jsonify(duas_data)
 
+# ============================================
+# LIVE MEETING SYSTEM - COMPLETE FIX
+# ============================================
+
 @app.route("/live-meeting")
 def live_meeting_landing():
     import uuid
@@ -1437,8 +1434,18 @@ def live_meeting_landing():
 def live_meeting(room_id):
     return render_template("live_meeting.html", room_id=room_id)
 
+# NEW: Student join page
+@app.route("/student-live/<room_id>")
+def student_live(room_id):
+    return render_template("student_live.html", room_id=room_id)
+
+# NEW: Join as student route
+@app.route("/join-live/<room_id>")
+def join_live(room_id):
+    return redirect(url_for('student_live', room_id=room_id))
+
 # ============================================
-# SOCKET.IO HANDLERS - UPDATED FOR PRODUCTION
+# SOCKET.IO HANDLERS - COMPLETE FIX
 # ============================================
 
 active_rooms = {}
@@ -2600,40 +2607,21 @@ def temp_login():
     <p><a href="/login">Back to real login</a></p>
     '''
 
-# ============================================
-# APPLICATION STARTUP - UPDATED FOR PRODUCTION
-# ============================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_ENV") == "development"
     
-    # Check if we're running on Render
-    if os.environ.get("RENDER"):
-        print("🌐 Running on Render Production Server")
-        print(f"📡 WebSocket Server: Ready with async_mode='{async_mode}'")
-        print(f"💾 Database: {'Connected' if DATABASE_URL else 'SQLite (Local)'}")
-        
-        # On Render, we need to run with socketio.run() with proper production settings
-        socketio.run(
-            app,
-            host="0.0.0.0",
-            port=port,
-            debug=False,  # Always False in production
-            allow_unsafe_werkzeug=False,
-            log_output=True
-        )
-    else:
-        # Local development
-        print(f"🚀 Starting LOCAL development server on port {port}")
-        print(f"🌐 Local URL: http://localhost:{port}")
-        print(f"📡 Socket.IO enabled: True (async_mode='{async_mode}')")
-        print(f"💾 Database: {'SQLite' if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI'] else 'PostgreSQL'}")
-        
-        socketio.run(
-            app,
-            host="0.0.0.0",
-            port=port,
-            debug=debug,
-            allow_unsafe_werkzeug=True,
-            log_output=True
-        )
+    print(f"🚀 Starting server on port {port} (debug={debug})")
+    print(f"🌐 Server URL: http://localhost:{port}")
+    print(f"📡 Socket.IO enabled: True")
+    print(f"💾 Database URL: {DATABASE_URL[:50]}..." if DATABASE_URL else "💾 Using SQLite database")
+    print(f"🎥 Live Meeting System: READY")
+    
+    socketio.run(
+        app,
+        host="0.0.0.0",
+        port=port,
+        debug=debug,
+        allow_unsafe_werkzeug=True,
+        log_output=True
+    )
