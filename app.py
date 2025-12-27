@@ -1,5 +1,6 @@
 """
-app.py - COMPLETE FIXED VERSION WITH ALL HANDLERS
+app.py - SIMPLIFIED, WORKING VERSION
+ONE signaling path, ONE join path, CLEAN WebRTC
 """
 
 # ============================================
@@ -7,119 +8,46 @@ app.py - COMPLETE FIXED VERSION WITH ALL HANDLERS
 # ============================================
 import eventlet
 eventlet.monkey_patch()
-print("✅ Eventlet monkey patch applied (FIRST THING)")
+print("✅ Eventlet monkey patch applied")
 
 # ============================================
-# NOW import everything else
+# Imports
 # ============================================
 import os
 import json
-from dotenv import load_dotenv
-from hashlib import sha256
-import redis
-from functools import wraps
-from sqlalchemy import func
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
-import random
-from difflib import get_close_matches
-import requests
-
-# Flask and extensions
-from flask import (
-    Flask, request, jsonify, render_template,
-    redirect, url_for, session, flash,
-    send_file, send_from_directory
-)
+from flask import Flask, render_template, session, redirect, url_for, request, flash
+from flask_socketio import SocketIO, join_room, emit, leave_room
 from flask_sqlalchemy import SQLAlchemy
-from flask_socketio import SocketIO, join_room, emit, disconnect
-
-# Load environment variables
-load_dotenv()
-
-print("🚀 Initializing Tawfiq AI Live Meeting System...")
 
 # ============================================
-# FLASK APP CONFIGURATION
+# Flask App Configuration
 # ============================================
 app = Flask(__name__)
-
-# Database Configuration
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-
-if DATABASE_URL:
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-    if 'render.com' in DATABASE_URL or os.getenv('RENDER'):
-        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-            'connect_args': {
-                'sslmode': 'require',
-                'sslrootcert': 'prod-ca-2021.crt'
-            }
-        }
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
-
-# App config
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
-app.config['SECRET_KEY'] = os.getenv('MY_SECRET', 'your-secret-key-here')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# ============================================
-# INITIALIZE EXTENSIONS
-# ============================================
+# Initialize extensions
 db = SQLAlchemy(app)
-
-# Initialize Socket.IO with eventlet
-socketio = SocketIO(
-    app,
-    cors_allowed_origins="*",
-    async_mode='eventlet',  # CRITICAL: Must match monkey patch
-    ping_timeout=60,
-    ping_interval=25,
-    max_http_buffer_size=1e8,
-    logger=True,
-    engineio_logger=True,
-    transports=['websocket', 'polling']
-)
-print("✅ Socket.IO initialized with eventlet async mode")
+socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True)
 
 # ============================================
-# DATABASE MODELS
+# Database Models
 # ============================================
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=False)
-    level = db.Column(db.Integer, default=1)
-    joined_on = db.Column(db.DateTime, default=datetime.utcnow)
-    last_login = db.Column(db.DateTime)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-class UserQuestions(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), nullable=False)
-    question = db.Column(db.Text, nullable=False)
-    answer = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-class MeetingRoom(db.Model):
-    id = db.Column(db.String(32), primary_key=True)
-    room_id = db.Column(db.String(64), nullable=False, index=True)
-    teacher_id = db.Column(db.String(128), nullable=False)
-    teacher_name = db.Column(db.String(150))
-    state = db.Column(db.String(20), default='waiting')
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    room_data = db.Column(db.JSON, default={})
+
+class Room(db.Model):
+    id = db.Column(db.String(32), primary_key=True)
+    teacher_id = db.Column(db.String(80))
+    teacher_name = db.Column(db.String(80))
+    student_count = db.Column(db.Integer, default=0)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Create tables
 with app.app_context():
@@ -127,1050 +55,292 @@ with app.app_context():
     print("✅ Database tables created")
 
 # ============================================
-# REDIS SETUP
+# In-Memory Storage (Simple & Clean)
 # ============================================
-REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
-print(f"🔗 Redis URL: {REDIS_URL}")
-
-try:
-    redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
-    redis_client.ping()
-    print("✅ Redis connected successfully")
-    REDIS_AVAILABLE = True
-except Exception as e:
-    print(f"⚠️ Redis connection failed: {e}")
-    print("⚠️ Using in-memory storage (rooms reset on server restart)")
-    REDIS_AVAILABLE = False
-    redis_client = None
-
-# Redis helper functions
-def save_to_redis(key, data, ttl=3600):
-    if REDIS_AVAILABLE and redis_client:
-        try:
-            redis_client.setex(key, ttl, json.dumps(data))
-            return True
-        except:
-            pass
-    return False
-
-def get_from_redis(key):
-    if REDIS_AVAILABLE and redis_client:
-        try:
-            data = redis_client.get(key)
-            return json.loads(data) if data else None
-        except:
-            pass
-    return None
-
-def delete_from_redis(key):
-    if REDIS_AVAILABLE and redis_client:
-        try:
-            redis_client.delete(key)
-            return True
-        except:
-            pass
-    return False
+# Room state: room_id -> {teacher_sid: str, students: set(sid)}
+rooms = {}
+# User sessions: sid -> {room: str, role: str, user_id: str}
+sessions = {}
 
 # ============================================
-# IN-MEMORY STORAGE (active connections only)
+# Socket.IO Event Handlers (SIMPLE)
 # ============================================
-active_sessions = {}
-room_connections = {}
-
-# Room state management
-def save_room_state(room_id, state_data):
-    room_key = f"room:{room_id}"
-    save_to_redis(room_key, state_data)
-    
-    # Also save to database
-    try:
-        with app.app_context():
-            room = MeetingRoom.query.filter_by(room_id=room_id).first()
-            if room:
-                room.room_data = state_data
-                room.updated_at = datetime.utcnow()
-            else:
-                room = MeetingRoom(
-                    id=room_key,
-                    room_id=room_id,
-                    teacher_id=state_data.get('teacher_id', 'unknown'),
-                    teacher_name=state_data.get('teacher_name', 'Teacher'),
-                    state=state_data.get('state', 'waiting'),
-                    room_data=state_data
-                )
-                db.session.add(room)
-            db.session.commit()
-    except Exception as e:
-        print(f"⚠️ Failed to save room to database: {e}")
-
-def get_room_state(room_id):
-    room_key = f"room:{room_id}"
-    state = get_from_redis(room_key)
-    if state:
-        return state
-    
-    # Fallback to database
-    try:
-        with app.app_context():
-            room = MeetingRoom.query.filter_by(room_id=room_id).first()
-            if room and room.room_data:
-                save_to_redis(room_key, room.room_data)
-                return room.room_data
-    except:
-        pass
-    
-    return None
-
-def delete_room_state(room_id):
-    room_key = f"room:{room_id}"
-    delete_from_redis(room_key)
-    try:
-        with app.app_context():
-            room = MeetingRoom.query.filter_by(room_id=room_id).first()
-            if room:
-                db.session.delete(room)
-                db.session.commit()
-    except:
-        pass
-
-# ============================================
-# SOCKET.IO EVENT HANDLERS - COMPLETE SET
-# ============================================
-
 @socketio.on('connect')
 def handle_connect():
     sid = request.sid
-    print(f"✅ Client connected: {sid}")
-    active_sessions[sid] = {
-        'connected_at': datetime.utcnow().isoformat(),
-        'room': None,
-        'user_type': None,
-        'user_id': None,
-        'username': None,
-        'last_ping': datetime.utcnow().isoformat()
-    }
+    sessions[sid] = {'room': None, 'role': None, 'user_id': None}
+    print(f"✅ Connected: {sid}")
 
 @socketio.on('disconnect')
 def handle_disconnect():
     sid = request.sid
-    if sid in active_sessions:
-        session_data = active_sessions[sid]
+    if sid in sessions:
+        session_data = sessions[sid]
         room_id = session_data.get('room')
-        user_id = session_data.get('user_id')
         
-        print(f"❌ Client disconnected: {sid} (room: {room_id}, user: {user_id})")
-        
-        # Clean up room connections
-        if room_id and room_id in room_connections:
-            if sid in room_connections[room_id]:
-                room_connections[room_id].remove(sid)
-            
-            # Notify if teacher disconnected
-            if session_data.get('user_type') == 'teacher':
-                emit('teacher-disconnected', {
-                    'teacherId': user_id,
-                    'teacherName': session_data.get('username', 'Teacher'),
-                    'reason': 'Teacher left'
-                }, room=room_id)
-                
-                # Clean up room state
-                delete_room_state(room_id)
-            elif session_data.get('user_type') == 'student':
-                # Notify teacher about student leaving
-                room_state = get_room_state(room_id)
-                if room_state and room_state.get('teacher_sid'):
-                    emit('student-left', {
-                        'userId': user_id,
-                        'username': session_data.get('username', 'Student'),
-                        'socketId': sid
-                    }, room=room_state['teacher_sid'])
-        
-        del active_sessions[sid]
-
-@socketio.on('teacher-join')
-def handle_teacher_join(data):
-    try:
-        sid = request.sid
-        room_id = data.get('room')
-        user_id = data.get('userId', f'teacher_{sid}')
-        username = data.get('username', 'Teacher')
-        
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        print(f"👨‍🏫 Teacher {username} joining room {room_id}")
-        
-        # Get or create room
-        room_state = get_room_state(room_id)
-        if not room_state:
-            room_state = {
-                'state': 'waiting',
-                'teacher_id': user_id,
-                'teacher_name': username,
-                'teacher_sid': sid,
-                'created_at': datetime.utcnow().isoformat(),
-                'waiting_students': [],
-                'connected_students': [],
-                'students': {}
-            }
-        
-        # Update room state
-        room_state['teacher_id'] = user_id
-        room_state['teacher_name'] = username
-        room_state['teacher_sid'] = sid
-        room_state['updated_at'] = datetime.utcnow().isoformat()
-        
-        save_room_state(room_id, room_state)
-        
-        # Update session
-        active_sessions[sid]['room'] = room_id
-        active_sessions[sid]['user_type'] = 'teacher'
-        active_sessions[sid]['user_id'] = user_id
-        active_sessions[sid]['username'] = username
-        
-        # Room connections
-        if room_id not in room_connections:
-            room_connections[room_id] = []
-        if sid not in room_connections[room_id]:
-            room_connections[room_id].append(sid)
-        
-        join_room(room_id)
-        
-        emit('room-state', {
-            'state': room_state['state'],
-            'waitingStudents': len(room_state['waiting_students']),
-            'connectedStudents': len(room_state['connected_students']),
-            'teacherId': user_id,
-            'teacherName': username,
-            'roomId': room_id
-        })
-        
-        print(f"✅ Teacher joined room {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in teacher-join: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('student-join')
-def handle_student_join(data):
-    try:
-        sid = request.sid
-        room_id = data.get('room')
-        user_id = data.get('userId', f'student_{sid}')
-        username = data.get('username', 'Student')
-        
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        print(f"👨‍🎓 Student {username} joining room {room_id}")
-        
-        # Check room exists
-        room_state = get_room_state(room_id)
-        if not room_state:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        # Update session
-        active_sessions[sid]['room'] = room_id
-        active_sessions[sid]['user_type'] = 'student'
-        active_sessions[sid]['user_id'] = user_id
-        active_sessions[sid]['username'] = username
-        
-        # Room connections
-        if room_id not in room_connections:
-            room_connections[room_id] = []
-        if sid not in room_connections[room_id]:
-            room_connections[room_id].append(sid)
-        
-        join_room(room_id)
-        
-        # Add student to room state
-        student_data = {
-            'user_id': user_id,
-            'username': username,
-            'sid': sid,
-            'joined_at': datetime.utcnow().isoformat(),
-            'connected': room_state['state'] == 'live'
-        }
-        
-        if room_state['state'] == 'waiting':
-            if user_id not in [s['user_id'] for s in room_state['waiting_students']]:
-                room_state['waiting_students'].append(student_data)
-        else:
-            if user_id not in [s['user_id'] for s in room_state['connected_students']]:
-                room_state['connected_students'].append(student_data)
-        
-        # Store student in students dict
-        room_state['students'][user_id] = {
-            'sid': sid,
-            'username': username,
-            'user_id': user_id,
-            'joined_at': datetime.utcnow().isoformat()
-        }
-        
-        save_room_state(room_id, room_state)
-        
-        # Notify teacher
-        teacher_sid = room_state.get('teacher_sid')
-        if teacher_sid:
-            emit('student-joined', {
-                'userId': user_id,
-                'username': username,
-                'socketId': sid,
-                'meetingStarted': room_state['state'] == 'live'
-            }, room=teacher_sid)
-        
-        # Send response to student
-        if room_state['state'] == 'waiting':
-            emit('student-waiting-ack', {
-                'status': 'waiting',
-                'room': room_id,
-                'teacherName': room_state['teacher_name'],
-                'message': 'Waiting for teacher to start the meeting'
-            })
-        else:
-            emit('student-joined-ack', {
-                'status': 'joined',
-                'room': room_id,
-                'teacherName': room_state['teacher_name'],
-                'message': 'Successfully joined the live meeting',
-                'meetingStarted': True
-            })
-        
-        # Update room state for all
-        emit('room-state', {
-            'state': room_state['state'],
-            'waitingStudents': len(room_state['waiting_students']),
-            'connectedStudents': len(room_state['connected_students']),
-            'teacherId': room_state['teacher_id'],
-            'teacherName': room_state['teacher_name'],
-            'roomId': room_id
-        }, room=room_id)
-        
-        print(f"✅ Student joined room {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in student-join: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('start-meeting')
-def handle_start_meeting(data):
-    try:
-        room_id = data.get('room')
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        print(f"🚀 Starting meeting in room {room_id}")
-        
-        room_state = get_room_state(room_id)
-        if not room_state:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        room_state['state'] = 'live'
-        room_state['started_at'] = datetime.utcnow().isoformat()
-        
-        # Move waiting to connected
-        for student in room_state['waiting_students']:
-            if student['user_id'] not in [s['user_id'] for s in room_state['connected_students']]:
-                student['connected'] = True
-                room_state['connected_students'].append(student)
-        room_state['waiting_students'] = []
-        
-        save_room_state(room_id, room_state)
-        
-        # Notify all
-        emit('room-started', {
-            'room': room_id,
-            'teacherId': room_state['teacher_id'],
-            'teacherName': room_state['teacher_name'],
-            'startedAt': room_state['started_at']
-        }, room=room_id)
-        
-        # Notify individual students
-        for student in room_state['connected_students']:
-            student_sid = student.get('sid')
-            if student_sid:
-                emit('meeting-started', {
-                    'room': room_id,
-                    'teacherName': room_state['teacher_name'],
-                    'message': 'The meeting has started!'
-                }, room=student_sid)
-        
-        # Update room state
-        emit('room-state', {
-            'state': 'live',
-            'waitingStudents': 0,
-            'connectedStudents': len(room_state['connected_students']),
-            'teacherId': room_state['teacher_id'],
-            'teacherName': room_state['teacher_name'],
-            'roomId': room_id
-        }, room=room_id)
-        
-        print(f"✅ Meeting started in room {room_id} with {len(room_state['connected_students'])} students")
-        
-    except Exception as e:
-        print(f"❌ Error in start-meeting: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('end-meeting')
-def handle_end_meeting(data):
-    try:
-        room_id = data.get('room')
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        print(f"🛑 Ending meeting in room {room_id}")
-        
-        room_state = get_room_state(room_id)
-        if room_state:
-            emit('room-ended', {
-                'room': room_id,
-                'teacherId': room_state.get('teacher_id'),
-                'teacherName': room_state.get('teacher_name'),
-                'message': 'Meeting has ended',
-                'endedAt': datetime.utcnow().isoformat()
-            }, room=room_id)
-        
-        delete_room_state(room_id)
-        
-        if room_id in room_connections:
-            for sid in room_connections[room_id]:
-                if sid in active_sessions:
-                    active_sessions[sid]['room'] = None
-            del room_connections[room_id]
-        
-        print(f"✅ Meeting ended and cleaned up for room {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in end-meeting: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('webrtc-signal')
-def handle_webrtc_signal(data):
-    try:
-        room_id = data.get('room')
-        from_user = data.get('from')
-        to_user = data.get('to')
-        signal = data.get('signal')
-        signal_type = data.get('type', 'signal')
-        
-        print(f"📡 WebRTC signal: {from_user} -> {to_user} ({signal_type})")
-        
-        # Find target socket ID
-        target_sid = None
-        
-        # Check if target is teacher
-        if to_user.startswith('teacher_') or to_user == 'teacher':
-            room_state = get_room_state(room_id)
-            if room_state:
-                target_sid = room_state.get('teacher_sid')
-        else:
-            # Check if target is student in active sessions
-            for sid, session_data in active_sessions.items():
-                if session_data.get('user_id') == to_user and session_data.get('room') == room_id:
-                    target_sid = sid
-                    break
-        
-        if target_sid:
-            emit('webrtc-signal', {
-                'from': from_user,
-                'to': to_user,
-                'signal': signal,
-                'type': signal_type,
-                'room': room_id
-            }, room=target_sid)
-            print(f"📤 Forwarded signal to {target_sid}")
-        else:
-            print(f"⚠️ Target user {to_user} not found in room {room_id}")
-            
-    except Exception as e:
-        print(f"❌ Error in webrtc-signal: {e}")
-
-# ============================================
-# NEW: WEBRTC SPECIFIC HANDLERS
-# ============================================
-
-@socketio.on('webrtc-offer')
-def handle_webrtc_offer(data):
-    """Handle WebRTC offer from teacher to student"""
-    try:
-        room_id = data.get('room')
-        to_student = data.get('to')
-        offer = data.get('offer')
-        
-        print(f"🎥 WebRTC offer from teacher to student {to_student}")
-        
-        # Find student socket
-        for sid, session in active_sessions.items():
-            if session.get('user_id') == to_student and session.get('room') == room_id:
-                emit('webrtc-offer', {
-                    'from': 'teacher',
-                    'to': to_student,
-                    'offer': offer,
-                    'room': room_id
-                }, room=sid)
-                print(f"📤 Forwarded offer to student {to_student}")
-                return
-        
-        print(f"⚠️ Student {to_student} not found in room {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in webrtc-offer: {e}")
-
-@socketio.on('webrtc-answer')
-def handle_webrtc_answer(data):
-    """Handle WebRTC answer from student to teacher"""
-    try:
-        room_id = data.get('room')
-        from_student = data.get('from')
-        answer = data.get('answer')
-        
-        print(f"🎥 WebRTC answer from student {from_student} to teacher")
-        
-        # Find teacher socket
-        room_state = get_room_state(room_id)
-        if room_state and room_state.get('teacher_sid'):
-            emit('webrtc-answer', {
-                'from': from_student,
-                'to': 'teacher',
-                'answer': answer,
-                'room': room_id
-            }, room=room_state['teacher_sid'])
-            print(f"📤 Forwarded answer to teacher")
-        else:
-            print(f"⚠️ Teacher not found in room {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in webrtc-answer: {e}")
-
-@socketio.on('webrtc-ice-candidate')
-def handle_webrtc_ice_candidate(data):
-    """Handle ICE candidate exchange"""
-    try:
-        room_id = data.get('room')
-        from_user = data.get('from')
-        to_user = data.get('to')
-        candidate = data.get('candidate')
-        
-        print(f"❄️ ICE candidate from {from_user} to {to_user}")
-        
-        # Find target socket
-        target_sid = None
-        
-        if to_user == 'teacher':
-            room_state = get_room_state(room_id)
-            if room_state:
-                target_sid = room_state.get('teacher_sid')
-        else:
-            # Find student
-            for sid, session in active_sessions.items():
-                if session.get('user_id') == to_user and session.get('room') == room_id:
-                    target_sid = sid
-                    break
-        
-        if target_sid:
-            emit('webrtc-ice-candidate', {
-                'from': from_user,
-                'to': to_user,
-                'candidate': candidate,
-                'room': room_id
-            }, room=target_sid)
-            print(f"📤 Forwarded ICE candidate to {to_user}")
-        else:
-            print(f"⚠️ Target {to_user} not found in room {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in webrtc-ice-candidate: {e}")
-
-# ============================================
-# NEW: CONTROL HANDLERS
-# ============================================
-
-@socketio.on('mute-student')
-def handle_mute_student(data):
-    """Mute a student's microphone"""
-    try:
-        room_id = data.get('room')
-        student_id = data.get('userId')
-        
-        print(f"🔇 Muting student {student_id} in room {room_id}")
-        
-        # Find student socket
-        for sid, session in active_sessions.items():
-            if session.get('user_id') == student_id and session.get('room') == room_id:
-                emit('student-muted', {
-                    'userId': student_id,
-                    'muted': True
-                }, room=sid)
-                
-                # Confirm to teacher
-                room_state = get_room_state(room_id)
-                if room_state:
-                    teacher_sid = room_state.get('teacher_sid')
+        if room_id and room_id in rooms:
+            # Remove from room
+            if session_data.get('role') == 'teacher':
+                # Teacher disconnected - notify all students
+                emit('teacher-disconnected', room=room_id)
+                del rooms[room_id]
+            else:
+                # Student disconnected
+                if sid in rooms[room_id]['students']:
+                    rooms[room_id]['students'].remove(sid)
+                    rooms[room_id]['student_count'] = len(rooms[room_id]['students'])
+                    # Notify teacher
+                    teacher_sid = rooms[room_id].get('teacher_sid')
                     if teacher_sid:
-                        emit('student-muted-confirm', {
-                            'userId': student_id,
-                            'muted': True
-                        }, room=teacher_sid)
-                
-                break
-                
-    except Exception as e:
-        print(f"❌ Error in mute-student: {e}")
-
-@socketio.on('unmute-student')
-def handle_unmute_student(data):
-    """Unmute a student's microphone"""
-    try:
-        room_id = data.get('room')
-        student_id = data.get('userId')
+                        emit('student-left', {'sid': sid}, room=teacher_sid)
+            
+            # Clean up empty rooms
+            if room_id in rooms and not rooms[room_id]['students'] and not rooms[room_id].get('teacher_sid'):
+                del rooms[room_id]
         
-        print(f"🔊 Unmuting student {student_id} in room {room_id}")
-        
-        # Find student socket
-        for sid, session in active_sessions.items():
-            if session.get('user_id') == student_id and session.get('room') == room_id:
-                emit('student-muted', {
-                    'userId': student_id,
-                    'muted': False
-                }, room=sid)
-                
-                # Confirm to teacher
-                room_state = get_room_state(room_id)
-                if room_state:
-                    teacher_sid = room_state.get('teacher_sid')
-                    if teacher_sid:
-                        emit('student-muted-confirm', {
-                            'userId': student_id,
-                            'muted': False
-                        }, room=teacher_sid)
-                
-                break
-                
-    except Exception as e:
-        print(f"❌ Error in unmute-student: {e}")
-
-@socketio.on('toggle-camera')
-def handle_toggle_camera(data):
-    """Toggle student's camera"""
-    try:
-        room_id = data.get('room')
-        student_id = data.get('userId')
-        enabled = data.get('enabled', True)
-        
-        print(f"📷 Toggling camera for student {student_id}: {enabled}")
-        
-        # Find student socket
-        for sid, session in active_sessions.items():
-            if session.get('user_id') == student_id and session.get('room') == room_id:
-                emit('camera-toggled', {
-                    'userId': student_id,
-                    'enabled': enabled
-                }, room=sid)
-                break
-                
-    except Exception as e:
-        print(f"❌ Error in toggle-camera: {e}")
-
-@socketio.on('ping')
-def handle_ping(data):
-    """Handle keep-alive ping"""
-    sid = request.sid
-    if sid in active_sessions:
-        # Update last activity
-        active_sessions[sid]['last_ping'] = datetime.utcnow().isoformat()
-    
-    # Send pong back
-    emit('pong', {'timestamp': data.get('timestamp', datetime.utcnow().isoformat())})
-
-@socketio.on('start-webrtc')
-def handle_start_webrtc(data):
-    """Start WebRTC for all connected students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        room_state = get_room_state(room_id)
-        if not room_state:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        print(f"🎥 Starting WebRTC in room {room_id} for {len(room_state['connected_students'])} students")
-        
-        # Notify teacher
-        teacher_sid = room_state.get('teacher_sid')
-        if teacher_sid:
-            emit('webrtc-start-teacher', {
-                'students': [
-                    {
-                        'userId': student['user_id'],
-                        'username': student['username'],
-                        'socketId': student.get('sid')
-                    }
-                    for student in room_state['connected_students']
-                ]
-            }, room=teacher_sid)
-        
-        # Notify each student
-        for student in room_state['connected_students']:
-            student_sid = student.get('sid')
-            if student_sid:
-                emit('webrtc-start-student', {
-                    'teacherId': room_state['teacher_id'],
-                    'teacherName': room_state['teacher_name'],
-                    'room': room_id
-                }, room=student_sid)
-        
-        print(f"✅ WebRTC started for {len(room_state['connected_students'])} students")
-        
-    except Exception as e:
-        print(f"❌ Error in start-webrtc: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('send-message')
-def handle_send_message(data):
-    """Handle chat messages"""
-    try:
-        room_id = data.get('room')
-        from_user = data.get('from')
-        message = data.get('message')
-        username = data.get('username', 'User')
-        
-        emit('receive-message', {
-            'from': from_user,
-            'username': username,
-            'message': message,
-            'timestamp': datetime.utcnow().isoformat()
-        }, room=room_id)
-        
-    except Exception as e:
-        print(f"❌ Error in send-message: {e}")
-
-# ============================================
-# FLASK ROUTES - YOUR EXISTING ROUTES
-# ============================================
-
-# Login required decorator
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user' not in session:
-            return redirect(url_for('login', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
+        del sessions[sid]
+    print(f"❌ Disconnected: {sid}")
 
 @socketio.on('join-room')
 def handle_join_room(data):
-    """Handle both teacher and student joining rooms"""
+    """SIMPLE: One join path for both teacher and student"""
     try:
         sid = request.sid
         room_id = data.get('room')
-        user_id = data.get('userId')
+        role = data.get('role', 'student')  # 'teacher' or 'student'
+        user_id = data.get('user_id', sid)
         username = data.get('username', 'User')
-        role = data.get('role', 'student')
         
         if not room_id:
             emit('error', {'message': 'Room ID required'})
             return
         
-        print(f"👤 {username} ({role}) joining room {room_id}")
+        print(f"👤 {role} joining room: {room_id}")
         
-        # Update session
-        active_sessions[sid]['room'] = room_id
-        active_sessions[sid]['user_type'] = role
-        active_sessions[sid]['user_id'] = user_id
-        active_sessions[sid]['username'] = username
-        
-        # Room connections
-        if room_id not in room_connections:
-            room_connections[room_id] = []
-        if sid not in room_connections[room_id]:
-            room_connections[room_id].append(sid)
-        
+        # Join the Socket.IO room
         join_room(room_id)
         
-        # Get or create room state
-        room_state = get_room_state(room_id)
+        # Initialize room if it doesn't exist
+        if room_id not in rooms:
+            rooms[room_id] = {
+                'teacher_sid': None,
+                'students': set(),
+                'student_count': 0
+            }
+        
+        # Update session
+        sessions[sid]['room'] = room_id
+        sessions[sid]['role'] = role
+        sessions[sid]['user_id'] = user_id
+        sessions[sid]['username'] = username
         
         if role == 'teacher':
             # Teacher joining
-            if not room_state:
-                room_state = {
-                    'state': 'waiting',
-                    'teacher_id': user_id,
-                    'teacher_name': username,
-                    'teacher_sid': sid,
-                    'created_at': datetime.utcnow().isoformat(),
-                    'waiting_students': [],
-                    'connected_students': []
-                }
-                save_room_state(room_id, room_state)
+            rooms[room_id]['teacher_sid'] = sid
             
-            emit('room-state', {
-                'state': room_state['state'],
-                'waitingStudents': len(room_state['waiting_students']),
-                'connectedStudents': len(room_state['connected_students']),
-                'teacherId': user_id,
-                'teacherName': username,
-                'roomId': room_id
+            # Create room in database if it doesn't exist
+            with app.app_context():
+                existing_room = Room.query.get(room_id)
+                if not existing_room:
+                    room = Room(
+                        id=room_id,
+                        teacher_id=user_id,
+                        teacher_name=username,
+                        is_active=True
+                    )
+                    db.session.add(room)
+                    db.session.commit()
+            
+            emit('room-joined', {
+                'role': 'teacher',
+                'room': room_id,
+                'message': 'You are now the teacher'
             })
             
-            # Notify existing students about teacher
-            for student in room_state['connected_students']:
-                student_sid = student.get('sid')
-                if student_sid:
-                    emit('teacher-connected', {
-                        'teacherId': user_id,
-                        'teacherName': username,
-                        'socketId': sid
-                    }, room=student_sid)
-                    
-        elif role == 'student':
+            print(f"✅ Teacher joined room: {room_id}")
+            
+        else:
             # Student joining
-            if not room_state:
-                emit('error', {'message': 'Room not found. Teacher needs to create it first.'})
+            # Check if teacher is present
+            teacher_sid = rooms[room_id].get('teacher_sid')
+            
+            if not teacher_sid:
+                emit('error', {'message': 'Teacher not in room. Please wait.'})
                 return
             
-            # Add student to room state
-            student_data = {
-                'user_id': user_id,
-                'username': username,
-                'sid': sid,
-                'joined_at': datetime.utcnow().isoformat(),
-                'connected': room_state['state'] == 'live'
-            }
+            # Add student to room
+            rooms[room_id]['students'].add(sid)
+            rooms[room_id]['student_count'] = len(rooms[room_id]['students'])
             
-            if room_state['state'] == 'waiting':
-                room_state['waiting_students'].append(student_data)
-            else:
-                room_state['connected_students'].append(student_data)
-            
-            save_room_state(room_id, room_state)
-            
-            # Notify teacher
-            teacher_sid = room_state.get('teacher_sid')
-            if teacher_sid:
-                emit('student-joined', {
-                    'userId': user_id,
-                    'username': username,
-                    'socketId': sid
-                }, room=teacher_sid)
-            
-            # Send response to student
-            emit('student-joined-ack', {
-                'status': 'joined',
+            # Notify student
+            emit('room-joined', {
+                'role': 'student',
                 'room': room_id,
-                'teacherName': room_state['teacher_name'],
-                'message': 'Successfully joined the class',
-                'meetingStarted': room_state['state'] == 'live'
+                'message': 'Joined classroom successfully'
             })
             
-            # Update room state
-            emit('room-state', {
-                'state': room_state['state'],
-                'waitingStudents': len(room_state['waiting_students']),
-                'connectedStudents': len(room_state['connected_students']),
-                'teacherId': room_state['teacher_id'],
-                'teacherName': room_state['teacher_name'],
-                'roomId': room_id
-            }, room=room_id)
-        
-        print(f"✅ {username} joined room {room_id}")
+            # Notify teacher
+            emit('student-joined', {
+                'sid': sid,
+                'username': username,
+                'user_id': user_id
+            }, room=teacher_sid)
+            
+            print(f"✅ Student joined room: {room_id} (Total: {rooms[room_id]['student_count']})")
         
     except Exception as e:
         print(f"❌ Error in join-room: {e}")
         emit('error', {'message': str(e)})
 
+# ============================================
+# WebRTC Signaling (ONE PATH - NO DUPLICATION)
+# ============================================
+
+@socketio.on('rtc-offer')
+def handle_rtc_offer(data):
+    """Teacher sends offer to student"""
+    try:
+        room_id = data.get('room')
+        offer = data.get('offer')
+        target_sid = data.get('target_sid')  # Student's socket ID
+        
+        if not all([room_id, offer, target_sid]):
+            emit('error', {'message': 'Missing offer data'})
+            return
+        
+        print(f"🎥 RTC offer from teacher to {target_sid}")
+        
+        # Forward offer to specific student
+        emit('rtc-offer', {
+            'offer': offer,
+            'room': room_id
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error in rtc-offer: {e}")
+        emit('error', {'message': str(e)})
+
+@socketio.on('rtc-answer')
+def handle_rtc_answer(data):
+    """Student sends answer to teacher"""
+    try:
+        room_id = data.get('room')
+        answer = data.get('answer')
+        
+        if not all([room_id, answer]):
+            emit('error', {'message': 'Missing answer data'})
+            return
+        
+        # Find teacher in room
+        if room_id in rooms:
+            teacher_sid = rooms[room_id].get('teacher_sid')
+            if teacher_sid:
+                print(f"🎥 RTC answer from student to teacher")
+                emit('rtc-answer', {
+                    'answer': answer,
+                    'sid': request.sid
+                }, room=teacher_sid)
+            else:
+                emit('error', {'message': 'Teacher not found'})
+        
+    except Exception as e:
+        print(f"❌ Error in rtc-answer: {e}")
+        emit('error', {'message': str(e)})
+
+@socketio.on('rtc-ice-candidate')
+def handle_rtc_ice_candidate(data):
+    """Exchange ICE candidates"""
+    try:
+        room_id = data.get('room')
+        candidate = data.get('candidate')
+        target_sid = data.get('target_sid')
+        
+        if not all([room_id, candidate, target_sid]):
+            emit('error', {'message': 'Missing ICE candidate data'})
+            return
+        
+        print(f"❄️ ICE candidate to {target_sid}")
+        
+        # Forward ICE candidate to target
+        emit('rtc-ice-candidate', {
+            'candidate': candidate,
+            'sid': request.sid
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error in rtc-ice-candidate: {e}")
+        emit('error', {'message': str(e)})
+
+# ============================================
+# Control Events
+# ============================================
+
+@socketio.on('start-broadcast')
+def handle_start_broadcast(data):
+    """Teacher starts broadcasting to all students"""
+    try:
+        room_id = data.get('room')
+        
+        if room_id in rooms:
+            teacher_sid = rooms[room_id].get('teacher_sid')
+            if teacher_sid == request.sid:
+                # Notify all students in room
+                emit('broadcast-started', {
+                    'message': 'Teacher started broadcasting'
+                }, room=room_id, skip_sid=teacher_sid)
+                print(f"📢 Broadcast started in room: {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in start-broadcast: {e}")
+
+@socketio.on('stop-broadcast')
+def handle_stop_broadcast(data):
+    """Teacher stops broadcasting"""
+    try:
+        room_id = data.get('room')
+        
+        if room_id in rooms:
+            teacher_sid = rooms[room_id].get('teacher_sid')
+            if teacher_sid == request.sid:
+                emit('broadcast-stopped', room=room_id, skip_sid=teacher_sid)
+                print(f"📢 Broadcast stopped in room: {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in stop-broadcast: {e}")
+
+# ============================================
+# Flask Routes (Simple)
+# ============================================
+
 @app.route('/')
 def index():
-    user = session.get('user')
-    if not user:
-        return redirect(url_for('login'))
-    return render_template('index.html', user=user)
+    return render_template('index.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
-        
-        if username and password:
-            session['user'] = {
-                'username': username,
-                'email': f'{username}@example.com',
-                'joined_on': datetime.now().strftime('%Y-%m-%d'),
-                'preferred_language': 'English',
-                'last_login': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            }
-            flash('Logged in successfully!')
-            return redirect(url_for('index'))
-        else:
-            flash('Please enter username and password')
-    
-    return render_template('login.html')
+@app.route('/teacher/<room_id>')
+def teacher_view(room_id):
+    return render_template('teacher.html', room_id=room_id)
 
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
-        username = request.form.get('username').strip()
-        email = request.form.get('email').strip()
-        password = request.form.get('password').strip()
-        
-        if not username or not password or not email:
-            flash('Please fill out all fields.')
-            return redirect(url_for('signup'))
-        
-        try:
-            with app.app_context():
-                if User.query.filter_by(username=username).first():
-                    flash('Username already exists.')
-                    return redirect(url_for('signup'))
-                
-                new_user = User(
-                    username=username,
-                    email=email,
-                    joined_on=datetime.utcnow()
-                )
-                new_user.set_password(password)
-                db.session.add(new_user)
-                db.session.commit()
-                
-                session['user'] = {
-                    'username': username,
-                    'email': email,
-                    'joined_on': new_user.joined_on.strftime('%Y-%m-%d'),
-                    'preferred_language': 'English',
-                    'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                
-                flash('Account created successfully!')
-                return redirect(url_for('index'))
-                
-        except Exception as e:
-            flash(f'Error creating account: {str(e)}')
-            return redirect(url_for('signup'))
-    
-    return render_template('signup.html', user=session.get('user'))
+@app.route('/student/<room_id>')
+def student_view(room_id):
+    return render_template('student.html', room_id=room_id)
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
-
-# LIVE MEETING ROUTES
-@app.route("/live-meeting")
-def live_meeting_landing():
+@app.route('/create-room')
+def create_room():
     import uuid
     room_id = str(uuid.uuid4())[:8]
-    return redirect(url_for('live_meeting', room_id=room_id))
-
-@app.route("/live-meeting/<room_id>")
-def live_meeting(room_id):
-    return render_template("live_meeting.html", room_id=room_id)
-
-@app.route("/student-live/<room_id>")
-def student_live(room_id):
-    return render_template("student_live.html", room_id=room_id)
-
-@app.route("/join-live/<room_id>")
-def join_live(room_id):
-    return redirect(url_for('student_live', room_id=room_id))
-
-@app.route("/teacher-dashboard/<room_id>")
-def teacher_dashboard(room_id):
-    return render_template("teacher_dashboard.html", room_id=room_id)
-
-@app.route("/student-dashboard/<room_id>")
-def student_dashboard(room_id):
-    return render_template("student_dashboard.html", room_id=room_id)
-
-# API ENDPOINTS
-@app.route('/ask', methods=['POST'])
-@login_required
-def ask():
-    data = request.get_json()
-    question = data.get('question', '')
-    
-    if not question:
-        return jsonify({'error': 'Question required'}), 400
-    
-    # Your existing ask logic here...
-    return jsonify({
-        'answer': 'Response from AI...',
-        'question': question
-    })
-
-# API to get room state
-@app.route('/api/room/<room_id>', methods=['GET'])
-def get_room_info(room_id):
-    room_state = get_room_state(room_id)
-    if not room_state:
-        return jsonify({'error': 'Room not found'}), 404
-    
-    return jsonify({
-        'room_id': room_id,
-        'teacher': room_state.get('teacher_name'),
-        'state': room_state.get('state'),
-        'students': len(room_state.get('connected_students', [])),
-        'waiting': len(room_state.get('waiting_students', [])),
-        'created_at': room_state.get('created_at')
-    })
-
-# API to get active rooms
-@app.route('/api/rooms', methods=['GET'])
-def get_active_rooms():
-    rooms_list = []
-    try:
-        with app.app_context():
-            active_rooms = MeetingRoom.query.filter_by(state='live').all()
-            rooms_list = [{
-                'room_id': room.room_id,
-                'teacher': room.teacher_name,
-                'created_at': room.created_at.isoformat() if room.created_at else None
-            } for room in active_rooms]
-    except:
-        pass
-    
-    return jsonify({'rooms': rooms_list})
-
-# Static files
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory('static', 'favicon.ico')
+    return redirect(f'/teacher/{room_id}')
 
 # ============================================
-# APPLICATION STARTUP - GUNICORN COMPATIBLE
+# Run Server
 # ============================================
-if __name__ == "__main__":
-    import os
-    
-    port = int(os.environ.get("PORT", 5000))
-    
+if __name__ == '__main__':
     print(f"\n{'='*60}")
-    print("🚀 TAWFIQ AI - PRODUCTION MODE")
+    print("🚀 SIMPLIFIED WebRTC Broadcast System")
     print(f"{'='*60}")
-    print(f"📡 Port: {port}")
-    print(f"⚡ Server: Socket.IO with eventlet")
-    print(f"🎥 WebSocket: READY")
-    print(f"💾 Redis: {'✅ Connected' if REDIS_AVAILABLE else '❌ Not available'}")
-    print(f"🎬 Video Chat: ENABLED")
-    print(f"🎤 Audio: ENABLED")
-    print(f"📝 Chat: ENABLED")
+    print("✅ One signaling path")
+    print("✅ One join path")
+    print("✅ Clean WebRTC")
+    print("✅ Ready for 1→N broadcasting")
     print(f"{'='*60}\n")
     
-    # Run Socket.IO server directly
-    socketio.run(
-        app,
-        host="0.0.0.0",
-        port=port,
-        debug=True,
-        log_output=True
-    )
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
