@@ -269,25 +269,35 @@
             text-align: center;
         }
         
-        .video-container {
+        .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
         
-        .video-box {
-            background: #1a202c;
-            border-radius: 15px;
-            overflow: hidden;
+        .video-wrapper {
             position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
             aspect-ratio: 16/9;
+            min-height: 200px;
         }
         
-        .video-box video {
+        .video-wrapper.teacher {
+            border: 3px solid #667eea;
+        }
+        
+        .video-wrapper.student {
+            border: 2px solid #48bb78;
+        }
+        
+        video {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            background: #000;
         }
         
         .video-label {
@@ -301,14 +311,25 @@
             font-size: 0.9rem;
         }
         
-        .controls-section-video {
+        .empty-video {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 1.2rem;
+            height: 100%;
+            background: #1a202c;
+        }
+        
+        .video-controls {
             display: flex;
             gap: 15px;
             justify-content: center;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
         
-        .control-btn {
+        .video-btn {
             padding: 12px 25px;
             border: none;
             border-radius: 50px;
@@ -321,28 +342,44 @@
             gap: 10px;
         }
         
-        .control-btn-mic {
+        .video-btn-primary {
             background: #4299e1;
             color: white;
         }
         
-        .control-btn-mic:hover {
+        .video-btn-primary:hover {
             background: #3182ce;
             transform: translateY(-2px);
         }
         
-        .control-btn-camera {
+        .video-btn-success {
             background: #48bb78;
             color: white;
         }
         
-        .control-btn-camera:hover {
+        .video-btn-success:hover {
             background: #38a169;
             transform: translateY(-2px);
         }
         
-        .control-btn-muted {
+        .video-btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        
+        .video-btn-danger:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+        
+        .video-btn-muted {
             background: #f56565 !important;
+        }
+        
+        .video-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
         
         .students-section {
@@ -381,10 +418,34 @@
             margin-bottom: 10px;
         }
         
+        .student-status {
+            font-size: 0.9rem;
+            padding: 3px 10px;
+            border-radius: 15px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-connected {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .status-video {
+            background: #c3dafe;
+            color: #2c5282;
+        }
+        
         .student-actions {
             display: flex;
             gap: 10px;
             margin-top: 10px;
+            flex-wrap: wrap;
         }
         
         .action-btn {
@@ -394,6 +455,9 @@
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .action-btn-mute {
@@ -401,29 +465,42 @@
             color: white;
         }
         
+        .action-btn-mute:hover {
+            background: #e53e3e;
+            transform: translateY(-2px);
+        }
+        
         .action-btn-unmute {
             background: #48bb78;
             color: white;
         }
         
-        .action-btn-video-on {
+        .action-btn-unmute:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn-video {
             background: #4299e1;
             color: white;
         }
         
-        .action-btn-video-off {
-            background: #ed8936;
-            color: white;
+        .action-btn-video:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
         }
         
-        .action-btn:hover {
-            transform: translateY(-2px);
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
         
         .empty-state {
             text-align: center;
             padding: 40px;
             color: #666;
+            grid-column: 1 / -1;
         }
         
         .empty-state i {
@@ -506,11 +583,11 @@
                 grid-template-columns: 1fr;
             }
             
-            .controls-section-video {
+            .video-controls {
                 flex-direction: column;
             }
             
-            .control-btn {
+            .video-btn {
                 width: 100%;
                 justify-content: center;
             }
@@ -545,34 +622,39 @@
             <div class="left-column">
                 <!-- Video Section -->
                 <div class="video-section">
-                    <h2>🎥 Live Broadcast</h2>
+                    <h2>🎥 Classroom View</h2>
                     
-                    <div class="video-container">
-                        <div class="video-box">
+                    <div class="video-grid" id="videoGrid">
+                        <!-- Teacher Video (Always visible) -->
+                        <div class="video-wrapper teacher" id="teacherVideoWrapper">
                             <video id="teacherVideo" autoplay playsinline muted></video>
-                            <div class="video-label" id="teacherVideoLabel">Teacher (You)</div>
+                            <div class="video-label">Teacher (You)</div>
                         </div>
                         
-                        <div class="video-box" id="studentVideoContainer" style="display: none;">
-                            <video id="studentVideo" autoplay playsinline></video>
-                            <div class="video-label" id="studentVideoLabel">Student</div>
-                        </div>
+                        <!-- Student videos will be added here -->
+                        <!-- Template: <div class="video-wrapper student"><video></video><div class="video-label">Student</div></div> -->
                     </div>
                     
-                    <div class="controls-section-video">
-                        <button id="micBtn" class="control-btn control-btn-mic" onclick="toggleMic()" disabled>
+                    <div class="video-controls">
+                        <button id="micBtn" class="video-btn video-btn-primary" onclick="toggleMic()">
                             🎤 Microphone
                         </button>
-                        <button id="cameraBtn" class="control-btn control-btn-camera" onclick="toggleCamera()" disabled>
+                        <button id="cameraBtn" class="video-btn video-btn-primary" onclick="toggleCamera()">
                             📷 Camera
                         </button>
-                        <button id="startWebRTCBtn" class="control-btn" style="background: #9f7aea; color: white;" onclick="startWebRTC()" disabled>
-                            🚀 Start Video Call
+                        <button id="startMeetingBtn" class="video-btn video-btn-success" onclick="startMeeting()">
+                            🚀 Start Meeting
+                        </button>
+                        <button id="startWebRTCBtn" class="video-btn video-btn-success" onclick="startWebRTC()" disabled>
+                            🔗 Connect Videos
+                        </button>
+                        <button id="endMeetingBtn" class="video-btn video-btn-danger" onclick="endMeeting()" disabled>
+                            🛑 End Meeting
                         </button>
                     </div>
                 </div>
                 
-                <!-- Status & Controls Section -->
+                <!-- Status & Stats -->
                 <div class="status-section">
                     <div class="status-card">
                         <div id="statusIndicator" class="status-indicator status-waiting">
@@ -593,27 +675,11 @@
                                 <div class="stat-number" id="totalCount">0</div>
                                 <div class="stat-label">Total Students</div>
                             </div>
+                            <div class="stat-box">
+                                <div class="stat-number" id="videoCount">0</div>
+                                <div class="stat-label">Active Videos</div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Meeting Controls -->
-                <div class="controls-section">
-                    <div class="control-card">
-                        <h3>🎬 Start Meeting</h3>
-                        <p>Begin your live class session</p>
-                        <button id="startBtn" class="btn btn-start" onclick="startMeeting()">
-                            <span id="startText">🚀 Start Meeting</span>
-                            <span id="startLoading" class="loading" style="display: none;"></span>
-                        </button>
-                    </div>
-                    
-                    <div class="control-card">
-                        <h3>🛑 End Meeting</h3>
-                        <p>End the current session</p>
-                        <button id="endBtn" class="btn btn-end" onclick="endMeeting()" disabled>
-                            🛑 End Meeting
-                        </button>
                     </div>
                 </div>
             </div>
@@ -648,15 +714,18 @@
         
         let socket = null;
         let meetingStarted = false;
-        let students = {};
-        
-        // WebRTC variables
-        let peerConnections = {}; // Store connections for each student
         let localStream = null;
-        let configuration = {
+        let students = {};
+        let peerConnections = {};
+        let isCameraOn = true;
+        let isMicOn = true;
+        
+        // WebRTC configuration
+        const configuration = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
             ]
         };
         
@@ -692,31 +761,33 @@
             // Update status
             const statusText = document.getElementById('statusText');
             const statusIndicator = document.getElementById('statusIndicator');
-            const startBtn = document.getElementById('startBtn');
-            const endBtn = document.getElementById('endBtn');
+            const startMeetingBtn = document.getElementById('startMeetingBtn');
+            const endMeetingBtn = document.getElementById('endMeetingBtn');
             const startWebRTCBtn = document.getElementById('startWebRTCBtn');
             
             if (meetingStarted) {
                 statusText.textContent = 'Meeting is LIVE';
                 statusIndicator.className = 'status-indicator status-live';
-                startBtn.disabled = true;
-                endBtn.disabled = false;
+                startMeetingBtn.disabled = true;
+                endMeetingBtn.disabled = false;
                 startWebRTCBtn.disabled = false;
             } else {
                 statusText.textContent = 'Waiting to start meeting';
                 statusIndicator.className = 'status-indicator status-waiting';
-                startBtn.disabled = false;
-                endBtn.disabled = true;
+                startMeetingBtn.disabled = false;
+                endMeetingBtn.disabled = true;
                 startWebRTCBtn.disabled = true;
             }
             
             // Update student counts
-            const waitingStudents = Object.values(students).filter(s => !s.connected).length;
+            const waitingStudents = Object.values(students).filter(s => s.waiting).length;
             const connectedStudents = Object.values(students).filter(s => s.connected).length;
+            const videoStudents = Object.values(students).filter(s => s.videoConnected).length;
             
             document.getElementById('waitingCount').textContent = waitingStudents;
             document.getElementById('connectedCount').textContent = connectedStudents;
             document.getElementById('totalCount').textContent = Object.keys(students).length;
+            document.getElementById('videoCount').textContent = videoStudents;
             
             // Update student list
             const studentsList = document.getElementById('studentsList');
@@ -730,29 +801,35 @@
                 
                 let html = '';
                 Object.values(students).forEach(student => {
-                    const hasVideo = student.videoConnected || false;
-                    const isMuted = student.muted || false;
+                    let status = 'Waiting';
+                    let statusClass = 'status-waiting';
+                    
+                    if (student.connected) {
+                        status = 'Connected';
+                        statusClass = 'status-connected';
+                    }
+                    if (student.videoConnected) {
+                        status = 'Video Active';
+                        statusClass = 'status-video';
+                    }
                     
                     html += `
                     <div class="student-card">
                         <div class="student-name">${student.username}</div>
-                        <div class="student-id">${student.userId}</div>
-                        <div class="student-status">
-                            ${student.connected ? '✅ Connected' : '⏳ Waiting'}
-                            ${hasVideo ? ' | 🎥 Video' : ''}
-                        </div>
-                        ${student.connected ? `
+                        <div class="student-id">${student.userId.substring(0, 8)}...</div>
+                        <div class="student-status ${statusClass}">${status}</div>
                         <div class="student-actions">
-                            <button class="action-btn ${isMuted ? 'action-btn-unmute' : 'action-btn-mute'}" 
-                                    onclick="toggleStudentMute('${student.userId}')">
-                                ${isMuted ? '🔊 Unmute' : '🔇 Mute'}
+                            <button class="action-btn ${student.muted ? 'action-btn-unmute' : 'action-btn-mute'}" 
+                                    onclick="toggleStudentMute('${student.userId}')"
+                                    ${!student.connected ? 'disabled' : ''}>
+                                ${student.muted ? '🔊 Unmute' : '🔇 Mute'}
                             </button>
-                            <button class="action-btn ${hasVideo ? 'action-btn-video-off' : 'action-btn-video-on'}" 
-                                    onclick="toggleStudentVideo('${student.userId}')">
-                                ${hasVideo ? '📷 Stop Video' : '📷 Start Video'}
+                            <button class="action-btn action-btn-video" 
+                                    onclick="toggleStudentVideo('${student.userId}')"
+                                    ${!student.connected ? 'disabled' : ''}>
+                                ${student.videoConnected ? '📷 Hide' : '📷 Show'} Video
                             </button>
                         </div>
-                        ` : ''}
                     </div>
                     `;
                 });
@@ -762,34 +839,130 @@
         }
         
         // ============================================
-        // WEBRTC FUNCTIONS
+        // MEDIA STREAM FUNCTIONS
         // ============================================
-        async function initWebRTC() {
+        async function startLocalStream() {
             try {
-                // Get camera and microphone access
+                // Request camera and microphone with better quality
                 localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
                 });
                 
-                // Show local video
+                // Show teacher video
                 const teacherVideo = document.getElementById('teacherVideo');
                 teacherVideo.srcObject = localStream;
                 
-                // Enable controls
+                // Enable camera/mic controls
                 document.getElementById('micBtn').disabled = false;
                 document.getElementById('cameraBtn').disabled = false;
                 
-                console.log('✅ WebRTC initialized with local stream');
+                // Update button states
+                updateCameraMicButtons();
+                
+                console.log('✅ Local stream started');
                 return true;
+                
             } catch (error) {
-                console.error('❌ WebRTC init error:', error);
-                showNotification('Camera/microphone access required', 'error');
+                console.error('❌ Error starting local stream:', error);
+                
+                if (error.name === 'NotAllowedError') {
+                    showNotification('Camera/microphone access denied. Please check permissions.', 'error');
+                } else if (error.name === 'NotFoundError') {
+                    showNotification('No camera/microphone found.', 'error');
+                } else {
+                    showNotification('Failed to access camera/microphone.', 'error');
+                }
+                
+                // Create dummy stream for audio only
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    showNotification('Using audio only mode', 'info');
+                } catch (audioError) {
+                    console.error('❌ Audio only mode also failed:', audioError);
+                }
+                
                 return false;
             }
         }
         
+        function toggleMic() {
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    audioTrack.enabled = !audioTrack.enabled;
+                    isMicOn = audioTrack.enabled;
+                    updateCameraMicButtons();
+                    showNotification(isMicOn ? 'Microphone on' : 'Microphone muted', 'info');
+                    
+                    // Update mic state for all peers
+                    Object.values(peerConnections).forEach(pc => {
+                        if (pc.getSenders) {
+                            const sender = pc.getSenders().find(s => s.track && s.track.kind === 'audio');
+                            if (sender) {
+                                sender.replaceTrack(audioTrack);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        
+        function toggleCamera() {
+            if (localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    isCameraOn = videoTrack.enabled;
+                    updateCameraMicButtons();
+                    showNotification(isCameraOn ? 'Camera on' : 'Camera off', 'info');
+                    
+                    // Update camera state for all peers
+                    Object.values(peerConnections).forEach(pc => {
+                        if (pc.getSenders) {
+                            const sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
+                            if (sender) {
+                                sender.replaceTrack(videoTrack);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        
+        function updateCameraMicButtons() {
+            const micBtn = document.getElementById('micBtn');
+            const cameraBtn = document.getElementById('cameraBtn');
+            
+            micBtn.innerHTML = isMicOn ? '🎤 Mute' : '🔇 Unmute';
+            micBtn.classList.toggle('video-btn-muted', !isMicOn);
+            
+            cameraBtn.innerHTML = isCameraOn ? '📷 Stop Camera' : '📷 Start Camera';
+            cameraBtn.classList.toggle('video-btn-muted', !isCameraOn);
+        }
+        
+        // ============================================
+        // WEBRTC FUNCTIONS
+        // ============================================
         async function createPeerConnection(studentId) {
+            console.log(`Creating peer connection for ${studentId}`);
+            
+            if (!localStream) {
+                const success = await startLocalStream();
+                if (!success) {
+                    showNotification('Cannot start WebRTC without camera/mic', 'error');
+                    return null;
+                }
+            }
+            
             const pc = new RTCPeerConnection(configuration);
             
             // Add local stream tracks
@@ -812,149 +985,160 @@
             
             // Handle remote stream
             pc.ontrack = (event) => {
-                const studentVideo = document.getElementById('studentVideo');
-                const studentVideoContainer = document.getElementById('studentVideoContainer');
+                console.log(`Received remote stream from ${studentId}`);
                 
-                if (studentVideo.srcObject !== event.streams[0]) {
-                    studentVideo.srcObject = event.streams[0];
-                    studentVideoContainer.style.display = 'block';
-                    
-                    // Update student state
-                    if (students[studentId]) {
-                        students[studentId].videoConnected = true;
-                        updateUI();
-                    }
+                // Add student video element
+                addStudentVideo(studentId, event.streams[0]);
+                
+                // Update student state
+                if (students[studentId]) {
+                    students[studentId].videoConnected = true;
+                    updateUI();
                 }
             };
             
+            // Handle connection state
             pc.onconnectionstatechange = () => {
                 console.log(`Connection state for ${studentId}: ${pc.connectionState}`);
                 
-                if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
-                    // Clean up if disconnected
-                    if (students[studentId]) {
-                        students[studentId].videoConnected = false;
-                        updateUI();
-                    }
+                if (pc.connectionState === 'connected') {
+                    console.log(`✅ Connected to ${studentId}`);
+                } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                    console.log(`❌ Connection lost for ${studentId}`);
+                    cleanupPeer(studentId);
                 }
             };
             
+            // Handle ICE connection state
+            pc.oniceconnectionstatechange = () => {
+                console.log(`ICE connection state for ${studentId}: ${pc.iceConnectionState}`);
+            };
+            
+            peerConnections[studentId] = pc;
             return pc;
         }
         
-        async function startWebRTC() {
-            if (!meetingStarted) {
-                showNotification('Please start the meeting first', 'error');
-                return;
+        async function initiateWebRTC(studentId) {
+            try {
+                const pc = await createPeerConnection(studentId);
+                if (!pc) return;
+                
+                // Create and send offer
+                const offer = await pc.createOffer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                });
+                
+                await pc.setLocalDescription(offer);
+                
+                socket.emit('webrtc-signal', {
+                    room: roomId,
+                    from: teacherId,
+                    to: studentId,
+                    signal: offer,
+                    type: 'offer'
+                });
+                
+                console.log(`✅ WebRTC offer sent to ${studentId}`);
+                
+            } catch (error) {
+                console.error(`❌ Error initiating WebRTC with ${studentId}:`, error);
+                showNotification(`Failed to connect video with ${students[studentId]?.username || 'student'}`, 'error');
             }
-            
-            if (!localStream) {
-                const success = await initWebRTC();
-                if (!success) return;
-            }
-            
-            showNotification('Starting video call with students...', 'info');
-            
-            // Create peer connections for all connected students
-            Object.keys(students).forEach(async (studentId) => {
-                if (students[studentId].connected && !peerConnections[studentId]) {
-                    try {
-                        const pc = await createPeerConnection(studentId);
-                        peerConnections[studentId] = pc;
-                        
-                        // Create and send offer
-                        const offer = await pc.createOffer();
-                        await pc.setLocalDescription(offer);
-                        
-                        socket.emit('webrtc-signal', {
-                            room: roomId,
-                            from: teacherId,
-                            to: studentId,
-                            signal: offer,
-                            type: 'offer'
-                        });
-                        
-                        console.log(`✅ Created peer connection for ${studentId}`);
-                    } catch (error) {
-                        console.error(`❌ Error creating peer connection for ${studentId}:`, error);
-                    }
-                }
-            });
         }
         
         async function handleWebRTCSignal(data) {
             const { from: studentId, signal, type } = data;
             
             try {
+                if (!peerConnections[studentId]) {
+                    await createPeerConnection(studentId);
+                }
+                
+                const pc = peerConnections[studentId];
+                if (!pc) return;
+                
                 if (type === 'answer') {
-                    const pc = peerConnections[studentId];
-                    if (pc && pc.signalingState !== 'closed') {
-                        await pc.setRemoteDescription(new RTCSessionDescription(signal));
-                    }
+                    await pc.setRemoteDescription(new RTCSessionDescription(signal));
                 } else if (signal.candidate) {
-                    const pc = peerConnections[studentId];
-                    if (pc && pc.remoteDescription) {
+                    try {
                         await pc.addIceCandidate(new RTCIceCandidate(signal));
+                    } catch (e) {
+                        console.warn('Error adding ICE candidate:', e);
                     }
                 }
+                
             } catch (error) {
-                console.error('❌ WebRTC signal error:', error);
+                console.error(`❌ Error handling WebRTC signal from ${studentId}:`, error);
             }
         }
         
-        function toggleMic() {
-            if (localStream) {
-                const audioTrack = localStream.getAudioTracks()[0];
-                if (audioTrack) {
-                    audioTrack.enabled = !audioTrack.enabled;
-                    const micBtn = document.getElementById('micBtn');
-                    micBtn.classList.toggle('control-btn-muted');
-                    micBtn.innerHTML = audioTrack.enabled ? '🎤 Mute' : '🔇 Unmute';
-                    showNotification(audioTrack.enabled ? 'Microphone on' : 'Microphone muted', 'info');
+        function cleanupPeer(studentId) {
+            if (peerConnections[studentId]) {
+                try {
+                    peerConnections[studentId].close();
+                } catch (e) {
+                    console.warn('Error closing peer connection:', e);
                 }
+                delete peerConnections[studentId];
+            }
+            
+            // Remove student video
+            removeStudentVideo(studentId);
+            
+            // Update student state
+            if (students[studentId]) {
+                students[studentId].videoConnected = false;
+                updateUI();
             }
         }
         
-        function toggleCamera() {
-            if (localStream) {
-                const videoTrack = localStream.getVideoTracks()[0];
-                if (videoTrack) {
-                    videoTrack.enabled = !videoTrack.enabled;
-                    const cameraBtn = document.getElementById('cameraBtn');
-                    cameraBtn.classList.toggle('control-btn-muted');
-                    cameraBtn.innerHTML = videoTrack.enabled ? '📷 Stop Camera' : '📷 Start Camera';
-                    showNotification(videoTrack.enabled ? 'Camera on' : 'Camera off', 'info');
-                }
-            }
-        }
-        
-        function toggleStudentMute(studentId) {
-            if (!socket || !socket.connected) return;
-            
-            const student = students[studentId];
-            if (!student) return;
-            
-            const shouldMute = !student.muted;
-            
-            socket.emit(shouldMute ? 'mute-student' : 'unmute-student', {
-                room: roomId,
-                userId: studentId
+        function cleanupAllPeers() {
+            Object.keys(peerConnections).forEach(studentId => {
+                cleanupPeer(studentId);
             });
-            
-            student.muted = shouldMute;
-            updateUI();
-            
-            showNotification(`${student.username} ${shouldMute ? 'muted' : 'unmuted'}`, 'info');
+            peerConnections = {};
         }
         
-        function toggleStudentVideo(studentId) {
-            if (!socket || !socket.connected) return;
+        function addStudentVideo(studentId, stream) {
+            const videoGrid = document.getElementById('videoGrid');
             
-            const student = students[studentId];
-            if (!student) return;
+            // Check if video already exists
+            const existingVideo = document.getElementById(`video-${studentId}`);
+            if (existingVideo) {
+                const video = existingVideo.querySelector('video');
+                video.srcObject = stream;
+                return;
+            }
             
-            // In a real implementation, you would send a signal to toggle video
-            showNotification(`Video toggle for ${student.username} requested`, 'info');
+            // Create new video element
+            const videoWrapper = document.createElement('div');
+            videoWrapper.className = 'video-wrapper student';
+            videoWrapper.id = `video-${studentId}`;
+            
+            const video = document.createElement('video');
+            video.id = `stream-${studentId}`;
+            video.autoplay = true;
+            video.playsInline = true;
+            video.srcObject = stream;
+            
+            const label = document.createElement('div');
+            label.className = 'video-label';
+            label.textContent = students[studentId]?.username || 'Student';
+            
+            videoWrapper.appendChild(video);
+            videoWrapper.appendChild(label);
+            videoGrid.appendChild(videoWrapper);
+            
+            console.log(`✅ Added video for ${studentId}`);
+        }
+        
+        function removeStudentVideo(studentId) {
+            const videoElement = document.getElementById(`video-${studentId}`);
+            if (videoElement) {
+                videoElement.remove();
+                console.log(`✅ Removed video for ${studentId}`);
+            }
         }
         
         // ============================================
@@ -984,6 +1168,9 @@
                     userId: teacherId,
                     username: username
                 });
+                
+                // Start local stream immediately
+                startLocalStream();
             });
             
             socket.on('connect_error', (error) => {
@@ -996,7 +1183,7 @@
                 showNotification('Disconnected from server', 'error');
             });
             
-            // Room state events
+            // ========== ROOM STATE EVENTS ==========
             socket.on('room-state', (data) => {
                 console.log('📊 Room state received:', data);
                 meetingStarted = data.state === 'live';
@@ -1012,9 +1199,25 @@
                 meetingStarted = true;
                 showNotification('Meeting started successfully!', 'success');
                 updateUI();
+                
+                // Auto-start WebRTC when meeting starts
+                setTimeout(() => startWebRTC(), 1000);
             });
             
-            // Student events
+            socket.on('room-ended', (data) => {
+                console.log('🛑 Room ended:', data);
+                meetingStarted = false;
+                students = {};
+                
+                // Clean up WebRTC connections
+                cleanupAllPeers();
+                
+                // Reset UI
+                updateUI();
+                showNotification('Meeting has ended', 'info');
+            });
+            
+            // ========== STUDENT EVENTS ==========
             socket.on('student-joined', (data) => {
                 console.log('👨‍🎓 Student joined:', data);
                 
@@ -1023,6 +1226,7 @@
                     username: data.username,
                     socketId: data.socketId,
                     connected: meetingStarted,
+                    waiting: !meetingStarted,
                     videoConnected: false,
                     muted: false
                 };
@@ -1030,9 +1234,9 @@
                 updateUI();
                 showNotification(`${data.username} joined the class`, 'info');
                 
-                // If meeting is live, automatically start WebRTC with new student
+                // If meeting is live, auto-connect video
                 if (meetingStarted && localStream) {
-                    setTimeout(() => startWebRTCWithStudent(data.userId), 1000);
+                    setTimeout(() => initiateWebRTC(data.userId), 2000);
                 }
             });
             
@@ -1040,24 +1244,25 @@
                 console.log('👋 Student left:', data);
                 
                 if (students[data.userId]) {
-                    // Clean up WebRTC connection
-                    if (peerConnections[data.userId]) {
-                        peerConnections[data.userId].close();
-                        delete peerConnections[data.userId];
-                    }
+                    // Clean up WebRTC
+                    cleanupPeer(data.userId);
                     
                     delete students[data.userId];
                     updateUI();
                     showNotification(`${data.username} left the class`, 'info');
-                    
-                    // Hide student video container if no students
-                    if (Object.keys(students).length === 0) {
-                        document.getElementById('studentVideoContainer').style.display = 'none';
-                    }
                 }
             });
             
-            socket.on('student-muted-confirm', (data) => {
+            socket.on('student-waiting-ack', (data) => {
+                console.log('⏳ Student waiting acknowledged:', data);
+            });
+            
+            socket.on('student-joined-ack', (data) => {
+                console.log('✅ Student joined acknowledged:', data);
+            });
+            
+            // ========== CONTROL EVENTS ==========
+            socket.on('student-muted', (data) => {
                 const student = students[data.userId];
                 if (student) {
                     student.muted = data.muted;
@@ -1066,82 +1271,21 @@
                 }
             });
             
-            // WebRTC events
-            socket.on('webrtc-start-teacher', (data) => {
-                console.log('🎥 WebRTC start request:', data);
-                showNotification('Starting video call with students...', 'info');
-            });
-            
+            // ========== WEBRTC EVENTS ==========
             socket.on('webrtc-signal', (data) => {
                 console.log('📡 WebRTC signal received from student:', data.from);
                 handleWebRTCSignal(data);
             });
             
-            // Error handling
+            socket.on('webrtc-start-student', (data) => {
+                console.log('🎥 WebRTC start request from student:', data);
+            });
+            
+            // ========== ERROR HANDLING ==========
             socket.on('error', (data) => {
                 console.error('❌ Socket error:', data);
                 showNotification(`Error: ${data.message}`, 'error');
-                
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('startText').style.display = 'inline';
-                document.getElementById('startLoading').style.display = 'none';
             });
-            
-            socket.on('room-ended', (data) => {
-                console.log('🛑 Room ended:', data);
-                meetingStarted = false;
-                students = {};
-                
-                // Clean up all WebRTC connections
-                Object.values(peerConnections).forEach(pc => pc.close());
-                peerConnections = {};
-                
-                // Stop local stream
-                if (localStream) {
-                    localStream.getTracks().forEach(track => track.stop());
-                    localStream = null;
-                }
-                
-                // Reset video elements
-                document.getElementById('teacherVideo').srcObject = null;
-                document.getElementById('studentVideo').srcObject = null;
-                document.getElementById('studentVideoContainer').style.display = 'none';
-                
-                // Disable controls
-                document.getElementById('micBtn').disabled = true;
-                document.getElementById('cameraBtn').disabled = true;
-                document.getElementById('startWebRTCBtn').disabled = true;
-                
-                updateUI();
-                showNotification('Meeting has ended', 'info');
-            });
-        }
-        
-        async function startWebRTCWithStudent(studentId) {
-            if (!localStream) {
-                const success = await initWebRTC();
-                if (!success) return;
-            }
-            
-            try {
-                const pc = await createPeerConnection(studentId);
-                peerConnections[studentId] = pc;
-                
-                const offer = await pc.createOffer();
-                await pc.setLocalDescription(offer);
-                
-                socket.emit('webrtc-signal', {
-                    room: roomId,
-                    from: teacherId,
-                    to: studentId,
-                    signal: offer,
-                    type: 'offer'
-                });
-                
-                console.log(`✅ Started WebRTC with ${studentId}`);
-            } catch (error) {
-                console.error(`❌ Error starting WebRTC with ${studentId}:`, error);
-            }
         }
         
         // ============================================
@@ -1155,14 +1299,6 @@
             
             console.log('🎬 Starting meeting...');
             
-            const startBtn = document.getElementById('startBtn');
-            const startText = document.getElementById('startText');
-            const startLoading = document.getElementById('startLoading');
-            
-            startBtn.disabled = true;
-            startText.style.display = 'none';
-            startLoading.style.display = 'inline-block';
-            
             socket.emit('start-meeting', {
                 room: roomId,
                 timestamp: Date.now()
@@ -1172,15 +1308,27 @@
             updateUI();
             
             showNotification('Starting meeting...', 'info');
+        }
+        
+        function startWebRTC() {
+            if (!meetingStarted) {
+                showNotification('Please start the meeting first', 'error');
+                return;
+            }
             
-            setTimeout(() => {
-                if (startText.style.display === 'none') {
-                    startText.style.display = 'inline';
-                    startLoading.style.display = 'none';
-                    startBtn.disabled = false;
-                    showNotification('Start request timed out', 'error');
+            if (!localStream) {
+                showNotification('Cannot start video without camera/mic access', 'error');
+                return;
+            }
+            
+            showNotification('Starting video connections with students...', 'info');
+            
+            // Create WebRTC connections with all connected students
+            Object.keys(students).forEach(studentId => {
+                if (students[studentId].connected && !peerConnections[studentId]) {
+                    initiateWebRTC(studentId);
                 }
-            }, 3000);
+            });
         }
         
         function endMeeting() {
@@ -1189,7 +1337,7 @@
                 return;
             }
             
-            if (confirm('Are you sure you want to end the meeting?')) {
+            if (confirm('Are you sure you want to end the meeting? All students will be disconnected.')) {
                 console.log('🛑 Ending meeting...');
                 
                 socket.emit('end-meeting', {
@@ -1201,6 +1349,45 @@
         }
         
         // ============================================
+        // STUDENT CONTROL FUNCTIONS
+        // ============================================
+        function toggleStudentMute(studentId) {
+            if (!socket || !socket.connected) return;
+            
+            const student = students[studentId];
+            if (!student) return;
+            
+            const shouldMute = !student.muted;
+            
+            socket.emit(shouldMute ? 'mute-student' : 'unmute-student', {
+                room: roomId,
+                userId: studentId
+            });
+            
+            student.muted = shouldMute;
+            updateUI();
+            
+            showNotification(`${student.username} ${shouldMute ? 'muted' : 'unmuted'}`, 'info');
+        }
+        
+        function toggleStudentVideo(studentId) {
+            const student = students[studentId];
+            if (!student) return;
+            
+            if (student.videoConnected) {
+                // Hide video
+                removeStudentVideo(studentId);
+                student.videoConnected = false;
+                showNotification(`${student.username}'s video hidden`, 'info');
+            } else {
+                // Show video - will appear when stream is received
+                showNotification(`Requesting video from ${student.username}...`, 'info');
+            }
+            
+            updateUI();
+        }
+        
+        // ============================================
         // INITIALIZATION
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
@@ -1208,9 +1395,13 @@
             console.log('Room ID:', roomId);
             console.log('Teacher ID:', teacherId);
             
+            // Connect to Socket.IO
             connectSocket();
+            
+            // Initialize UI
             updateUI();
             
+            // Prevent accidental refresh during meeting
             window.addEventListener('beforeunload', (e) => {
                 if (meetingStarted) {
                     e.preventDefault();
@@ -1218,6 +1409,7 @@
                 }
             });
             
+            // Keep connection alive
             setInterval(() => {
                 if (socket && socket.connected) {
                     socket.emit('ping', { timestamp: Date.now() });
