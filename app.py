@@ -867,6 +867,128 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@socketio.on('join-room')
+def handle_join_room(data):
+    """Handle both teacher and student joining rooms"""
+    try:
+        sid = request.sid
+        room_id = data.get('room')
+        user_id = data.get('userId')
+        username = data.get('username', 'User')
+        role = data.get('role', 'student')
+        
+        if not room_id:
+            emit('error', {'message': 'Room ID required'})
+            return
+        
+        print(f"👤 {username} ({role}) joining room {room_id}")
+        
+        # Update session
+        active_sessions[sid]['room'] = room_id
+        active_sessions[sid]['user_type'] = role
+        active_sessions[sid]['user_id'] = user_id
+        active_sessions[sid]['username'] = username
+        
+        # Room connections
+        if room_id not in room_connections:
+            room_connections[room_id] = []
+        if sid not in room_connections[room_id]:
+            room_connections[room_id].append(sid)
+        
+        join_room(room_id)
+        
+        # Get or create room state
+        room_state = get_room_state(room_id)
+        
+        if role == 'teacher':
+            # Teacher joining
+            if not room_state:
+                room_state = {
+                    'state': 'waiting',
+                    'teacher_id': user_id,
+                    'teacher_name': username,
+                    'teacher_sid': sid,
+                    'created_at': datetime.utcnow().isoformat(),
+                    'waiting_students': [],
+                    'connected_students': []
+                }
+                save_room_state(room_id, room_state)
+            
+            emit('room-state', {
+                'state': room_state['state'],
+                'waitingStudents': len(room_state['waiting_students']),
+                'connectedStudents': len(room_state['connected_students']),
+                'teacherId': user_id,
+                'teacherName': username,
+                'roomId': room_id
+            })
+            
+            # Notify existing students about teacher
+            for student in room_state['connected_students']:
+                student_sid = student.get('sid')
+                if student_sid:
+                    emit('teacher-connected', {
+                        'teacherId': user_id,
+                        'teacherName': username,
+                        'socketId': sid
+                    }, room=student_sid)
+                    
+        elif role == 'student':
+            # Student joining
+            if not room_state:
+                emit('error', {'message': 'Room not found. Teacher needs to create it first.'})
+                return
+            
+            # Add student to room state
+            student_data = {
+                'user_id': user_id,
+                'username': username,
+                'sid': sid,
+                'joined_at': datetime.utcnow().isoformat(),
+                'connected': room_state['state'] == 'live'
+            }
+            
+            if room_state['state'] == 'waiting':
+                room_state['waiting_students'].append(student_data)
+            else:
+                room_state['connected_students'].append(student_data)
+            
+            save_room_state(room_id, room_state)
+            
+            # Notify teacher
+            teacher_sid = room_state.get('teacher_sid')
+            if teacher_sid:
+                emit('student-joined', {
+                    'userId': user_id,
+                    'username': username,
+                    'socketId': sid
+                }, room=teacher_sid)
+            
+            # Send response to student
+            emit('student-joined-ack', {
+                'status': 'joined',
+                'room': room_id,
+                'teacherName': room_state['teacher_name'],
+                'message': 'Successfully joined the class',
+                'meetingStarted': room_state['state'] == 'live'
+            })
+            
+            # Update room state
+            emit('room-state', {
+                'state': room_state['state'],
+                'waitingStudents': len(room_state['waiting_students']),
+                'connectedStudents': len(room_state['connected_students']),
+                'teacherId': room_state['teacher_id'],
+                'teacherName': room_state['teacher_name'],
+                'roomId': room_id
+            }, room=room_id)
+        
+        print(f"✅ {username} joined room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in join-room: {e}")
+        emit('error', {'message': str(e)})
+
 @app.route('/')
 def index():
     user = session.get('user')
