@@ -342,22 +342,6 @@
             opacity: 0.3;
         }
         
-        .device-selector {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            display: none;
-        }
-        
-        .device-selector select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-top: 5px;
-        }
-        
         @media (max-width: 768px) {
             .container {
                 border-radius: 10px;
@@ -392,16 +376,62 @@
                 justify-content: center;
             }
         }
+        
+        .room-code-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .room-code-display {
+            font-family: monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4299e1;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+            letter-spacing: 2px;
+            border: 2px dashed #4299e1;
+            margin-top: 10px;
+        }
+        
+        .copy-btn {
+            margin-top: 10px;
+            background: #718096;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn:hover {
+            background: #4a5568;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎓 Join Live Class</h1>
-            <p>Enter your name to join the virtual classroom</p>
+            <p id="headerSubtitle">Enter your name to join the virtual classroom</p>
         </div>
         
         <div class="main-content">
+            <!-- Room Code Display -->
+            <div id="roomCodeSection" class="room-code-section">
+                <div style="text-align: center;">
+                    <div style="color: #666; margin-bottom: 5px;">Share this code with students:</div>
+                    <div class="room-code-display" id="displayRoomCode">Loading...</div>
+                    <button onclick="copyRoomCode()" class="copy-btn">📋 Copy Code</button>
+                </div>
+            </div>
+            
             <!-- Join Section -->
             <div class="join-section">
                 <div class="input-group">
@@ -414,18 +444,6 @@
                         <span id="joinText">🎯 Join Class</span>
                         <span id="joinLoading" class="loading" style="display: none;"></span>
                     </button>
-                </div>
-                
-                <!-- Device Selection -->
-                <div id="deviceSelector" class="device-selector">
-                    <div style="margin-bottom: 10px;">
-                        <label for="videoSelect">Camera:</label>
-                        <select id="videoSelect" class="device-select"></select>
-                    </div>
-                    <div>
-                        <label for="audioSelect">Microphone:</label>
-                        <select id="audioSelect" class="device-select"></select>
-                    </div>
                 </div>
                 
                 <div id="rejoinSection" style="display: none; margin-top: 20px;">
@@ -450,7 +468,7 @@
                         </div>
                         <div class="info-card">
                             <div class="info-label">Room</div>
-                            <div class="info-value" id="roomCode">Loading...</div>
+                            <div class="info-value" id="roomCode">-</div>
                         </div>
                         <div class="info-card">
                             <div class="info-label">Status</div>
@@ -465,10 +483,12 @@
                         <p style="color: #666;">You'll be connected as soon as the teacher starts the class.</p>
                     </div>
                     
-                    <div id="connectionStats" style="margin-top: 20px; display: none;">
-                        <div style="font-size: 0.9rem; color: #666;">
-                            📶 Connection: <span id="connectionQuality">Good</span>
-                        </div>
+                    <div id="errorMessage" style="display: none; margin-top: 20px; padding: 15px; background: #fed7d7; border-radius: 10px; color: #742a2a;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">⚠️ Connection Error</div>
+                        <div id="errorText">Room not found. Please check the room code.</div>
+                        <button onclick="retryConnection()" style="margin-top: 10px; padding: 8px 15px; background: #c53030; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            🔄 Retry Connection
+                        </button>
                     </div>
                 </div>
             </div>
@@ -499,9 +519,6 @@
                     <button id="cameraBtn" class="control-btn control-btn-camera" onclick="toggleCamera()" disabled>
                         📷 Camera
                     </button>
-                    <button id="deviceBtn" class="control-btn" onclick="toggleDeviceSelector()" style="background: #a0aec0; color: white;">
-                        ⚙️ Devices
-                    </button>
                 </div>
             </div>
         </div>
@@ -515,15 +532,30 @@
         // GLOBAL VARIABLES
         // ============================================
         const urlParams = new URLSearchParams(window.location.search);
-        const roomId = urlParams.get('room') || 'default-class-room';
+        let roomId = urlParams.get('room');
+        
+        // If no room in URL, try to get from path
+        if (!roomId) {
+            const pathSegments = window.location.pathname.split('/');
+            const lastSegment = pathSegments[pathSegments.length - 1];
+            if (lastSegment && lastSegment !== 'student-live' && lastSegment !== 'student.html') {
+                roomId = lastSegment;
+            }
+        }
+        
+        // Fallback to default
+        if (!roomId) {
+            roomId = 'default-class-room';
+        }
+        
+        console.log('Room ID:', roomId);
+        
         let socket = null;
         let studentId = null;
         let studentName = null;
         let isJoined = false;
         let isWaiting = false;
         let meetingStarted = false;
-        let selectedVideoDevice = null;
-        let selectedAudioDevice = null;
         
         // WebRTC variables
         let peerConnection = null;
@@ -533,23 +565,13 @@
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' }
-            ],
-            iceCandidatePoolSize: 10
+                { urls: 'stun:stun2.l.google.com:19302' }
+            ]
         };
         
         // ============================================
         // HELPER FUNCTIONS
         // ============================================
-        function sanitizeInput(input) {
-            return input
-                .trim()
-                .replace(/[<>]/g, '')
-                .substring(0, 30);
-        }
-        
         function showNotification(message, type = 'info') {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -561,6 +583,17 @@
             }, 3000);
         }
         
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+        
         function updateUI() {
             const statusIndicator = document.getElementById('statusIndicator');
             const statusText = document.getElementById('statusText');
@@ -569,8 +602,9 @@
             const waitingMessage = document.getElementById('waitingMessage');
             const roomCodeElement = document.getElementById('roomCode');
             
-            // Update room code
-            roomCodeElement.textContent = roomId.substring(0, 8) + '...';
+            // Update room code display
+            roomCodeElement.textContent = roomId;
+            document.getElementById('displayRoomCode').textContent = roomId;
             
             if (isJoined) {
                 if (meetingStarted) {
@@ -582,7 +616,6 @@
                     `;
                     waitingMessage.style.display = 'none';
                     document.getElementById('teacherStatus').style.display = 'block';
-                    document.getElementById('connectionStats').style.display = 'block';
                 } else {
                     // Joined but waiting
                     statusIndicator.className = 'status-indicator status-waiting';
@@ -592,10 +625,10 @@
                     `;
                     waitingMessage.style.display = 'block';
                     document.getElementById('teacherStatus').style.display = 'none';
-                    document.getElementById('connectionStats').style.display = 'none';
                 }
                 classInfo.style.display = 'grid';
                 joinBtn.disabled = true;
+                document.getElementById('roomCodeSection').style.display = 'block';
             } else {
                 // Not joined
                 statusIndicator.className = 'status-indicator status-disconnected';
@@ -606,59 +639,26 @@
                 classInfo.style.display = 'none';
                 waitingMessage.style.display = 'none';
                 document.getElementById('teacherStatus').style.display = 'none';
-                document.getElementById('connectionStats').style.display = 'none';
                 joinBtn.disabled = false;
+                document.getElementById('roomCodeSection').style.display = 'block';
             }
         }
         
-        async function enumerateDevices() {
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoSelect = document.getElementById('videoSelect');
-                const audioSelect = document.getElementById('audioSelect');
-                
-                videoSelect.innerHTML = '';
-                audioSelect.innerHTML = '';
-                
-                let videoDevices = devices.filter(device => device.kind === 'videoinput');
-                let audioDevices = devices.filter(device => device.kind === 'audioinput');
-                
-                // Add default options
-                videoSelect.innerHTML = '<option value="">Default Camera</option>';
-                audioSelect.innerHTML = '<option value="">Default Microphone</option>';
-                
-                // Add video devices
-                videoDevices.forEach(device => {
-                    const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.text = device.label || `Camera ${videoSelect.length}`;
-                    videoSelect.appendChild(option);
-                });
-                
-                // Add audio devices
-                audioDevices.forEach(device => {
-                    const option = document.createElement('option');
-                    option.value = device.deviceId;
-                    option.text = device.label || `Microphone ${audioSelect.length}`;
-                    audioSelect.appendChild(option);
-                });
-                
-                // Set saved preferences
-                if (selectedVideoDevice) {
-                    videoSelect.value = selectedVideoDevice;
-                }
-                if (selectedAudioDevice) {
-                    audioSelect.value = selectedAudioDevice;
-                }
-                
-            } catch (error) {
-                console.error('Error enumerating devices:', error);
-            }
+        function copyRoomCode() {
+            navigator.clipboard.writeText(roomId).then(() => {
+                showNotification('Room code copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
         }
         
-        function toggleDeviceSelector() {
-            const selector = document.getElementById('deviceSelector');
-            selector.style.display = selector.style.display === 'block' ? 'none' : 'block';
+        function retryConnection() {
+            hideError();
+            if (studentId && studentName) {
+                rejoinClass();
+            } else {
+                joinClass();
+            }
         }
         
         // ============================================
@@ -667,25 +667,25 @@
         function connectSocket() {
             console.log('🔌 Connecting to Socket.IO...');
             
-            // Use your Socket.IO server URL (change this to your server)
-            const socketServerUrl = window.location.hostname === 'localhost' 
-                ? 'http://localhost:3000'
-                : window.location.origin;
+            // Use current origin for Socket.IO
+            const socketServerUrl = window.location.origin;
             
             socket = io(socketServerUrl, {
                 transports: ['websocket', 'polling'],
-                upgrade: true,
-                forceNew: true,
                 reconnection: true,
                 reconnectionDelay: 1000,
                 reconnectionDelayMax: 5000,
-                reconnectionAttempts: Infinity
+                reconnectionAttempts: 10
             });
             
             // Connection events
             socket.on('connect', () => {
                 console.log('✅ Socket connected:', socket.id);
                 showNotification('Connected to server', 'success');
+                hideError();
+                
+                // Update header with room info
+                document.getElementById('headerSubtitle').textContent = `Room: ${roomId}`;
                 
                 // If we have student credentials, auto-rejoin
                 if (studentId && studentName) {
@@ -695,12 +695,14 @@
             
             socket.on('connect_error', (error) => {
                 console.error('❌ Socket connection error:', error);
-                showNotification('Connection error. Reconnecting...', 'error');
+                showError('Connection error. Please check your internet connection.');
+                showNotification('Connection error', 'error');
             });
             
             socket.on('disconnect', (reason) => {
                 console.log('❌ Socket disconnected:', reason);
-                showNotification('Disconnected from server', 'error');
+                showError('Disconnected from server. Reconnecting...');
+                showNotification('Disconnected', 'error');
                 isJoined = false;
                 updateUI();
             });
@@ -717,6 +719,7 @@
                 
                 updateUI();
                 showNotification(`Joined as ${studentName}. Waiting for teacher...`, 'info');
+                hideError();
                 
                 // Hide join loading
                 document.getElementById('joinText').style.display = 'inline';
@@ -736,6 +739,7 @@
                 
                 updateUI();
                 showNotification(`Joined live class with ${data.teacherName}!`, 'success');
+                hideError();
                 
                 // Start WebRTC
                 startWebRTC();
@@ -758,21 +762,38 @@
                 
                 updateUI();
                 showNotification('Teacher started the meeting!', 'success');
+                hideError();
                 
                 // Start WebRTC when meeting starts
                 startWebRTC();
             });
             
-            socket.on('teacher-status', (data) => {
-                console.log('👨‍🏫 Teacher status:', data.status);
-                const statusElement = document.getElementById('connectionStatus');
-                if (data.status === 'online') {
-                    statusElement.textContent = 'Teacher Online';
-                } else if (data.status === 'teaching') {
-                    statusElement.textContent = 'Live Teaching';
-                } else if (data.status === 'away') {
-                    statusElement.textContent = 'Teacher Away';
-                }
+            socket.on('room-started', (data) => {
+                console.log('🚀 Room started:', data);
+                meetingStarted = true;
+                isWaiting = false;
+                
+                document.getElementById('teacherName').textContent = data.teacherName || 'Teacher';
+                document.getElementById('connectionStatus').textContent = 'Live';
+                
+                updateUI();
+                showNotification('Teacher started the meeting!', 'success');
+                hideError();
+                
+                // Start WebRTC when meeting starts
+                startWebRTC();
+            });
+            
+            socket.on('teacher-disconnected', (data) => {
+                console.log('👨‍🏫 Teacher disconnected:', data);
+                meetingStarted = false;
+                isWaiting = true;
+                
+                document.getElementById('connectionStatus').textContent = 'Teacher Left';
+                showNotification('Teacher left the meeting', 'error');
+                
+                // Stop WebRTC
+                stopWebRTC();
             });
             
             socket.on('room-ended', (data) => {
@@ -802,27 +823,14 @@
             // ========== ERROR HANDLING ==========
             socket.on('error', (data) => {
                 console.error('❌ Socket error:', data);
-                showNotification(`Error: ${data.message}`, 'error');
+                showError(data.message || 'Connection error');
                 
                 // Re-enable join button on error
                 document.getElementById('joinText').style.display = 'inline';
                 document.getElementById('joinLoading').style.display = 'none';
                 document.getElementById('joinBtn').disabled = false;
-            });
-            
-            // ========== PRESENCE UPDATES ==========
-            socket.on('student-connected', (data) => {
-                console.log('👥 Student connected:', data.username);
-                if (data.userId !== studentId) {
-                    showNotification(`${data.username} joined the class`, 'info');
-                }
-            });
-            
-            socket.on('student-disconnected', (data) => {
-                console.log('👥 Student disconnected:', data.username);
-                if (data.userId !== studentId) {
-                    showNotification(`${data.username} left the class`, 'info');
-                }
+                isJoined = false;
+                updateUI();
             });
         }
         
@@ -831,7 +839,7 @@
         // ============================================
         function joinClass() {
             const usernameInput = document.getElementById('usernameInput');
-            studentName = sanitizeInput(usernameInput.value) || 'Student';
+            studentName = usernameInput.value.trim() || 'Student';
             studentId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             
             if (!studentName) {
@@ -839,13 +847,7 @@
                 return;
             }
             
-            if (!socket || !socket.connected) {
-                showNotification('Not connected to server', 'error');
-                connectSocket();
-                return;
-            }
-            
-            console.log('🎯 Joining class as:', studentName);
+            console.log('🎯 Joining class:', roomId, 'as:', studentName);
             
             // UI feedback
             const joinBtn = document.getElementById('joinBtn');
@@ -856,30 +858,50 @@
             joinLoading.style.display = 'inline-block';
             joinBtn.disabled = true;
             
-            // Send join request
-            socket.emit('student-join', {
-                room: roomId,
-                userId: studentId,
-                username: studentName
-            });
+            // Ensure socket is connected
+            if (!socket || !socket.connected) {
+                connectSocket();
+                // Wait a moment for connection
+                setTimeout(() => {
+                    if (socket.connected) {
+                        sendJoinRequest();
+                    } else {
+                        showError('Cannot connect to server');
+                        joinText.style.display = 'inline';
+                        joinLoading.style.display = 'none';
+                        joinBtn.disabled = false;
+                    }
+                }, 1000);
+            } else {
+                sendJoinRequest();
+            }
             
-            // Force UI update
-            isJoined = true;
-            updateUI();
-            
-            showNotification(`Joining as ${studentName}...`, 'info');
-            
-            // Timeout fallback
-            setTimeout(() => {
-                if (joinText.style.display === 'none' && !meetingStarted) {
-                    joinText.style.display = 'inline';
-                    joinLoading.style.display = 'none';
-                    joinBtn.disabled = false;
-                    showNotification('Join request timed out', 'error');
-                    isJoined = false;
-                    updateUI();
-                }
-            }, 5000);
+            function sendJoinRequest() {
+                // Send join request
+                socket.emit('student-join', {
+                    room: roomId,
+                    userId: studentId,
+                    username: studentName
+                });
+                
+                // Force UI update
+                isJoined = true;
+                updateUI();
+                
+                showNotification(`Joining as ${studentName}...`, 'info');
+                
+                // Timeout fallback
+                setTimeout(() => {
+                    if (joinText.style.display === 'none' && !meetingStarted) {
+                        joinText.style.display = 'inline';
+                        joinLoading.style.display = 'none';
+                        joinBtn.disabled = false;
+                        showError('Join request timed out. The room may not exist.');
+                        isJoined = false;
+                        updateUI();
+                    }
+                }, 8000);
+            }
         }
         
         function rejoinClass() {
@@ -888,7 +910,7 @@
                 return;
             }
             
-            console.log('🔄 Rejoining class:', studentName);
+            console.log('🔄 Rejoining class:', roomId, 'as:', studentName);
             
             if (!socket || !socket.connected) {
                 connectSocket();
@@ -915,71 +937,13 @@
         // ============================================
         // WEBRTC FUNCTIONS
         // ============================================
-        async function getMediaDevices() {
-            try {
-                const videoSelect = document.getElementById('videoSelect');
-                const audioSelect = document.getElementById('audioSelect');
-                
-                const constraints = {
-                    video: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        frameRate: { ideal: 30 }
-                    },
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    }
-                };
-                
-                // Apply device preferences if selected
-                if (videoSelect.value) {
-                    constraints.video.deviceId = { exact: videoSelect.value };
-                    selectedVideoDevice = videoSelect.value;
-                }
-                if (audioSelect.value) {
-                    constraints.audio.deviceId = { exact: audioSelect.value };
-                    selectedAudioDevice = audioSelect.value;
-                }
-                
-                localStream = await navigator.mediaDevices.getUserMedia(constraints);
-                return true;
-                
-            } catch (error) {
-                console.error('Media error:', error);
-                
-                // Fallback to basic constraints
-                try {
-                    localStream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
-                        audio: true
-                    });
-                    return true;
-                } catch (fallbackError) {
-                    console.error('Fallback media error:', fallbackError);
-                    
-                    if (fallbackError.name === 'NotAllowedError') {
-                        showNotification('Camera/mic permission denied. Please allow access.', 'error');
-                    } else if (fallbackError.name === 'NotFoundError') {
-                        showNotification('No camera/mic found on your device', 'error');
-                    } else if (fallbackError.name === 'NotReadableError') {
-                        showNotification('Camera/mic is in use by another application', 'error');
-                    }
-                    
-                    return false;
-                }
-            }
-        }
-        
         async function startWebRTC() {
             try {
-                // Get media devices
-                const mediaSuccess = await getMediaDevices();
-                if (!mediaSuccess) {
-                    showNotification('Cannot access camera/microphone', 'error');
-                    return;
-                }
+                // Get user media
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
                 
                 // Show local video
                 const studentVideo = document.getElementById('studentVideo');
@@ -992,7 +956,7 @@
                 // Create peer connection
                 peerConnection = new RTCPeerConnection(configuration);
                 
-                // Add local stream tracks
+                // Add local stream
                 localStream.getTracks().forEach(track => {
                     peerConnection.addTrack(track, localStream);
                 });
@@ -1010,46 +974,17 @@
                     }
                 };
                 
-                // Handle connection state
-                peerConnection.oniceconnectionstatechange = () => {
-                    const state = peerConnection.iceConnectionState;
-                    console.log('ICE connection state:', state);
-                    
-                    const qualityElement = document.getElementById('connectionQuality');
-                    if (state === 'connected' || state === 'completed') {
-                        qualityElement.textContent = 'Excellent';
-                        qualityElement.style.color = '#38a169';
-                    } else if (state === 'checking') {
-                        qualityElement.textContent = 'Connecting...';
-                        qualityElement.style.color = '#d69e2e';
-                    } else if (state === 'disconnected' || state === 'failed') {
-                        qualityElement.textContent = 'Poor';
-                        qualityElement.style.color = '#e53e3e';
-                        showNotification('Connection lost. Reconnecting...', 'error');
-                    }
-                };
-                
                 // Handle remote stream
                 peerConnection.ontrack = (event) => {
                     const teacherVideo = document.getElementById('teacherVideo');
                     if (teacherVideo.srcObject !== event.streams[0]) {
                         teacherVideo.srcObject = event.streams[0];
                         teacherStream = event.streams[0];
-                        
-                        // Show teacher video label
-                        document.getElementById('teacherVideoLabel').textContent = 'Teacher (Live)';
-                        document.getElementById('teacherStatus').style.display = 'block';
-                        
-                        showNotification('Teacher video stream started', 'success');
                     }
                 };
                 
                 // Create and send offer
-                const offer = await peerConnection.createOffer({
-                    offerToReceiveAudio: true,
-                    offerToReceiveVideo: true
-                });
-                
+                const offer = await peerConnection.createOffer();
                 await peerConnection.setLocalDescription(offer);
                 
                 socket.emit('webrtc-signal', {
@@ -1060,11 +995,11 @@
                     type: 'offer'
                 });
                 
-                console.log('✅ WebRTC started - Offer sent');
+                console.log('✅ WebRTC started');
                 
             } catch (error) {
                 console.error('❌ WebRTC error:', error);
-                showNotification('Failed to start video call', 'error');
+                showNotification('Camera/microphone access required', 'error');
             }
         }
         
@@ -1075,21 +1010,9 @@
                 const signal = data.signal;
                 
                 if (signal.type === 'answer') {
-                    peerConnection.setRemoteDescription(new RTCSessionDescription(signal))
-                        .then(() => {
-                            console.log('✅ Remote description set');
-                        })
-                        .catch(err => {
-                            console.error('❌ Error setting remote description:', err);
-                        });
+                    peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
                 } else if (signal.candidate) {
-                    peerConnection.addIceCandidate(new RTCIceCandidate(signal))
-                        .then(() => {
-                            console.log('✅ ICE candidate added');
-                        })
-                        .catch(err => {
-                            console.error('❌ Error adding ICE candidate:', err);
-                        });
+                    peerConnection.addIceCandidate(new RTCIceCandidate(signal));
                 }
             } catch (error) {
                 console.error('❌ WebRTC signal error:', error);
@@ -1115,8 +1038,6 @@
             
             document.getElementById('micBtn').disabled = true;
             document.getElementById('cameraBtn').disabled = true;
-            document.getElementById('teacherVideoLabel').textContent = 'Teacher';
-            document.getElementById('teacherStatus').style.display = 'none';
         }
         
         function toggleMic() {
@@ -1126,11 +1047,7 @@
                     audioTrack.enabled = !audioTrack.enabled;
                     const micBtn = document.getElementById('micBtn');
                     micBtn.classList.toggle('control-btn-muted');
-                    micBtn.innerHTML = audioTrack.enabled ? 
-                        '🎤 Mute' : 
-                        '<span style="color: #fff">🔇 Unmute</span>';
-                    
-                    showNotification(audioTrack.enabled ? 'Microphone unmuted' : 'Microphone muted', 'info');
+                    micBtn.innerHTML = audioTrack.enabled ? '🎤 Mute' : '🔇 Unmute';
                 }
             }
         }
@@ -1142,11 +1059,7 @@
                     videoTrack.enabled = !videoTrack.enabled;
                     const cameraBtn = document.getElementById('cameraBtn');
                     cameraBtn.classList.toggle('control-btn-muted');
-                    cameraBtn.innerHTML = videoTrack.enabled ? 
-                        '📷 Stop Camera' : 
-                        '<span style="color: #fff">📷 Start Camera</span>';
-                    
-                    showNotification(videoTrack.enabled ? 'Camera started' : 'Camera stopped', 'info');
+                    cameraBtn.innerHTML = videoTrack.enabled ? '📷 Stop Camera' : '📷 Start Camera';
                 }
             }
         }
@@ -1158,14 +1071,18 @@
             console.log('🚀 Initializing Student View...');
             console.log('Room ID:', roomId);
             
+            // Show room code
+            document.getElementById('displayRoomCode').textContent = roomId;
+            document.getElementById('roomCodeSection').style.display = 'block';
+            
+            // Update header
+            document.getElementById('headerSubtitle').textContent = `Room: ${roomId}`;
+            
             // Auto-focus name input
             document.getElementById('usernameInput').focus();
             
             // Connect immediately
             connectSocket();
-            
-            // Enumerate devices
-            enumerateDevices();
             
             // Show initial state
             updateUI();
@@ -1177,30 +1094,9 @@
                 }
             });
             
-            // Device change handlers
-            document.getElementById('videoSelect').addEventListener('change', async () => {
-                if (localStream) {
-                    stopWebRTC();
-                    if (isJoined && meetingStarted) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        startWebRTC();
-                    }
-                }
-            });
-            
-            document.getElementById('audioSelect').addEventListener('change', async () => {
-                if (localStream) {
-                    stopWebRTC();
-                    if (isJoined && meetingStarted) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        startWebRTC();
-                    }
-                }
-            });
-            
             // Keep connection alive
             setInterval(() => {
-                if (socket && socket.connected) {
+                if (socket && socket.connected && isJoined) {
                     socket.emit('ping', { 
                         timestamp: Date.now(),
                         room: roomId,
@@ -1208,18 +1104,6 @@
                     });
                 }
             }, 25000);
-            
-            // Handle page unload
-            window.addEventListener('beforeunload', () => {
-                if (socket && socket.connected && studentId) {
-                    socket.emit('student-leave', {
-                        room: roomId,
-                        userId: studentId,
-                        username: studentName
-                    });
-                }
-                stopWebRTC();
-            });
         });
     </script>
 </body>
