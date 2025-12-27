@@ -3,221 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nelavista Live - Teacher Control Center</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='live_meeting.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Live Meeting - Teacher Dashboard</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
-        :root {
-            --teacher-primary: #2c3e50;
-            --teacher-secondary: #34495e;
-            --teacher-accent: #3498db;
-            --teacher-success: #27ae60;
-            --teacher-warning: #f39c12;
-            --teacher-danger: #e74c3c;
-            --teacher-light: #ecf0f1;
-            --teacher-dark: #2c3e50;
-            --student-primary: #16a085;
-            --ai-color: #9b59b6;
-            --waiting-color: #f39c12;
-            --ended-color: #7f8c8d;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            overflow-x: hidden;
+            padding: 20px;
         }
-
-        .teacher-header {
-            background: var(--teacher-primary);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
-
-        .classroom-info h1 {
-            font-size: 1.5rem;
+        
+        .header {
+            padding: 30px;
+            background: linear-gradient(to right, #667eea, #764ba2);
             color: white;
-            margin-bottom: 5px;
+            text-align: center;
         }
-
-        .classroom-info .room-status {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            margin-right: 10px;
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
         }
-
-        .room-status.waiting {
-            background: var(--waiting-color);
-            color: white;
-        }
-
-        .room-status.live {
-            background: var(--teacher-success);
-            color: white;
-        }
-
-        .room-status.ended {
-            background: var(--ended-color);
-            color: white;
-        }
-
-        .classroom-info .room-id {
-            font-size: 0.9rem;
-            color: #bdc3c7;
-            background: rgba(0,0,0,0.2);
-            padding: 3px 10px;
-            border-radius: 15px;
-            display: inline-block;
-        }
-
-        .teacher-controls {
-            display: flex;
-            gap: 15px;
-        }
-
-        .control-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .control-btn.primary {
-            background: var(--teacher-accent);
-            color: white;
-        }
-
-        .control-btn.warning {
-            background: var(--teacher-warning);
-            color: white;
-        }
-
-        .control-btn.danger {
-            background: var(--teacher-danger);
-            color: white;
-        }
-
-        .control-btn.success {
-            background: var(--teacher-success);
-            color: white;
-        }
-
-        .control-btn.disabled {
-            background: #7f8c8d;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .control-btn:hover:not(.disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-        }
-
-        .join-link-container {
+        
+        .room-info {
             background: rgba(255,255,255,0.1);
-            border-radius: 10px;
             padding: 15px;
-            margin: 10px 0;
+            border-radius: 10px;
+            margin: 20px 0;
         }
-
-        .join-link {
+        
+        .room-id {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .share-section {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
-
-        .join-link input {
+        
+        .share-input {
             flex: 1;
-            padding: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
             color: white;
-            border-radius: 5px;
-            font-family: monospace;
+            font-size: 1rem;
         }
-
-        .main-container {
-            display: flex;
-            height: calc(100vh - 70px);
-            padding: 20px;
-            gap: 20px;
+        
+        .share-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-
-        /* Left Panel - Teaching Area */
-        .teaching-area {
-            flex: 3;
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .main-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+        
+        .left-column {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 30px;
         }
-
-        .video-container {
-            background: rgba(0,0,0,0.5);
+        
+        .right-column {
+            background: #f8f9fa;
             border-radius: 15px;
-            padding: 20px;
-            position: relative;
-            min-height: 400px;
+            padding: 25px;
+            height: fit-content;
         }
-
-        .video-container h2 {
-            color: white;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .video-grid {
+        
+        .controls-section {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 0;
         }
-
-        .video-wrapper {
-            position: relative;
+        
+        .control-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .control-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+        
+        .control-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
             border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .btn-start {
+            background: linear-gradient(to right, #48bb78, #38a169);
+            color: white;
+        }
+        
+        .btn-start:hover:not(:disabled) {
+            background: linear-gradient(to right, #38a169, #2f855a);
+            transform: scale(1.05);
+        }
+        
+        .btn-end {
+            background: linear-gradient(to right, #f56565, #e53e3e);
+            color: white;
+        }
+        
+        .btn-end:hover {
+            background: linear-gradient(to right, #e53e3e, #c53030);
+            transform: scale(1.05);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .status-section {
+            margin-bottom: 0;
+        }
+        
+        .status-card {
+            background: #f0f4ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 0;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+        
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-live {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .status-ended {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .dot-waiting {
+            background: #856404;
+            animation: pulse 2s infinite;
+        }
+        
+        .dot-live {
+            background: #0f5132;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .video-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .video-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .video-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .video-box {
+            background: #1a202c;
+            border-radius: 15px;
             overflow: hidden;
-            background: #000;
+            position: relative;
             aspect-ratio: 16/9;
         }
-
-        .video-wrapper.teacher {
-            border: 3px solid var(--teacher-accent);
-            grid-column: 1 / -1;
-        }
-
-        .video-wrapper.student {
-            border: 2px solid var(--student-primary);
-        }
-
-        video {
+        
+        .video-box video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
+        
         .video-label {
             position: absolute;
             bottom: 10px;
@@ -228,1974 +300,930 @@
             border-radius: 5px;
             font-size: 0.9rem;
         }
-
-        .presentation-mode {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-
-        .presentation-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        /* Right Panel - Teacher Controls */
-        .control-panel {
-            flex: 1;
-            background: rgba(44, 62, 80, 0.9);
-            border-radius: 15px;
-            padding: 25px;
-            overflow-y: auto;
-            min-width: 350px;
-        }
-
-        .control-section {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--teacher-accent);
-        }
-
-        .control-section.disabled {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        .control-section h3 {
-            color: white;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .control-section h3 i {
-            color: var(--teacher-accent);
-        }
-
-        .toggle-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .toggle-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-        }
-
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--teacher-success);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        input:disabled + .slider {
-            background-color: #7f8c8d;
-            cursor: not-allowed;
-        }
-
-        /* AI Prompter */
-        .ai-prompter {
-            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .prompter-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .prompter-header h4 {
-            color: white;
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .prompter-content {
-            font-size: 0.95rem;
-            line-height: 1.4;
-            color: white;
-        }
-
-        .time-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.8);
-        }
-
-        .time-bar {
-            flex: 1;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .time-progress {
-            height: 100%;
-            background: white;
-            width: 60%;
-            border-radius: 2px;
-        }
-
-        /* Mistake Guard */
-        .mistake-alert {
-            background: rgba(231, 76, 60, 0.1);
-            border: 1px solid rgba(231, 76, 60, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 10px;
-            display: none;
-        }
-
-        .mistake-alert.show {
-            display: block;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { border-color: rgba(231, 76, 60, 0.3); }
-            50% { border-color: rgba(231, 76, 60, 0.8); }
-            100% { border-color: rgba(231, 76, 60, 0.3); }
-        }
-
-        .mistake-content {
-            color: #e74c3c;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Smart Board */
-        .smart-board {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 10px;
-        }
-
-        .notes-editor {
-            width: 100%;
-            min-height: 150px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 5px;
-            padding: 10px;
-            color: white;
-            font-family: monospace;
-            resize: vertical;
-            margin-bottom: 10px;
-        }
-
-        /* Student List */
-        .student-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .student-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-        }
-
-        .student-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .student-status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--teacher-success);
-        }
-
-        .student-status.waiting {
-            background: var(--waiting-color);
-        }
-
-        .student-status.offline {
-            background: #7f8c8d;
-        }
-
-        .student-controls {
-            display: flex;
-            gap: 5px;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.7);
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .icon-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        .icon-btn.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        /* Question Control */
-        .question-queue {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
-        .question-item {
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 8px;
-        }
-
-        .question-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 5px;
-        }
-
-        /* Slide Controls */
-        .slide-container {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 10px;
-        }
-
-        .slide-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .slide-preview {
-            width: 100%;
-            height: 150px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255,255,255,0.5);
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--teacher-primary);
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h3 {
-            color: white;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* Status Indicators */
-        .status-indicators {
+        
+        .controls-section-video {
             display: flex;
             gap: 15px;
-            margin-top: 10px;
-            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
         }
-
-        .status-item {
+        
+        .control-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 5px;
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.8);
+            gap: 10px;
         }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
+        
+        .control-btn-mic {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .control-btn-mic:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
+        }
+        
+        .control-btn-camera {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .control-btn-camera:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        
+        .control-btn-muted {
+            background: #f56565 !important;
+        }
+        
+        .students-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .students-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .student-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .student-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .student-id {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .student-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn-mute {
+            background: #f56565;
+            color: white;
+        }
+        
+        .action-btn-unmute {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .action-btn-video-on {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .action-btn-video-off {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #48bb78;
+        }
+        
+        .notification.error {
+            background: #f56565;
+        }
+        
+        .notification.info {
+            background: #4299e1;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
         }
-
-        .status-dot.waiting {
-            background: var(--waiting-color);
-            animation: pulse-waiting 2s infinite;
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-
-        @keyframes pulse-waiting {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-
-        .status-dot.live {
-            background: var(--teacher-success);
-            animation: blink 2s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .status-dot.ended {
-            background: var(--ended-color);
-        }
-
-        .status-dot.recording {
-            background: var(--teacher-danger);
-        }
-
-        .status-dot.ai-active {
-            background: var(--ai-color);
-        }
-
-        /* Responsive */
+        
         @media (max-width: 1200px) {
-            .main-container {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .right-column {
+                order: -1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-section-video {
                 flex-direction: column;
             }
             
-            .control-panel {
-                min-width: 100%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .teacher-controls {
-                flex-wrap: wrap;
-            }
-            
             .control-btn {
-                padding: 8px 15px;
-                font-size: 0.9rem;
+                width: 100%;
+                justify-content: center;
             }
-            
-            .video-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Utility Classes */
-        .hidden {
-            display: none;
-        }
-
-        .text-muted {
-            color: rgba(255,255,255,0.6);
-        }
-
-        .text-small {
-            font-size: 0.85rem;
-        }
-
-        .center-message {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 300px;
-            text-align: center;
-            gap: 20px;
-        }
-
-        .center-message i {
-            font-size: 3rem;
-            color: var(--teacher-accent);
-        }
-
-        /* Error states */
-        .error-state {
-            background: rgba(231, 76, 60, 0.1);
-            border: 1px solid rgba(231, 76, 60, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 10px 0;
-            text-align: center;
         }
     </style>
 </head>
 <body>
-    <!-- Teacher Header -->
-    <div class="teacher-header">
-        <div class="classroom-info">
-            <h1><i class="fas fa-chalkboard-teacher"></i> Nelavista Live - Teacher Control Center</h1>
-            <span class="room-status waiting" id="roomStatus">WAITING</span>
-            <span class="room-id">Room: {{ room_id }}</span>
-        </div>
-        <div class="teacher-controls">
-            <button class="control-btn success" id="startMeetingBtn" onclick="startMeeting()">
-                <i class="fas fa-play"></i> Start Meeting
-            </button>
-            <button class="control-btn primary" id="recordBtn" onclick="toggleRecording()" disabled>
-                <i class="fas fa-circle"></i> Start Recording
-            </button>
-            <button class="control-btn warning" onclick="openSettings()">
-                <i class="fas fa-cog"></i> Settings
-            </button>
-            <button class="control-btn danger" onclick="endClass()">
-                <i class="fas fa-power-off"></i> End Class
-            </button>
-        </div>
-    </div>
-
-    <!-- Join Link Container -->
-    <div class="join-link-container">
-        <div><strong><i class="fas fa-link"></i> Share this link with students:</strong></div>
-        <div class="join-link">
-            <input type="text" id="joinLink" readonly value="Loading...">
-            <button class="control-btn primary" onclick="copyJoinLink()">
-                <i class="fas fa-copy"></i> Copy
-            </button>
-        </div>
-        <div class="text-muted text-small">
-            Students can join anytime. They'll wait until you start the meeting.
-        </div>
-    </div>
-
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Left: Teaching Area -->
-        <div class="teaching-area">
-            <!-- Video Container -->
-            <div class="video-container">
-                <h2><i class="fas fa-video"></i> Classroom View</h2>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Live Classroom - Teacher Dashboard</h1>
+            <p>Welcome to your virtual classroom dashboard</p>
+            
+            <div class="room-info">
+                <div class="room-id">Room Code: <strong>{{ room_id }}</strong></div>
+                <p>Share this link with your students:</p>
                 
-                <!-- Waiting State -->
-                <div id="waitingState" class="center-message">
-                    <i class="fas fa-clock"></i>
-                    <h3>Meeting Not Started</h3>
-                    <p>Click "Start Meeting" to begin the class.</p>
-                    <p>Students in waiting room: <span id="waitingStudentsCount">0</span></p>
+                <div class="share-section">
+                    <input type="text" 
+                           id="shareLink" 
+                           class="share-input" 
+                           readonly
+                           value="https://www.tawfiqai.com/student-live/{{ room_id }}">
+                    <button class="share-btn" onclick="copyShareLink()">
+                        📋 Copy Link
+                    </button>
                 </div>
-
-                <!-- Live State -->
-                <div id="liveState" class="hidden">
-                    <div class="video-grid">
-                        <!-- Teacher Video (Main) -->
-                        <div class="video-wrapper teacher">
-                            <video id="teacherVideo" autoplay muted></video>
-                            <div class="video-label">Teacher (You)</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Left Column: Video & Controls -->
+            <div class="left-column">
+                <!-- Video Section -->
+                <div class="video-section">
+                    <h2>🎥 Live Broadcast</h2>
+                    
+                    <div class="video-container">
+                        <div class="video-box">
+                            <video id="teacherVideo" autoplay playsinline muted></video>
+                            <div class="video-label" id="teacherVideoLabel">Teacher (You)</div>
                         </div>
                         
-                        <!-- Student Videos will be added here dynamically -->
-                        <div id="studentVideos"></div>
-                    </div>
-
-                    <!-- Presentation Mode -->
-                    <div class="presentation-mode">
-                        <h3><i class="fas fa-desktop"></i> Presentation Mode</h3>
-                        <div class="presentation-controls">
-                            <button class="control-btn primary" onclick="togglePresentation()">
-                                <i class="fas fa-toggle-on"></i> Enable Presentation
-                            </button>
-                            <button class="control-btn" onclick="uploadSlide()">
-                                <i class="fas fa-upload"></i> Upload Slide
-                            </button>
-                            <button class="control-btn" onclick="showPrivateSlide()">
-                                <i class="fas fa-eye-slash"></i> Private Slide
-                            </button>
+                        <div class="video-box" id="studentVideoContainer" style="display: none;">
+                            <video id="studentVideo" autoplay playsinline></video>
+                            <div class="video-label" id="studentVideoLabel">Student</div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Ended State -->
-                <div id="endedState" class="center-message hidden">
-                    <i class="fas fa-flag-checkered"></i>
-                    <h3>Class Ended</h3>
-                    <p>This meeting has been ended by the teacher.</p>
-                    <button class="control-btn primary" onclick="window.location.href='/'">
-                        <i class="fas fa-home"></i> Return Home
-                    </button>
-                </div>
-            </div>
-
-            <!-- Status Indicators -->
-            <div class="status-indicators">
-                <div class="status-item">
-                    <span class="status-dot waiting" id="statusDot"></span>
-                    <span id="statusText">Waiting for teacher to start</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-dot recording" id="recordingDot"></span>
-                    <span id="recordingText">Not Recording</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-dot ai-active"></span>
-                    <span>AI Assistant Active</span>
-                </div>
-                <div class="status-item">
-                    <i class="fas fa-users"></i>
-                    <span id="studentCount">0 Students Connected</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right: Control Panel -->
-        <div class="control-panel" id="controlPanel">
-            <!-- Section 1: AI Prompter (Private) -->
-            <div class="control-section" id="aiPrompterSection">
-                <h3><i class="fas fa-robot"></i> AI Prompter (Private)</h3>
-                <div class="toggle-item">
-                    <div class="toggle-label">
-                        <i class="fas fa-bell"></i>
-                        <span>Enable AI Prompter</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="aiPrompterToggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
-                <div class="ai-prompter">
-                    <div class="prompter-header">
-                        <h4><i class="fas fa-lightbulb"></i> Next Topic</h4>
-                        <span class="text-small">5 min left</span>
-                    </div>
-                    <div class="prompter-content" id="prompterContent">
-                        You planned 5 minutes for examples. Consider using real-world scenarios.
-                    </div>
-                    <div class="time-indicator">
-                        <span>Session Progress</span>
-                        <div class="time-bar">
-                            <div class="time-progress"></div>
-                        </div>
-                        <span>60%</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 2: Mistake Guard (Private) -->
-            <div class="control-section" id="mistakeGuardSection">
-                <h3><i class="fas fa-shield-alt"></i> Mistake Guard (Private)</h3>
-                <div class="toggle-item">
-                    <div class="toggle-label">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Enable Mistake Detection</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="mistakeGuardToggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
-                <div class="mistake-alert" id="mistakeAlert">
-                    <div class="mistake-content">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <span id="mistakeText">Check sign in equation: x² - 4 = (x-2)(x+2)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 3: Smart Board Assist -->
-            <div class="control-section" id="smartBoardSection">
-                <h3><i class="fas fa-chalkboard"></i> Smart Board Assist</h3>
-                <div class="toggle-item">
-                    <div class="toggle-label">
-                        <i class="fas fa-magic"></i>
-                        <span>Auto-generate Notes</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="smartBoardToggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
-                <div class="smart-board">
-                    <textarea class="notes-editor" id="smartBoardNotes" placeholder="AI-generated notes will appear here...">
-Today's Topic: Introduction to Algebra
-Key Points:
-1. Variables represent unknown values
-2. Equations show equality
-3. Solving for x
-                    </textarea>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="control-btn primary" onclick="editNotes()">
-                            <i class="fas fa-edit"></i> Edit Notes
+                    
+                    <div class="controls-section-video">
+                        <button id="micBtn" class="control-btn control-btn-mic" onclick="toggleMic()" disabled>
+                            🎤 Microphone
                         </button>
-                        <button class="control-btn success" onclick="releaseNotes()">
-                            <i class="fas fa-share"></i> Release to Students
+                        <button id="cameraBtn" class="control-btn control-btn-camera" onclick="toggleCamera()" disabled>
+                            📷 Camera
+                        </button>
+                        <button id="startWebRTCBtn" class="control-btn" style="background: #9f7aea; color: white;" onclick="startWebRTC()" disabled>
+                            🚀 Start Video Call
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Status & Controls Section -->
+                <div class="status-section">
+                    <div class="status-card">
+                        <div id="statusIndicator" class="status-indicator status-waiting">
+                            <span class="status-dot dot-waiting"></span>
+                            <span id="statusText">Waiting to start meeting</span>
+                        </div>
+                        
+                        <div class="stats">
+                            <div class="stat-box">
+                                <div class="stat-number" id="waitingCount">0</div>
+                                <div class="stat-label">Students Waiting</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number" id="connectedCount">0</div>
+                                <div class="stat-label">Students Connected</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-number" id="totalCount">0</div>
+                                <div class="stat-label">Total Students</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Meeting Controls -->
+                <div class="controls-section">
+                    <div class="control-card">
+                        <h3>🎬 Start Meeting</h3>
+                        <p>Begin your live class session</p>
+                        <button id="startBtn" class="btn btn-start" onclick="startMeeting()">
+                            <span id="startText">🚀 Start Meeting</span>
+                            <span id="startLoading" class="loading" style="display: none;"></span>
+                        </button>
+                    </div>
+                    
+                    <div class="control-card">
+                        <h3>🛑 End Meeting</h3>
+                        <p>End the current session</p>
+                        <button id="endBtn" class="btn btn-end" onclick="endMeeting()" disabled>
+                            🛑 End Meeting
                         </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Section 4: Camera & Mic Authority -->
-            <div class="control-section" id="cameraControlSection">
-                <h3><i class="fas fa-microphone"></i> Camera & Mic Control</h3>
-                <div class="toggle-group">
-                    <div class="toggle-item">
-                        <div class="toggle-label">
-                            <i class="fas fa-microphone-slash"></i>
-                            <span>Mute All Students</span>
+            
+            <!-- Right Column: Students List -->
+            <div class="right-column">
+                <div class="students-section">
+                    <h2>👥 Students</h2>
+                    
+                    <div id="studentsList" class="students-list">
+                        <div class="empty-state" id="emptyStudents">
+                            <div>👨‍🎓</div>
+                            <p>No students have joined yet</p>
+                            <p>Share the link above with your students</p>
                         </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="muteAllToggle" disabled>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-item">
-                        <div class="toggle-label">
-                            <i class="fas fa-video-slash"></i>
-                            <span>Disable All Cameras</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="disableCamsToggle" disabled>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-item">
-                        <div class="toggle-label">
-                            <i class="fas fa-hand-paper"></i>
-                            <span>Require Mic Permission</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="micPermissionToggle" checked disabled>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 5: Question Control -->
-            <div class="control-section" id="questionControlSection">
-                <h3><i class="fas fa-question-circle"></i> Question Control</h3>
-                <div class="toggle-group">
-                    <div class="toggle-item">
-                        <div class="toggle-label">
-                            <i class="fas fa-comments"></i>
-                            <span>Allow Questions</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="allowQuestionsToggle" checked disabled>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="toggle-item">
-                        <div class="toggle-label">
-                            <i class="fas fa-user-secret"></i>
-                            <span>Show Names to All</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="showNamesToggle" checked disabled>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="question-queue" id="questionQueue">
-                    <!-- Questions will appear here -->
-                </div>
-            </div>
-
-            <!-- Section 6: Student Management -->
-            <div class="control-section" id="studentManagementSection">
-                <h3><i class="fas fa-users"></i> Student Management</h3>
-                <div class="student-list" id="studentList">
-                    <!-- Students will appear here -->
-                </div>
-            </div>
-
-            <!-- Section 7: Slide Control -->
-            <div class="control-section" id="slideControlSection">
-                <h3><i class="fas fa-images"></i> Slide Control</h3>
-                <div class="slide-controls">
-                    <button class="control-btn" onclick="showSlideToAll()" disabled>
-                        <i class="fas fa-eye"></i> Show to All
-                    </button>
-                    <button class="control-btn" onclick="hideSlides()" disabled>
-                        <i class="fas fa-eye-slash"></i> Hide Slides
-                    </button>
-                    <button class="control-btn" onclick="nextSlide()" disabled>
-                        <i class="fas fa-forward"></i> Next
-                    </button>
-                </div>
-                
-                <div class="slide-container">
-                    <div class="slide-preview">
-                        <i class="fas fa-file-powerpoint fa-3x"></i>
-                        <div>Slide 1: Introduction</div>
-                    </div>
-                    <div class="text-muted text-small">
-                        Private Slide Mode: Students cannot see unless you share
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Modals -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-cog"></i> Classroom Settings</h3>
-                <button class="close-modal" onclick="closeSettings()">&times;</button>
-            </div>
-            <div class="toggle-group">
-                <div class="toggle-item">
-                    <div class="toggle-label">
-                        <i class="fas fa-record-vinyl"></i>
-                        <span>Allow Recording</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="allowRecordingToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toggle-item">
-                    <div class="toggle-label">
-                        <i class="fas fa-download"></i>
-                        <span>Allow Content Download</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="allowDownloadToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="toggle-item">
-                    <div class="toggle-label">
-                        <i class="fas fa-share-alt"></i>
-                        <span>Allow Class Sharing</span>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="allowSharingToggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-            <div style="margin-top: 20px;">
-                <button class="control-btn primary" onclick="saveSettings()">
-                    <i class="fas fa-save"></i> Save Settings
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="https://unpkg.com/simple-peer@9.11.1/simplepeer.min.js"></script>
+    
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+    
     <script>
         // ============================================
-        // A. MEETING FLOW (CORE) - COMPLETED
+        // GLOBAL VARIABLES
         // ============================================
-
-        // Global variables
-        const ROOM_ID = "{{ room_id }}";
-        const JOIN_URL = `${window.location.origin}/student-live/${ROOM_ID}`;
+        const roomId = "{{ room_id }}";
+        const teacherId = `teacher_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const username = "Teacher";
         
-        let socket;
+        let socket = null;
+        let meetingStarted = false;
+        let students = {};
+        
+        // WebRTC variables
+        let peerConnections = {}; // Store connections for each student
         let localStream = null;
-        let peers = {};
-        let isRecording = false;
-        let studentCount = 0;
-        let waitingStudents = 0;
-        let meetingState = 'waiting'; // waiting, live, ended
-        let userId = `teacher_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        let reconnectAttempts = 0;
-        const MAX_RECONNECT_ATTEMPTS = 5;
-
-        // STUN servers for better connectivity
-        const ICE_CONFIG = {
+        let configuration = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:global.stun.twilio.com:3478' },
-                { urls: 'stun:stun.voipbuster.com' },
-                { urls: 'stun:stun.voipstunt.com' }
-            ],
-            sdpSemantics: 'unified-plan'
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
         };
-
-        // Initialize application
-        async function initializeApplication() {
-            try {
-                // Set up join link
-                document.getElementById('joinLink').value = JOIN_URL;
-                
-                // Initialize Socket.IO with reconnection logic
-                initializeSocketConnection();
-                
-                // Update UI based on initial state
-                updateUIForState();
-                
-                // Request camera/mic permission but don't start stream yet
-                await requestMediaPermission();
-                
-                // Update status indicators
-                updateStatusIndicators();
-                
-            } catch (error) {
-                console.error('Initialization error:', error);
-                showNotification('Initialization failed. Please refresh.', 'error');
-            }
-        }
-
-        // Initialize Socket.IO connection
-        function initializeSocketConnection() {
-            socket = io({
-                reconnection: true,
-                reconnectionAttempts: MAX_RECONNECT_ATTEMPTS,
-                reconnectionDelay: 1000,
-                reconnectionDelayMax: 5000,
-                timeout: 20000
-            });
-
-            // Connection events
-            socket.on('connect', () => {
-                console.log('Connected to server');
-                reconnectAttempts = 0;
-                showNotification('Connected to server', 'success');
-                
-                // Join room as teacher
-                socket.emit('teacher-join', {
-                    room: ROOM_ID,
-                    userId: userId,
-                    username: 'Teacher'
-                });
-            });
-
-            socket.on('connect_error', (error) => {
-                console.error('Connection error:', error);
-                reconnectAttempts++;
-                if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-                    showNotification('Failed to connect to server. Please refresh.', 'error');
-                }
-            });
-
-            socket.on('disconnect', (reason) => {
-                console.log('Disconnected:', reason);
-                showNotification('Disconnected from server. Reconnecting...', 'warning');
-            });
-
-            socket.on('reconnect', (attemptNumber) => {
-                console.log('Reconnected after', attemptNumber, 'attempts');
-                showNotification('Reconnected to server', 'success');
-                
-                // Rejoin room
-                socket.emit('teacher-rejoin', {
-                    room: ROOM_ID,
-                    userId: userId,
-                    username: 'Teacher'
-                });
-            });
-
-            // Room state events
-            socket.on('room-state', handleRoomState);
-            socket.on('room-started', handleRoomStarted);
-            socket.on('room-ended', handleRoomEnded);
-            
-            // Student events
-            socket.on('student-joined', handleStudentJoined);
-            socket.on('student-left', handleStudentLeft);
-            socket.on('student-waiting', handleStudentWaiting);
-            
-            // Control events
-            socket.on('student-muted', handleStudentMuted);
-            socket.on('student-camera-disabled', handleStudentCameraDisabled);
-            socket.on('mic-request', handleMicRequest);
-            socket.on('student-question', handleStudentQuestion);
-            socket.on('student-struggle', handleStudentStruggle);
-            
-            // WebRTC events
-            socket.on('webrtc-signal', handleWebRTCSignal);
-            socket.on('webrtc-start', handleWebRTCStart);
-            
-            // Error events
-            socket.on('error', handleSocketError);
-        }
-
+        
         // ============================================
-        // B. WEBRTC FIXES (CRITICAL) - COMPLETED
+        // HELPER FUNCTIONS
         // ============================================
-
-        // Request media permission (doesn't start stream)
-        async function requestMediaPermission() {
-            try {
-                // Just check permissions without starting stream
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const hasVideo = devices.some(device => device.kind === 'videoinput');
-                const hasAudio = devices.some(device => device.kind === 'audioinput');
-                
-                if (!hasVideo) {
-                    console.warn('No video device found');
-                }
-                if (!hasAudio) {
-                    console.warn('No audio device found');
-                }
-                
-                return { hasVideo, hasAudio };
-            } catch (error) {
-                console.error('Error checking media devices:', error);
-                return { hasVideo: false, hasAudio: false };
-            }
-        }
-
-        // Start local media stream
-        async function startLocalStream() {
-            try {
-                if (localStream) {
-                    // Stop existing stream
-                    localStream.getTracks().forEach(track => track.stop());
-                }
-                
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        frameRate: { ideal: 30 }
-                    }, 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    }
-                });
-                
-                document.getElementById('teacherVideo').srcObject = localStream;
-                console.log('Local stream started');
-                
-                return localStream;
-            } catch (error) {
-                console.error('Error starting local stream:', error);
-                
-                if (error.name === 'NotAllowedError') {
-                    showNotification('Camera/microphone access denied. Please check permissions.', 'error');
-                } else if (error.name === 'NotFoundError') {
-                    showNotification('No camera/microphone found.', 'error');
-                } else {
-                    showNotification('Failed to access camera/microphone.', 'error');
-                }
-                
-                throw error;
-            }
-        }
-
-        // Create peer connection with proper ICE configuration
-        function createPeer(userId, initiator = false) {
-            console.log(`Creating peer for ${userId}, initiator: ${initiator}`);
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
             
-            const peer = new SimplePeer({
-                initiator: initiator,
-                trickle: true,
-                stream: localStream,
-                config: ICE_CONFIG,
-                reconnectTimer: 1000,
-                sdpTransform: (sdp) => {
-                    // Add bandwidth constraints for better performance
-                    return sdp.replace(/a=mid:video\r\n/g, 'a=mid:video\r\nb=AS:1000\r\n');
-                }
-            });
-
-            peer.on('signal', (signal) => {
-                console.log(`Sending signal to ${userId}`);
-                socket.emit('webrtc-signal', {
-                    room: ROOM_ID,
-                    to: userId,
-                    from: userId,
-                    signal: signal
-                });
-            });
-
-            peer.on('stream', (stream) => {
-                console.log(`Received stream from ${userId}`);
-                addStudentVideo(userId, stream);
-            });
-
-            peer.on('track', (track, stream) => {
-                console.log(`Received track from ${userId}`);
-                addStudentVideo(userId, stream);
-            });
-
-            peer.on('connect', () => {
-                console.log(`Peer connected to ${userId}`);
-                updateStudentConnectionStatus(userId, 'connected');
-            });
-
-            peer.on('close', () => {
-                console.log(`Peer connection closed for ${userId}`);
-                cleanupPeer(userId);
-            });
-
-            peer.on('error', (error) => {
-                console.error(`Peer error for ${userId}:`, error);
-                
-                if (error.toString().includes('ICE')) {
-                    console.warn('ICE connection failed, attempting restart...');
-                    setTimeout(() => {
-                        if (peers[userId]) {
-                            cleanupPeer(userId);
-                            createPeer(userId, true);
-                        }
-                    }, 1000);
-                }
-                
-                updateStudentConnectionStatus(userId, 'error');
-            });
-
-            peers[userId] = peer;
-            return peer;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
-
-        // Clean up peer connection
-        function cleanupPeer(userId) {
-            if (peers[userId]) {
-                try {
-                    peers[userId].destroy();
-                } catch (e) {
-                    console.warn('Error destroying peer:', e);
-                }
-                delete peers[userId];
-            }
-            removeStudentVideo(userId);
-        }
-
-        // Clean up all peers
-        function cleanupAllPeers() {
-            Object.keys(peers).forEach(userId => {
-                cleanupPeer(userId);
-            });
-            peers = {};
-        }
-
-        // ============================================
-        // C. SOCKET / BACKEND AUTHORITY - COMPLETED
-        // ============================================
-
-        // Handle room state updates from server
-        function handleRoomState(data) {
-            console.log('Room state:', data);
-            meetingState = data.state;
-            updateUIForState();
-            
-            if (data.waitingStudents) {
-                waitingStudents = data.waitingStudents;
-                updateWaitingStudentsCount();
-            }
-            
-            if (data.connectedStudents) {
-                studentCount = data.connectedStudents;
-                updateStudentCount();
-            }
-        }
-
-        // Handle room started event
-        async function handleRoomStarted(data) {
-            console.log('Room started:', data);
-            meetingState = 'live';
+        
+        function copyShareLink() {
+            const shareLink = document.getElementById('shareLink');
+            shareLink.select();
+            shareLink.setSelectionRange(0, 99999);
             
             try {
-                // Start local stream
-                await startLocalStream();
+                navigator.clipboard.writeText(shareLink.value);
+                showNotification('Link copied to clipboard!', 'success');
+            } catch (err) {
+                document.execCommand('copy');
+                showNotification('Link copied!', 'success');
+            }
+        }
+        
+        function updateUI() {
+            // Update status
+            const statusText = document.getElementById('statusText');
+            const statusIndicator = document.getElementById('statusIndicator');
+            const startBtn = document.getElementById('startBtn');
+            const endBtn = document.getElementById('endBtn');
+            const startWebRTCBtn = document.getElementById('startWebRTCBtn');
+            
+            if (meetingStarted) {
+                statusText.textContent = 'Meeting is LIVE';
+                statusIndicator.className = 'status-indicator status-live';
+                startBtn.disabled = true;
+                endBtn.disabled = false;
+                startWebRTCBtn.disabled = false;
+            } else {
+                statusText.textContent = 'Waiting to start meeting';
+                statusIndicator.className = 'status-indicator status-waiting';
+                startBtn.disabled = false;
+                endBtn.disabled = true;
+                startWebRTCBtn.disabled = true;
+            }
+            
+            // Update student counts
+            const waitingStudents = Object.values(students).filter(s => !s.connected).length;
+            const connectedStudents = Object.values(students).filter(s => s.connected).length;
+            
+            document.getElementById('waitingCount').textContent = waitingStudents;
+            document.getElementById('connectedCount').textContent = connectedStudents;
+            document.getElementById('totalCount').textContent = Object.keys(students).length;
+            
+            // Update student list
+            const studentsList = document.getElementById('studentsList');
+            const emptyStudents = document.getElementById('emptyStudents');
+            
+            if (Object.keys(students).length === 0) {
+                emptyStudents.style.display = 'block';
+                studentsList.innerHTML = '';
+            } else {
+                emptyStudents.style.display = 'none';
                 
-                // Update UI
-                updateUIForState();
-                showNotification('Meeting started! Students are now connecting.', 'success');
+                let html = '';
+                Object.values(students).forEach(student => {
+                    const hasVideo = student.videoConnected || false;
+                    const isMuted = student.muted || false;
+                    
+                    html += `
+                    <div class="student-card">
+                        <div class="student-name">${student.username}</div>
+                        <div class="student-id">${student.userId}</div>
+                        <div class="student-status">
+                            ${student.connected ? '✅ Connected' : '⏳ Waiting'}
+                            ${hasVideo ? ' | 🎥 Video' : ''}
+                        </div>
+                        ${student.connected ? `
+                        <div class="student-actions">
+                            <button class="action-btn ${isMuted ? 'action-btn-unmute' : 'action-btn-mute'}" 
+                                    onclick="toggleStudentMute('${student.userId}')">
+                                ${isMuted ? '🔊 Unmute' : '🔇 Mute'}
+                            </button>
+                            <button class="action-btn ${hasVideo ? 'action-btn-video-off' : 'action-btn-video-on'}" 
+                                    onclick="toggleStudentVideo('${student.userId}')">
+                                ${hasVideo ? '📷 Stop Video' : '📷 Start Video'}
+                            </button>
+                        </div>
+                        ` : ''}
+                    </div>
+                    `;
+                });
+                
+                studentsList.innerHTML = html;
+            }
+        }
+        
+        // ============================================
+        // WEBRTC FUNCTIONS
+        // ============================================
+        async function initWebRTC() {
+            try {
+                // Get camera and microphone access
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                // Show local video
+                const teacherVideo = document.getElementById('teacherVideo');
+                teacherVideo.srcObject = localStream;
                 
                 // Enable controls
-                enableMeetingControls(true);
+                document.getElementById('micBtn').disabled = false;
+                document.getElementById('cameraBtn').disabled = false;
                 
-                // Start WebRTC connections with students
-                socket.emit('start-webrtc', { room: ROOM_ID });
-                
+                console.log('✅ WebRTC initialized with local stream');
+                return true;
             } catch (error) {
-                console.error('Failed to start meeting:', error);
-                showNotification('Failed to start meeting. Please check your camera/microphone.', 'error');
+                console.error('❌ WebRTC init error:', error);
+                showNotification('Camera/microphone access required', 'error');
+                return false;
             }
         }
-
-        // Handle room ended event
-        function handleRoomEnded(data) {
-            console.log('Room ended:', data);
-            meetingState = 'ended';
+        
+        async function createPeerConnection(studentId) {
+            const pc = new RTCPeerConnection(configuration);
             
-            // Clean up everything
-            cleanupAllPeers();
-            
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            
-            // Update UI
-            updateUIForState();
-            showNotification('Class has been ended.', 'info');
-            
-            // Disable all controls
-            enableMeetingControls(false);
-        }
-
-        // Handle student joined
-        function handleStudentJoined(data) {
-            console.log('Student joined:', data);
-            studentCount++;
-            updateStudentCount();
-            addStudentToList(data);
-            
-            // Create peer connection if meeting is live
-            if (meetingState === 'live' && localStream) {
-                createPeer(data.userId, true);
-            }
-        }
-
-        // Handle student left
-        function handleStudentLeft(data) {
-            console.log('Student left:', data);
-            studentCount--;
-            updateStudentCount();
-            removeStudentFromList(data.userId);
-            cleanupPeer(data.userId);
-        }
-
-        // Handle student waiting
-        function handleStudentWaiting(data) {
-            console.log('Student waiting:', data);
-            waitingStudents++;
-            updateWaitingStudentsCount();
-        }
-
-        // Handle WebRTC signal
-        function handleWebRTCSignal(data) {
-            console.log('Received WebRTC signal from:', data.from);
-            
-            if (!peers[data.from]) {
-                // Create peer as receiver
-                createPeer(data.from, false);
-            }
-            
-            if (peers[data.from]) {
-                peers[data.from].signal(data.signal);
-            }
-        }
-
-        // Handle WebRTC start
-        function handleWebRTCStart(data) {
-            console.log('Starting WebRTC connections with students');
-            
-            // Create peer connections with all students
-            data.students.forEach(student => {
-                if (!peers[student.userId]) {
-                    createPeer(student.userId, true);
-                }
-            });
-        }
-
-        // Handle socket errors
-        function handleSocketError(error) {
-            console.error('Socket error:', error);
-            showNotification(`Error: ${error.message || 'Unknown error'}`, 'error');
-        }
-
-        // ============================================
-        // D. UX / PRODUCT ISSUES - COMPLETED
-        // ============================================
-
-        // Update UI based on meeting state
-        function updateUIForState() {
-            const waitingState = document.getElementById('waitingState');
-            const liveState = document.getElementById('liveState');
-            const endedState = document.getElementById('endedState');
-            const roomStatus = document.getElementById('roomStatus');
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            const startMeetingBtn = document.getElementById('startMeetingBtn');
-            const recordBtn = document.getElementById('recordBtn');
-            const controlPanel = document.getElementById('controlPanel');
-            
-            // Hide all states first
-            waitingState.classList.add('hidden');
-            liveState.classList.add('hidden');
-            endedState.classList.add('hidden');
-            
-            // Update based on state
-            switch (meetingState) {
-                case 'waiting':
-                    waitingState.classList.remove('hidden');
-                    roomStatus.textContent = 'WAITING';
-                    roomStatus.className = 'room-status waiting';
-                    statusDot.className = 'status-dot waiting';
-                    statusText.textContent = 'Waiting for teacher to start';
-                    startMeetingBtn.classList.remove('hidden');
-                    recordBtn.disabled = true;
-                    controlPanel.classList.add('disabled');
-                    enableMeetingControls(false);
-                    break;
-                    
-                case 'live':
-                    liveState.classList.remove('hidden');
-                    roomStatus.textContent = 'LIVE';
-                    roomStatus.className = 'room-status live';
-                    statusDot.className = 'status-dot live';
-                    statusText.textContent = 'Class in session';
-                    startMeetingBtn.classList.add('hidden');
-                    recordBtn.disabled = false;
-                    controlPanel.classList.remove('disabled');
-                    enableMeetingControls(true);
-                    break;
-                    
-                case 'ended':
-                    endedState.classList.remove('hidden');
-                    roomStatus.textContent = 'ENDED';
-                    roomStatus.className = 'room-status ended';
-                    statusDot.className = 'status-dot ended';
-                    statusText.textContent = 'Class ended';
-                    startMeetingBtn.classList.add('hidden');
-                    recordBtn.disabled = true;
-                    controlPanel.classList.add('disabled');
-                    enableMeetingControls(false);
-                    break;
-            }
-        }
-
-        // Enable/disable meeting controls
-        function enableMeetingControls(enabled) {
-            const controls = [
-                'muteAllToggle',
-                'disableCamsToggle',
-                'micPermissionToggle',
-                'allowQuestionsToggle',
-                'showNamesToggle'
-            ];
-            
-            controls.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.disabled = !enabled;
-                }
+            // Add local stream tracks
+            localStream.getTracks().forEach(track => {
+                pc.addTrack(track, localStream);
             });
             
-            // Update control sections
-            const sections = [
-                'cameraControlSection',
-                'questionControlSection',
-                'studentManagementSection',
-                'slideControlSection'
-            ];
+            // Handle ICE candidates
+            pc.onicecandidate = (event) => {
+                if (event.candidate && socket) {
+                    socket.emit('webrtc-signal', {
+                        room: roomId,
+                        from: teacherId,
+                        to: studentId,
+                        signal: event.candidate,
+                        type: 'candidate'
+                    });
+                }
+            };
             
-            sections.forEach(id => {
-                const section = document.getElementById(id);
-                if (section) {
-                    if (enabled) {
-                        section.classList.remove('disabled');
-                    } else {
-                        section.classList.add('disabled');
+            // Handle remote stream
+            pc.ontrack = (event) => {
+                const studentVideo = document.getElementById('studentVideo');
+                const studentVideoContainer = document.getElementById('studentVideoContainer');
+                
+                if (studentVideo.srcObject !== event.streams[0]) {
+                    studentVideo.srcObject = event.streams[0];
+                    studentVideoContainer.style.display = 'block';
+                    
+                    // Update student state
+                    if (students[studentId]) {
+                        students[studentId].videoConnected = true;
+                        updateUI();
+                    }
+                }
+            };
+            
+            pc.onconnectionstatechange = () => {
+                console.log(`Connection state for ${studentId}: ${pc.connectionState}`);
+                
+                if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                    // Clean up if disconnected
+                    if (students[studentId]) {
+                        students[studentId].videoConnected = false;
+                        updateUI();
+                    }
+                }
+            };
+            
+            return pc;
+        }
+        
+        async function startWebRTC() {
+            if (!meetingStarted) {
+                showNotification('Please start the meeting first', 'error');
+                return;
+            }
+            
+            if (!localStream) {
+                const success = await initWebRTC();
+                if (!success) return;
+            }
+            
+            showNotification('Starting video call with students...', 'info');
+            
+            // Create peer connections for all connected students
+            Object.keys(students).forEach(async (studentId) => {
+                if (students[studentId].connected && !peerConnections[studentId]) {
+                    try {
+                        const pc = await createPeerConnection(studentId);
+                        peerConnections[studentId] = pc;
+                        
+                        // Create and send offer
+                        const offer = await pc.createOffer();
+                        await pc.setLocalDescription(offer);
+                        
+                        socket.emit('webrtc-signal', {
+                            room: roomId,
+                            from: teacherId,
+                            to: studentId,
+                            signal: offer,
+                            type: 'offer'
+                        });
+                        
+                        console.log(`✅ Created peer connection for ${studentId}`);
+                    } catch (error) {
+                        console.error(`❌ Error creating peer connection for ${studentId}:`, error);
                     }
                 }
             });
         }
-
-        // Update status indicators
-        function updateStatusIndicators() {
-            const recordingDot = document.getElementById('recordingDot');
-            const recordingText = document.getElementById('recordingText');
-            
-            if (isRecording) {
-                recordingDot.style.background = 'var(--teacher-danger)';
-                recordingText.textContent = 'Recording';
-            } else {
-                recordingDot.style.background = '#7f8c8d';
-                recordingText.textContent = 'Not Recording';
-            }
-        }
-
-        // Update student count
-        function updateStudentCount() {
-            document.getElementById('studentCount').textContent = 
-                `${studentCount} Student${studentCount !== 1 ? 's' : ''} Connected`;
-        }
-
-        // Update waiting students count
-        function updateWaitingStudentsCount() {
-            document.getElementById('waitingStudentsCount').textContent = waitingStudents;
-        }
-
-        // ============================================
-        // E. CONTROL FUNCTIONS - COMPLETED
-        // ============================================
-
-        // Start meeting
-        function startMeeting() {
-            if (meetingState !== 'waiting') {
-                showNotification('Meeting already started or ended', 'warning');
-                return;
-            }
-            
-            socket.emit('start-meeting', { room: ROOM_ID });
-            showNotification('Starting meeting...', 'info');
-        }
-
-        // End class
-        function endClass() {
-            if (meetingState === 'ended') {
-                showNotification('Class already ended', 'warning');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to end the class? This will disconnect all students.')) {
-                socket.emit('end-meeting', { room: ROOM_ID });
-                showNotification('Ending class...', 'info');
-            }
-        }
-
-        // Toggle recording
-        function toggleRecording() {
-            if (meetingState !== 'live') {
-                showNotification('Meeting must be live to record', 'warning');
-                return;
-            }
-            
-            isRecording = !isRecording;
-            socket.emit('toggle-recording', { 
-                room: ROOM_ID, 
-                recording: isRecording 
-            });
-            
-            const recordBtn = document.getElementById('recordBtn');
-            if (isRecording) {
-                recordBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Recording';
-                recordBtn.classList.remove('primary');
-                recordBtn.classList.add('danger');
-                showNotification('Recording started', 'success');
-            } else {
-                recordBtn.innerHTML = '<i class="fas fa-circle"></i> Start Recording';
-                recordBtn.classList.remove('danger');
-                recordBtn.classList.add('primary');
-                showNotification('Recording stopped', 'info');
-            }
-            
-            updateStatusIndicators();
-        }
-
-        // Copy join link
-        function copyJoinLink() {
-            const joinLink = document.getElementById('joinLink');
-            joinLink.select();
-            joinLink.setSelectionRange(0, 99999); // For mobile devices
+        
+        async function handleWebRTCSignal(data) {
+            const { from: studentId, signal, type } = data;
             
             try {
-                navigator.clipboard.writeText(joinLink.value);
-                showNotification('Join link copied to clipboard!', 'success');
-            } catch (err) {
-                // Fallback for older browsers
-                document.execCommand('copy');
-                showNotification('Join link copied to clipboard!', 'success');
-            }
-        }
-
-        // ============================================
-        // F. STUDENT MANAGEMENT - COMPLETED
-        // ============================================
-
-        // Add student to list
-        function addStudentToList(data) {
-            const studentList = document.getElementById('studentList');
-            const studentItem = document.createElement('div');
-            studentItem.className = 'student-item';
-            studentItem.id = `student-${data.userId}`;
-            studentItem.dataset.userId = data.userId;
-            
-            studentItem.innerHTML = `
-                <div class="student-info">
-                    <span class="student-status waiting" id="status-${data.userId}"></span>
-                    <span>${data.username || `Student ${studentList.children.length + 1}`}</span>
-                </div>
-                <div class="student-controls">
-                    <button class="icon-btn" title="Mute" onclick="muteStudent('${data.userId}')" id="mute-${data.userId}">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                    <button class="icon-btn" title="Disable Camera" onclick="disableStudentCamera('${data.userId}')" id="camera-${data.userId}">
-                        <i class="fas fa-video"></i>
-                    </button>
-                    <button class="icon-btn" title="View Struggles" onclick="viewStudentStruggles('${data.userId}')">
-                        <i class="fas fa-brain"></i>
-                    </button>
-                </div>
-            `;
-            
-            studentList.appendChild(studentItem);
-        }
-
-        // Remove student from list
-        function removeStudentFromList(userId) {
-            const studentElement = document.getElementById(`student-${userId}`);
-            if (studentElement) {
-                studentElement.remove();
-            }
-        }
-
-        // Update student connection status
-        function updateStudentConnectionStatus(userId, status) {
-            const statusElement = document.getElementById(`status-${userId}`);
-            if (statusElement) {
-                statusElement.className = 'student-status';
-                switch (status) {
-                    case 'connected':
-                        statusElement.classList.add('connected');
-                        statusElement.style.background = 'var(--teacher-success)';
-                        break;
-                    case 'waiting':
-                        statusElement.classList.add('waiting');
-                        statusElement.style.background = 'var(--waiting-color)';
-                        break;
-                    case 'error':
-                        statusElement.style.background = 'var(--teacher-danger)';
-                        break;
-                    default:
-                        statusElement.style.background = '#7f8c8d';
+                if (type === 'answer') {
+                    const pc = peerConnections[studentId];
+                    if (pc && pc.signalingState !== 'closed') {
+                        await pc.setRemoteDescription(new RTCSessionDescription(signal));
+                    }
+                } else if (signal.candidate) {
+                    const pc = peerConnections[studentId];
+                    if (pc && pc.remoteDescription) {
+                        await pc.addIceCandidate(new RTCIceCandidate(signal));
+                    }
                 }
+            } catch (error) {
+                console.error('❌ WebRTC signal error:', error);
             }
         }
-
-        // Mute student
-        function muteStudent(userId) {
-            socket.emit('mute-student', { room: ROOM_ID, userId });
-            
-            const muteBtn = document.getElementById(`mute-${userId}`);
-            if (muteBtn) {
-                muteBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-                muteBtn.title = 'Unmute';
-                muteBtn.onclick = () => unmuteStudent(userId);
-            }
-            
-            showNotification(`Student ${userId} muted`);
-        }
-
-        // Unmute student
-        function unmuteStudent(userId) {
-            socket.emit('unmute-student', { room: ROOM_ID, userId });
-            
-            const muteBtn = document.getElementById(`mute-${userId}`);
-            if (muteBtn) {
-                muteBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                muteBtn.title = 'Mute';
-                muteBtn.onclick = () => muteStudent(userId);
-            }
-            
-            showNotification(`Student ${userId} unmuted`);
-        }
-
-        // Handle student muted event from server
-        function handleStudentMuted(data) {
-            const muteBtn = document.getElementById(`mute-${data.userId}`);
-            if (muteBtn) {
-                if (data.muted) {
-                    muteBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
-                    muteBtn.title = 'Unmute';
-                    muteBtn.onclick = () => unmuteStudent(data.userId);
-                } else {
-                    muteBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                    muteBtn.title = 'Mute';
-                    muteBtn.onclick = () => muteStudent(data.userId);
-                }
-            }
-        }
-
-        // Disable student camera
-        function disableStudentCamera(userId) {
-            socket.emit('disable-camera', { room: ROOM_ID, userId });
-            
-            const cameraBtn = document.getElementById(`camera-${userId}`);
-            if (cameraBtn) {
-                cameraBtn.innerHTML = '<i class="fas fa-video-slash"></i>';
-                cameraBtn.title = 'Enable Camera';
-                cameraBtn.onclick = () => enableStudentCamera(userId);
-            }
-            
-            showNotification(`Camera disabled for student ${userId}`);
-        }
-
-        // Enable student camera
-        function enableStudentCamera(userId) {
-            socket.emit('enable-camera', { room: ROOM_ID, userId });
-            
-            const cameraBtn = document.getElementById(`camera-${userId}`);
-            if (cameraBtn) {
-                cameraBtn.innerHTML = '<i class="fas fa-video"></i>';
-                cameraBtn.title = 'Disable Camera';
-                cameraBtn.onclick = () => disableStudentCamera(userId);
-            }
-            
-            showNotification(`Camera enabled for student ${userId}`);
-        }
-
-        // Handle student camera disabled event from server
-        function handleStudentCameraDisabled(data) {
-            const cameraBtn = document.getElementById(`camera-${data.userId}`);
-            if (cameraBtn) {
-                if (data.disabled) {
-                    cameraBtn.innerHTML = '<i class="fas fa-video-slash"></i>';
-                    cameraBtn.title = 'Enable Camera';
-                    cameraBtn.onclick = () => enableStudentCamera(data.userId);
-                } else {
-                    cameraBtn.innerHTML = '<i class="fas fa-video"></i>';
-                    cameraBtn.title = 'Disable Camera';
-                    cameraBtn.onclick = () => disableStudentCamera(data.userId);
-                }
-            }
-        }
-
-        // ============================================
-        // G. STUDENT INTERACTION HANDLERS - COMPLETED
-        // ============================================
-
-        // Handle mic request
-        function handleMicRequest(data) {
-            const allow = confirm(`Student ${data.username} wants to unmute. Allow?`);
-            socket.emit('mic-response', { 
-                room: ROOM_ID, 
-                userId: data.userId, 
-                allowed: allow 
-            });
-            
-            if (allow) {
-                showNotification(`Microphone access granted to ${data.username}`);
-            } else {
-                showNotification(`Microphone access denied for ${data.username}`);
-            }
-        }
-
-        // Handle student question
-        function handleStudentQuestion(data) {
-            const questionQueue = document.getElementById('questionQueue');
-            const questionItem = document.createElement('div');
-            questionItem.className = 'question-item';
-            
-            const showName = document.getElementById('showNamesToggle').checked;
-            const studentName = showName ? data.username : 'Anonymous';
-            
-            questionItem.innerHTML = `
-                <div class="question-meta">
-                    <span>${studentName}</span>
-                    <span>Just now</span>
-                </div>
-                <div class="question-text">${data.question}</div>
-                <div style="margin-top: 8px; display: flex; gap: 5px;">
-                    <button class="icon-btn" onclick="answerQuestion('${data.userId}', '${data.questionId}')" title="Answer">
-                        <i class="fas fa-reply"></i>
-                    </button>
-                    <button class="icon-btn" onclick="dismissQuestion('${data.questionId}')" title="Dismiss">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            
-            questionQueue.prepend(questionItem);
-            
-            // Show notification
-            showNotification(`New question from ${studentName}`);
-            
-            // Play sound for new question
-            playNotificationSound();
-        }
-
-        // Handle student struggle
-        function handleStudentStruggle(data) {
-            console.log('Student struggle:', data);
-            
-            // Update student list with struggle indicator
-            const studentElement = document.getElementById(`student-${data.userId}`);
-            if (studentElement) {
-                const status = studentElement.querySelector('.student-status');
-                status.style.background = 'var(--teacher-warning)';
-                
-                // Add tooltip
-                status.title = `Struggling with: ${data.topic}`;
-            }
-            
-            // Show notification
-            showNotification(`Student ${data.username} is struggling with ${data.topic}`);
-        }
-
-        // ============================================
-        // H. VIDEO MANAGEMENT - COMPLETED
-        // ============================================
-
-        // Add student video
-        function addStudentVideo(userId, stream) {
-            const studentVideos = document.getElementById('studentVideos');
-            
-            if (document.getElementById(`video-${userId}`)) {
-                // Update existing video stream
-                const video = document.getElementById(`video-${userId}`).querySelector('video');
-                video.srcObject = stream;
-                return;
-            }
-            
-            const videoWrapper = document.createElement('div');
-            videoWrapper.className = 'video-wrapper student';
-            videoWrapper.id = `video-${userId}`;
-            
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.autoplay = true;
-            video.playsInline = true;
-            video.muted = false; // Allow student audio
-            
-            const label = document.createElement('div');
-            label.className = 'video-label';
-            label.textContent = `Student`;
-            label.id = `label-${userId}`;
-            
-            videoWrapper.appendChild(video);
-            videoWrapper.appendChild(label);
-            studentVideos.appendChild(videoWrapper);
-            
-            // Update connection status
-            updateStudentConnectionStatus(userId, 'connected');
-        }
-
-        // Remove student video
-        function removeStudentVideo(userId) {
-            const videoElement = document.getElementById(`video-${userId}`);
-            if (videoElement) {
-                videoElement.remove();
-            }
-        }
-
-        // ============================================
-        // I. UTILITY FUNCTIONS - COMPLETED
-        // ============================================
-
-        // Show notification
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                border-radius: 8px;
-                z-index: 3000;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                animation: slideIn 0.3s ease;
-                max-width: 400px;
-                word-wrap: break-word;
-            `;
-            
-            // Set color based on type
-            switch (type) {
-                case 'success':
-                    notification.style.background = 'var(--teacher-success)';
-                    break;
-                case 'error':
-                    notification.style.background = 'var(--teacher-danger)';
-                    break;
-                case 'warning':
-                    notification.style.background = 'var(--teacher-warning)';
-                    break;
-                default:
-                    notification.style.background = 'var(--teacher-accent)';
-            }
-            
-            notification.style.color = 'white';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            // Remove after 5 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 5000);
-        }
-
-        // Play notification sound
-        function playNotificationSound() {
-            try {
-                const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
-                audio.volume = 0.3;
-                audio.play().catch(e => console.log('Audio play failed:', e));
-            } catch (e) {
-                // Silent fail if audio not supported
-            }
-        }
-
-        // Add CSS for animations
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // ============================================
-        // J. INITIALIZATION AND CLEANUP - COMPLETED
-        // ============================================
-
-        // Initialize when page loads
-        window.addEventListener('load', () => {
-            console.log('Initializing Nelavista Live Teacher Control...');
-            initializeApplication();
-        });
-
-        // Clean up on page unload
-        window.addEventListener('beforeunload', () => {
-            console.log('Cleaning up before unload...');
-            
-            if (socket) {
-                socket.emit('teacher-leave', { room: ROOM_ID, userId });
-                socket.disconnect();
-            }
-            
-            cleanupAllPeers();
-            
+        
+        function toggleMic() {
             if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-        });
-
-        // ============================================
-        // K. ADDITIONAL FEATURES (from original) - COMPLETED
-        // ============================================
-
-        // AI Prompter Functions
-        function updatePrompter(content) {
-            document.getElementById('prompterContent').textContent = content;
-        }
-
-        function simulateMistakeDetection() {
-            const mistakeAlert = document.getElementById('mistakeAlert');
-            const mistakeText = document.getElementById('mistakeText');
-            
-            const mistakes = [
-                "Check sign in equation: x² - 4 = (x-2)(x+2)",
-                "Possible mispronunciation: It's 'Pythagorean', not 'Pythagoras'",
-                "Formula correction: Area of circle is πr², not 2πr",
-                "Historical date check: 1492, not 1493",
-                "Unit check: Use meters, not centimeters"
-            ];
-            
-            if (document.getElementById('mistakeGuardToggle').checked) {
-                mistakeText.textContent = mistakes[Math.floor(Math.random() * mistakes.length)];
-                mistakeAlert.classList.add('show');
-                
-                setTimeout(() => {
-                    mistakeAlert.classList.remove('show');
-                }, 10000);
+                const audioTrack = localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    audioTrack.enabled = !audioTrack.enabled;
+                    const micBtn = document.getElementById('micBtn');
+                    micBtn.classList.toggle('control-btn-muted');
+                    micBtn.innerHTML = audioTrack.enabled ? '🎤 Mute' : '🔇 Unmute';
+                    showNotification(audioTrack.enabled ? 'Microphone on' : 'Microphone muted', 'info');
+                }
             }
         }
-
-        // Smart Board Functions
-        function editNotes() {
-            const notesEditor = document.getElementById('smartBoardNotes');
-            notesEditor.focus();
-            showNotification('Edit mode enabled');
-        }
-
-        function releaseNotes() {
-            const notes = document.getElementById('smartBoardNotes').value;
-            socket.emit('release-notes', { room: ROOM_ID, notes });
-            showNotification('Notes released to students');
-        }
-
-        // Presentation Functions
-        function togglePresentation() {
-            const button = event.target.closest('button');
-            const isEnabled = button.textContent.includes('Enable');
-            
-            if (isEnabled) {
-                button.innerHTML = '<i class="fas fa-toggle-off"></i> Disable Presentation';
-                button.classList.add('success');
-                socket.emit('presentation-mode', { room: ROOM_ID, enabled: true });
-                showNotification('Presentation mode enabled');
-            } else {
-                button.innerHTML = '<i class="fas fa-toggle-on"></i> Enable Presentation';
-                button.classList.remove('success');
-                socket.emit('presentation-mode', { room: ROOM_ID, enabled: false });
-                showNotification('Presentation mode disabled');
+        
+        function toggleCamera() {
+            if (localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    const cameraBtn = document.getElementById('cameraBtn');
+                    cameraBtn.classList.toggle('control-btn-muted');
+                    cameraBtn.innerHTML = videoTrack.enabled ? '📷 Stop Camera' : '📷 Start Camera';
+                    showNotification(videoTrack.enabled ? 'Camera on' : 'Camera off', 'info');
+                }
             }
         }
-
-        function uploadSlide() {
-            alert('Slide upload feature would open file dialog');
-            // In real implementation: document.getElementById('slideUpload').click();
-        }
-
-        function showPrivateSlide() {
-            socket.emit('private-slide', { room: ROOM_ID });
-            showNotification('Private slide mode: Only you can see this slide');
-        }
-
-        function showSlideToAll() {
-            socket.emit('show-slide', { room: ROOM_ID, slideNumber: 1 });
-            showNotification('Slide shown to all students');
-        }
-
-        function hideSlides() {
-            socket.emit('hide-slides', { room: ROOM_ID });
-            showNotification('Slides hidden from students');
-        }
-
-        function nextSlide() {
-            socket.emit('next-slide', { room: ROOM_ID });
-            showNotification('Next slide displayed');
-        }
-
-        // Settings Functions
-        function openSettings() {
-            document.getElementById('settingsModal').classList.add('show');
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('show');
-        }
-
-        function saveSettings() {
-            const allowRecording = document.getElementById('allowRecordingToggle').checked;
-            const allowDownload = document.getElementById('allowDownloadToggle').checked;
-            const allowSharing = document.getElementById('allowSharingToggle').checked;
+        
+        function toggleStudentMute(studentId) {
+            if (!socket || !socket.connected) return;
             
-            socket.emit('update-settings', {
-                room: ROOM_ID,
-                settings: { allowRecording, allowDownload, allowSharing }
+            const student = students[studentId];
+            if (!student) return;
+            
+            const shouldMute = !student.muted;
+            
+            socket.emit(shouldMute ? 'mute-student' : 'unmute-student', {
+                room: roomId,
+                userId: studentId
             });
             
-            showNotification('Settings saved');
-            closeSettings();
+            student.muted = shouldMute;
+            updateUI();
+            
+            showNotification(`${student.username} ${shouldMute ? 'muted' : 'unmuted'}`, 'info');
         }
-
-        // Sample AI prompts
-        function getNextPrompt() {
-            const prompts = [
-                "You planned 5 minutes left for examples. Consider real-world applications.",
-                "Check if students are following. Consider a quick poll.",
-                "Next topic: Practice problems. Prepare 3 examples.",
-                "Time to summarize key points before moving on.",
-                "Consider asking: 'Any questions before we proceed?'"
-            ];
-            return prompts[Math.floor(Math.random() * prompts.length)];
+        
+        function toggleStudentVideo(studentId) {
+            if (!socket || !socket.connected) return;
+            
+            const student = students[studentId];
+            if (!student) return;
+            
+            // In a real implementation, you would send a signal to toggle video
+            showNotification(`Video toggle for ${student.username} requested`, 'info');
         }
-
-        // Start AI updates simulation
-        setInterval(() => {
-            if (meetingState === 'live') {
-                updatePrompter(getNextPrompt());
+        
+        // ============================================
+        // SOCKET.IO FUNCTIONS
+        // ============================================
+        function connectSocket() {
+            console.log('🔌 Connecting to Socket.IO...');
+            
+            socket = io({
+                transports: ['websocket', 'polling'],
+                upgrade: true,
+                forceNew: true,
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                reconnectionAttempts: Infinity
+            });
+            
+            // Connection events
+            socket.on('connect', () => {
+                console.log('✅ Socket connected:', socket.id);
+                showNotification('Connected to server', 'success');
+                
+                // Immediately join as teacher
+                socket.emit('teacher-join', {
+                    room: roomId,
+                    userId: teacherId,
+                    username: username
+                });
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.error('❌ Socket connection error:', error);
+                showNotification('Connection error. Reconnecting...', 'error');
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('❌ Socket disconnected');
+                showNotification('Disconnected from server', 'error');
+            });
+            
+            // Room state events
+            socket.on('room-state', (data) => {
+                console.log('📊 Room state received:', data);
+                meetingStarted = data.state === 'live';
+                updateUI();
+                
+                if (data.state === 'live') {
+                    showNotification('Meeting is now LIVE!', 'success');
+                }
+            });
+            
+            socket.on('room-started', (data) => {
+                console.log('🚀 Meeting started:', data);
+                meetingStarted = true;
+                showNotification('Meeting started successfully!', 'success');
+                updateUI();
+            });
+            
+            // Student events
+            socket.on('student-joined', (data) => {
+                console.log('👨‍🎓 Student joined:', data);
+                
+                students[data.userId] = {
+                    userId: data.userId,
+                    username: data.username,
+                    socketId: data.socketId,
+                    connected: meetingStarted,
+                    videoConnected: false,
+                    muted: false
+                };
+                
+                updateUI();
+                showNotification(`${data.username} joined the class`, 'info');
+                
+                // If meeting is live, automatically start WebRTC with new student
+                if (meetingStarted && localStream) {
+                    setTimeout(() => startWebRTCWithStudent(data.userId), 1000);
+                }
+            });
+            
+            socket.on('student-left', (data) => {
+                console.log('👋 Student left:', data);
+                
+                if (students[data.userId]) {
+                    // Clean up WebRTC connection
+                    if (peerConnections[data.userId]) {
+                        peerConnections[data.userId].close();
+                        delete peerConnections[data.userId];
+                    }
+                    
+                    delete students[data.userId];
+                    updateUI();
+                    showNotification(`${data.username} left the class`, 'info');
+                    
+                    // Hide student video container if no students
+                    if (Object.keys(students).length === 0) {
+                        document.getElementById('studentVideoContainer').style.display = 'none';
+                    }
+                }
+            });
+            
+            socket.on('student-muted-confirm', (data) => {
+                const student = students[data.userId];
+                if (student) {
+                    student.muted = data.muted;
+                    updateUI();
+                    showNotification(`${student.username} ${data.muted ? 'muted' : 'unmuted'}`, 'info');
+                }
+            });
+            
+            // WebRTC events
+            socket.on('webrtc-start-teacher', (data) => {
+                console.log('🎥 WebRTC start request:', data);
+                showNotification('Starting video call with students...', 'info');
+            });
+            
+            socket.on('webrtc-signal', (data) => {
+                console.log('📡 WebRTC signal received from student:', data.from);
+                handleWebRTCSignal(data);
+            });
+            
+            // Error handling
+            socket.on('error', (data) => {
+                console.error('❌ Socket error:', data);
+                showNotification(`Error: ${data.message}`, 'error');
+                
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('startText').style.display = 'inline';
+                document.getElementById('startLoading').style.display = 'none';
+            });
+            
+            socket.on('room-ended', (data) => {
+                console.log('🛑 Room ended:', data);
+                meetingStarted = false;
+                students = {};
+                
+                // Clean up all WebRTC connections
+                Object.values(peerConnections).forEach(pc => pc.close());
+                peerConnections = {};
+                
+                // Stop local stream
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
+                
+                // Reset video elements
+                document.getElementById('teacherVideo').srcObject = null;
+                document.getElementById('studentVideo').srcObject = null;
+                document.getElementById('studentVideoContainer').style.display = 'none';
+                
+                // Disable controls
+                document.getElementById('micBtn').disabled = true;
+                document.getElementById('cameraBtn').disabled = true;
+                document.getElementById('startWebRTCBtn').disabled = true;
+                
+                updateUI();
+                showNotification('Meeting has ended', 'info');
+            });
+        }
+        
+        async function startWebRTCWithStudent(studentId) {
+            if (!localStream) {
+                const success = await initWebRTC();
+                if (!success) return;
             }
-        }, 30000);
-
-        // Start mistake detection simulation
-        setInterval(() => {
-            if (meetingState === 'live' && Math.random() > 0.7) {
-                simulateMistakeDetection();
+            
+            try {
+                const pc = await createPeerConnection(studentId);
+                peerConnections[studentId] = pc;
+                
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                
+                socket.emit('webrtc-signal', {
+                    room: roomId,
+                    from: teacherId,
+                    to: studentId,
+                    signal: offer,
+                    type: 'offer'
+                });
+                
+                console.log(`✅ Started WebRTC with ${studentId}`);
+            } catch (error) {
+                console.error(`❌ Error starting WebRTC with ${studentId}:`, error);
             }
-        }, 45000);
+        }
+        
+        // ============================================
+        // MEETING CONTROL FUNCTIONS
+        // ============================================
+        function startMeeting() {
+            if (!socket || !socket.connected) {
+                showNotification('Not connected to server', 'error');
+                return;
+            }
+            
+            console.log('🎬 Starting meeting...');
+            
+            const startBtn = document.getElementById('startBtn');
+            const startText = document.getElementById('startText');
+            const startLoading = document.getElementById('startLoading');
+            
+            startBtn.disabled = true;
+            startText.style.display = 'none';
+            startLoading.style.display = 'inline-block';
+            
+            socket.emit('start-meeting', {
+                room: roomId,
+                timestamp: Date.now()
+            });
+            
+            meetingStarted = true;
+            updateUI();
+            
+            showNotification('Starting meeting...', 'info');
+            
+            setTimeout(() => {
+                if (startText.style.display === 'none') {
+                    startText.style.display = 'inline';
+                    startLoading.style.display = 'none';
+                    startBtn.disabled = false;
+                    showNotification('Start request timed out', 'error');
+                }
+            }, 3000);
+        }
+        
+        function endMeeting() {
+            if (!socket || !socket.connected) {
+                showNotification('Not connected to server', 'error');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to end the meeting?')) {
+                console.log('🛑 Ending meeting...');
+                
+                socket.emit('end-meeting', {
+                    room: roomId
+                });
+                
+                showNotification('Ending meeting...', 'info');
+            }
+        }
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Initializing Teacher Dashboard...');
+            console.log('Room ID:', roomId);
+            console.log('Teacher ID:', teacherId);
+            
+            connectSocket();
+            updateUI();
+            
+            window.addEventListener('beforeunload', (e) => {
+                if (meetingStarted) {
+                    e.preventDefault();
+                    e.returnValue = 'Are you sure you want to leave? The meeting will end.';
+                }
+            });
+            
+            setInterval(() => {
+                if (socket && socket.connected) {
+                    socket.emit('ping', { timestamp: Date.now() });
+                }
+            }, 25000);
+        });
     </script>
 </body>
 </html>
