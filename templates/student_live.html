@@ -3,50 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student - Live Classroom</title>
+    <title>Join Live Classroom</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .container { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 800px; width: 100%; }
-        .header { background: #4CAF50; color: white; padding: 30px; text-align: center; }
-        .content { padding: 30px; }
-        .join-section { margin-bottom: 30px; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        input { flex: 1; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; }
-        button { padding: 15px 30px; background: #4CAF50; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        .video-container { background: black; border-radius: 15px; overflow: hidden; aspect-ratio: 16/9; margin: 20px 0; position: relative; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        .video-label { position: absolute; bottom: 10px; left: 10px; color: white; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 5px; }
-        .status { text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-top: 20px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+        .header { 
+            background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%); 
+            color: white; 
+            padding: 30px; 
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none" opacity="0.1"><circle cx="50" cy="50" r="40" fill="white"/></svg>');
+            background-size: cover;
+        }
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        .header h1 { 
+            font-size: 2.2rem; 
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .room-code {
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-top: 10px;
+            backdrop-filter: blur(5px);
+        }
+        .content {
+            padding: 30px;
+        }
+        .join-section {
+            margin-bottom: 30px;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        button {
+            padding: 16px 32px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        button:hover:not(:disabled) {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .video-container {
+            background: #1a202c;
+            border-radius: 15px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            margin: 20px 0;
+            position: relative;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            transition: opacity 0.3s;
+        }
+        .video-label {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+        .status {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .status-message {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .status-detail {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .notification.success { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
+        .notification.error { background: linear-gradient(135deg, #f44336, #c62828); }
+        .notification.info { background: linear-gradient(135deg, #2196F3, #1565C0); }
+        
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎓 Join Live Class</h1>
-            <p>Room: <strong>{{ room_id }}</strong></p>
+            <div class="header-content">
+                <h1>
+                    <span>🎓</span>
+                    Join Live Class
+                </h1>
+                <div class="room-code">
+                    Room: <strong>{{ room_id }}</strong>
+                </div>
+            </div>
         </div>
         
         <div class="content">
             <div class="join-section">
                 <div class="input-group">
                     <input type="text" id="username" placeholder="Enter your name" value="Student">
-                    <button onclick="joinClass()" id="joinBtn">🎯 Join Class</button>
+                    <button onclick="joinClass()" id="joinBtn">
+                        <span>🎯</span>
+                        Join Class
+                    </button>
                 </div>
             </div>
             
             <div class="video-container">
+                <div class="video-overlay" id="videoOverlay">
+                    <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">👨‍🏫</div>
+                    <div style="font-size: 1.2rem; margin-bottom: 10px;">Waiting for teacher...</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Join the class to see the live stream</div>
+                </div>
                 <video id="remoteVideo" autoplay playsinline></video>
-                <div class="video-label" id="videoLabel">Waiting for teacher...</div>
+                <div class="video-label" id="videoLabel">Teacher</div>
             </div>
             
             <div class="status" id="status">
-                <p>Enter your name and click "Join Class"</p>
+                <div class="status-icon">📝</div>
+                <div class="status-message">Enter your name and join the class</div>
+                <div class="status-detail">You'll see the teacher's live video here</div>
             </div>
         </div>
     </div>
+    
+    <div id="notification" class="notification"></div>
     
     <script>
         // ============================================
@@ -65,20 +266,37 @@
             username = usernameInput.value.trim() || 'Student';
             
             if (!username) {
-                alert('Please enter your name');
+                showNotification('Please enter your name', 'error');
                 return;
             }
             
             socket.emit('join-room', {
                 room: roomId,
                 role: 'student',
-                user_id: `student_${Date.now()}`,
                 username: username
             });
             
             document.getElementById('joinBtn').disabled = true;
-            document.getElementById('joinBtn').textContent = 'Joining...';
-            updateStatus('Joining classroom...');
+            document.getElementById('joinBtn').innerHTML = '<span class="loading"></span> Joining...';
+            updateStatus('📡', 'Joining classroom...', 'Connecting to server...');
+            
+            // Add loading animation
+            const style = document.createElement('style');
+            style.textContent = `
+                .loading {
+                    display: inline-block;
+                    width: 20px;
+                    height: 20px;
+                    border: 2px solid rgba(255,255,255,0.3);
+                    border-radius: 50%;
+                    border-top-color: white;
+                    animation: spin 1s linear infinite;
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
         }
         
         // ============================================
@@ -94,23 +312,42 @@
             
             // Handle remote stream
             peerConnection.ontrack = (event) => {
-                console.log('📹 Received remote stream');
+                console.log('📹 Received remote stream from teacher');
                 const remoteVideo = document.getElementById('remoteVideo');
                 remoteVideo.srcObject = event.streams[0];
-                document.getElementById('videoLabel').textContent = 'Teacher';
-                updateStatus('Connected to teacher!');
+                
+                // Hide overlay when video starts
+                document.getElementById('videoOverlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('videoOverlay').style.display = 'none';
+                }, 300);
+                
+                updateStatus('✅', 'Connected to teacher!', 'Live stream is active');
+                showNotification('Connected to teacher!', 'success');
             };
             
             // ICE candidate handling
             peerConnection.onicecandidate = (event) => {
                 if (event.candidate) {
-                    // We don't know teacher's SID yet, so we'll send it later
-                    // after we receive the offer
                     socket.emit('rtc-ice-candidate', {
                         room: roomId,
                         candidate: event.candidate,
-                        target_sid: null // Will be set after offer
+                        target_sid: null // Teacher's SID will be known after offer
                     });
+                }
+            };
+            
+            // Connection state monitoring
+            peerConnection.onconnectionstatechange = () => {
+                console.log('Connection state:', peerConnection.connectionState);
+                
+                if (peerConnection.connectionState === 'connected') {
+                    updateStatus('✅', 'Connected!', 'Streaming live video');
+                } else if (peerConnection.connectionState === 'disconnected' || 
+                          peerConnection.connectionState === 'failed') {
+                    updateStatus('⚠️', 'Connection lost', 'Trying to reconnect...');
+                    document.getElementById('videoOverlay').style.display = 'flex';
+                    document.getElementById('videoOverlay').style.opacity = '1';
                 }
             };
             
@@ -122,13 +359,19 @@
         // ============================================
         socket.on('connect', () => {
             console.log('✅ Connected to server');
-            updateStatus('Ready to join');
+            updateStatus('✅', 'Connected to server', 'Ready to join');
         });
         
         socket.on('room-joined', (data) => {
             console.log('✅ Joined room as student');
-            document.getElementById('joinBtn').textContent = 'Joined ✓';
-            updateStatus('Waiting for teacher to start...');
+            document.getElementById('joinBtn').innerHTML = '<span>✅</span> Joined';
+            updateStatus('👨‍🏫', 'Waiting for teacher...', 'Teacher will start the class soon');
+            showNotification('Successfully joined the classroom!', 'success');
+        });
+        
+        socket.on('teacher-ready', () => {
+            console.log('📢 Teacher is ready to broadcast');
+            updateStatus('🎥', 'Teacher is ready...', 'Setting up video connection');
         });
         
         socket.on('rtc-offer', async (data) => {
@@ -151,31 +394,25 @@
                 });
                 
                 console.log('📤 Sent WebRTC answer to teacher');
+                updateStatus('🔄', 'Connecting...', 'Establishing video connection');
+                
             } catch (error) {
                 console.error('❌ Error handling offer:', error);
+                showNotification('Failed to connect to teacher', 'error');
             }
         });
         
         socket.on('rtc-ice-candidate', (data) => {
             const { candidate } = data;
             if (peerConnection && candidate) {
-                peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                    .catch(err => console.error('❌ Error adding ICE candidate:', err));
             }
-        });
-        
-        socket.on('broadcast-started', () => {
-            console.log('📢 Teacher started broadcasting');
-            updateStatus('Teacher is broadcasting live!');
-        });
-        
-        socket.on('broadcast-stopped', () => {
-            console.log('📢 Teacher stopped broadcasting');
-            updateStatus('Broadcast ended');
         });
         
         socket.on('teacher-disconnected', () => {
             console.log('👨‍🏫 Teacher disconnected');
-            updateStatus('Teacher left the classroom');
+            updateStatus('⚠️', 'Teacher left', 'The teacher has ended the class');
             
             if (peerConnection) {
                 peerConnection.close();
@@ -184,24 +421,52 @@
             
             const video = document.getElementById('remoteVideo');
             video.srcObject = null;
-            document.getElementById('videoLabel').textContent = 'Teacher disconnected';
+            
+            document.getElementById('videoOverlay').style.display = 'flex';
+            document.getElementById('videoOverlay').style.opacity = '1';
+            document.getElementById('videoOverlay').innerHTML = `
+                <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">👋</div>
+                <div style="font-size: 1.2rem; margin-bottom: 10px;">Class ended</div>
+                <div style="font-size: 0.9rem; opacity: 0.8;">Teacher has left the classroom</div>
+            `;
+            
+            showNotification('Teacher has ended the class', 'info');
         });
         
         socket.on('error', (data) => {
             console.error('❌ Server error:', data);
-            updateStatus('Error: ' + (data.message || 'Connection failed'));
+            updateStatus('❌', 'Error', data.message || 'Connection failed');
             document.getElementById('joinBtn').disabled = false;
-            document.getElementById('joinBtn').textContent = 'Join Class';
+            document.getElementById('joinBtn').innerHTML = '<span>🎯</span> Join Class';
+            showNotification(data.message || 'Connection failed', 'error');
         });
         
         // ============================================
         // UI FUNCTIONS
         // ============================================
-        function updateStatus(message) {
-            document.getElementById('status').innerHTML = `<p>${message}</p>`;
+        function updateStatus(icon, message, detail) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = `
+                <div class="status-icon">${icon}</div>
+                <div class="status-message">${message}</div>
+                <div class="status-detail">${detail}</div>
+            `;
         }
         
-        // Auto-join if username is set
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
         document.addEventListener('DOMContentLoaded', () => {
             const usernameInput = document.getElementById('username');
             usernameInput.focus();
@@ -212,6 +477,9 @@
                     joinClass();
                 }
             });
+            
+            // Update video label with room ID
+            document.getElementById('videoLabel').textContent = `Room: ${roomId}`;
         });
     </script>
 </body>
