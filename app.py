@@ -71,29 +71,46 @@ def on_disconnect():
 # ============================================
 @socketio.on("join-room")
 def join(data):
-    room_id = data["room"]
-    role = data["role"]
+    try:
+        room_id = data["room"]
+        role = data["role"]
 
-    room = get_room(room_id)
-    join_room(room_id)
+        if not room_id:
+            emit("error", {"message": "Room ID is required"})
+            return
 
-    if role == "teacher":
-        if room["teacher"]:
-            emit("error", {"message": "Teacher already exists"})
-            return
-        room["teacher"] = request.sid
-        emit("room-joined", {"role": "teacher", "room": room_id})
-    else:
-        if not room["teacher"]:
-            emit("error", {"message": "Teacher not connected"})
-            return
-        room["students"].add(request.sid)
-        emit("room-joined", {
-            "role": "student",
-            "room": room_id,
-            "teacher_sid": room["teacher"]
-        })
-        emit("student-joined", {"sid": request.sid}, room=room["teacher"])
+        room = get_room(room_id)
+        join_room(room_id)
+
+        if role == "teacher":
+            if room["teacher"]:
+                emit("error", {"message": "Teacher already exists"})
+                return
+            room["teacher"] = request.sid
+            # ✅ Store teacher's SID in DB for persistence
+            with app.app_context():
+                room_db = Room.query.get(room_id)
+                if not room_db:
+                    room_db = Room(id=room_id, teacher_sid=request.sid)
+                    db.session.add(room_db)
+                else:
+                    room_db.teacher_sid = request.sid
+                db.session.commit()
+            emit("room-joined", {"role": "teacher", "room": room_id})
+        else:
+            if not room["teacher"]:
+                emit("error", {"message": "Teacher not connected"})
+                return
+            room["students"].add(request.sid)
+            emit("room-joined", {
+                "role": "student",
+                "room": room_id,
+                "teacher_sid": room["teacher"]
+            })
+            emit("student-joined", {"sid": request.sid}, room=room["teacher"])
+    except Exception as e:
+        print(f"❌ Error in join-room: {e}")
+        emit("error", {"message": "Internal server error"})
 
 # ============================================
 # WebRTC Signaling (ONLY RELAY)
@@ -117,10 +134,26 @@ def rtc_ice(data):
 def index():
     return render_template("index.html")
 
+# 🔧 FIX 1: Redirect the hyphen URL to the underscore URL
+@app.route("/live-meeting")
+def hyphen_redirect():
+    return redirect(url_for('live_meeting'))
+
 @app.route("/live_meeting")
 def live_meeting():
     room_id = uuid.uuid4().hex[:8]
     return redirect(url_for("teacher", room_id=room_id))
+
+# 🔧 FIX 2: Allow students to join from a form
+@app.route("/join", methods=["GET", "POST"])
+def join_room_page():
+    if request.method == "POST":
+        room_id = request.form.get("room_id", "").strip()
+        if room_id:
+            return redirect(url_for("student", room_id=room_id))
+        else:
+            flash("Please enter a valid Room ID")
+    return render_template("join.html")  # You need a join.html template
 
 @app.route("/teacher/<room_id>")
 def teacher(room_id):
@@ -131,8 +164,16 @@ def student(room_id):
     return render_template("student_live.html", room_id=room_id)
 
 # ============================================
+# Health Check & Debug
+# ============================================
+@app.route("/health")
+def health():
+    return {"status": "ok", "rooms": len(rooms), "connections": len(sessions)}
+
+# ============================================
 # Run
 # ============================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, host="0.0.0.0", port=port)
+    print(f"🚀 Server starting on port {port}")
+    socketio.run(app, host="0.0.0.0", port=port, debug=True)
