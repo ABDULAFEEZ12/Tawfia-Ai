@@ -648,10 +648,12 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             studentNameElement.textContent = studentName;
+            // Request WebRTC config from server immediately
+            socket.emit('get-webrtc-config');
             connectToRoom();
             setupEventListeners();
             startSessionTimer();
-            logDebug('Page loaded');
+            logDebug('Page loaded and WebRTC config requested');
         });
 
         function connectToRoom() {
@@ -688,6 +690,7 @@
                 logDebug('Received WebRTC config from server');
                 // Store config for later use
                 window.webrtcConfig = config;
+                logDebug('WebRTC config stored: ' + JSON.stringify(config.iceServers.map(s => s.urls)));
             });
 
             // Button events
@@ -715,6 +718,7 @@
             if (data.webrtc_config) {
                 window.webrtcConfig = data.webrtc_config;
                 logDebug('WebRTC config received with room join');
+                logDebug('Config details: ' + JSON.stringify(data.webrtc_config.iceServers.map(s => s.urls)));
             }
         }
 
@@ -746,11 +750,13 @@
                     peerConnection.close();
                 }
                 
-                // Create peer connection with TURN servers
+                // !FIX! CRITICAL: Get ICE servers using the corrected function
                 const iceServers = getIceServers();
+                
+                // !FIX! Create peer connection with the CORRECT configuration
                 peerConnection = new RTCPeerConnection({
                     iceServers: iceServers,
-                    iceTransportPolicy: 'all', // Try all, fallback to relay if needed
+                    iceTransportPolicy: 'all', // !FIX! MUST be 'all' (not 'relay') to try host & public IPs
                     bundlePolicy: 'max-bundle',
                     rtcpMuxPolicy: 'require',
                     iceCandidatePoolSize: 10
@@ -887,22 +893,42 @@
         }
 
         function getIceServers() {
-            // Use server-provided config if available, otherwise use default
+            // !FIX! CRITICAL: Always use the config sent from app.py's get_webrtc_config()
             if (window.webrtcConfig && window.webrtcConfig.iceServers) {
-                logDebug('Using server-provided ICE servers');
-                return window.webrtcConfig.iceServers;
+                logDebug('Using server-provided ICE servers from app.py');
+                
+                // Log what we received for debugging
+                logDebug('Server config contains: ' + window.webrtcConfig.iceServers.length + ' servers');
+                
+                // Optional: Force TCP preference for TURN servers to improve firewall traversal
+                const enhancedServers = window.webrtcConfig.iceServers.map(server => {
+                    if (server.urls.includes('turn:') && !server.urls.includes('transport=tcp')) {
+                        // Create a TCP-only copy for the TURN server
+                        const tcpServer = {...server};
+                        if (typeof tcpServer.urls === 'string') {
+                            tcpServer.urls = tcpServer.urls.replace('turn:', 'turn:') + '?transport=tcp';
+                        }
+                        // Return both original and TCP version
+                        return [server, tcpServer];
+                    }
+                    return server;
+                }).flat(); // Flatten the array if we added TCP copies
+                
+                logDebug('Returning enhanced ICE servers with TCP support');
+                return enhancedServers;
             }
             
-            // Default ICE servers with TURN support
+            // !FIX! Fallback should match your app.py exactly - no discrepancies
+            logDebug('Using fallback ICE servers (should match app.py)');
             return [
-                // STUN servers
+                // STUN servers (same as app.py)
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
                 { urls: 'stun:stun2.l.google.com:19302' },
                 { urls: 'stun:stun3.l.google.com:19302' },
                 { urls: 'stun:stun4.l.google.com:19302' },
                 
-                // TURN servers - CRITICAL for firewall/NAT traversal
+                // TURN servers (MUST match app.py)
                 { 
                     urls: 'turn:openrelay.metered.ca:80',
                     username: 'openrelayproject',
@@ -1253,9 +1279,6 @@
                 socket.emit('ping');
             }
         }, 30000);
-
-        // Request WebRTC config from server
-        socket.emit('get-webrtc-config');
     </script>
 </body>
 </html>
