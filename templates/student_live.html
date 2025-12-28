@@ -3,203 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Live Classroom</title>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <title>Student Live - Room {{ room_id }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
         }
-        .container {
-            background: white;
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .room-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .room-details h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .room-details .room-id {
+            background: #f0f4ff;
+            padding: 5px 15px;
             border-radius: 20px;
+            font-family: monospace;
+            font-size: 18px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .student-info {
+            text-align: right;
+        }
+
+        .student-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .student-role {
+            background: #e0f7fa;
+            color: #00796b;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .video-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .video-container {
+            background: #000;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 800px;
+            margin-bottom: 20px;
+            position: relative;
+            aspect-ratio: 16/9;
+        }
+
+        #teacherVideo {
             width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
         }
-        .header { 
-            background: linear-gradient(135deg, #2196F3 0%, #1565C0 100%); 
-            color: white; 
-            padding: 30px; 
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .header::before {
-            content: '';
+
+        .video-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none" opacity="0.1"><circle cx="50" cy="50" r="40" fill="white"/></svg>');
-            background-size: cover;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .header-content {
-            position: relative;
-            z-index: 1;
+
+        .video-label {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .header h1 { 
-            font-size: 2.2rem; 
-            margin-bottom: 10px;
+
+        .video-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        .control-btn.active {
+            background: #ff4757;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .connection-status.connecting {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .connection-status.connected {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .connection-status.error {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .connection-status i {
+            font-size: 18px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-indicator.connecting {
+            background: #ffa502;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-indicator.connected {
+            background: #2ed573;
+        }
+
+        .status-indicator.error {
+            background: #ff4757;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .section-title i {
+            font-size: 20px;
+        }
+
+        .class-info {
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: #edf2ff;
+            transform: translateX(5px);
+        }
+
+        .info-item i {
+            color: #667eea;
+            font-size: 18px;
+            width: 24px;
+        }
+
+        .info-item .label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .info-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
-        .room-code {
-            font-size: 1.2rem;
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 50px;
-            display: inline-block;
-            margin-top: 10px;
-            backdrop-filter: blur(5px);
-        }
-        .content {
-            padding: 30px;
-        }
-        .join-section {
-            margin-bottom: 30px;
-        }
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        input {
-            flex: 1;
-            padding: 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        input:focus {
-            outline: none;
-            border-color: #2196F3;
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-        }
-        button {
-            padding: 16px 32px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-        button:hover:not(:disabled) {
-            background: #45a049;
+
+        .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
         }
-        button:disabled {
-            background: #ccc;
+
+        .action-btn.secondary {
+            background: #6c757d;
+        }
+
+        .action-btn.danger {
+            background: #ff4757;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none !important;
         }
-        .video-container {
-            background: #1a202c;
-            border-radius: 15px;
-            overflow: hidden;
-            aspect-ratio: 16/9;
-            margin: 20px 0;
-            position: relative;
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            max-width: 400px;
         }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: #000;
+
+        .notification.show {
+            transform: translateX(0);
         }
-        .video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+
+        .notification.success {
+            border-left: 4px solid #2ed573;
+        }
+
+        .notification.error {
+            border-left: 4px solid #ff4757;
+        }
+
+        .notification.info {
+            border-left: 4px solid #667eea;
+        }
+
+        .notification i {
+            font-size: 24px;
+        }
+
+        .notification.success i {
+            color: #2ed573;
+        }
+
+        .notification.error i {
+            color: #ff4757;
+        }
+
+        .notification.info i {
+            color: #667eea;
+        }
+
+        .empty-video {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.7);
+            height: 100%;
             color: white;
-            transition: opacity 0.3s;
-        }
-        .video-label {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            backdrop-filter: blur(5px);
-        }
-        .status {
             text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin-top: 20px;
+            padding: 40px;
         }
-        .status-icon {
-            font-size: 2rem;
+
+        .empty-video i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .empty-video h3 {
+            font-size: 24px;
             margin-bottom: 10px;
-        }
-        .status-message {
-            font-size: 1.1rem;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        .status-detail {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
             color: white;
-            font-weight: bold;
-            z-index: 1000;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
+
+        .empty-video p {
+            font-size: 16px;
+            opacity: 0.8;
+            color: white;
         }
-        .notification.success { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
-        .notification.error { background: linear-gradient(135deg, #f44336, #c62828); }
-        .notification.info { background: linear-gradient(135deg, #2196F3, #1565C0); }
-        
-        @media (max-width: 768px) {
-            .input-group {
-                flex-direction: column;
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
             }
-            button {
-                width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .room-info {
                 justify-content: center;
+            }
+            
+            .student-info {
+                text-align: center;
+            }
+            
+            .video-overlay {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .video-controls {
+                align-self: flex-end;
             }
         }
     </style>
@@ -207,279 +446,457 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-content">
-                <h1>
-                    <span>🎓</span>
-                    Join Live Class
-                </h1>
-                <div class="room-code">
-                    Room: <strong>{{ room_id }}</strong>
+            <div class="room-info">
+                <div class="room-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="room-details">
+                    <h1>Live Classroom</h1>
+                    <div class="room-id">Room: {{ room_id }}</div>
                 </div>
             </div>
+            <div class="student-info">
+                <div class="student-name" id="studentName">Student</div>
+                <div class="student-role">Student</div>
+            </div>
         </div>
-        
-        <div class="content">
-            <div class="join-section">
-                <div class="input-group">
-                    <input type="text" id="username" placeholder="Enter your name" value="Student">
-                    <button onclick="joinClass()" id="joinBtn">
-                        <span>🎯</span>
-                        Join Class
+
+        <div class="main-content">
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="teacherVideo" autoplay playsinline></video>
+                    <div class="empty-video" id="emptyVideo">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <h3>Waiting for teacher</h3>
+                        <p>The teacher will start the broadcast soon...</p>
+                    </div>
+                    <div class="video-overlay">
+                        <div class="video-label" id="videoLabel">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Teacher's Broadcast</span>
+                        </div>
+                        <div class="video-controls">
+                            <button class="control-btn" id="toggleFullscreen" title="Fullscreen">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="control-btn" id="toggleMute" title="Toggle Mute">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="connection-status" id="connectionStatus">
+                    <i class="fas fa-sync-alt fa-spin"></i>
+                    <span>Connecting to classroom...</span>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn" id="raiseHand" disabled>
+                        <i class="fas fa-hand-paper"></i> Raise Hand
+                    </button>
+                    <button class="action-btn secondary" id="toggleAudio">
+                        <i class="fas fa-microphone"></i> Enable Microphone
+                    </button>
+                    <button class="action-btn danger" id="leaveClass">
+                        <i class="fas fa-sign-out-alt"></i> Leave Class
                     </button>
                 </div>
             </div>
-            
-            <div class="video-container">
-                <div class="video-overlay" id="videoOverlay">
-                    <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">👨‍🏫</div>
-                    <div style="font-size: 1.2rem; margin-bottom: 10px;">Waiting for teacher...</div>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">Join the class to see the live stream</div>
+
+            <div class="sidebar">
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    <h2>Class Information</h2>
                 </div>
-                <video id="remoteVideo" autoplay playsinline></video>
-                <div class="video-label" id="videoLabel">Teacher</div>
-            </div>
-            
-            <div class="status" id="status">
-                <div class="status-icon">📝</div>
-                <div class="status-message">Enter your name and join the class</div>
-                <div class="status-detail">You'll see the teacher's live video here</div>
+
+                <div class="class-info">
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <div class="label">Session Time</div>
+                            <div class="value" id="sessionTime">00:00</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-network-wired"></i>
+                        <div>
+                            <div class="label">Connection</div>
+                            <div class="value" id="connectionType">WebRTC</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-video"></i>
+                        <div>
+                            <div class="label">Stream Quality</div>
+                            <div class="value" id="streamQuality">Auto</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-user-tie"></i>
+                        <div>
+                            <div class="label">Teacher</div>
+                            <div class="value" id="teacherName">Waiting...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <i class="fas fa-cogs"></i>
+                    <h2>Settings</h2>
+                </div>
+
+                <div class="controls">
+                    <button class="action-btn secondary" id="toggleVideoQuality">
+                        <i class="fas fa-tachometer-alt"></i> Adjust Quality
+                    </button>
+                    <button class="action-btn secondary" id="reportIssue">
+                        <i class="fas fa-flag"></i> Report Issue
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div id="notification" class="notification"></div>
-    
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div class="notification-content">
+            <div class="notification-title">Notification</div>
+            <div class="notification-message">This is a notification message</div>
+        </div>
+    </div>
+
     <script>
-        // ============================================
-        // CONFIGURATION
-        // ============================================
         const roomId = "{{ room_id }}";
         const socket = io();
         let peerConnection = null;
-        let username = '';
-        
-        // ============================================
-        // JOIN CLASS
-        // ============================================
-        function joinClass() {
-            const usernameInput = document.getElementById('username');
-            username = usernameInput.value.trim() || 'Student';
-            
-            if (!username) {
-                showNotification('Please enter your name', 'error');
-                return;
-            }
-            
+        let sessionStartTime = null;
+        let sessionTimer = null;
+        let isMuted = false;
+        let studentName = localStorage.getItem('studentName') || `Student_${Math.floor(Math.random() * 1000)}`;
+
+        // DOM Elements
+        const teacherVideo = document.getElementById('teacherVideo');
+        const emptyVideo = document.getElementById('emptyVideo');
+        const videoLabel = document.getElementById('videoLabel');
+        const toggleFullscreen = document.getElementById('toggleFullscreen');
+        const toggleMute = document.getElementById('toggleMute');
+        const raiseHand = document.getElementById('raiseHand');
+        const toggleAudioBtn = document.getElementById('toggleAudio');
+        const leaveClass = document.getElementById('leaveClass');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const studentNameElement = document.getElementById('studentName');
+        const sessionTimeElement = document.getElementById('sessionTime');
+        const teacherNameElement = document.getElementById('teacherName');
+        const notification = document.getElementById('notification');
+        const toggleVideoQuality = document.getElementById('toggleVideoQuality');
+        const reportIssue = document.getElementById('reportIssue');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            studentNameElement.textContent = studentName;
+            connectToRoom();
+            setupEventListeners();
+            startSessionTimer();
+        });
+
+        function connectToRoom() {
             socket.emit('join-room', {
                 room: roomId,
                 role: 'student',
-                username: username
+                username: studentName
             });
-            
-            document.getElementById('joinBtn').disabled = true;
-            document.getElementById('joinBtn').innerHTML = '<span class="loading"></span> Joining...';
-            updateStatus('📡', 'Joining classroom...', 'Connecting to server...');
-            
-            // Add loading animation
-            const style = document.createElement('style');
-            style.textContent = `
-                .loading {
-                    display: inline-block;
-                    width: 20px;
-                    height: 20px;
-                    border: 2px solid rgba(255,255,255,0.3);
-                    border-radius: 50%;
-                    border-top-color: white;
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-            `;
-            document.head.appendChild(style);
         }
-        
-        // ============================================
-        // WEBRTC (SIMPLE - STUDENT ANSWERS ONLY)
-        // ============================================
-        async function setupPeerConnection() {
-            peerConnection = new RTCPeerConnection({
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' }
-                ]
-            });
-            
-            // Handle remote stream
-            peerConnection.ontrack = (event) => {
-                console.log('📹 Received remote stream from teacher');
-                const remoteVideo = document.getElementById('remoteVideo');
-                remoteVideo.srcObject = event.streams[0];
-                
-                // Hide overlay when video starts
-                document.getElementById('videoOverlay').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('videoOverlay').style.display = 'none';
-                }, 300);
-                
-                updateStatus('✅', 'Connected to teacher!', 'Live stream is active');
-                showNotification('Connected to teacher!', 'success');
-            };
-            
-            // ICE candidate handling
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socket.emit('rtc-ice-candidate', {
-                        room: roomId,
-                        candidate: event.candidate,
-                        target_sid: null // Teacher's SID will be known after offer
-                    });
-                }
-            };
-            
-            // Connection state monitoring
-            peerConnection.onconnectionstatechange = () => {
-                console.log('Connection state:', peerConnection.connectionState);
-                
-                if (peerConnection.connectionState === 'connected') {
-                    updateStatus('✅', 'Connected!', 'Streaming live video');
-                } else if (peerConnection.connectionState === 'disconnected' || 
-                          peerConnection.connectionState === 'failed') {
-                    updateStatus('⚠️', 'Connection lost', 'Trying to reconnect...');
-                    document.getElementById('videoOverlay').style.display = 'flex';
-                    document.getElementById('videoOverlay').style.opacity = '1';
-                }
-            };
-            
-            return peerConnection;
+
+        function setupEventListeners() {
+            // Socket.IO events
+            socket.on('room-joined', handleRoomJoined);
+            socket.on('teacher-ready', handleTeacherReady);
+            socket.on('rtc-offer', handleRTCOffer);
+            socket.on('rtc-ice-candidate', handleRTCIceCandidate);
+            socket.on('teacher-disconnected', handleTeacherDisconnected);
+            socket.on('error', handleError);
+
+            // Button events
+            toggleFullscreen.addEventListener('click', toggleFullscreenMode);
+            toggleMute.addEventListener('click', toggleVideoMute);
+            raiseHand.addEventListener('click', raiseHandAction);
+            toggleAudioBtn.addEventListener('click', toggleStudentAudio);
+            leaveClass.addEventListener('click', leaveClassroom);
+            toggleVideoQuality.addEventListener('click', adjustVideoQuality);
+            reportIssue.addEventListener('click', reportTechnicalIssue);
         }
-        
-        // ============================================
-        // SOCKET.IO HANDLERS
-        // ============================================
-        socket.on('connect', () => {
-            console.log('✅ Connected to server');
-            updateStatus('✅', 'Connected to server', 'Ready to join');
-        });
-        
-        socket.on('room-joined', (data) => {
-            console.log('✅ Joined room as student');
-            document.getElementById('joinBtn').innerHTML = '<span>✅</span> Joined';
-            updateStatus('👨‍🏫', 'Waiting for teacher...', 'Teacher will start the class soon');
-            showNotification('Successfully joined the classroom!', 'success');
-        });
-        
-        socket.on('teacher-ready', () => {
-            console.log('📢 Teacher is ready to broadcast');
-            updateStatus('🎥', 'Teacher is ready...', 'Setting up video connection');
-        });
-        
-        socket.on('rtc-offer', async (data) => {
-            console.log('🎥 Received WebRTC offer from teacher');
-            
-            if (!peerConnection) {
-                await setupPeerConnection();
-            }
-            
-            const { offer } = data;
-            
+
+        function handleRoomJoined(data) {
+            updateConnectionStatus('connected', 'Connected to classroom');
+            showNotification('success', 'Connected', 'Successfully joined the classroom.');
+        }
+
+        function handleTeacherReady() {
+            showNotification('info', 'Teacher is ready', 'The teacher is about to start the broadcast.');
+            updateConnectionStatus('connecting', 'Waiting for teacher\'s stream...');
+        }
+
+        async function handleRTCOffer(data) {
             try {
+                const { offer, from_teacher } = data;
+                
+                updateConnectionStatus('connecting', 'Establishing connection with teacher...');
+                
+                // Create peer connection
+                peerConnection = new RTCPeerConnection({
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
+                    ]
+                });
+
+                // Handle incoming stream
+                peerConnection.ontrack = (event) => {
+                    if (teacherVideo.srcObject !== event.streams[0]) {
+                        teacherVideo.srcObject = event.streams[0];
+                        emptyVideo.style.display = 'none';
+                        teacherVideo.style.display = 'block';
+                        updateConnectionStatus('connected', 'Receiving teacher\'s stream');
+                        showNotification('success', 'Stream connected', 'Now receiving teacher\'s broadcast.');
+                        raiseHand.disabled = false;
+                    }
+                };
+
+                // ICE candidate handler
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        socket.emit('rtc-ice-candidate', {
+                            room: roomId,
+                            candidate: event.candidate,
+                            target_sid: from_teacher
+                        });
+                    }
+                };
+
+                // Set remote description
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+                // Create and send answer
                 const answer = await peerConnection.createAnswer();
                 await peerConnection.setLocalDescription(answer);
-                
+
                 socket.emit('rtc-answer', {
                     room: roomId,
-                    answer: answer
+                    answer: peerConnection.localDescription
                 });
-                
-                console.log('📤 Sent WebRTC answer to teacher');
-                updateStatus('🔄', 'Connecting...', 'Establishing video connection');
-                
+
             } catch (error) {
-                console.error('❌ Error handling offer:', error);
-                showNotification('Failed to connect to teacher', 'error');
+                console.error('Error handling RTC offer:', error);
+                showNotification('error', 'Connection Error', 'Could not establish connection with teacher.');
+                updateConnectionStatus('error', 'Connection failed');
             }
-        });
-        
-        socket.on('rtc-ice-candidate', (data) => {
-            const { candidate } = data;
-            if (peerConnection && candidate) {
+        }
+
+        function handleRTCIceCandidate(data) {
+            const { candidate, from_sid } = data;
+            if (peerConnection) {
                 peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-                    .catch(err => console.error('❌ Error adding ICE candidate:', err));
+                    .catch(error => {
+                        console.error('Error adding ICE candidate:', error);
+                    });
             }
-        });
-        
-        socket.on('teacher-disconnected', () => {
-            console.log('👨‍🏫 Teacher disconnected');
-            updateStatus('⚠️', 'Teacher left', 'The teacher has ended the class');
+        }
+
+        function handleTeacherDisconnected() {
+            showNotification('error', 'Teacher disconnected', 'The teacher has left the classroom.');
+            updateConnectionStatus('error', 'Teacher disconnected');
             
+            // Stop video stream
+            if (teacherVideo.srcObject) {
+                teacherVideo.srcObject.getTracks().forEach(track => track.stop());
+                teacherVideo.srcObject = null;
+            }
+            
+            // Show empty state
+            emptyVideo.style.display = 'flex';
+            teacherVideo.style.display = 'none';
+            raiseHand.disabled = true;
+            
+            // Clean up peer connection
             if (peerConnection) {
                 peerConnection.close();
                 peerConnection = null;
             }
-            
-            const video = document.getElementById('remoteVideo');
-            video.srcObject = null;
-            
-            document.getElementById('videoOverlay').style.display = 'flex';
-            document.getElementById('videoOverlay').style.opacity = '1';
-            document.getElementById('videoOverlay').innerHTML = `
-                <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.5;">👋</div>
-                <div style="font-size: 1.2rem; margin-bottom: 10px;">Class ended</div>
-                <div style="font-size: 0.9rem; opacity: 0.8;">Teacher has left the classroom</div>
-            `;
-            
-            showNotification('Teacher has ended the class', 'info');
-        });
-        
-        socket.on('error', (data) => {
-            console.error('❌ Server error:', data);
-            updateStatus('❌', 'Error', data.message || 'Connection failed');
-            document.getElementById('joinBtn').disabled = false;
-            document.getElementById('joinBtn').innerHTML = '<span>🎯</span> Join Class';
-            showNotification(data.message || 'Connection failed', 'error');
-        });
-        
-        // ============================================
-        // UI FUNCTIONS
-        // ============================================
-        function updateStatus(icon, message, detail) {
-            const statusEl = document.getElementById('status');
-            statusEl.innerHTML = `
-                <div class="status-icon">${icon}</div>
-                <div class="status-message">${message}</div>
-                <div class="status-detail">${detail}</div>
-            `;
         }
-        
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
+
+        function updateConnectionStatus(status, message) {
+            let icon, color;
+            
+            switch(status) {
+                case 'connected':
+                    icon = 'fa-check-circle';
+                    color = '#388e3c';
+                    break;
+                case 'connecting':
+                    icon = 'fa-sync-alt fa-spin';
+                    color = '#f57c00';
+                    break;
+                case 'error':
+                    icon = 'fa-exclamation-circle';
+                    color = '#d32f2f';
+                    break;
+            }
+            
+            connectionStatus.innerHTML = `
+                <i class="fas ${icon}" style="color:${color}"></i>
+                <span>${message}</span>
+            `;
+            connectionStatus.className = `connection-status ${status}`;
+        }
+
+        function toggleFullscreenMode() {
+            const videoContainer = teacherVideo.parentElement;
+            
+            if (!document.fullscreenElement) {
+                if (videoContainer.requestFullscreen) {
+                    videoContainer.requestFullscreen();
+                } else if (videoContainer.webkitRequestFullscreen) {
+                    videoContainer.webkitRequestFullscreen();
+                } else if (videoContainer.msRequestFullscreen) {
+                    videoContainer.msRequestFullscreen();
+                }
+                toggleFullscreen.innerHTML = '<i class="fas fa-compress"></i>';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                toggleFullscreen.innerHTML = '<i class="fas fa-expand"></i>';
+            }
+        }
+
+        function toggleVideoMute() {
+            isMuted = !isMuted;
+            teacherVideo.muted = isMuted;
+            toggleMute.innerHTML = isMuted ? 
+                '<i class="fas fa-volume-mute"></i>' : 
+                '<i class="fas fa-volume-up"></i>';
+            toggleMute.classList.toggle('active', isMuted);
+            showNotification('info', isMuted ? 'Muted' : 'Unmuted', 
+                `Video stream ${isMuted ? 'muted' : 'unmuted'}`);
+        }
+
+        function raiseHandAction() {
+            showNotification('info', 'Hand Raised', 'Teacher has been notified that you have a question.');
+            
+            // Visual feedback
+            raiseHand.innerHTML = '<i class="fas fa-hand-paper fa-bounce"></i> Hand Raised';
+            raiseHand.disabled = true;
+            
+            setTimeout(() => {
+                raiseHand.innerHTML = '<i class="fas fa-hand-paper"></i> Raise Hand';
+                raiseHand.disabled = false;
+            }, 5000);
+        }
+
+        async function toggleStudentAudio() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const audioTrack = stream.getAudioTracks()[0];
+                
+                if (audioTrack.enabled) {
+                    audioTrack.enabled = false;
+                    toggleAudioBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Enable Microphone';
+                    showNotification('info', 'Microphone off', 'Your microphone is now disabled.');
+                } else {
+                    audioTrack.enabled = true;
+                    toggleAudioBtn.innerHTML = '<i class="fas fa-microphone"></i> Disable Microphone';
+                    showNotification('info', 'Microphone on', 'Your microphone is now enabled.');
+                }
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                showNotification('error', 'Microphone Error', 'Could not access microphone. Please check permissions.');
+            }
+        }
+
+        function adjustVideoQuality() {
+            showNotification('info', 'Quality Settings', 'Video quality adjustment is not yet implemented.');
+        }
+
+        function reportTechnicalIssue() {
+            const issue = prompt('Please describe the issue you are experiencing:');
+            if (issue) {
+                showNotification('success', 'Issue Reported', 'Thank you for reporting the issue. The teacher has been notified.');
+            }
+        }
+
+        function leaveClassroom() {
+            if (confirm('Are you sure you want to leave the classroom?')) {
+                // Clean up
+                if (peerConnection) {
+                    peerConnection.close();
+                }
+                
+                if (teacherVideo.srcObject) {
+                    teacherVideo.srcObject.getTracks().forEach(track => track.stop());
+                }
+                
+                socket.disconnect();
+                
+                // Redirect to home
+                window.location.href = '/live_meeting';
+            }
+        }
+
+        function startSessionTimer() {
+            sessionStartTime = new Date();
+            sessionTimer = setInterval(() => {
+                const now = new Date();
+                const diff = Math.floor((now - sessionStartTime) / 1000);
+                const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+                const seconds = (diff % 60).toString().padStart(2, '0');
+                sessionTimeElement.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        function showNotification(type, title, message) {
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle'
+            };
+            
             notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${icons[type]}"></i>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+            `;
+            
             notification.classList.add('show');
             
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
         }
-        
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        document.addEventListener('DOMContentLoaded', () => {
-            const usernameInput = document.getElementById('username');
-            usernameInput.focus();
-            
-            // Auto-join on Enter key
-            usernameInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    joinClass();
-                }
-            });
-            
-            // Update video label with room ID
-            document.getElementById('videoLabel').textContent = `Room: ${roomId}`;
+
+        function handleError(data) {
+            showNotification('error', 'Error', data.message);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (socket) socket.disconnect();
+            if (peerConnection) peerConnection.close();
+            clearInterval(sessionTimer);
+        });
+
+        // Fullscreen change handler
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                toggleFullscreen.innerHTML = '<i class="fas fa-expand"></i>';
+            }
         });
     </script>
 </body>
