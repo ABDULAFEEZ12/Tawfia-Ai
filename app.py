@@ -1,7 +1,5 @@
-"""
 app.py - UPDATED WITH TURN SERVER SUPPORT
 FIXED WebRTC connection issues
-"""
 
 # ============================================
 # CRITICAL: Eventlet monkey patch MUST BE FIRST
