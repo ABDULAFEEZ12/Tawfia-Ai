@@ -117,6 +117,11 @@ def rtc_ice(data):
 def index():
     return render_template("index.html")
 
+@app.route("/live_meeting")
+def live_meeting():
+    room_id = uuid.uuid4().hex[:8]
+    return redirect(url_for("teacher", room_id=room_id))
+
 @app.route("/teacher/<room_id>")
 def teacher(room_id):
     return render_template("teacher_live.html", room_id=room_id)
