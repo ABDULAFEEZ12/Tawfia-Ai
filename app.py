@@ -1,11 +1,17 @@
+# ============================================
+# CRITICAL: Eventlet monkey patch MUST BE FIRST
+# ============================================
 import eventlet
 eventlet.monkey_patch()
 print("✅ Eventlet monkey patch applied")
 
+# ============================================
+# Imports
+# ============================================
 import os
 import uuid
 from datetime import datetime
-from flask import Flask, render_template, session, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_socketio import SocketIO, emit, join_room
 from flask_sqlalchemy import SQLAlchemy
 
@@ -14,11 +20,17 @@ from flask_sqlalchemy import SQLAlchemy
 # ============================================
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///app.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL", "sqlite:///app.db"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode="eventlet"
+)
 
 # ============================================
 # Database Models
@@ -40,7 +52,10 @@ sessions = {}
 
 def get_room(room_id):
     if room_id not in rooms:
-        rooms[room_id] = {"teacher": None, "students": set()}
+        rooms[room_id] = {
+            "teacher": None,
+            "students": set()
+        }
     return rooms[room_id]
 
 # ============================================
@@ -54,29 +69,36 @@ def on_connect():
 @socketio.on("disconnect")
 def on_disconnect():
     sid = request.sid
+
     for room_id, room in rooms.items():
         if room["teacher"] == sid:
             room["teacher"] = None
-            for s in room["students"]:
-                emit("teacher-disconnected", room=s)
+            for student_sid in room["students"]:
+                emit("teacher-disconnected", room=student_sid)
+
         if sid in room["students"]:
             room["students"].remove(sid)
             if room["teacher"]:
-                emit("student-left", {"sid": sid}, room=room["teacher"])
+                emit(
+                    "student-left",
+                    {"sid": sid},
+                    room=room["teacher"]
+                )
+
     sessions.pop(sid, None)
     print(f"❌ Disconnected: {sid}")
 
 # ============================================
-# Room Join
+# Room Join Logic
 # ============================================
 @socketio.on("join-room")
 def join(data):
     try:
-        room_id = data["room"]
-        role = data["role"]
+        room_id = data.get("room")
+        role = data.get("role")
 
-        if not room_id:
-            emit("error", {"message": "Room ID is required"})
+        if not room_id or not role:
+            emit("error", {"message": "Invalid room or role"})
             return
 
         room = get_room(room_id)
@@ -86,34 +108,51 @@ def join(data):
             if room["teacher"]:
                 emit("error", {"message": "Teacher already exists"})
                 return
+
             room["teacher"] = request.sid
-            # ✅ Store teacher's SID in DB for persistence
+
             with app.app_context():
                 room_db = Room.query.get(room_id)
                 if not room_db:
-                    room_db = Room(id=room_id, teacher_sid=request.sid)
+                    room_db = Room(
+                        id=room_id,
+                        teacher_sid=request.sid
+                    )
                     db.session.add(room_db)
                 else:
                     room_db.teacher_sid = request.sid
                 db.session.commit()
-            emit("room-joined", {"role": "teacher", "room": room_id})
-        else:
+
+            emit("room-joined", {
+                "role": "teacher",
+                "room": room_id
+            })
+
+        elif role == "student":
             if not room["teacher"]:
                 emit("error", {"message": "Teacher not connected"})
                 return
+
             room["students"].add(request.sid)
+
             emit("room-joined", {
                 "role": "student",
                 "room": room_id,
                 "teacher_sid": room["teacher"]
             })
-            emit("student-joined", {"sid": request.sid}, room=room["teacher"])
+
+            emit(
+                "student-joined",
+                {"sid": request.sid},
+                room=room["teacher"]
+            )
+
     except Exception as e:
-        print(f"❌ Error in join-room: {e}")
-        emit("error", {"message": "Internal server error"})
+        print(f"❌ join-room error: {e}")
+        emit("error", {"message": "Server error"})
 
 # ============================================
-# WebRTC Signaling (ONLY RELAY)
+# WebRTC Signaling Relay ONLY
 # ============================================
 @socketio.on("rtc-offer")
 def rtc_offer(data):
@@ -134,26 +173,26 @@ def rtc_ice(data):
 def index():
     return render_template("index.html")
 
-# 🔧 FIX 1: Redirect the hyphen URL to the underscore URL
+# Redirect hyphen version to underscore
 @app.route("/live-meeting")
-def hyphen_redirect():
-    return redirect(url_for('live_meeting'))
+def live_meeting_redirect():
+    return redirect(url_for("live_meeting"))
 
+# Create meeting and redirect teacher
 @app.route("/live_meeting")
 def live_meeting():
     room_id = uuid.uuid4().hex[:8]
     return redirect(url_for("teacher", room_id=room_id))
 
-# 🔧 FIX 2: Allow students to join from a form
+# Join existing meeting
 @app.route("/join", methods=["GET", "POST"])
-def join_room_page():
+def join_page():
     if request.method == "POST":
         room_id = request.form.get("room_id", "").strip()
         if room_id:
             return redirect(url_for("student", room_id=room_id))
-        else:
-            flash("Please enter a valid Room ID")
-    return render_template("join.html")  # You need a join.html template
+        flash("Please enter a valid Room ID")
+    return render_template("join.html")
 
 @app.route("/teacher/<room_id>")
 def teacher(room_id):
@@ -164,16 +203,20 @@ def student(room_id):
     return render_template("student_live.html", room_id=room_id)
 
 # ============================================
-# Health Check & Debug
+# Health Check
 # ============================================
 @app.route("/health")
 def health():
-    return {"status": "ok", "rooms": len(rooms), "connections": len(sessions)}
+    return {
+        "status": "ok",
+        "rooms": len(rooms),
+        "connections": len(sessions)
+    }
 
 # ============================================
-# Run
+# Run Server
 # ============================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    print(f"🚀 Server starting on port {port}")
+    print(f"🚀 Server running on port {port}")
     socketio.run(app, host="0.0.0.0", port=port, debug=True)
