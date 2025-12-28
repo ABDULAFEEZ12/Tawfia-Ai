@@ -1,6 +1,7 @@
 """
 app.py - SIMPLIFIED, WORKING VERSION
 ONE signaling path, CLEAN WebRTC
+FIXED: Database schema + WebRTC connection issues
 """
 
 # ============================================
@@ -34,7 +35,7 @@ db = SQLAlchemy(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # ============================================
-# Database Models
+# Database Models (FIXED SCHEMA)
 # ============================================
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -44,7 +45,7 @@ class User(db.Model):
 
 class Room(db.Model):
     id = db.Column(db.String(32), primary_key=True)
-    teacher_sid = db.Column(db.String(120))
+    teacher_id = db.Column(db.String(120))  # Changed from teacher_sid to teacher_id
     teacher_name = db.Column(db.String(80))
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -108,6 +109,12 @@ def handle_disconnect():
             if session_data['role'] == 'teacher':
                 # Teacher disconnected
                 room['teacher_sid'] = None
+                # Update database
+                with app.app_context():
+                    room_db = Room.query.get(room_id)
+                    if room_db:
+                        room_db.teacher_id = None
+                        db.session.commit()
                 # Notify all students
                 for student_sid in room['students']:
                     emit('teacher-disconnected', room=student_sid)
@@ -157,17 +164,21 @@ def handle_join_room(data):
                 if not existing_room:
                     room_db = Room(
                         id=room_id,
-                        teacher_sid=sid,
+                        teacher_id=sid,  # Changed from teacher_sid to teacher_id
                         teacher_name=username,
                         is_active=True
                     )
                     db.session.add(room_db)
-                    db.session.commit()
+                else:
+                    existing_room.teacher_id = sid
+                    existing_room.teacher_name = username
+                db.session.commit()
             
             emit('room-joined', {
                 'role': 'teacher',
                 'room': room_id,
-                'message': 'You are now the teacher'
+                'message': 'You are now the teacher',
+                'sid': sid  # Send SID to teacher
             })
             
             print(f"✅ Teacher joined room: {room_id}")
@@ -184,10 +195,12 @@ def handle_join_room(data):
             emit('room-joined', {
                 'role': 'student',
                 'room': room_id,
-                'message': 'Joined classroom successfully'
+                'message': 'Joined classroom successfully',
+                'sid': sid,  # Send SID to student
+                'teacher_sid': room['teacher_sid']  # Send teacher's SID to student
             })
             
-            # Notify teacher
+            # Notify teacher about new student
             emit('student-joined', {
                 'sid': sid,
                 'username': username
@@ -208,7 +221,7 @@ def handle_join_room(data):
         emit('error', {'message': str(e)})
 
 # ============================================
-# WebRTC Signaling (SINGLE PATH - NO DUPLICATION)
+# WebRTC Signaling (FIXED VERSION)
 # ============================================
 
 @socketio.on('rtc-offer')
@@ -229,7 +242,10 @@ def handle_rtc_offer(data):
             return
         
         room = rooms[room_id]
-        if request.sid != room['teacher_sid']:
+        teacher_sid = request.sid
+        
+        # Verify sender is the teacher
+        if teacher_sid != room['teacher_sid']:
             emit('error', {'message': 'Only teacher can send offers'})
             return
         
@@ -238,12 +254,13 @@ def handle_rtc_offer(data):
             emit('error', {'message': 'Student not found in room'})
             return
         
-        print(f"🎥 Teacher sending offer to student {target_sid}")
+        print(f"🎥 Teacher ({teacher_sid}) sending offer to student {target_sid}")
         
         # Forward offer to student
         emit('rtc-offer', {
             'offer': offer,
-            'from_teacher': True
+            'from_teacher': teacher_sid,
+            'room': room_id
         }, room=target_sid)
         
     except Exception as e:
@@ -267,10 +284,10 @@ def handle_rtc_answer(data):
             return
         
         room = rooms[room_id]
-        sender_sid = request.sid
+        student_sid = request.sid
         
         # Verify sender is a student in this room
-        if sender_sid not in room['students']:
+        if student_sid not in room['students']:
             emit('error', {'message': 'Not authorized'})
             return
         
@@ -279,12 +296,13 @@ def handle_rtc_answer(data):
             emit('error', {'message': 'Teacher not available'})
             return
         
-        print(f"🎥 Student {sender_sid} sending answer to teacher")
+        print(f"🎥 Student {student_sid} sending answer to teacher")
         
         # Forward answer to teacher
         emit('rtc-answer', {
             'answer': answer,
-            'from_student': sender_sid
+            'from_student': student_sid,
+            'room': room_id
         }, room=room['teacher_sid'])
         
     except Exception as e:
@@ -332,7 +350,8 @@ def handle_rtc_ice_candidate(data):
         # Forward ICE candidate to target
         emit('rtc-ice-candidate', {
             'candidate': candidate,
-            'from_sid': sender_sid
+            'from_sid': sender_sid,
+            'room': room_id
         }, room=target_sid)
         
     except Exception as e:
@@ -354,7 +373,9 @@ def handle_start_broadcast(data):
             return
         
         room = rooms[room_id]
-        if request.sid != room['teacher_sid']:
+        teacher_sid = request.sid
+        
+        if teacher_sid != room['teacher_sid']:
             emit('error', {'message': 'Only teacher can start broadcast'})
             return
         
@@ -366,12 +387,16 @@ def handle_start_broadcast(data):
         # Notify teacher with student list
         emit('broadcast-ready', {
             'student_sids': student_sids,
-            'student_count': len(student_sids)
+            'student_count': len(student_sids),
+            'room': room_id
         })
         
-        # Notify students
+        # Notify each student individually
         for student_sid in student_sids:
-            emit('teacher-ready', room=student_sid)
+            emit('teacher-ready', {
+                'teacher_sid': teacher_sid,
+                'room': room_id
+            }, room=student_sid)
         
     except Exception as e:
         print(f"❌ Error in start-broadcast: {e}")
@@ -417,7 +442,7 @@ def join_room_post():
     return redirect(f'/student/{room_id}')
 
 # ============================================
-# UPDATED: Live Meeting Routes (Support both _ and -)
+# Live Meeting Routes (Support both _ and -)
 # ============================================
 
 @app.route('/live-meeting')
@@ -465,16 +490,31 @@ def live_meeting_join():
     return redirect(url_for('live_meeting_student_view', room_id=room_id))
 
 # ============================================
+# Database Migration Helper
+# ============================================
+@app.route('/reset-db')
+def reset_database():
+    """Reset database to fix schema issues"""
+    with app.app_context():
+        # Drop all tables
+        db.drop_all()
+        # Recreate with new schema
+        db.create_all()
+        print("✅ Database reset complete")
+    return "Database reset complete. Please restart the server."
+
+# ============================================
 # Run Server
 # ============================================
 if __name__ == '__main__':
     print(f"\n{'='*60}")
     print("🚀 SIMPLIFIED WebRTC Broadcast System")
     print(f"{'='*60}")
+    print("✅ FIXED: Database schema (teacher_id column)")
+    print("✅ FIXED: WebRTC signaling with proper SID passing")
     print("✅ Clean signaling: rtc-offer, rtc-answer, rtc-ice-candidate")
     print("✅ One join path: join-room")
     print("✅ Teacher → Many Students architecture")
-    print("✅ UPDATED: /live_meeting and /live-meeting routes now supported")
     print("✅ Using templates: live_meeting.html, teacher_live.html, student_live.html")
     print("✅ Ready for production")
     print(f"{'='*60}\n")
