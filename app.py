@@ -417,30 +417,35 @@ def join_room_post():
     return redirect(f'/student/{room_id}')
 
 # ============================================
-# NEW: Live Meeting Routes (Responsive Interface)
+# UPDATED: Live Meeting Routes (Support both _ and -)
 # ============================================
 
+@app.route('/live-meeting')
 @app.route('/live_meeting')
 def live_meeting():
     """Landing page for live meeting with role selection"""
     return render_template('live_meeting.html')
 
+@app.route('/live-meeting/teacher')
 @app.route('/live_meeting/teacher')
 def live_meeting_teacher_create():
     """Create new meeting as teacher"""
     room_id = str(uuid.uuid4())[:8]
-    return redirect(f'/live_meeting/teacher/{room_id}')
+    return redirect(url_for('live_meeting_teacher_view', room_id=room_id))
 
+@app.route('/live-meeting/teacher/<room_id>')
 @app.route('/live_meeting/teacher/<room_id>')
 def live_meeting_teacher_view(room_id):
     """Modern teacher interface - using teacher_live.html"""
     return render_template('teacher_live.html', room_id=room_id)
 
+@app.route('/live-meeting/student/<room_id>')
 @app.route('/live_meeting/student/<room_id>')
 def live_meeting_student_view(room_id):
     """Modern student interface - using student_live.html"""
     return render_template('student_live.html', room_id=room_id)
 
+@app.route('/live-meeting/join', methods=['POST'])
 @app.route('/live_meeting/join', methods=['POST'])
 def live_meeting_join():
     """Join meeting via form (modern interface)"""
@@ -457,7 +462,7 @@ def live_meeting_join():
     # Store username in session for later use
     session['live_username'] = username
     
-    return redirect(f'/live_meeting/student/{room_id}')
+    return redirect(url_for('live_meeting_student_view', room_id=room_id))
 
 # ============================================
 # Run Server
@@ -469,7 +474,7 @@ if __name__ == '__main__':
     print("✅ Clean signaling: rtc-offer, rtc-answer, rtc-ice-candidate")
     print("✅ One join path: join-room")
     print("✅ Teacher → Many Students architecture")
-    print("✅ NEW: /live_meeting routes added")
+    print("✅ UPDATED: /live_meeting and /live-meeting routes now supported")
     print("✅ Using templates: live_meeting.html, teacher_live.html, student_live.html")
     print("✅ Ready for production")
     print(f"{'='*60}\n")
