@@ -223,6 +223,17 @@
             background: #2ed573;
         }
 
+        .action-btn.disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .action-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
         .students-section {
             background: white;
             border-radius: 15px;
@@ -293,6 +304,10 @@
 
         .status.connected {
             color: #2ed573;
+        }
+
+        .status.connecting {
+            color: #ffa502;
         }
 
         .status.disconnected {
@@ -377,6 +392,22 @@
             font-size: 48px;
             margin-bottom: 15px;
             color: #ccc;
+        }
+
+        .debug-info {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-info h4 {
+            margin-bottom: 10px;
+            color: #1a2980;
         }
 
         @media (max-width: 1024px) {
@@ -487,6 +518,12 @@
                         <i class="fas fa-power-off"></i> End Session
                     </button>
                 </div>
+
+                <!-- Debug Information Panel -->
+                <div class="debug-info">
+                    <h4><i class="fas fa-bug"></i> Debug Information</h4>
+                    <div id="debugLog"></div>
+                </div>
             </div>
 
             <div class="students-section">
@@ -522,6 +559,7 @@
         let sessionStartTime = null;
         let sessionTimer = null;
         let students = {};
+        let mySid = null;
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
@@ -539,6 +577,7 @@
         const connectionStatusBar = document.getElementById('connectionStatusBar');
         const sessionTime = document.getElementById('sessionTime');
         const notification = document.getElementById('notification');
+        const debugLog = document.getElementById('debugLog');
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -553,10 +592,15 @@
                 role: 'teacher',
                 username: 'Teacher'
             });
+            logDebug('Connecting to room: ' + roomId);
         }
 
         function setupEventListeners() {
             // Socket.IO events
+            socket.on('connect', () => {
+                logDebug('Socket.IO connected');
+            });
+            
             socket.on('room-joined', handleRoomJoined);
             socket.on('student-joined', handleStudentJoined);
             socket.on('student-left', handleStudentLeft);
@@ -564,6 +608,9 @@
             socket.on('rtc-ice-candidate', handleRTCIceCandidate);
             socket.on('error', handleError);
             socket.on('broadcast-ready', handleBroadcastReady);
+            socket.on('teacher-ready', () => {
+                logDebug('Received teacher-ready event (should not happen for teacher)');
+            });
 
             // Button events
             startBroadcast.addEventListener('click', startBroadcasting);
@@ -576,15 +623,23 @@
         }
 
         function handleRoomJoined(data) {
+            mySid = data.sid;
+            logDebug(`Room joined. My SID: ${mySid}, Role: ${data.role}`);
             showNotification('success', 'Connected to room', 'You are now the teacher in this classroom.');
             updateConnectionStatus('connected');
         }
 
         function handleStudentJoined(data) {
             const { sid, username } = data;
-            students[sid] = { username, connected: true };
+            students[sid] = { 
+                username, 
+                connected: true,
+                status: 'connected',
+                peerConnection: null
+            };
             updateStudentsList();
             showNotification('info', 'Student joined', `${username} has joined the classroom.`);
+            logDebug(`Student joined: ${username} (SID: ${sid})`);
             
             // If broadcasting, establish connection with new student
             if (isBroadcasting && localStream) {
@@ -596,41 +651,60 @@
             const { sid } = data;
             if (students[sid]) {
                 students[sid].connected = false;
+                students[sid].status = 'disconnected';
                 updateStudentsList();
+                logDebug(`Student left: ${students[sid].username} (SID: ${sid})`);
                 
                 // Clean up peer connection
                 if (peerConnections[sid]) {
                     peerConnections[sid].close();
                     delete peerConnections[sid];
                 }
+                if (students[sid].peerConnection) {
+                    delete students[sid].peerConnection;
+                }
             }
         }
 
         function handleBroadcastReady(data) {
             const { student_sids, student_count } = data;
+            logDebug(`Broadcast ready. Student SIDs: ${JSON.stringify(student_sids)}`);
             showNotification('success', 'Broadcast started', `Connected to ${student_count} students.`);
             
             // Create peer connections for all students
             student_sids.forEach(sid => {
-                createPeerConnection(sid);
+                if (students[sid]) {
+                    createPeerConnection(sid);
+                }
             });
         }
 
         async function startBroadcasting() {
             try {
                 updateConnectionStatus('connecting');
+                logDebug('Starting broadcast...');
                 
                 // Get media stream
                 localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
                 });
                 
                 // Display local stream
                 teacherVideo.srcObject = localStream;
+                logDebug('Local stream obtained and displayed');
                 
                 // Start broadcast
                 socket.emit('start-broadcast', { room: roomId });
+                logDebug('start-broadcast event emitted');
                 
                 isBroadcasting = true;
                 startBroadcast.innerHTML = '<i class="fas fa-pause"></i> Stop Broadcast';
@@ -638,77 +712,143 @@
                 startBroadcast.classList.add('danger');
                 showNotification('success', 'Broadcast started', 'You are now broadcasting to students.');
                 
+                // Create peer connections for existing students
+                Object.keys(students).forEach(sid => {
+                    if (students[sid].connected) {
+                        createPeerConnection(sid);
+                    }
+                });
+                
             } catch (error) {
                 console.error('Error starting broadcast:', error);
+                logDebug(`Error starting broadcast: ${error.message}`);
                 showNotification('error', 'Error', 'Could not access camera/microphone. Please check permissions.');
                 updateConnectionStatus('error');
             }
         }
 
         function createPeerConnection(studentSid) {
-            if (!localStream) return;
+            if (!localStream || !students[studentSid]) return;
 
-            const peerConnection = new RTCPeerConnection({
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' }
-                ]
-            });
+            logDebug(`Creating peer connection for student: ${studentSid}`);
+            
+            try {
+                const peerConnection = new RTCPeerConnection({
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' },
+                        { urls: 'stun:stun3.l.google.com:19302' },
+                        { urls: 'stun:stun4.l.google.com:19302' }
+                    ],
+                    iceTransportPolicy: 'all',
+                    bundlePolicy: 'max-bundle',
+                    rtcpMuxPolicy: 'require'
+                });
 
-            // Add local stream tracks
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
-            });
+                // Add local stream tracks
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
 
-            // ICE candidate handler
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socket.emit('rtc-ice-candidate', {
-                        room: roomId,
-                        candidate: event.candidate,
-                        target_sid: studentSid
-                    });
-                }
-            };
+                // ICE candidate handler
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        logDebug(`Sending ICE candidate to ${studentSid}`);
+                        socket.emit('rtc-ice-candidate', {
+                            room: roomId,
+                            candidate: event.candidate,
+                            target_sid: studentSid
+                        });
+                    }
+                };
 
-            peerConnections[studentSid] = peerConnection;
+                // Connection state changes
+                peerConnection.onconnectionstatechange = () => {
+                    logDebug(`Peer connection state for ${studentSid}: ${peerConnection.connectionState}`);
+                    if (students[studentSid]) {
+                        students[studentSid].status = peerConnection.connectionState;
+                        updateStudentsList();
+                    }
+                };
 
-            // Create and send offer
-            peerConnection.createOffer()
-                .then(offer => peerConnection.setLocalDescription(offer))
+                // ICE connection state changes
+                peerConnection.oniceconnectionstatechange = () => {
+                    logDebug(`ICE connection state for ${studentSid}: ${peerConnection.iceConnectionState}`);
+                };
+
+                peerConnections[studentSid] = peerConnection;
+                students[studentSid].peerConnection = peerConnection;
+                students[studentSid].status = 'connecting';
+
+                // Create and send offer
+                peerConnection.createOffer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                })
+                .then(offer => {
+                    logDebug(`Created offer for ${studentSid}`);
+                    return peerConnection.setLocalDescription(offer);
+                })
                 .then(() => {
+                    logDebug(`Sending offer to ${studentSid}`);
                     socket.emit('rtc-offer', {
                         room: roomId,
                         target_sid: studentSid,
                         offer: peerConnection.localDescription
                     });
+                    updateStudentsList();
                 })
                 .catch(error => {
-                    console.error('Error creating offer:', error);
+                    console.error('Error creating/sending offer:', error);
+                    logDebug(`Error creating/sending offer to ${studentSid}: ${error.message}`);
                 });
+
+            } catch (error) {
+                console.error('Error creating peer connection:', error);
+                logDebug(`Error creating peer connection for ${studentSid}: ${error.message}`);
+            }
         }
 
         function handleRTCAnswer(data) {
-            const { answer, from_student } = data;
+            const { answer, from_student, room } = data;
+            logDebug(`Received answer from student: ${from_student}`);
+            
             const peerConnection = peerConnections[from_student];
             
             if (peerConnection) {
                 const remoteDesc = new RTCSessionDescription(answer);
                 peerConnection.setRemoteDescription(remoteDesc)
+                    .then(() => {
+                        logDebug(`Set remote description for ${from_student}`);
+                        if (students[from_student]) {
+                            students[from_student].status = 'connected';
+                            updateStudentsList();
+                        }
+                    })
                     .catch(error => {
                         console.error('Error setting remote description:', error);
+                        logDebug(`Error setting remote description for ${from_student}: ${error.message}`);
                     });
+            } else {
+                logDebug(`No peer connection found for student: ${from_student}`);
             }
         }
 
         function handleRTCIceCandidate(data) {
-            const { candidate, from_sid } = data;
+            const { candidate, from_sid, room } = data;
+            logDebug(`Received ICE candidate from ${from_sid}`);
+            
             const peerConnection = peerConnections[from_sid];
             
             if (peerConnection) {
                 peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                    .then(() => {
+                        logDebug(`Added ICE candidate from ${from_sid}`);
+                    })
                     .catch(error => {
                         console.error('Error adding ICE candidate:', error);
+                        logDebug(`Error adding ICE candidate from ${from_sid}: ${error.message}`);
                     });
             }
         }
@@ -718,7 +858,10 @@
                 if (!screenStream) {
                     // Start screen sharing
                     screenStream = await navigator.mediaDevices.getDisplayMedia({
-                        video: true,
+                        video: {
+                            cursor: "always",
+                            displaySurface: "monitor"
+                        },
                         audio: true
                     });
                     
@@ -736,6 +879,7 @@
                     toggleScreenShare.classList.add('active');
                     toggleScreenShare.innerHTML = '<i class="fas fa-stop"></i>';
                     showNotification('info', 'Screen sharing', 'Your screen is now being shared with students.');
+                    logDebug('Screen sharing started');
                 } else {
                     // Stop screen sharing
                     screenStream.getTracks().forEach(track => track.stop());
@@ -756,10 +900,12 @@
                     toggleScreenShare.classList.remove('active');
                     toggleScreenShare.innerHTML = '<i class="fas fa-desktop"></i>';
                     showNotification('info', 'Screen sharing stopped', 'Screen sharing has been stopped.');
+                    logDebug('Screen sharing stopped');
                 }
             } catch (error) {
                 console.error('Error toggling screen share:', error);
                 showNotification('error', 'Error', 'Could not share screen. Please try again.');
+                logDebug(`Screen sharing error: ${error.message}`);
             }
         }
 
@@ -772,6 +918,7 @@
                     toggleVideo.innerHTML = videoTrack.enabled ? 
                         '<i class="fas fa-video"></i>' : 
                         '<i class="fas fa-video-slash"></i>';
+                    logDebug(`Video ${videoTrack.enabled ? 'enabled' : 'disabled'}`);
                 }
             }
         }
@@ -785,6 +932,7 @@
                     toggleAudio.innerHTML = audioTrack.enabled ? 
                         '<i class="fas fa-microphone"></i>' : 
                         '<i class="fas fa-microphone-slash"></i>';
+                    logDebug(`Audio ${audioTrack.enabled ? 'enabled' : 'disabled'}`);
                 }
             }
         }
@@ -803,17 +951,32 @@
                     </div>
                 `;
             } else {
-                studentsList.innerHTML = connectedStudents.map(([sid, student]) => `
+                studentsList.innerHTML = connectedStudents.map(([sid, student]) => {
+                    let statusClass = 'connecting';
+                    let statusText = 'Connecting';
+                    
+                    if (student.status === 'connected') {
+                        statusClass = 'connected';
+                        statusText = 'Connected';
+                    } else if (student.status === 'disconnected') {
+                        statusClass = 'disconnected';
+                        statusText = 'Disconnected';
+                    } else if (student.status) {
+                        statusClass = student.status;
+                        statusText = student.status.charAt(0).toUpperCase() + student.status.slice(1);
+                    }
+                    
+                    return `
                     <div class="student-item">
                         <div class="student-avatar">${student.username.charAt(0).toUpperCase()}</div>
                         <div class="student-info">
                             <h4>${student.username}</h4>
-                            <div class="status connected">
-                                <i class="fas fa-circle"></i> Connected
+                            <div class="status ${statusClass}">
+                                <i class="fas fa-circle"></i> ${statusText}
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             }
         }
 
@@ -895,6 +1058,7 @@
         }
 
         function handleError(data) {
+            logDebug(`Error received: ${data.message}`);
             showNotification('error', 'Error', data.message);
         }
 
@@ -919,6 +1083,18 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
+        }
+
+        function logDebug(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            debugLog.prepend(logEntry);
+            
+            // Keep only last 20 log entries
+            while (debugLog.children.length > 20) {
+                debugLog.removeChild(debugLog.lastChild);
+            }
         }
 
         // Cleanup on page unload
