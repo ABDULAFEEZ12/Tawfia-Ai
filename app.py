@@ -1,7 +1,6 @@
 """
-app.py - SIMPLIFIED, WORKING VERSION
-ONE signaling path, CLEAN WebRTC
-FIXED: Database schema + WebRTC connection issues
+app.py - UPDATED WITH TURN SERVER SUPPORT
+FIXED WebRTC connection issues
 """
 
 # ============================================
@@ -35,7 +34,7 @@ db = SQLAlchemy(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # ============================================
-# Database Models (FIXED SCHEMA)
+# Database Models
 # ============================================
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,7 +44,7 @@ class User(db.Model):
 
 class Room(db.Model):
     id = db.Column(db.String(32), primary_key=True)
-    teacher_id = db.Column(db.String(120))  # Changed from teacher_sid to teacher_id
+    teacher_id = db.Column(db.String(120))
     teacher_name = db.Column(db.String(80))
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -56,11 +55,9 @@ with app.app_context():
     print("✅ Database tables created")
 
 # ============================================
-# In-Memory Storage (Simple & Clean)
+# In-Memory Storage
 # ============================================
-# Structure: {room_id: {'teacher_sid': sid, 'students': {sid: username}}}
 rooms = {}
-# Structure: {sid: {'room': room_id, 'role': 'teacher'|'student', 'username': name}}
 sessions = {}
 
 # ============================================
@@ -71,7 +68,7 @@ def get_or_create_room(room_id):
     if room_id not in rooms:
         rooms[room_id] = {
             'teacher_sid': None,
-            'students': {},  # sid -> username
+            'students': {},
             'created_at': datetime.utcnow().isoformat()
         }
     return rooms[room_id]
@@ -82,19 +79,73 @@ def cleanup_room(room_id):
         room = rooms[room_id]
         if not room['teacher_sid'] and not room['students']:
             del rooms[room_id]
-            # Also remove from database
             with app.app_context():
                 Room.query.filter_by(id=room_id).delete()
                 db.session.commit()
 
 # ============================================
-# Socket.IO Event Handlers (SIMPLE)
+# NEW: WebRTC Configuration Helper
+# ============================================
+def get_webrtc_config():
+    """Return WebRTC configuration with TURN servers"""
+    config = {
+        'iceServers': [
+            # STUN servers
+            {'urls': 'stun:stun.l.google.com:19302'},
+            {'urls': 'stun:stun1.l.google.com:19302'},
+            {'urls': 'stun:stun2.l.google.com:19302'},
+            {'urls': 'stun:stun3.l.google.com:19302'},
+            {'urls': 'stun:stun4.l.google.com:19302'},
+            
+            # TURN servers - CRITICAL for firewall/NAT traversal
+            {
+                'urls': 'turn:openrelay.metered.ca:80',
+                'username': 'openrelayproject',
+                'credential': 'openrelayproject'
+            },
+            {
+                'urls': 'turn:openrelay.metered.ca:443',
+                'username': 'openrelayproject',
+                'credential': 'openrelayproject'
+            },
+            {
+                'urls': 'turn:openrelay.metered.ca:443?transport=tcp',
+                'username': 'openrelayproject',
+                'credential': 'openrelayproject'
+            },
+            {
+                'urls': 'turn:numb.viagenie.ca',
+                'username': 'webrtc@live.com',
+                'credential': 'muazkh'
+            }
+        ]
+    }
+    
+    # For local development, add simpler configuration
+    if os.environ.get('FLASK_ENV') == 'development':
+        config['iceServers'].insert(0, {'urls': 'stun:localhost:3478'})
+        
+    return config
+
+# ============================================
+# NEW: Send WebRTC config to clients
+# ============================================
+@socketio.on('get-webrtc-config')
+def handle_get_webrtc_config():
+    """Send WebRTC configuration to client"""
+    emit('webrtc-config', get_webrtc_config())
+    print("📡 Sent WebRTC config to client")
+
+# ============================================
+# Socket.IO Event Handlers
 # ============================================
 @socketio.on('connect')
 def handle_connect():
     sid = request.sid
     sessions[sid] = {'room': None, 'role': None, 'username': None}
     print(f"✅ Client connected: {sid}")
+    # Send WebRTC config on connect
+    emit('webrtc-config', get_webrtc_config())
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -107,26 +158,20 @@ def handle_disconnect():
             room = rooms[room_id]
             
             if session_data['role'] == 'teacher':
-                # Teacher disconnected
                 room['teacher_sid'] = None
-                # Update database
                 with app.app_context():
                     room_db = Room.query.get(room_id)
                     if room_db:
                         room_db.teacher_id = None
                         db.session.commit()
-                # Notify all students
                 for student_sid in room['students']:
                     emit('teacher-disconnected', room=student_sid)
             elif session_data['role'] == 'student':
-                # Student disconnected
                 if sid in room['students']:
                     del room['students'][sid]
-                    # Notify teacher
                     if room['teacher_sid']:
                         emit('student-left', {'sid': sid}, room=room['teacher_sid'])
             
-            # Clean up empty room
             cleanup_room(room_id)
         
         del sessions[sid]
@@ -134,11 +179,11 @@ def handle_disconnect():
 
 @socketio.on('join-room')
 def handle_join_room(data):
-    """SIMPLE: One join path for both teacher and student"""
+    """One join path for both teacher and student"""
     try:
         sid = request.sid
         room_id = data.get('room')
-        role = data.get('role', 'student')  # 'teacher' or 'student'
+        role = data.get('role', 'student')
         username = data.get('username', 'User' if role == 'teacher' else 'Student')
         
         if not room_id:
@@ -147,24 +192,21 @@ def handle_join_room(data):
         
         print(f"👤 {username} ({role}) joining room: {room_id}")
         
-        # Get or create room
         room = get_or_create_room(room_id)
         
         if role == 'teacher':
-            # Teacher joining
             if room['teacher_sid']:
                 emit('error', {'message': 'Room already has a teacher'})
                 return
             
             room['teacher_sid'] = sid
             
-            # Save to database
             with app.app_context():
                 existing_room = Room.query.get(room_id)
                 if not existing_room:
                     room_db = Room(
                         id=room_id,
-                        teacher_id=sid,  # Changed from teacher_sid to teacher_id
+                        teacher_id=sid,
                         teacher_name=username,
                         is_active=True
                     )
@@ -178,29 +220,29 @@ def handle_join_room(data):
                 'role': 'teacher',
                 'room': room_id,
                 'message': 'You are now the teacher',
-                'sid': sid  # Send SID to teacher
+                'sid': sid,
+                'webrtc_config': get_webrtc_config()  # Send config with room join
             })
             
             print(f"✅ Teacher joined room: {room_id}")
             
         else:
-            # Student joining
             if not room['teacher_sid']:
                 emit('error', {'message': 'Teacher not in room. Please wait.'})
                 return
             
-            # Add student to room
             room['students'][sid] = username
             
             emit('room-joined', {
                 'role': 'student',
                 'room': room_id,
                 'message': 'Joined classroom successfully',
-                'sid': sid,  # Send SID to student
-                'teacher_sid': room['teacher_sid']  # Send teacher's SID to student
+                'sid': sid,
+                'teacher_sid': room['teacher_sid'],
+                'teacher_name': 'Teacher',  # Default name
+                'webrtc_config': get_webrtc_config()  # Send config with room join
             })
             
-            # Notify teacher about new student
             emit('student-joined', {
                 'sid': sid,
                 'username': username
@@ -208,12 +250,10 @@ def handle_join_room(data):
             
             print(f"✅ Student joined room: {room_id}")
         
-        # Update session
         sessions[sid]['room'] = room_id
         sessions[sid]['role'] = role
         sessions[sid]['username'] = username
         
-        # Join Socket.IO room
         join_room(room_id)
         
     except Exception as e:
@@ -221,22 +261,20 @@ def handle_join_room(data):
         emit('error', {'message': str(e)})
 
 # ============================================
-# WebRTC Signaling (FIXED VERSION)
+# WebRTC Signaling
 # ============================================
-
 @socketio.on('rtc-offer')
 def handle_rtc_offer(data):
     """Teacher sends offer to specific student"""
     try:
         room_id = data.get('room')
-        target_sid = data.get('target_sid')  # Student's socket ID
+        target_sid = data.get('target_sid')
         offer = data.get('offer')
         
         if not all([room_id, target_sid, offer]):
             emit('error', {'message': 'Missing offer data'})
             return
         
-        # Verify teacher is in room
         if room_id not in rooms:
             emit('error', {'message': 'Room not found'})
             return
@@ -244,19 +282,16 @@ def handle_rtc_offer(data):
         room = rooms[room_id]
         teacher_sid = request.sid
         
-        # Verify sender is the teacher
         if teacher_sid != room['teacher_sid']:
             emit('error', {'message': 'Only teacher can send offers'})
             return
         
-        # Verify target is a student in this room
         if target_sid not in room['students']:
             emit('error', {'message': 'Student not found in room'})
             return
         
-        print(f"🎥 Teacher ({teacher_sid}) sending offer to student {target_sid}")
+        print(f"🎥 Teacher sending offer to student {target_sid}")
         
-        # Forward offer to student
         emit('rtc-offer', {
             'offer': offer,
             'from_teacher': teacher_sid,
@@ -278,7 +313,6 @@ def handle_rtc_answer(data):
             emit('error', {'message': 'Missing answer data'})
             return
         
-        # Verify room exists
         if room_id not in rooms:
             emit('error', {'message': 'Room not found'})
             return
@@ -286,19 +320,16 @@ def handle_rtc_answer(data):
         room = rooms[room_id]
         student_sid = request.sid
         
-        # Verify sender is a student in this room
         if student_sid not in room['students']:
             emit('error', {'message': 'Not authorized'})
             return
         
-        # Verify teacher exists
         if not room['teacher_sid']:
             emit('error', {'message': 'Teacher not available'})
             return
         
         print(f"🎥 Student {student_sid} sending answer to teacher")
         
-        # Forward answer to teacher
         emit('rtc-answer', {
             'answer': answer,
             'from_student': student_sid,
@@ -311,7 +342,7 @@ def handle_rtc_answer(data):
 
 @socketio.on('rtc-ice-candidate')
 def handle_rtc_ice_candidate(data):
-    """Exchange ICE candidates between teacher and student"""
+    """Exchange ICE candidates"""
     try:
         room_id = data.get('room')
         candidate = data.get('candidate')
@@ -321,7 +352,6 @@ def handle_rtc_ice_candidate(data):
             emit('error', {'message': 'Missing ICE candidate data'})
             return
         
-        # Verify room exists
         if room_id not in rooms:
             emit('error', {'message': 'Room not found'})
             return
@@ -329,7 +359,6 @@ def handle_rtc_ice_candidate(data):
         room = rooms[room_id]
         sender_sid = request.sid
         
-        # Verify sender is in room (either teacher or student)
         is_teacher = (sender_sid == room['teacher_sid'])
         is_student = (sender_sid in room['students'])
         
@@ -337,7 +366,6 @@ def handle_rtc_ice_candidate(data):
             emit('error', {'message': 'Not authorized'})
             return
         
-        # Verify target is in room
         is_target_teacher = (target_sid == room['teacher_sid'])
         is_target_student = (target_sid in room['students'])
         
@@ -347,7 +375,6 @@ def handle_rtc_ice_candidate(data):
         
         print(f"❄️ ICE candidate from {sender_sid} to {target_sid}")
         
-        # Forward ICE candidate to target
         emit('rtc-ice-candidate', {
             'candidate': candidate,
             'from_sid': sender_sid,
@@ -359,9 +386,33 @@ def handle_rtc_ice_candidate(data):
         emit('error', {'message': str(e)})
 
 # ============================================
+# NEW: ICE Restart Handler
+# ============================================
+@socketio.on('ice-restart')
+def handle_ice_restart(data):
+    """Handle ICE restart requests"""
+    try:
+        room_id = data.get('room')
+        target_sid = data.get('target_sid')
+        
+        if not room_id or not target_sid:
+            emit('error', {'message': 'Missing data for ICE restart'})
+            return
+        
+        print(f"🔄 ICE restart requested for {target_sid}")
+        
+        emit('ice-restart-request', {
+            'room': room_id,
+            'from_sid': request.sid
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error in ice-restart: {e}")
+        emit('error', {'message': str(e)})
+
+# ============================================
 # Control Events
 # ============================================
-
 @socketio.on('start-broadcast')
 def handle_start_broadcast(data):
     """Teacher starts broadcasting to all students"""
@@ -381,17 +432,14 @@ def handle_start_broadcast(data):
         
         print(f"📢 Teacher starting broadcast in room: {room_id}")
         
-        # Get list of student SIDs
         student_sids = list(room['students'].keys())
         
-        # Notify teacher with student list
         emit('broadcast-ready', {
             'student_sids': student_sids,
             'student_count': len(student_sids),
             'room': room_id
         })
         
-        # Notify each student individually
         for student_sid in student_sids:
             emit('teacher-ready', {
                 'teacher_sid': teacher_sid,
@@ -410,31 +458,25 @@ def handle_ping(data):
 # ============================================
 # Flask Routes
 # ============================================
-
 @app.route('/')
 def index():
-    """Home page - redirect to teacher or show join form"""
     return render_template('index.html')
 
 @app.route('/teacher')
 def teacher_create():
-    """Create new room as teacher"""
     room_id = str(uuid.uuid4())[:8]
     return redirect(f'/teacher/{room_id}')
 
 @app.route('/teacher/<room_id>')
 def teacher_view(room_id):
-    """Teacher dashboard"""
     return render_template('teacher.html', room_id=room_id)
 
 @app.route('/student/<room_id>')
 def student_view(room_id):
-    """Student join page"""
     return render_template('student.html', room_id=room_id)
 
 @app.route('/join', methods=['POST'])
 def join_room_post():
-    """Join room via form"""
     room_id = request.form.get('room_id', '').strip()
     if not room_id:
         flash('Please enter a room ID')
@@ -442,38 +484,32 @@ def join_room_post():
     return redirect(f'/student/{room_id}')
 
 # ============================================
-# Live Meeting Routes (Support both _ and -)
+# Live Meeting Routes
 # ============================================
-
 @app.route('/live-meeting')
 @app.route('/live_meeting')
 def live_meeting():
-    """Landing page for live meeting with role selection"""
     return render_template('live_meeting.html')
 
 @app.route('/live-meeting/teacher')
 @app.route('/live_meeting/teacher')
 def live_meeting_teacher_create():
-    """Create new meeting as teacher"""
     room_id = str(uuid.uuid4())[:8]
     return redirect(url_for('live_meeting_teacher_view', room_id=room_id))
 
 @app.route('/live-meeting/teacher/<room_id>')
 @app.route('/live_meeting/teacher/<room_id>')
 def live_meeting_teacher_view(room_id):
-    """Modern teacher interface - using teacher_live.html"""
     return render_template('teacher_live.html', room_id=room_id)
 
 @app.route('/live-meeting/student/<room_id>')
 @app.route('/live_meeting/student/<room_id>')
 def live_meeting_student_view(room_id):
-    """Modern student interface - using student_live.html"""
     return render_template('student_live.html', room_id=room_id)
 
 @app.route('/live-meeting/join', methods=['POST'])
 @app.route('/live_meeting/join', methods=['POST'])
 def live_meeting_join():
-    """Join meeting via form (modern interface)"""
     room_id = request.form.get('room_id', '').strip()
     username = request.form.get('username', '').strip()
     
@@ -484,7 +520,6 @@ def live_meeting_join():
     if not username:
         username = f"Student_{str(uuid.uuid4())[:4]}"
     
-    # Store username in session for later use
     session['live_username'] = username
     
     return redirect(url_for('live_meeting_student_view', room_id=room_id))
@@ -494,29 +529,36 @@ def live_meeting_join():
 # ============================================
 @app.route('/reset-db')
 def reset_database():
-    """Reset database to fix schema issues"""
     with app.app_context():
-        # Drop all tables
         db.drop_all()
-        # Recreate with new schema
         db.create_all()
         print("✅ Database reset complete")
     return "Database reset complete. Please restart the server."
+
+# ============================================
+# NEW: WebRTC Test Route
+# ============================================
+@app.route('/webrtc-test')
+def webrtc_test():
+    """Test page for WebRTC connectivity"""
+    return render_template('webrtc_test.html')
 
 # ============================================
 # Run Server
 # ============================================
 if __name__ == '__main__':
     print(f"\n{'='*60}")
-    print("🚀 SIMPLIFIED WebRTC Broadcast System")
+    print("🚀 WebRTC Broadcast System WITH TURN SUPPORT")
     print(f"{'='*60}")
-    print("✅ FIXED: Database schema (teacher_id column)")
-    print("✅ FIXED: WebRTC signaling with proper SID passing")
-    print("✅ Clean signaling: rtc-offer, rtc-answer, rtc-ice-candidate")
-    print("✅ One join path: join-room")
-    print("✅ Teacher → Many Students architecture")
-    print("✅ Using templates: live_meeting.html, teacher_live.html, student_live.html")
+    print("✅ TURN servers added for firewall/NAT traversal")
+    print("✅ ICE restart functionality")
+    print("✅ Improved WebRTC configuration")
     print("✅ Ready for production")
+    print(f"{'='*60}")
+    print("🌐 WebRTC Config Loaded:")
+    config = get_webrtc_config()
+    print(f"   STUN Servers: {len([s for s in config['iceServers'] if 'stun' in s['urls']])}")
+    print(f"   TURN Servers: {len([s for s in config['iceServers'] if 'turn' in s['urls']])}")
     print(f"{'='*60}\n")
     
     port = int(os.environ.get('PORT', 5000))
