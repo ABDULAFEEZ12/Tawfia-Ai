@@ -622,6 +622,8 @@
         let studentName = localStorage.getItem('studentName') || `Student_${Math.floor(Math.random() * 1000)}`;
         let teacherSid = null;
         let connectionState = 'disconnected';
+        let iceRestartAttempts = 0;
+        const MAX_ICE_RESTART_ATTEMPTS = 3;
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
@@ -681,6 +683,12 @@
             socket.on('pong', () => {
                 logDebug('Pong received - connection alive');
             });
+            socket.on('ice-restart-request', handleIceRestartRequest);
+            socket.on('webrtc-config', (config) => {
+                logDebug('Received WebRTC config from server');
+                // Store config for later use
+                window.webrtcConfig = config;
+            });
 
             // Button events
             toggleFullscreen.addEventListener('click', toggleFullscreenMode);
@@ -702,6 +710,12 @@
             if (data.teacher_name) {
                 teacherNameElement.textContent = data.teacher_name;
             }
+            
+            // Store WebRTC config if provided
+            if (data.webrtc_config) {
+                window.webrtcConfig = data.webrtc_config;
+                logDebug('WebRTC config received with room join');
+            }
         }
 
         function handleTeacherReady(data) {
@@ -711,6 +725,12 @@
             updateConnectionStatus('connecting', 'Waiting for teacher\'s offer...');
         }
 
+        function handleIceRestartRequest(data) {
+            logDebug('Received ICE restart request from teacher');
+            showNotification('info', 'Reconnecting', 'Re-establishing connection with teacher...');
+            // Teacher will send a new offer
+        }
+
         async function handleRTCOffer(data) {
             try {
                 const { offer, from_teacher, room } = data;
@@ -718,23 +738,22 @@
                 logDebug(`Received WebRTC offer from teacher: ${from_teacher}`);
                 updateConnectionStatus('connecting', 'Establishing connection with teacher...');
                 
+                // Reset ICE restart attempts on new offer
+                iceRestartAttempts = 0;
+                
                 // Clean up existing connection if any
                 if (peerConnection) {
                     peerConnection.close();
                 }
                 
-                // Create peer connection with multiple STUN servers
+                // Create peer connection with TURN servers
+                const iceServers = getIceServers();
                 peerConnection = new RTCPeerConnection({
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' },
-                        { urls: 'stun:stun3.l.google.com:19302' },
-                        { urls: 'stun:stun4.l.google.com:19302' }
-                    ],
-                    iceTransportPolicy: 'all',
+                    iceServers: iceServers,
+                    iceTransportPolicy: 'all', // Try all, fallback to relay if needed
                     bundlePolicy: 'max-bundle',
-                    rtcpMuxPolicy: 'require'
+                    rtcpMuxPolicy: 'require',
+                    iceCandidatePoolSize: 10
                 });
 
                 // Handle incoming stream
@@ -745,25 +764,38 @@
                         emptyVideo.style.display = 'none';
                         teacherVideo.style.display = 'block';
                         
-                        // Monitor stream quality
                         monitorStreamQuality(event.streams[0]);
                         
                         updateConnectionStatus('connected', 'Receiving teacher\'s stream');
                         showNotification('success', 'Stream connected', 'Now receiving teacher\'s broadcast.');
                         raiseHand.disabled = false;
                         connectionState = 'connected';
+                        
+                        // Reset ICE restart attempts on successful connection
+                        iceRestartAttempts = 0;
                     }
                 };
 
                 // ICE candidate handler
                 peerConnection.onicecandidate = (event) => {
                     if (event.candidate) {
-                        logDebug(`Sending ICE candidate to teacher`);
+                        const candidateType = getCandidateType(event.candidate);
+                        logDebug(`Sending ${candidateType} ICE candidate to teacher`);
                         socket.emit('rtc-ice-candidate', {
                             room: roomId,
                             candidate: event.candidate,
                             target_sid: from_teacher
                         });
+                    } else {
+                        logDebug('ICE gathering complete');
+                    }
+                };
+
+                // ICE candidate error handler
+                peerConnection.onicecandidateerror = (event) => {
+                    logDebug(`ICE candidate error: ${event.errorCode} ${event.errorText}`);
+                    if (event.errorCode === 701) {
+                        logDebug('STUN/TURN server may be blocked by firewall');
                     }
                 };
 
@@ -775,10 +807,18 @@
                     
                     if (peerConnection.connectionState === 'connected') {
                         connectionState = 'connected';
+                        iceRestartAttempts = 0;
                     } else if (peerConnection.connectionState === 'disconnected' || 
                                peerConnection.connectionState === 'failed') {
                         connectionState = 'disconnected';
                         showNotification('error', 'Connection lost', 'Lost connection with teacher.');
+                        
+                        // Attempt ICE restart
+                        if (iceRestartAttempts < MAX_ICE_RESTART_ATTEMPTS) {
+                            setTimeout(() => {
+                                requestIceRestart();
+                            }, 2000);
+                        }
                     }
                 };
 
@@ -786,11 +826,33 @@
                 peerConnection.oniceconnectionstatechange = () => {
                     logDebug(`ICE connection state: ${peerConnection.iceConnectionState}`);
                     connectionTypeElement.textContent = peerConnection.iceConnectionState;
+                    
+                    if (peerConnection.iceConnectionState === 'disconnected' || 
+                        peerConnection.iceConnectionState === 'failed') {
+                        logDebug('ICE connection failed');
+                        
+                        // Attempt ICE restart
+                        if (iceRestartAttempts < MAX_ICE_RESTART_ATTEMPTS) {
+                            setTimeout(() => {
+                                if (peerConnection.iceConnectionState !== 'connected' && 
+                                    peerConnection.iceConnectionState !== 'checking') {
+                                    requestIceRestart();
+                                }
+                            }, 2000);
+                        }
+                    } else if (peerConnection.iceConnectionState === 'connected') {
+                        iceRestartAttempts = 0;
+                    }
                 };
 
                 // ICE gathering state changes
                 peerConnection.onicegatheringstatechange = () => {
                     logDebug(`ICE gathering state: ${peerConnection.iceGatheringState}`);
+                };
+
+                // Negotiation needed (for renegotiation)
+                peerConnection.onnegotiationneeded = () => {
+                    logDebug('Negotiation needed');
                 };
 
                 // Set remote description
@@ -812,6 +874,10 @@
                 });
                 logDebug('Sent answer to teacher');
 
+                // Log SDP for debugging
+                logDebug(`SDP offer type: ${offer.type}`);
+                logDebug(`SDP answer type: ${answer.type}`);
+
             } catch (error) {
                 console.error('Error handling RTC offer:', error);
                 logDebug(`Error handling RTC offer: ${error.message}`);
@@ -820,14 +886,64 @@
             }
         }
 
+        function getIceServers() {
+            // Use server-provided config if available, otherwise use default
+            if (window.webrtcConfig && window.webrtcConfig.iceServers) {
+                logDebug('Using server-provided ICE servers');
+                return window.webrtcConfig.iceServers;
+            }
+            
+            // Default ICE servers with TURN support
+            return [
+                // STUN servers
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' },
+                
+                // TURN servers - CRITICAL for firewall/NAT traversal
+                { 
+                    urls: 'turn:openrelay.metered.ca:80',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                },
+                { 
+                    urls: 'turn:openrelay.metered.ca:443',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                },
+                { 
+                    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                },
+                {
+                    urls: 'turn:numb.viagenie.ca',
+                    username: 'webrtc@live.com',
+                    credential: 'muazkh'
+                }
+            ];
+        }
+
+        function getCandidateType(candidate) {
+            const candidateStr = candidate.candidate;
+            if (candidateStr.includes('typ relay')) return 'TURN (relay)';
+            if (candidateStr.includes('typ srflx')) return 'STUN (server reflexive)';
+            if (candidateStr.includes('typ host')) return 'Host';
+            if (candidateStr.includes('typ prflx')) return 'Peer reflexive';
+            return 'Unknown';
+        }
+
         function handleRTCIceCandidate(data) {
             const { candidate, from_sid, room } = data;
-            logDebug(`Received ICE candidate from: ${from_sid}`);
+            const candidateType = getCandidateType(new RTCIceCandidate(candidate));
+            logDebug(`Received ${candidateType} ICE candidate from: ${from_sid}`);
             
             if (peerConnection) {
                 peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
                     .then(() => {
-                        logDebug('Added ICE candidate successfully');
+                        logDebug(`Added ${candidateType} ICE candidate successfully`);
                     })
                     .catch(error => {
                         console.error('Error adding ICE candidate:', error);
@@ -852,11 +968,31 @@
             teacherVideo.style.display = 'none';
             raiseHand.disabled = true;
             connectionState = 'disconnected';
+            iceRestartAttempts = 0;
             
             // Clean up peer connection
             if (peerConnection) {
                 peerConnection.close();
                 peerConnection = null;
+            }
+        }
+
+        function requestIceRestart() {
+            if (iceRestartAttempts >= MAX_ICE_RESTART_ATTEMPTS) {
+                logDebug('Max ICE restart attempts reached');
+                showNotification('error', 'Connection Failed', 'Could not establish connection. Please refresh.');
+                return;
+            }
+            
+            iceRestartAttempts++;
+            logDebug(`Requesting ICE restart from teacher (attempt ${iceRestartAttempts}/${MAX_ICE_RESTART_ATTEMPTS})`);
+            
+            if (teacherSid) {
+                socket.emit('ice-restart', {
+                    room: roomId,
+                    target_sid: teacherSid
+                });
+                showNotification('info', 'Reconnecting', 'Attempting to reconnect...');
             }
         }
 
@@ -1117,6 +1253,9 @@
                 socket.emit('ping');
             }
         }, 30000);
+
+        // Request WebRTC config from server
+        socket.emit('get-webrtc-config');
     </script>
 </body>
 </html>
