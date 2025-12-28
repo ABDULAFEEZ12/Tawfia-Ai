@@ -583,6 +583,9 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Request WebRTC config from server immediately
+            socket.emit('get-webrtc-config');
+            logDebug('Requested WebRTC config from server');
             connectToRoom();
             setupEventListeners();
             startSessionTimer();
@@ -595,9 +598,6 @@
                 username: 'Teacher'
             });
             logDebug('Connecting to room: ' + roomId);
-            
-            // Request WebRTC config from server
-            socket.emit('get-webrtc-config');
         }
 
         function setupEventListeners() {
@@ -617,6 +617,7 @@
             socket.on('webrtc-config', (config) => {
                 logDebug('Received WebRTC config from server');
                 window.webrtcConfig = config;
+                logDebug('Config contains: ' + config.iceServers.length + ' ICE servers');
             });
 
             // Button events
@@ -759,9 +760,10 @@
             
             try {
                 const iceServers = getIceServers();
+                logDebug(`Using ${iceServers.length} ICE servers for peer connection`);
                 const peerConnection = new RTCPeerConnection({
                     iceServers: iceServers,
-                    iceTransportPolicy: 'all',
+                    iceTransportPolicy: 'all', // !FIX! CRITICAL: MUST be 'all' to try all connection types
                     bundlePolicy: 'max-bundle',
                     rtcpMuxPolicy: 'require',
                     iceCandidatePoolSize: 10
@@ -871,22 +873,42 @@
         }
 
         function getIceServers() {
-            // Use server-provided config if available, otherwise use default
+            // !FIX! CRITICAL: Always use the config sent from app.py's get_webrtc_config()
             if (window.webrtcConfig && window.webrtcConfig.iceServers) {
-                logDebug('Using server-provided ICE servers');
-                return window.webrtcConfig.iceServers;
+                logDebug('Using server-provided ICE servers from app.py');
+                
+                // Log what we received for debugging
+                logDebug('Server config contains: ' + window.webrtcConfig.iceServers.length + ' servers');
+                
+                // Optional: Force TCP preference for TURN servers to improve firewall traversal
+                const enhancedServers = window.webrtcConfig.iceServers.map(server => {
+                    if (server.urls.includes('turn:') && !server.urls.includes('transport=tcp')) {
+                        // Create a TCP-only copy for the TURN server
+                        const tcpServer = {...server};
+                        if (typeof tcpServer.urls === 'string') {
+                            tcpServer.urls = tcpServer.urls.replace('turn:', 'turn:') + '?transport=tcp';
+                        }
+                        // Return both original and TCP version
+                        return [server, tcpServer];
+                    }
+                    return server;
+                }).flat(); // Flatten the array if we added TCP copies
+                
+                logDebug('Returning enhanced ICE servers with TCP support');
+                return enhancedServers;
             }
             
-            // Default ICE servers with TURN support
+            // !FIX! Fallback should match your app.py exactly - no discrepancies
+            logDebug('Using fallback ICE servers (should match app.py)');
             return [
-                // STUN servers
+                // STUN servers (same as app.py)
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
                 { urls: 'stun:stun2.l.google.com:19302' },
                 { urls: 'stun:stun3.l.google.com:19302' },
                 { urls: 'stun:stun4.l.google.com:19302' },
                 
-                // TURN servers - CRITICAL for firewall/NAT traversal
+                // TURN servers (MUST match app.py)
                 { 
                     urls: 'turn:openrelay.metered.ca:80',
                     username: 'openrelayproject',
