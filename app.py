@@ -435,7 +435,7 @@ def live_meeting_join():
 if __name__ == '__main__':
     print(f"\n{'='*60}")
     print("🚀 WebRTC Broadcast System - SIGNALING ONLY")
-    print(f"{='*60}")
+    print(f"{'='*60}")
     print("✅ Backend handles signaling only (NO TURN/STUN config)")
     print("✅ TURN configuration is frontend-only (for Render compatibility)")
     print("✅ Production ready for Render deployment")
@@ -443,4 +443,3 @@ if __name__ == '__main__':
     
     port = int(os.environ.get('PORT', 5000))
     socketio.run(app, host='0.0.0.0', port=port, debug=True)
-    
