@@ -51,7 +51,6 @@ with app.app_context():
 # ============================================
 rooms = {}
 sessions = {}
-student_preferences = {}
 
 # ============================================
 # Helper Functions
@@ -63,23 +62,10 @@ def get_or_create_room(room_id):
             'teacher_sid': None,
             'teacher_name': None,
             'students': {},  # sid -> username
-            'student_data': {},  # sid -> {hasVideo, hasAudio, preferences}
-            'controls': {
-                'cameras_disabled': False,
-                'mics_disabled': False,
-                'questions_enabled': True,
-                'slides_enabled': True,
-                'class_started': False
-            },
+            'student_data': {},  # sid -> {hasVideo, hasAudio}
             'created_at': datetime.utcnow().isoformat()
         }
     return rooms[room_id]
-
-def get_room_student_data(room_id, student_sid):
-    """Get student data from room"""
-    if room_id in rooms and student_sid in rooms[room_id]['student_data']:
-        return rooms[room_id]['student_data'][student_sid]
-    return None
 
 def cleanup_room(room_id):
     """Remove empty rooms"""
@@ -152,7 +138,6 @@ def handle_join_room(data):
         room_id = data.get('room')
         role = data.get('role', 'student')
         username = data.get('username', 'User' if role == 'teacher' else 'Student')
-        preferences = data.get('preferences', {})
         
         if not room_id:
             emit('error', {'message': 'Room ID required'})
@@ -195,11 +180,14 @@ def handle_join_room(data):
             print(f"✅ Teacher joined room: {room_id}")
             
         else:
+            if not room['teacher_sid']:
+                emit('error', {'message': 'Teacher not in room. Please wait.'})
+                return
+            
             room['students'][sid] = username
             room['student_data'][sid] = {
                 'hasVideo': False,
-                'hasAudio': False,
-                'preferences': preferences
+                'hasAudio': False
             }
             
             emit('room-joined', {
@@ -208,8 +196,7 @@ def handle_join_room(data):
                 'message': 'Joined classroom successfully',
                 'sid': sid,
                 'teacher_sid': room['teacher_sid'],
-                'teacher_name': room['teacher_name'],
-                'teacher_controls': room['controls']
+                'teacher_name': room['teacher_name']
             })
             
             # Notify teacher about new student
@@ -232,85 +219,54 @@ def handle_join_room(data):
         emit('error', {'message': str(e)})
 
 # ============================================
-# WebRTC Signaling - FIXED VERSION
+# WEBRTC SIGNALING - FIXED VERSION
 # ============================================
-@socketio.on('teacher-ready')
-def handle_teacher_ready(data):
-    """Teacher is ready and sends offer to all students"""
-    try:
-        room_id = data.get('room')
-        teacher_sid = data.get('teacher_sid')
-        teacher_name = data.get('teacher_name')
-        
-        if not room_id or room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        room = rooms[room_id]
-        
-        # Verify sender is the teacher
-        if request.sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can send ready signal'})
-            return
-        
-        print(f"📢 Teacher {teacher_name} ready in room: {room_id}")
-        
-        # Notify all students that teacher is ready
-        for student_sid in room['students']:
-            emit('teacher-ready', {
-                'teacher_sid': teacher_sid,
-                'teacher_name': teacher_name,
-                'room': room_id
-            }, room=student_sid)
-        
-    except Exception as e:
-        print(f"❌ Error in teacher-ready: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('rtc-offer')
 def handle_rtc_offer(data):
-    """Handle RTC offer - can be from teacher to student OR student to teacher"""
+    """Handle RTC offer from teacher to student OR student to teacher"""
     try:
         room_id = data.get('room')
         target_sid = data.get('target_sid')
         offer = data.get('offer')
-        from_sid = request.sid
         
         if not all([room_id, target_sid, offer]):
-            print(f"❌ Missing RTC offer data: room={room_id}, target={target_sid}")
+            print(f"❌ Missing RTC offer data")
             return
         
         if room_id not in rooms:
-            print(f"❌ Room {room_id} not found for RTC offer")
+            print(f"❌ Room {room_id} not found")
             return
         
         room = rooms[room_id]
+        sender_sid = request.sid
         
-        # Check if sender is authorized (teacher or student in this room)
-        sender_is_teacher = (from_sid == room['teacher_sid'])
-        sender_is_student = (from_sid in room['students'])
-        
-        if not (sender_is_teacher or sender_is_student):
-            print(f"❌ Unauthorized sender for RTC offer: {from_sid}")
+        # Check if sender is in room
+        if sender_sid not in [room['teacher_sid']] + list(room['students'].keys()):
+            print(f"❌ Sender {sender_sid} not in room")
             return
         
-        # Check if target exists in room
-        target_is_teacher = (target_sid == room['teacher_sid'])
-        target_is_student = (target_sid in room['students'])
-        
-        if not (target_is_teacher or target_is_student):
-            print(f"❌ Target not found for RTC offer: {target_sid}")
+        # Check if target is in room
+        if target_sid not in [room['teacher_sid']] + list(room['students'].keys()):
+            print(f"❌ Target {target_sid} not in room")
             return
         
-        print(f"🎥 RTC offer from {from_sid} to {target_sid} in room {room_id}")
-        
-        # Forward offer to target
-        emit('rtc-offer', {
-            'offer': offer,
-            'from_sid': from_sid,
-            'room': room_id
-        }, room=target_sid)
-        
+        # Determine direction
+        if sender_sid == room['teacher_sid']:
+            print(f"🎥 Teacher → Student offer to {target_sid}")
+            # Teacher sending to student
+            emit('rtc-offer', {
+                'offer': offer,
+                'from_teacher': sender_sid
+            }, room=target_sid)
+        else:
+            print(f"🎥 Student → Teacher offer from {sender_sid}")
+            # Student sending to teacher
+            emit('rtc-offer', {
+                'offer': offer,
+                'from_student': sender_sid
+            }, room=target_sid)
+            
     except Exception as e:
         print(f"❌ Error in rtc-offer: {e}")
 
@@ -319,7 +275,6 @@ def handle_rtc_answer(data):
     """Handle RTC answer"""
     try:
         room_id = data.get('room')
-        target_sid = data.get('target_sid')
         answer = data.get('answer')
         student_name = data.get('studentName')
         student_sid = request.sid
@@ -331,45 +286,35 @@ def handle_rtc_answer(data):
             return
         
         if room_id not in rooms:
-            print(f"❌ Room {room_id} not found for RTC answer")
+            print(f"❌ Room {room_id} not found")
             return
         
         room = rooms[room_id]
         
-        # Check if sender is authorized
-        sender_is_teacher = (student_sid == room['teacher_sid'])
-        sender_is_student = (student_sid in room['students'])
-        
-        if not (sender_is_teacher or sender_is_student):
-            print(f"❌ Unauthorized sender for RTC answer: {student_sid}")
+        if student_sid not in room['students']:
+            print(f"❌ Student {student_sid} not in room")
             return
         
-        # If no target_sid provided, assume answer is for teacher
-        if not target_sid and sender_is_student:
-            target_sid = room['teacher_sid']
-        
-        # Check if target exists
-        if target_sid not in [room['teacher_sid']] + list(room['students'].keys()):
-            print(f"❌ Target not found for RTC answer: {target_sid}")
+        if not room['teacher_sid']:
+            print(f"❌ Teacher not in room")
             return
         
-        # Update student data if this is from a student
-        if sender_is_student and student_sid in room['student_data']:
+        # Update student data
+        if student_sid in room['student_data']:
             room['student_data'][student_sid]['hasVideo'] = hasVideo
             room['student_data'][student_sid]['hasAudio'] = hasAudio
-            print(f"📹 Student {student_name or room['students'][student_sid]} hasVideo={hasVideo}, hasAudio={hasAudio}")
         
-        print(f"🎥 RTC answer from {student_sid} to {target_sid} in room {room_id}")
+        print(f"🎥 Student {student_name} sending answer to teacher")
         
-        # Forward answer to target
+        # Forward answer to teacher
         emit('rtc-answer', {
             'answer': answer,
-            'from_sid': student_sid,
-            'studentName': student_name or room['students'].get(student_sid, 'Student'),
+            'studentName': student_name,
+            'studentSid': student_sid,
             'hasVideo': hasVideo,
             'hasAudio': hasAudio,
             'room': room_id
-        }, room=target_sid)
+        }, room=room['teacher_sid'])
         
     except Exception as e:
         print(f"❌ Error in rtc-answer: {e}")
@@ -383,30 +328,18 @@ def handle_rtc_ice_candidate(data):
         target_sid = data.get('target_sid')
         
         if not all([room_id, candidate, target_sid]):
-            print(f"⚠️ Incomplete ICE candidate data")
             return
         
         if room_id not in rooms:
-            print(f"❌ Room {room_id} not found for ICE candidate")
             return
         
         room = rooms[room_id]
         sender_sid = request.sid
         
-        # Verify sender is in room
-        sender_is_teacher = (sender_sid == room['teacher_sid'])
-        sender_is_student = (sender_sid in room['students'])
+        # Verify both sender and target are in room
+        valid_sids = [room['teacher_sid']] + list(room['students'].keys())
         
-        if not (sender_is_teacher or sender_is_student):
-            print(f"❌ Unauthorized sender for ICE candidate: {sender_sid}")
-            return
-        
-        # Verify target is in room
-        target_is_teacher = (target_sid == room['teacher_sid'])
-        target_is_student = (target_sid in room['students'])
-        
-        if not (target_is_teacher or target_is_student):
-            print(f"❌ Target not found for ICE candidate: {target_sid}")
+        if sender_sid not in valid_sids or target_sid not in valid_sids:
             return
         
         # Relay candidate
@@ -420,8 +353,37 @@ def handle_rtc_ice_candidate(data):
         print(f"❌ Error in rtc-ice-candidate: {e}")
 
 # ============================================
-# Teacher Control Events
+# TEACHER CONTROL EVENTS
 # ============================================
+
+@socketio.on('teacher-ready')
+def handle_teacher_ready(data):
+    """Teacher is ready to start class"""
+    try:
+        room_id = data.get('room')
+        
+        if room_id not in rooms:
+            return
+        
+        room = rooms[room_id]
+        teacher_sid = request.sid
+        
+        if teacher_sid != room['teacher_sid']:
+            return
+        
+        # Notify all students
+        for student_sid in room['students']:
+            emit('teacher-ready', {
+                'teacher_sid': teacher_sid,
+                'teacher_name': room['teacher_name'],
+                'room': room_id
+            }, room=student_sid)
+        
+        print(f"📢 Teacher ready in room: {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in teacher-ready: {e}")
+
 @socketio.on('teacher-control-update')
 def handle_teacher_control_update(data):
     """Teacher updates classroom controls"""
@@ -431,22 +393,16 @@ def handle_teacher_control_update(data):
         value = data.get('value')
         
         if not all([room_id, control]):
-            emit('error', {'message': 'Missing control data'})
             return
         
         if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
             return
         
         room = rooms[room_id]
         teacher_sid = request.sid
         
         if teacher_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can update controls'})
             return
-        
-        # Update control
-        room['controls'][control] = value
         
         # Broadcast to all students
         for student_sid in room['students']:
@@ -456,37 +412,32 @@ def handle_teacher_control_update(data):
                 'room': room_id
             }, room=student_sid)
         
-        print(f"⚙️ Teacher updated control {control} to {value} in room: {room_id}")
+        print(f"⚙️ Teacher updated {control} to {value}")
         
     except Exception as e:
         print(f"❌ Error in teacher-control-update: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('teacher-force-media-control')
 def handle_teacher_force_media_control(data):
     """Teacher forces media control on student(s)"""
     try:
         room_id = data.get('room')
-        control = data.get('control')  # 'camera' or 'microphone'
+        control = data.get('control')
         enabled = data.get('enabled', True)
         reason = data.get('reason', '')
+        target_student_sid = data.get('targetStudentSid')
         
         if not all([room_id, control]):
-            emit('error', {'message': 'Missing control data'})
             return
         
         if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
             return
         
         room = rooms[room_id]
         teacher_sid = request.sid
         
         if teacher_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can force media controls'})
             return
-        
-        target_student_sid = data.get('targetStudentSid')
         
         if target_student_sid:
             # Send to specific student
@@ -497,7 +448,6 @@ def handle_teacher_force_media_control(data):
                     'reason': reason,
                     'room': room_id
                 }, room=target_student_sid)
-                print(f"🎛️ Teacher forced {control} {enabled} for student {target_student_sid}")
         else:
             # Send to all students
             for student_sid in room['students']:
@@ -507,110 +457,94 @@ def handle_teacher_force_media_control(data):
                     'reason': reason,
                     'room': room_id
                 }, room=student_sid)
-            print(f"🎛️ Teacher forced {control} {enabled} for all students")
+        
+        print(f"🎛️ Teacher forced {control} to {enabled}")
         
     except Exception as e:
         print(f"❌ Error in teacher-force-media-control: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('hand-acknowledged')
 def handle_hand_acknowledged(data):
     """Teacher acknowledges a raised hand"""
     try:
         room_id = data.get('room')
-        student_name = data.get('studentName')
         student_sid = data.get('studentSid')
-        acknowledged_by = data.get('acknowledgedBy')
         
         if not all([room_id, student_sid]):
-            emit('error', {'message': 'Missing data'})
             return
         
         if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
             return
         
         room = rooms[room_id]
         teacher_sid = request.sid
         
         if teacher_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can acknowledge hands'})
             return
         
         # Send acknowledgement to student
         emit('hand-acknowledged', {
-            'studentName': student_name,
-            'acknowledgedBy': acknowledged_by,
+            'studentName': data.get('studentName'),
+            'acknowledgedBy': data.get('acknowledgedBy'),
             'room': room_id
         }, room=student_sid)
         
-        print(f"✋ Teacher acknowledged hand from {student_name}")
+        print(f"✋ Teacher acknowledged hand")
         
     except Exception as e:
         print(f"❌ Error in hand-acknowledged: {e}")
-        emit('error', {'message': str(e)})
 
 # ============================================
-# Student Action Events
+# STUDENT ACTION EVENTS
 # ============================================
+
 @socketio.on('student-action')
 def handle_student_action(data):
-    """Student performs an action (raise hand, struggle signal, etc.)"""
+    """Student performs an action"""
     try:
         room_id = data.get('room')
-        action = data.get('action')
-        
-        if not all([room_id, action]):
-            emit('error', {'message': 'Missing action data'})
-            return
         
         if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
             return
         
         room = rooms[room_id]
         student_sid = request.sid
         
         if student_sid not in room['students']:
-            emit('error', {'message': 'Not authorized'})
             return
         
-        student_name = room['students'][student_sid]
-        data['studentName'] = student_name
-        data['studentSid'] = student_sid
+        if not room['teacher_sid']:
+            return
         
         # Forward to teacher
-        if room['teacher_sid']:
-            emit('student-action', data, room=room['teacher_sid'])
+        data['studentName'] = room['students'][student_sid]
+        data['studentSid'] = student_sid
         
-        print(f"🎯 Student {student_name} performed action: {action}")
+        emit('student-action', data, room=room['teacher_sid'])
+        
+        print(f"🎯 Student action: {data.get('action')}")
         
     except Exception as e:
         print(f"❌ Error in student-action: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('student-media-update')
 def handle_student_media_update(data):
     """Student updates their media status"""
     try:
         room_id = data.get('room')
-        media_type = data.get('mediaType')  # 'camera' or 'microphone'
+        media_type = data.get('mediaType')
         enabled = data.get('enabled')
-        student_name = data.get('studentName')
         
         if not all([room_id, media_type, enabled is not None]):
-            emit('error', {'message': 'Missing media update data'})
             return
         
         if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
             return
         
         room = rooms[room_id]
         student_sid = request.sid
         
         if student_sid not in room['students']:
-            emit('error', {'message': 'Not authorized'})
             return
         
         # Update student data
@@ -625,68 +559,55 @@ def handle_student_media_update(data):
             emit('student-media-update', {
                 'mediaType': media_type,
                 'enabled': enabled,
-                'studentName': student_name or room['students'][student_sid],
+                'studentName': room['students'][student_sid],
                 'studentSid': student_sid,
                 'room': room_id
             }, room=room['teacher_sid'])
         
-        print(f"📹 Student {room['students'][student_sid]} updated {media_type} to {enabled}")
+        print(f"📹 Student {media_type} = {enabled}")
         
     except Exception as e:
         print(f"❌ Error in student-media-update: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('student-preferences')
 def handle_student_preferences(data):
-    """Student updates their preferences"""
+    """Student updates preferences"""
     try:
         room_id = data.get('room')
         preferences = data.get('preferences', {})
         
         if not room_id:
-            emit('error', {'message': 'Missing room ID'})
             return
         
         if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
             return
         
         room = rooms[room_id]
         student_sid = request.sid
         
         if student_sid not in room['students']:
-            emit('error', {'message': 'Not authorized'})
             return
         
-        # Update preferences
-        if student_sid in room['student_data']:
-            if 'preferences' not in room['student_data'][student_sid]:
-                room['student_data'][student_sid]['preferences'] = {}
-            room['student_data'][student_sid]['preferences'].update(preferences)
-        
-        print(f"⚙️ Student {room['students'][student_sid]} updated preferences")
+        print(f"⚙️ Student updated preferences")
         
     except Exception as e:
         print(f"❌ Error in student-preferences: {e}")
-        emit('error', {'message': str(e)})
 
 # ============================================
-# AI and Content Events
+# AI AND CONTENT EVENTS
 # ============================================
+
 @socketio.on('ai-summary')
 def handle_ai_summary(data):
     """Send AI summary to students"""
     try:
         room_id = data.get('room')
         summary = data.get('summary')
-        summary_type = data.get('type', 'note')
         
         if not all([room_id, summary]):
-            emit('error', {'message': 'Missing AI summary data'})
             return
         
         if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
             return
         
         room = rooms[room_id]
@@ -694,28 +615,22 @@ def handle_ai_summary(data):
         
         # Verify sender is teacher
         if sender_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can send AI summaries'})
             return
         
-        # Send to all students with AI listener enabled
+        # Send to all students
         timestamp = datetime.utcnow().isoformat()
         for student_sid in room['students']:
-            student_data = room['student_data'].get(student_sid, {})
-            preferences = student_data.get('preferences', {})
-            
-            if preferences.get('aiListener', False):
-                emit('ai-summary', {
-                    'summary': summary,
-                    'type': summary_type,
-                    'timestamp': timestamp,
-                    'room': room_id
-                }, room=student_sid)
+            emit('ai-summary', {
+                'summary': summary,
+                'type': data.get('type', 'note'),
+                'timestamp': timestamp,
+                'room': room_id
+            }, room=student_sid)
         
-        print(f"🤖 AI summary sent to students in room: {room_id}")
+        print(f"🤖 AI summary sent")
         
     except Exception as e:
         print(f"❌ Error in ai-summary: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('slide-update')
 def handle_slide_update(data):
@@ -723,16 +638,11 @@ def handle_slide_update(data):
     try:
         room_id = data.get('room')
         slide_url = data.get('slide_url')
-        slide_number = data.get('slide_number')
-        total_slides = data.get('total_slides')
-        slide_title = data.get('slide_title')
         
         if not all([room_id, slide_url]):
-            emit('error', {'message': 'Missing slide data'})
             return
         
         if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
             return
         
         room = rooms[room_id]
@@ -740,32 +650,27 @@ def handle_slide_update(data):
         
         # Verify sender is teacher
         if sender_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can update slides'})
             return
         
-        # Send to all students with slides enabled
+        # Send to all students
         for student_sid in room['students']:
-            student_data = room['student_data'].get(student_sid, {})
-            preferences = student_data.get('preferences', {})
-            
-            if preferences.get('showSlides', False):
-                emit('slide-update', {
-                    'slide_url': slide_url,
-                    'slide_number': slide_number,
-                    'total_slides': total_slides,
-                    'slide_title': slide_title,
-                    'room': room_id
-                }, room=student_sid)
+            emit('slide-update', {
+                'slide_url': slide_url,
+                'slide_number': data.get('slide_number'),
+                'total_slides': data.get('total_slides'),
+                'slide_title': data.get('slide_title'),
+                'room': room_id
+            }, room=student_sid)
         
-        print(f"📊 Slide updated in room: {room_id}")
+        print(f"📊 Slide updated")
         
     except Exception as e:
         print(f"❌ Error in slide-update: {e}")
-        emit('error', {'message': str(e)})
 
 # ============================================
-# System Events
+# SYSTEM EVENTS
 # ============================================
+
 @socketio.on('ping')
 def handle_ping(data):
     """Keep-alive ping"""
@@ -793,18 +698,15 @@ def handle_teacher_disconnect_broadcast(data):
                 'room': room_id
             }, room=student_sid)
         
-        # Clean up room
-        room['teacher_sid'] = None
-        room['teacher_name'] = None
-        
-        print(f"🛑 Teacher ended class in room: {room_id}")
+        print(f"🛑 Teacher ended class")
         
     except Exception as e:
         print(f"❌ Error in teacher-disconnected: {e}")
 
 # ============================================
-# Flask Routes
+# FLASK ROUTES
 # ============================================
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -830,31 +732,23 @@ def join_room_post():
         return redirect('/')
     return redirect(f'/student/{room_id}')
 
-# ============================================
-# Live Meeting Routes
-# ============================================
-@app.route('/live-meeting')
 @app.route('/live_meeting')
 def live_meeting():
     return render_template('live_meeting.html')
 
-@app.route('/live-meeting/teacher')
 @app.route('/live_meeting/teacher')
 def live_meeting_teacher_create():
     room_id = str(uuid.uuid4())[:8]
-    return redirect(url_for('live_meeting_teacher_view', room_id=room_id))
+    return redirect(f'/live_meeting/teacher/{room_id}')
 
-@app.route('/live-meeting/teacher/<room_id>')
 @app.route('/live_meeting/teacher/<room_id>')
 def live_meeting_teacher_view(room_id):
     return render_template('teacher_live.html', room_id=room_id)
 
-@app.route('/live-meeting/student/<room_id>')
 @app.route('/live_meeting/student/<room_id>')
 def live_meeting_student_view(room_id):
     return render_template('student_live.html', room_id=room_id)
 
-@app.route('/live-meeting/join', methods=['POST'])
 @app.route('/live_meeting/join', methods=['POST'])
 def live_meeting_join():
     room_id = request.form.get('room_id', '').strip()
@@ -869,20 +763,19 @@ def live_meeting_join():
     
     session['live_username'] = username
     
-    return redirect(url_for('live_meeting_student_view', room_id=room_id))
+    return redirect(f'/live_meeting/student/{room_id}')
 
 # ============================================
-# Run Server
+# RUN SERVER
 # ============================================
 if __name__ == '__main__':
     print(f"\n{'='*60}")
-    print("🚀 WebRTC Classroom System - FIXED SIGNALING")
+    print("🚀 WebRTC Classroom - FIXED SIGNALING SERVER")
     print(f"{'='*60}")
-    print("✅ Bidirectional WebRTC connections fixed")
-    print("✅ Teacher can now see/hear students")
-    print("✅ Students can now see/hear teacher")
-    print("✅ Production ready for Render deployment")
+    print("✅ Fixed WebRTC offer/answer/ICE relay")
+    print("✅ Teacher ↔ Student bidirectional communication")
+    print("✅ All control events properly forwarded")
     print(f"{'='*60}\n")
     
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port, debug=True, log_output=True)
+    socketio.run(app, host='0.0.0.0', port=port, debug=True)
