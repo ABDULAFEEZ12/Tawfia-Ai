@@ -131,6 +131,42 @@
             height: 100%;
             object-fit: cover;
         }
+
+        /* ✅ ADDED: Student video container */
+        .student-video-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 250px;
+            height: 188px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 3px solid #2ed573;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        #studentVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror effect */
+        }
+        
+        .student-video-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
         
         .video-overlay {
             position: absolute;
@@ -421,6 +457,10 @@
                 min-width: 100px;
                 padding: 10px 15px;
             }
+            .student-video-container {
+                width: 200px;
+                height: 150px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -437,6 +477,12 @@
             }
             .controls-section {
                 grid-template-columns: 1fr;
+            }
+            .student-video-container {
+                width: 150px;
+                height: 113px;
+                bottom: 10px;
+                right: 10px;
             }
         }
     </style>
@@ -476,6 +522,16 @@
             <div class="video-section">
                 <div class="video-container">
                     <video id="teacherVideo" autoplay playsinline muted></video>
+                    
+                    <!-- ✅ ADDED: Student video container -->
+                    <div class="student-video-container">
+                        <video id="studentVideo" autoplay playsinline></video>
+                        <div class="student-video-label">
+                            <i class="fas fa-user-graduate"></i>
+                            <span id="studentVideoLabel">Student View</span>
+                        </div>
+                    </div>
+                    
                     <div class="video-overlay">
                         <div class="video-label">
                             <i class="fas fa-user-tie"></i> You (Teacher)
@@ -555,9 +611,12 @@
         let sessionTimer = null;
         let students = {};
         let mySid = null;
+        let currentStudentVideoSid = null; // ✅ ADDED: Track which student is displayed
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
+        const studentVideo = document.getElementById('studentVideo'); // ✅ ADDED
+        const studentVideoLabel = document.getElementById('studentVideoLabel'); // ✅ ADDED
         const toggleVideo = document.getElementById('toggleVideo');
         const toggleAudio = document.getElementById('toggleAudio');
         const toggleScreenShare = document.getElementById('toggleScreenShare');
@@ -643,7 +702,8 @@
                 username,
                 connected: true,
                 status: 'connecting',
-                peerConnection: null
+                peerConnection: null,
+                stream: null // ✅ ADDED: Store student's stream
             };
             updateStudentsList();
             showNotification('info', 'Student joined', `${username} has joined the classroom.`);
@@ -663,12 +723,20 @@
                 updateStudentsList();
                 logDebug(`Student left: ${students[sid].username} (SID: ${sid})`);
 
+                // If this student's video is currently displayed, clear it
+                if (currentStudentVideoSid === sid) {
+                    studentVideo.srcObject = null;
+                    studentVideoLabel.textContent = 'Student View';
+                    currentStudentVideoSid = null;
+                }
+
                 // Clean up peer connection
                 if (peerConnections[sid]) {
                     peerConnections[sid].close();
                     delete peerConnections[sid];
                 }
                 delete students[sid].peerConnection;
+                delete students[sid].stream;
             }
         }
 
@@ -754,6 +822,23 @@
                     peerConnection.addTrack(track, localStream);
                 });
 
+                // ✅ CRITICAL: Handle incoming tracks from student
+                peerConnection.ontrack = (event) => {
+                    logDebug(`Received ${event.track.kind} track from student: ${studentSid}`);
+                    
+                    // Store the stream for this student
+                    if (event.streams && event.streams[0]) {
+                        students[studentSid].stream = event.streams[0];
+                        logDebug(`Student ${studentSid} stream stored. Has video: ${event.streams[0].getVideoTracks().length > 0}`);
+                        
+                        // If this is the first student or no student video is currently displayed,
+                        // show this student's video
+                        if (!currentStudentVideoSid || currentStudentVideoSid === studentSid) {
+                            displayStudentVideo(studentSid, event.streams[0]);
+                        }
+                    }
+                };
+
                 // ICE candidate handler
                 peerConnection.onicecandidate = (event) => {
                     if (event.candidate) {
@@ -780,6 +865,15 @@
                     if (students[studentSid]) {
                         students[studentSid].status = peerConnection.connectionState;
                         updateStudentsList();
+                        
+                        // If connection is closed/failed, clear the video if it was showing
+                        if ((peerConnection.connectionState === 'disconnected' || 
+                             peerConnection.connectionState === 'failed') && 
+                            currentStudentVideoSid === studentSid) {
+                            studentVideo.srcObject = null;
+                            studentVideoLabel.textContent = 'Student View';
+                            currentStudentVideoSid = null;
+                        }
                     }
                 };
 
@@ -806,6 +900,8 @@
                 })
                 .then(offer => {
                     logDebug(`Created offer for ${studentSid}`);
+                    // ✅ DEBUG: Check if offer includes receive directions
+                    console.log("SDP Offer includes receive:", offer.sdp.includes("a=recvonly") || offer.sdp.includes("a=sendrecv"));
                     return peerConnection.setLocalDescription(offer);
                 })
                 .then(() => {
@@ -825,6 +921,43 @@
             } catch (error) {
                 console.error('Error creating peer connection:', error);
                 logDebug(`Error creating peer connection for ${studentSid}: ${error.message}`);
+            }
+        }
+
+        // ✅ ADDED: Function to display student video
+        function displayStudentVideo(studentSid, stream) {
+            if (!stream || !students[studentSid]) return;
+            
+            try {
+                // Set the student video source
+                studentVideo.srcObject = stream;
+                studentVideoLabel.textContent = students[studentSid].username;
+                currentStudentVideoSid = studentSid;
+                
+                logDebug(`Displaying video from student: ${students[studentSid].username}`);
+                
+                // Play the video
+                studentVideo.play().then(() => {
+                    logDebug(`Student video playing for ${students[studentSid].username}`);
+                }).catch(err => {
+                    logDebug(`Error playing student video: ${err.message}`);
+                });
+                
+                // Listen for when the student stops their video
+                stream.getVideoTracks().forEach(track => {
+                    track.onended = () => {
+                        logDebug(`Student ${studentSid} video track ended`);
+                        if (currentStudentVideoSid === studentSid) {
+                            studentVideo.srcObject = null;
+                            studentVideoLabel.textContent = 'Student View';
+                            currentStudentVideoSid = null;
+                        }
+                    };
+                });
+                
+            } catch (error) {
+                console.error('Error displaying student video:', error);
+                logDebug(`Error displaying student video: ${error.message}`);
             }
         }
 
@@ -984,8 +1117,9 @@
                         statusText = student.status.charAt(0).toUpperCase() + student.status.slice(1);
                     }
                     
+                    // ✅ ADDED: Make student items clickable to switch video view
                     return `
-                        <div class="student-item">
+                        <div class="student-item" data-sid="${sid}" style="cursor: pointer;">
                             <div class="student-avatar">${student.username.charAt(0).toUpperCase()}</div>
                             <div class="student-info">
                                 <h4>${student.username}</h4>
@@ -996,6 +1130,17 @@
                         </div>
                     `;
                 }).join('');
+                
+                // ✅ ADDED: Add click event to switch student video
+                document.querySelectorAll('.student-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const sid = item.dataset.sid;
+                        if (students[sid] && students[sid].stream) {
+                            displayStudentVideo(sid, students[sid].stream);
+                            showNotification('info', 'Viewing Student', `Now viewing ${students[sid].username}`);
+                        }
+                    });
+                });
             }
         }
 
@@ -1065,6 +1210,9 @@
                 
                 // Close all peer connections
                 Object.values(peerConnections).forEach(pc => pc.close());
+                
+                // Clear student video
+                studentVideo.srcObject = null;
                 
                 // Disconnect socket
                 socket.disconnect();
