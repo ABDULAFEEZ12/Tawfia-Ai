@@ -123,6 +123,42 @@
             background: #000;
         }
 
+        /* ✅ ADDED: Student self-view container */
+        .student-selfview-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 3px solid #667eea;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #studentVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror effect for self-view */
+        }
+
+        .student-selfview-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         .video-overlay {
             position: absolute;
             bottom: 20px;
@@ -454,6 +490,11 @@
             .main-content {
                 grid-template-columns: 1fr;
             }
+            
+            .student-selfview-container {
+                width: 150px;
+                height: 112px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -480,6 +521,13 @@
             .video-controls {
                 align-self: flex-end;
             }
+            
+            .student-selfview-container {
+                width: 120px;
+                height: 90px;
+                bottom: 10px;
+                right: 10px;
+            }
         }
     </style>
 </head>
@@ -505,6 +553,16 @@
             <div class="video-section">
                 <div class="video-container">
                     <video id="teacherVideo" autoplay playsinline></video>
+                    
+                    <!-- ✅ ADDED: Student self-view -->
+                    <div class="student-selfview-container">
+                        <video id="studentVideo" autoplay playsinline muted></video>
+                        <div class="student-selfview-label">
+                            <i class="fas fa-user"></i>
+                            <span>You</span>
+                        </div>
+                    </div>
+                    
                     <div class="empty-video" id="emptyVideo">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <h3>Waiting for teacher</h3>
@@ -622,9 +680,11 @@
         let studentName = localStorage.getItem('studentName') || `Student_${Math.floor(Math.random() * 1000)}`;
         let teacherSid = null;
         let connectionState = 'disconnected';
+        let studentStream = null; // ✅ ADDED: To store student's own stream
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
+        const studentVideo = document.getElementById('studentVideo'); // ✅ ADDED
         const emptyVideo = document.getElementById('emptyVideo');
         const videoLabel = document.getElementById('videoLabel');
         const toggleFullscreen = document.getElementById('toggleFullscreen');
@@ -661,10 +721,51 @@
             studentNameElement.textContent = studentName;
             logDebug('Student page loaded. Room: ' + roomId);
             logDebug('Using Metered TURN over TCP 443 (Render compatible)');
-            connectToRoom();
+            
+            // ✅ CRITICAL FIX: Get student's own media FIRST
+            initializeStudentMedia().then(() => {
+                connectToRoom();
+            }).catch(error => {
+                logDebug(`Failed to get student media: ${error.message}`);
+                showNotification('error', 'Camera/Mic Error', 'Please allow camera and microphone access');
+            });
+            
             setupEventListeners();
             startSessionTimer();
         });
+
+        // ✅ CRITICAL FIX: Initialize student's own media stream
+        async function initializeStudentMedia() {
+            try {
+                logDebug('Requesting student camera and microphone...');
+                studentStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+                
+                // Set up student's self-view
+                studentVideo.srcObject = studentStream;
+                studentVideo.muted = true; // CRITICAL: Prevents echo/feedback loop
+                await studentVideo.play().catch(e => console.log("Student video autoplay prevented:", e));
+                
+                logDebug(`Student media obtained: ${studentStream.getVideoTracks().length} video track(s), ${studentStream.getAudioTracks().length} audio track(s)`);
+                console.log("Student video track:", studentStream.getVideoTracks()[0]?.getSettings());
+                
+                showNotification('success', 'Camera Ready', 'Your camera and microphone are active');
+                return true;
+            } catch (error) {
+                console.error('Error getting student media:', error);
+                throw error;
+            }
+        }
 
         function connectToRoom() {
             logDebug(`Connecting to room: ${roomId} as ${studentName}`);
@@ -747,9 +848,29 @@
 
                 logDebug('PeerConnection created with forced TURN relay mode');
 
-                // Handle incoming stream
+                // ✅ CRITICAL FIX: Add student's own tracks to the connection BEFORE setting remote description
+                if (studentStream) {
+                    logDebug('Adding student tracks to peer connection...');
+                    studentStream.getTracks().forEach(track => {
+                        logDebug(`Adding track: ${track.kind} (${track.id})`);
+                        peerConnection.addTrack(track, studentStream);
+                    });
+                    
+                    // Verify tracks were added
+                    setTimeout(() => {
+                        const senders = peerConnection.getSenders();
+                        logDebug(`Added ${senders.length} track(s) to peer connection:`);
+                        senders.forEach(sender => {
+                            logDebug(`  - ${sender.track?.kind}: ${sender.track?.id}`);
+                        });
+                    }, 100);
+                } else {
+                    logDebug('WARNING: No student stream available to add to peer connection');
+                }
+
+                // Handle incoming stream from teacher
                 peerConnection.ontrack = (event) => {
-                    logDebug(`Received media track: ${event.track.kind}`);
+                    logDebug(`Received media track from teacher: ${event.track.kind}`);
                     if (teacherVideo.srcObject !== event.streams[0]) {
                         teacherVideo.srcObject = event.streams[0];
                         emptyVideo.style.display = 'none';
@@ -827,6 +948,10 @@
                     answer: peerConnection.localDescription
                 });
                 logDebug('Sent answer to teacher');
+
+                // ✅ DEBUG: Check if video is in SDP
+                console.log("SDP contains student video?", answer.sdp.includes("m=video"));
+                console.log("SDP contains student audio?", answer.sdp.includes("m=audio"));
 
             } catch (error) {
                 console.error('Error handling RTC offer:', error);
@@ -999,25 +1124,44 @@
 
         async function toggleStudentAudio() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    }
-                });
-                const audioTrack = stream.getAudioTracks()[0];
+                if (!studentStream) {
+                    studentStream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    });
+                    
+                    // Update student video with audio
+                    studentVideo.srcObject = studentStream;
+                }
                 
-                if (audioTrack.enabled) {
-                    audioTrack.enabled = false;
-                    toggleAudioBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Enable Microphone';
-                    showNotification('info', 'Microphone off', 'Your microphone is now disabled.');
-                    logDebug('Microphone disabled');
-                } else {
-                    audioTrack.enabled = true;
-                    toggleAudioBtn.innerHTML = '<i class="fas fa-microphone"></i> Disable Microphone';
-                    showNotification('info', 'Microphone on', 'Your microphone is now enabled.');
-                    logDebug('Microphone enabled');
+                const audioTrack = studentStream.getAudioTracks()[0];
+                
+                if (audioTrack) {
+                    if (audioTrack.enabled) {
+                        audioTrack.enabled = false;
+                        toggleAudioBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Enable Microphone';
+                        showNotification('info', 'Microphone off', 'Your microphone is now disabled.');
+                        logDebug('Microphone disabled');
+                    } else {
+                        audioTrack.enabled = true;
+                        toggleAudioBtn.innerHTML = '<i class="fas fa-microphone"></i> Disable Microphone';
+                        showNotification('info', 'Microphone on', 'Your microphone is now enabled.');
+                        logDebug('Microphone enabled');
+                    }
+                    
+                    // If we have a peer connection, we need to replace the audio track
+                    if (peerConnection && peerConnection.getSenders().length > 0) {
+                        const audioSender = peerConnection.getSenders().find(
+                            sender => sender.track && sender.track.kind === 'audio'
+                        );
+                        if (audioSender) {
+                            audioSender.replaceTrack(audioTrack);
+                            logDebug('Replaced audio track in peer connection');
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('Error accessing microphone:', error);
@@ -1050,6 +1194,11 @@
                 
                 if (teacherVideo.srcObject) {
                     teacherVideo.srcObject.getTracks().forEach(track => track.stop());
+                }
+                
+                if (studentStream) {
+                    studentStream.getTracks().forEach(track => track.stop());
+                    studentVideo.srcObject = null;
                 }
                 
                 socket.disconnect();
@@ -1125,6 +1274,9 @@
         window.addEventListener('beforeunload', () => {
             if (socket) socket.disconnect();
             if (peerConnection) peerConnection.close();
+            if (studentStream) {
+                studentStream.getTracks().forEach(track => track.stop());
+            }
             clearInterval(sessionTimer);
             logDebug('Page unloading - cleaning up');
         });
