@@ -107,11 +107,12 @@
             backdrop-filter: blur(10px);
         }
 
-        .video-container {
+        /* Teacher video container - TOP */
+        .teacher-video-container {
             background: #000;
             border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             position: relative;
             aspect-ratio: 16/9;
         }
@@ -121,6 +122,38 @@
             height: 100%;
             object-fit: contain;
             background: #000;
+        }
+
+        /* Student self-view container - BELOW teacher */
+        .student-selfview-container {
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 180px;
+            position: relative;
+            border: 3px solid #667eea;
+        }
+
+        #studentVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror effect for self-view */
+        }
+
+        .student-selfview-label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
         }
 
         .video-overlay {
@@ -454,6 +487,10 @@
             .main-content {
                 grid-template-columns: 1fr;
             }
+            
+            .student-selfview-container {
+                height: 160px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -480,6 +517,10 @@
             .video-controls {
                 align-self: flex-end;
             }
+            
+            .student-selfview-container {
+                height: 140px;
+            }
         }
     </style>
 </head>
@@ -503,8 +544,10 @@
 
         <div class="main-content">
             <div class="video-section">
-                <div class="video-container">
+                <!-- Teacher video on TOP -->
+                <div class="teacher-video-container">
                     <video id="teacherVideo" autoplay playsinline></video>
+                    
                     <div class="empty-video" id="emptyVideo">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <h3>Waiting for teacher</h3>
@@ -523,6 +566,15 @@
                                 <i class="fas fa-volume-up"></i>
                             </button>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Student self-view BELOW teacher -->
+                <div class="student-selfview-container">
+                    <video id="studentVideo" autoplay playsinline muted></video>
+                    <div class="student-selfview-label">
+                        <i class="fas fa-user"></i>
+                        <span>You</span>
                     </div>
                 </div>
 
@@ -622,9 +674,11 @@
         let studentName = localStorage.getItem('studentName') || `Student_${Math.floor(Math.random() * 1000)}`;
         let teacherSid = null;
         let connectionState = 'disconnected';
+        let studentStream = null;
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
+        const studentVideo = document.getElementById('studentVideo');
         const emptyVideo = document.getElementById('emptyVideo');
         const videoLabel = document.getElementById('videoLabel');
         const toggleFullscreen = document.getElementById('toggleFullscreen');
@@ -643,28 +697,84 @@
         const streamQualityElement = document.getElementById('streamQuality');
         const connectionTypeElement = document.getElementById('connectionType');
 
-        // ============================================
-        // ✅ FIXED WEBRTC CONFIG FOR RENDER
-        // ============================================
+        // ✅ FIXED WebRTC Config - STUN first, TURN fallback
         const WEBRTC_CONFIG = {
             iceServers: [
+                // 1. Try STUN servers first for direct connections
+                { urls: "stun:stun.l.google.com:19302" },
+                { urls: "stun:stun1.l.google.com:19302" },
+                // 2. TURN servers as fallback (USE YOUR OWN CREDENTIALS!)
+                {
+                    urls: "turn:global.relay.metered.ca:443?transport=tcp",
+                    username: "459b679e028c3f37200569ec", // ⚠️ REPLACE with your Metered.ca username
+                    credential: "7Y4blbcvHOg1Uhwm" // ⚠️ REPLACE with your Metered.ca secret
+                },
                 {
                     urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                    username: "459b679e028c3f37200569ec",
-                    credential: "7Y4blbcvHOg1Uhwm"
+                    username: "459b679e028c3f37200569ec", // ⚠️ REPLACE with your Metered.ca username
+                    credential: "7Y4blbcvHOg1Uhwm" // ⚠️ REPLACE with your Metered.ca secret
                 }
             ]
+            // DO NOT set iceTransportPolicy here - let browser use default "all" strategy
         };
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             studentNameElement.textContent = studentName;
             logDebug('Student page loaded. Room: ' + roomId);
-            logDebug('Using Metered TURN over TCP 443 (Render compatible)');
-            connectToRoom();
+            logDebug('Using STUN first, TURN fallback strategy');
+            
+            initializeStudentMedia().then(() => {
+                connectToRoom();
+            }).catch(error => {
+                logDebug(`Failed to get student media: ${error.message}`);
+                showNotification('error', 'Camera/Mic Error', 'Please allow camera and microphone access');
+            });
+            
             setupEventListeners();
             startSessionTimer();
         });
+
+        async function initializeStudentMedia() {
+            try {
+                logDebug('Requesting student camera and microphone...');
+                studentStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+                
+                studentVideo.srcObject = studentStream;
+                studentVideo.muted = true;
+                
+                // Handle play() promise properly
+                const playPromise = studentVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        // Ignore autoplay prevention errors
+                        if (error.name !== 'NotAllowedError') {
+                            logDebug(`Student video play error (non-critical): ${error.message}`);
+                        }
+                    });
+                }
+                
+                logDebug(`Student media obtained: ${studentStream.getVideoTracks().length} video track(s), ${studentStream.getAudioTracks().length} audio track(s)`);
+                console.log("Student video track:", studentStream.getVideoTracks()[0]?.getSettings());
+                
+                showNotification('success', 'Camera Ready', 'Your camera and microphone are active');
+                return true;
+            } catch (error) {
+                console.error('Error getting student media:', error);
+                throw error;
+            }
+        }
 
         function connectToRoom() {
             logDebug(`Connecting to room: ${roomId} as ${studentName}`);
@@ -676,7 +786,6 @@
         }
 
         function setupEventListeners() {
-            // Socket.IO events
             socket.on('connect', () => {
                 logDebug('Socket.IO connected');
             });
@@ -696,7 +805,6 @@
                 logDebug('Pong received - connection alive');
             });
 
-            // Button events
             toggleFullscreen.addEventListener('click', toggleFullscreenMode);
             toggleMute.addEventListener('click', toggleVideoMute);
             raiseHand.addEventListener('click', raiseHandAction);
@@ -712,7 +820,6 @@
             updateConnectionStatus('connected', 'Connected to classroom');
             showNotification('success', 'Connected', 'Successfully joined the classroom.');
             
-            // Update teacher name if available
             if (data.teacher_name) {
                 teacherNameElement.textContent = data.teacher_name;
             }
@@ -732,24 +839,39 @@
                 logDebug(`Received WebRTC offer from teacher: ${from_teacher}`);
                 updateConnectionStatus('connecting', 'Establishing connection with teacher...');
                 
-                // Clean up existing connection if any
                 if (peerConnection) {
                     peerConnection.close();
                 }
                 
-                // ✅ CRITICAL: Use the simplified Render-compatible config
+                // ✅ REMOVED iceTransportPolicy: "relay" - use default strategy
                 peerConnection = new RTCPeerConnection({
                     iceServers: WEBRTC_CONFIG.iceServers,
-                    iceTransportPolicy: "relay",  // ✅ Force TURN only
                     bundlePolicy: 'max-bundle',
                     rtcpMuxPolicy: 'require'
                 });
 
-                logDebug('PeerConnection created with forced TURN relay mode');
+                logDebug('PeerConnection created with STUN first, TURN fallback strategy');
 
-                // Handle incoming stream
+                if (studentStream) {
+                    logDebug('Adding student tracks to peer connection...');
+                    studentStream.getTracks().forEach(track => {
+                        logDebug(`Adding track: ${track.kind} (${track.id})`);
+                        peerConnection.addTrack(track, studentStream);
+                    });
+                    
+                    setTimeout(() => {
+                        const senders = peerConnection.getSenders();
+                        logDebug(`Added ${senders.length} track(s) to peer connection:`);
+                        senders.forEach(sender => {
+                            logDebug(`  - ${sender.track?.kind}: ${sender.track?.id}`);
+                        });
+                    }, 100);
+                } else {
+                    logDebug('WARNING: No student stream available to add to peer connection');
+                }
+
                 peerConnection.ontrack = (event) => {
-                    logDebug(`Received media track: ${event.track.kind}`);
+                    logDebug(`Received media track from teacher: ${event.track.kind}`);
                     if (teacherVideo.srcObject !== event.streams[0]) {
                         teacherVideo.srcObject = event.streams[0];
                         emptyVideo.style.display = 'none';
@@ -761,10 +883,20 @@
                         showNotification('success', 'Stream connected', 'Now receiving teacher\'s broadcast.');
                         raiseHand.disabled = false;
                         connectionState = 'connected';
+                        
+                        // Handle play() promise properly for teacher video
+                        const playPromise = teacherVideo.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                // Ignore autoplay errors
+                                if (error.name !== 'NotAllowedError') {
+                                    logDebug(`Teacher video play error: ${error.message}`);
+                                }
+                            });
+                        }
                     }
                 };
 
-                // ICE candidate handler
                 peerConnection.onicecandidate = (event) => {
                     if (event.candidate) {
                         const candidateType = getCandidateType(event.candidate);
@@ -779,12 +911,10 @@
                     }
                 };
 
-                // ICE candidate error handler
                 peerConnection.onicecandidateerror = (event) => {
                     logDebug(`ICE candidate error: ${event.errorCode} ${event.errorText}`);
                 };
 
-                // Connection state changes
                 peerConnection.onconnectionstatechange = () => {
                     logDebug(`Peer connection state: ${peerConnection.connectionState}`);
                     updateConnectionStatus(peerConnection.connectionState, 
@@ -792,28 +922,29 @@
                     
                     if (peerConnection.connectionState === 'connected') {
                         connectionState = 'connected';
+                        connectionTypeElement.textContent = 'Connected';
                     } else if (peerConnection.connectionState === 'disconnected' || 
                                peerConnection.connectionState === 'failed') {
                         connectionState = 'disconnected';
+                        connectionTypeElement.textContent = 'Disconnected';
                         showNotification('error', 'Connection lost', 'Lost connection with teacher.');
                     }
                 };
 
-                // ICE connection state changes
                 peerConnection.oniceconnectionstatechange = () => {
                     logDebug(`ICE connection state: ${peerConnection.iceConnectionState}`);
                     connectionTypeElement.textContent = peerConnection.iceConnectionState;
                     
                     if (peerConnection.iceConnectionState === 'connected') {
-                        logDebug('✅ ICE connected via TURN relay');
+                        logDebug('✅ ICE connected');
+                    } else if (peerConnection.iceConnectionState === 'failed') {
+                        logDebug('❌ ICE connection failed');
                     }
                 };
 
-                // Set remote description
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
                 logDebug('Remote description set successfully');
 
-                // Create and send answer
                 const answer = await peerConnection.createAnswer({
                     offerToReceiveAudio: true,
                     offerToReceiveVideo: true
@@ -821,12 +952,14 @@
                 await peerConnection.setLocalDescription(answer);
                 logDebug('Created and set local description (answer)');
 
-                // Send answer to teacher
                 socket.emit('rtc-answer', {
                     room: roomId,
                     answer: peerConnection.localDescription
                 });
                 logDebug('Sent answer to teacher');
+
+                console.log("SDP contains student video?", answer.sdp.includes("m=video"));
+                console.log("SDP contains student audio?", answer.sdp.includes("m=audio"));
 
             } catch (error) {
                 console.error('Error handling RTC offer:', error);
@@ -867,19 +1000,16 @@
             showNotification('error', 'Teacher disconnected', 'The teacher has left the classroom.');
             updateConnectionStatus('error', 'Teacher disconnected');
             
-            // Stop video stream
             if (teacherVideo.srcObject) {
                 teacherVideo.srcObject.getTracks().forEach(track => track.stop());
                 teacherVideo.srcObject = null;
             }
             
-            // Show empty state
             emptyVideo.style.display = 'flex';
             teacherVideo.style.display = 'none';
             raiseHand.disabled = true;
             connectionState = 'disconnected';
             
-            // Clean up peer connection
             if (peerConnection) {
                 peerConnection.close();
                 peerConnection = null;
@@ -932,7 +1062,6 @@
                 
                 logDebug(`Stream settings: ${settings.width}x${settings.height} @ ${settings.frameRate}fps`);
                 
-                // Update quality display
                 if (settings.width >= 1920) {
                     streamQualityElement.textContent = '1080p HD';
                 } else if (settings.width >= 1280) {
@@ -987,7 +1116,6 @@
             showNotification('info', 'Hand Raised', 'Teacher has been notified that you have a question.');
             logDebug('Raised hand');
             
-            // Visual feedback
             raiseHand.innerHTML = '<i class="fas fa-hand-paper fa-bounce"></i> Hand Raised';
             raiseHand.disabled = true;
             
@@ -999,25 +1127,42 @@
 
         async function toggleStudentAudio() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    }
-                });
-                const audioTrack = stream.getAudioTracks()[0];
+                if (!studentStream) {
+                    studentStream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    });
+                    
+                    studentVideo.srcObject = studentStream;
+                }
                 
-                if (audioTrack.enabled) {
-                    audioTrack.enabled = false;
-                    toggleAudioBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Enable Microphone';
-                    showNotification('info', 'Microphone off', 'Your microphone is now disabled.');
-                    logDebug('Microphone disabled');
-                } else {
-                    audioTrack.enabled = true;
-                    toggleAudioBtn.innerHTML = '<i class="fas fa-microphone"></i> Disable Microphone';
-                    showNotification('info', 'Microphone on', 'Your microphone is now enabled.');
-                    logDebug('Microphone enabled');
+                const audioTrack = studentStream.getAudioTracks()[0];
+                
+                if (audioTrack) {
+                    if (audioTrack.enabled) {
+                        audioTrack.enabled = false;
+                        toggleAudioBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Enable Microphone';
+                        showNotification('info', 'Microphone off', 'Your microphone is now disabled.');
+                        logDebug('Microphone disabled');
+                    } else {
+                        audioTrack.enabled = true;
+                        toggleAudioBtn.innerHTML = '<i class="fas fa-microphone"></i> Disable Microphone';
+                        showNotification('info', 'Microphone on', 'Your microphone is now enabled.');
+                        logDebug('Microphone enabled');
+                    }
+                    
+                    if (peerConnection && peerConnection.getSenders().length > 0) {
+                        const audioSender = peerConnection.getSenders().find(
+                            sender => sender.track && sender.track.kind === 'audio'
+                        );
+                        if (audioSender) {
+                            audioSender.replaceTrack(audioTrack);
+                            logDebug('Replaced audio track in peer connection');
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('Error accessing microphone:', error);
@@ -1043,7 +1188,6 @@
             if (confirm('Are you sure you want to leave the classroom?')) {
                 logDebug('Leaving classroom');
                 
-                // Clean up
                 if (peerConnection) {
                     peerConnection.close();
                 }
@@ -1052,9 +1196,13 @@
                     teacherVideo.srcObject.getTracks().forEach(track => track.stop());
                 }
                 
+                if (studentStream) {
+                    studentStream.getTracks().forEach(track => track.stop());
+                    studentVideo.srcObject = null;
+                }
+                
                 socket.disconnect();
                 
-                // Redirect to home
                 window.location.href = '/live_meeting';
             }
         }
@@ -1109,27 +1257,25 @@
             `;
             debugLog.prepend(logEntry);
             
-            // Keep only last 20 log entries
             while (debugLog.children.length > 20) {
                 debugLog.removeChild(debugLog.lastChild);
             }
             
-            // Auto-scroll to top
             debugLog.scrollTop = 0;
             
-            // Also log to console
             console.debug(`[${timestamp}] ${message}`);
         }
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (socket) socket.disconnect();
             if (peerConnection) peerConnection.close();
+            if (studentStream) {
+                studentStream.getTracks().forEach(track => track.stop());
+            }
             clearInterval(sessionTimer);
             logDebug('Page unloading - cleaning up');
         });
 
-        // Fullscreen change handler
         document.addEventListener('fullscreenchange', () => {
             if (!document.fullscreenElement) {
                 toggleFullscreen.innerHTML = '<i class="fas fa-expand"></i>';
