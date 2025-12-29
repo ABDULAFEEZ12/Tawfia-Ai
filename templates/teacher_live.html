@@ -694,8 +694,7 @@
                 connected: true,
                 status: 'connecting',
                 peerConnection: null,
-                stream: null,
-                streamAttached: false  // ADDED: Track if stream has been attached
+                stream: null
             };
             updateStudentsList();
             showNotification('info', 'Student joined', `${username} has joined the classroom.`);
@@ -711,7 +710,6 @@
             if (students[sid]) {
                 students[sid].connected = false;
                 students[sid].status = 'disconnected';
-                students[sid].streamAttached = false; // RESET when student leaves
                 updateStudentsList();
                 logDebug(`Student left: ${students[sid].username} (SID: ${sid})`);
 
@@ -809,17 +807,11 @@
                     logDebug(`Received ${event.track.kind} track from student: ${studentSid}`);
                     
                     if (event.streams && event.streams[0]) {
-                        const stream = event.streams[0];
-                        students[studentSid].stream = stream;
-                        logDebug(`Student ${studentSid} stream stored. Has video: ${stream.getVideoTracks().length > 0}`);
+                        students[studentSid].stream = event.streams[0];
+                        logDebug(`Student ${studentSid} stream stored. Has video: ${event.streams[0].getVideoTracks().length > 0}`);
                         
-                        // 🔒 CRITICAL FIX: Only attach stream once, not per track
-                        if (!students[studentSid].streamAttached) {
-                            students[studentSid].streamAttached = true;
-                            
-                            if (!currentStudentVideoSid || currentStudentVideoSid === studentSid) {
-                                displayStudentVideo(studentSid, stream);
-                            }
+                        if (!currentStudentVideoSid || currentStudentVideoSid === studentSid) {
+                            displayStudentVideo(studentSid, event.streams[0]);
                         }
                     }
                 };
@@ -879,6 +871,7 @@
                 })
                 .then(offer => {
                     logDebug(`Created offer for ${studentSid}`);
+                    console.log("SDP Offer includes receive:", offer.sdp.includes("a=recvonly") || offer.sdp.includes("a=sendrecv"));
                     return peerConnection.setLocalDescription(offer);
                 })
                 .then(() => {
@@ -1063,11 +1056,12 @@
             liveStudentCount.textContent = connectedStudents.length;
             
             if (connectedStudents.length === 0) {
-                studentsList.innerHTML = 
-                    `<div class="empty-state">
+                studentsList.innerHTML = `
+                    <div class="empty-state">
                         <i class="fas fa-user-friends"></i>
                         <p>Waiting for students to join...</p>
-                    </div>`;
+                    </div>
+                `;
             } else {
                 studentsList.innerHTML = connectedStudents.map(([sid, student]) => {
                     let statusClass = 'connecting';
@@ -1195,12 +1189,13 @@
             };
             
             notification.className = `notification ${type}`;
-            notification.innerHTML = 
-                `<i class="fas ${icons[type]}"></i>
+            notification.innerHTML = `
+                <i class="fas ${icons[type]}"></i>
                 <div class="notification-content">
                     <div class="notification-title">${title}</div>
                     <div class="notification-message">${message}</div>
-                </div>`;
+                </div>
+            `;
             notification.classList.add('show');
             
             setTimeout(() => {
