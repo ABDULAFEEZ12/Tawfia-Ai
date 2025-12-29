@@ -126,6 +126,69 @@
             background: #000;
         }
 
+        /* Student Self-View */
+        .student-self-view {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 160px;
+            height: 120px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid #667eea;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #studentSelfVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror effect for self-view */
+        }
+
+        .self-view-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 11;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .self-view-toggle {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 11;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .self-view-toggle:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
         .video-overlay {
             position: absolute;
             bottom: 20px;
@@ -375,7 +438,9 @@
         }
 
         .personal-control-btn.active {
-            background: #ff4757;
+            background: #28a745;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
 
         .personal-control-btn:disabled {
@@ -611,6 +676,18 @@
             box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
         }
 
+        .action-btn.active {
+            background: #ff6b00;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.4);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 107, 0, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 107, 0, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 107, 0, 0.4); }
+        }
+
         .action-btn.secondary {
             background: #6c757d;
         }
@@ -690,6 +767,10 @@
             border-left: 4px solid #667eea;
         }
 
+        .notification.warning {
+            border-left: 4px solid #ff6b00;
+        }
+
         .notification i {
             font-size: 24px;
         }
@@ -704,6 +785,10 @@
 
         .notification.info i {
             color: #667eea;
+        }
+
+        .notification.warning i {
+            color: #ff6b00;
         }
 
         /* Focus Mode Styles */
@@ -766,6 +851,11 @@
             .struggle-signals {
                 grid-template-columns: 1fr;
             }
+            
+            .student-self-view {
+                width: 120px;
+                height: 90px;
+            }
         }
     </style>
 </head>
@@ -796,6 +886,18 @@
                         <h3>Waiting for teacher</h3>
                         <p>The teacher will start the broadcast soon...</p>
                     </div>
+                    
+                    <!-- Student Self-View -->
+                    <div class="student-self-view" id="studentSelfView">
+                        <div class="self-view-label">
+                            <i class="fas fa-user"></i> You
+                        </div>
+                        <video id="studentSelfVideo" autoplay muted playsinline></video>
+                        <button class="self-view-toggle" id="toggleSelfView" title="Hide self-view">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                    
                     <div class="video-overlay">
                         <div class="video-label" id="videoLabel">
                             <i class="fas fa-chalkboard-teacher"></i>
@@ -852,10 +954,10 @@
 
                 <div class="personal-controls">
                     <button class="personal-control-btn" id="toggleCamera">
-                        <i class="fas fa-video"></i> Camera Off
+                        <i class="fas fa-video-slash"></i> Camera Off
                     </button>
                     <button class="personal-control-btn" id="toggleMic">
-                        <i class="fas fa-microphone"></i> Mic Off
+                        <i class="fas fa-microphone-slash"></i> Mic Off
                     </button>
                 </div>
 
@@ -1022,8 +1124,12 @@
         let aiListenerEnabled = false;
         let focusModeEnabled = false;
         let slidesEnabled = false;
-        let questionIdentity = 'public'; // 'public' or 'private'
+        let questionIdentity = 'public';
         let currentStruggleSignal = null;
+        let isHandRaised = false;
+        let studentStream = null;
+        let studentAudioTrack = null;
+        let studentVideoTrack = null;
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
@@ -1060,8 +1166,11 @@
         const hideSlides = document.getElementById('hideSlides');
         const streamQualityElement = document.getElementById('streamQuality');
         const clearAISummary = document.getElementById('clearAISummary');
+        const studentSelfView = document.getElementById('studentSelfView');
+        const studentSelfVideo = document.getElementById('studentSelfVideo');
+        const toggleSelfViewBtn = document.getElementById('toggleSelfView');
 
-        // WebRTC Configuration
+        // WebRTC Configuration for bidirectional communication
         const WEBRTC_CONFIG = {
             iceServers: [
                 {
@@ -1118,6 +1227,8 @@
             socket.on('slide-update', handleSlideUpdate);
             socket.on('teacher-control-update', handleTeacherControlUpdate);
             socket.on('struggle-acknowledged', handleStruggleAcknowledged);
+            socket.on('hand-acknowledged', handleHandAcknowledged);
+            socket.on('teacher-force-media-control', handleForceMediaControl);
 
             // Button events
             toggleFullscreen.addEventListener('click', toggleFullscreenMode);
@@ -1157,6 +1268,9 @@
             
             // AI notes
             clearAISummary.addEventListener('click', clearAINotes);
+            
+            // Self-view toggle
+            toggleSelfViewBtn.addEventListener('click', toggleSelfView);
         }
 
         function handleRoomJoined(data) {
@@ -1196,7 +1310,7 @@
                     peerConnection.close();
                 }
                 
-                // Create new connection
+                // Create new bidirectional connection
                 peerConnection = new RTCPeerConnection({
                     iceServers: WEBRTC_CONFIG.iceServers,
                     iceTransportPolicy: "relay",
@@ -1204,7 +1318,7 @@
                     rtcpMuxPolicy: 'require'
                 });
 
-                // Handle incoming stream
+                // Handle incoming teacher stream
                 peerConnection.ontrack = (event) => {
                     if (teacherVideo.srcObject !== event.streams[0]) {
                         teacherVideo.srcObject = event.streams[0];
@@ -1219,6 +1333,15 @@
                         connectionState = 'connected';
                     }
                 };
+
+                // Add existing student tracks if enabled
+                if (studentCameraEnabled && studentVideoTrack) {
+                    peerConnection.addTrack(studentVideoTrack, studentStream);
+                }
+                
+                if (studentMicEnabled && studentAudioTrack) {
+                    peerConnection.addTrack(studentAudioTrack, studentStream || new MediaStream());
+                }
 
                 // ICE candidate handler
                 peerConnection.onicecandidate = (event) => {
@@ -1250,10 +1373,14 @@
                 });
                 await peerConnection.setLocalDescription(answer);
 
-                // Send answer to teacher
+                // Send answer to teacher with student media status
                 socket.emit('rtc-answer', {
                     room: roomId,
-                    answer: peerConnection.localDescription
+                    answer: peerConnection.localDescription,
+                    studentName: studentName,
+                    studentSid: socket.id,
+                    hasVideo: studentCameraEnabled,
+                    hasAudio: studentMicEnabled
                 });
 
             } catch (error) {
@@ -1338,7 +1465,12 @@
                         // Teacher disabled all cameras
                         toggleCameraBtn.disabled = true;
                         toggleCameraBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Disabled';
-                        showNotification('info', 'Camera Disabled', 'Teacher has disabled all cameras');
+                        showNotification('warning', 'Camera Disabled', 'Teacher has disabled all cameras');
+                        
+                        // Turn off student camera if it's on
+                        if (studentCameraEnabled) {
+                            forceTurnOffCamera();
+                        }
                     } else {
                         toggleCameraBtn.disabled = false;
                         toggleCameraBtn.innerHTML = studentCameraEnabled ? 
@@ -1352,7 +1484,12 @@
                         // Teacher muted all mics
                         toggleMicBtn.disabled = true;
                         toggleMicBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mic Disabled';
-                        showNotification('info', 'Mic Disabled', 'Teacher has muted all microphones');
+                        showNotification('warning', 'Mic Disabled', 'Teacher has muted all microphones');
+                        
+                        // Turn off student mic if it's on
+                        if (studentMicEnabled) {
+                            forceTurnOffMic();
+                        }
                     } else {
                         toggleMicBtn.disabled = false;
                         toggleMicBtn.innerHTML = studentMicEnabled ? 
@@ -1374,15 +1511,20 @@
         }
 
         function updateFromTeacherControls(controls) {
-            // Update UI based on teacher controls
             if (controls.cameras_disabled) {
                 toggleCameraBtn.disabled = true;
                 toggleCameraBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Disabled';
+                if (studentCameraEnabled) {
+                    forceTurnOffCamera();
+                }
             }
             
             if (controls.mics_disabled) {
                 toggleMicBtn.disabled = true;
                 toggleMicBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mic Disabled';
+                if (studentMicEnabled) {
+                    forceTurnOffMic();
+                }
             }
             
             if (!controls.slides_enabled) {
@@ -1396,10 +1538,371 @@
             const { signal_type } = data;
             showNotification('success', 'Received', `Teacher acknowledged your "${signal_type}" signal`);
             
-            // Reset struggle button after acknowledgement
             if (currentStruggleSignal === signal_type) {
                 resetStruggleButtons();
             }
+        }
+
+        function handleHandAcknowledged(data) {
+            const { studentName: ackStudentName, acknowledgedBy } = data;
+            if (ackStudentName === studentName) {
+                showNotification('success', 'Hand Acknowledged', `${acknowledgedBy} has seen your raised hand`);
+                
+                // Lower hand after acknowledgement
+                if (isHandRaised) {
+                    setTimeout(() => {
+                        raiseHandAction(); // Lower hand
+                    }, 2000);
+                }
+            }
+        }
+
+        function handleForceMediaControl(data) {
+            const { control, enabled, reason } = data;
+            
+            if (control === 'camera') {
+                if (!enabled && studentCameraEnabled) {
+                    forceTurnOffCamera();
+                    showNotification('warning', 'Camera Disabled', `Teacher disabled camera: ${reason || ''}`);
+                }
+            }
+            
+            if (control === 'microphone') {
+                if (!enabled && studentMicEnabled) {
+                    forceTurnOffMic();
+                    showNotification('warning', 'Microphone Disabled', `Teacher disabled microphone: ${reason || ''}`);
+                }
+            }
+        }
+
+        function forceTurnOffCamera() {
+            studentCameraEnabled = false;
+            
+            if (studentVideoTrack) {
+                studentVideoTrack.stop();
+                studentVideoTrack = null;
+            }
+            
+            if (peerConnection) {
+                const senders = peerConnection.getSenders();
+                const videoSender = senders.find(sender => 
+                    sender.track && sender.track.kind === 'video');
+                if (videoSender) {
+                    peerConnection.removeTrack(videoSender);
+                }
+            }
+            
+            // Hide self-view
+            studentSelfView.style.display = 'none';
+            studentSelfVideo.srcObject = null;
+            
+            // Update UI
+            toggleCameraBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Disabled';
+            toggleCameraBtn.classList.remove('active');
+            
+            // Notify teacher
+            socket.emit('student-media-update', {
+                room: roomId,
+                mediaType: 'camera',
+                enabled: false,
+                studentName: studentName
+            });
+        }
+
+        function forceTurnOffMic() {
+            studentMicEnabled = false;
+            
+            if (studentAudioTrack) {
+                studentAudioTrack.stop();
+                studentAudioTrack = null;
+            }
+            
+            if (peerConnection) {
+                const senders = peerConnection.getSenders();
+                const audioSender = senders.find(sender => 
+                    sender.track && sender.track.kind === 'audio');
+                if (audioSender) {
+                    peerConnection.removeTrack(audioSender);
+                }
+            }
+            
+            // Update UI
+            toggleMicBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mic Disabled';
+            toggleMicBtn.classList.remove('active');
+            
+            // Notify teacher
+            socket.emit('student-media-update', {
+                room: roomId,
+                mediaType: 'microphone',
+                enabled: false,
+                studentName: studentName
+            });
+        }
+
+        async function toggleStudentCamera() {
+            if (toggleCameraBtn.disabled) return;
+            
+            try {
+                if (!studentCameraEnabled) {
+                    // Get camera stream
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: {
+                            width: { ideal: 640 },
+                            height: { ideal: 480 },
+                            frameRate: { ideal: 30 }
+                        }
+                    });
+                    
+                    studentStream = stream;
+                    studentVideoTrack = stream.getVideoTracks()[0];
+                    
+                    // Show self-view
+                    studentSelfVideo.srcObject = stream;
+                    studentSelfView.style.display = 'block';
+                    
+                    // Send the stream to teacher if peerConnection exists
+                    if (peerConnection) {
+                        peerConnection.addTrack(studentVideoTrack, studentStream);
+                    }
+                    
+                    // Notify teacher that camera is on
+                    socket.emit('student-media-update', {
+                        room: roomId,
+                        mediaType: 'camera',
+                        enabled: true,
+                        studentName: studentName,
+                        studentSid: socket.id
+                    });
+                    
+                    toggleCameraBtn.innerHTML = '<i class="fas fa-video"></i> Camera On';
+                    toggleCameraBtn.classList.add('active');
+                    studentCameraEnabled = true;
+                    showNotification('success', 'Camera On', 'Your camera is now visible to teacher');
+                    
+                } else {
+                    // Stop camera
+                    if (studentVideoTrack) {
+                        studentVideoTrack.stop();
+                        studentVideoTrack = null;
+                    }
+                    
+                    // Hide self-view
+                    studentSelfView.style.display = 'none';
+                    studentSelfVideo.srcObject = null;
+                    
+                    // Remove video track from peer connection
+                    if (peerConnection) {
+                        const senders = peerConnection.getSenders();
+                        const videoSender = senders.find(sender => 
+                            sender.track && sender.track.kind === 'video');
+                        if (videoSender) {
+                            peerConnection.removeTrack(videoSender);
+                        }
+                    }
+                    
+                    // Notify teacher
+                    socket.emit('student-media-update', {
+                        room: roomId,
+                        mediaType: 'camera',
+                        enabled: false,
+                        studentName: studentName,
+                        studentSid: socket.id
+                    });
+                    
+                    toggleCameraBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
+                    toggleCameraBtn.classList.remove('active');
+                    studentCameraEnabled = false;
+                    showNotification('info', 'Camera Off', 'Your camera is now hidden');
+                }
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                showNotification('error', 'Camera Error', 'Could not access camera');
+                toggleCameraBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Error';
+                studentCameraEnabled = false;
+                toggleCameraBtn.classList.remove('active');
+            }
+        }
+
+        async function toggleStudentMic() {
+            if (toggleMicBtn.disabled) return;
+            
+            try {
+                if (!studentMicEnabled) {
+                    // Get microphone stream
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    });
+                    
+                    studentAudioTrack = stream.getAudioTracks()[0];
+                    
+                    // Send the stream to teacher if peerConnection exists
+                    if (peerConnection) {
+                        peerConnection.addTrack(studentAudioTrack, stream);
+                    }
+                    
+                    // Notify teacher
+                    socket.emit('student-media-update', {
+                        room: roomId,
+                        mediaType: 'microphone',
+                        enabled: true,
+                        studentName: studentName,
+                        studentSid: socket.id
+                    });
+                    
+                    toggleMicBtn.innerHTML = '<i class="fas fa-microphone"></i> Mic On';
+                    toggleMicBtn.classList.add('active');
+                    studentMicEnabled = true;
+                    showNotification('success', 'Microphone On', 'Teacher can now hear you');
+                    
+                } else {
+                    // Stop microphone
+                    if (studentAudioTrack) {
+                        studentAudioTrack.stop();
+                        studentAudioTrack = null;
+                    }
+                    
+                    // Remove audio track from peer connection
+                    if (peerConnection) {
+                        const senders = peerConnection.getSenders();
+                        const audioSender = senders.find(sender => 
+                            sender.track && sender.track.kind === 'audio');
+                        if (audioSender) {
+                            peerConnection.removeTrack(audioSender);
+                        }
+                    }
+                    
+                    // Notify teacher
+                    socket.emit('student-media-update', {
+                        room: roomId,
+                        mediaType: 'microphone',
+                        enabled: false,
+                        studentName: studentName,
+                        studentSid: socket.id
+                    });
+                    
+                    toggleMicBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mic Off';
+                    toggleMicBtn.classList.remove('active');
+                    studentMicEnabled = false;
+                    showNotification('info', 'Microphone Off', 'Teacher cannot hear you');
+                }
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                showNotification('error', 'Microphone Error', 'Could not access microphone');
+                toggleMicBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mic Error';
+                studentMicEnabled = false;
+                toggleMicBtn.classList.remove('active');
+            }
+        }
+
+        function toggleSelfView() {
+            if (studentSelfView.style.display === 'block') {
+                studentSelfView.style.display = 'none';
+                toggleSelfViewBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                toggleSelfViewBtn.title = 'Show self-view';
+            } else {
+                studentSelfView.style.display = 'block';
+                toggleSelfViewBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                toggleSelfViewBtn.title = 'Hide self-view';
+            }
+        }
+
+        function raiseHandAction() {
+            isHandRaised = !isHandRaised;
+            
+            // Send raise hand event to teacher
+            socket.emit('student-action', {
+                room: roomId,
+                action: 'raise_hand',
+                studentName: studentName,
+                studentSid: socket.id,
+                isRaised: isHandRaised,
+                timestamp: new Date().toISOString(),
+                identity: questionIdentity
+            });
+            
+            if (isHandRaised) {
+                // Visual feedback
+                raiseHand.innerHTML = '<i class="fas fa-hand-paper fa-bounce"></i> Hand Raised';
+                raiseHand.classList.add('active');
+                
+                const message = questionIdentity === 'public' 
+                    ? 'Your hand is raised and visible to everyone'
+                    : 'Only teacher can see your raised hand';
+                
+                showNotification('info', 'Hand Raised', message);
+                
+                // Auto lower after 30 seconds
+                setTimeout(() => {
+                    if (isHandRaised) {
+                        raiseHandAction(); // Toggle off
+                    }
+                }, 30000);
+                
+            } else {
+                raiseHand.innerHTML = '<i class="fas fa-hand-paper"></i> Raise Hand';
+                raiseHand.classList.remove('active');
+                showNotification('info', 'Hand Lowered', 'Your hand has been lowered');
+            }
+        }
+
+        function sendStruggleSignal(signalType) {
+            if (currentStruggleSignal === signalType) {
+                resetStruggleButtons();
+                socket.emit('student-action', {
+                    room: roomId,
+                    action: 'struggle_signal',
+                    signal_type: 'clear',
+                    studentName: studentName,
+                    studentSid: socket.id,
+                    timestamp: new Date().toISOString()
+                });
+                return;
+            }
+            
+            // Send struggle signal
+            socket.emit('student-action', {
+                room: roomId,
+                action: 'struggle_signal',
+                signal_type: signalType,
+                studentName: studentName,
+                studentSid: socket.id,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Update UI
+            resetStruggleButtons();
+            currentStruggleSignal = signalType;
+            
+            const buttonMap = {
+                'confused': confusedBtn,
+                'too_fast': tooFastBtn,
+                'got_it': gotItBtn,
+                'need_help': needHelpBtn
+            };
+            
+            if (buttonMap[signalType]) {
+                buttonMap[signalType].classList.add('active');
+            }
+            
+            const messageMap = {
+                'confused': 'Teacher notified: You\'re confused',
+                'too_fast': 'Teacher notified: Pace is too fast',
+                'got_it': 'Teacher notified: You understand',
+                'need_help': 'Teacher notified: You need help'
+            };
+            
+            showNotification('info', 'Learning Status', messageMap[signalType] || 'Status sent to teacher');
+        }
+
+        function resetStruggleButtons() {
+            [confusedBtn, tooFastBtn, gotItBtn, needHelpBtn].forEach(btn => {
+                btn.classList.remove('active');
+            });
+            currentStruggleSignal = null;
         }
 
         function updateConnectionStatus(status, message) {
@@ -1439,7 +1942,6 @@
                 const videoTrack = stream.getVideoTracks()[0];
                 const settings = videoTrack.getSettings();
                 
-                // Update quality display
                 if (settings.width >= 1920) {
                     streamQualityElement.textContent = '1080p HD';
                 } else if (settings.width >= 1280) {
@@ -1477,154 +1979,6 @@
             toggleMute.classList.toggle('active', isMuted);
             showNotification('info', isMuted ? 'Muted' : 'Unmuted', 
                 `Video ${isMuted ? 'muted' : 'unmuted'}`);
-        }
-
-        function raiseHandAction() {
-            // Send raise hand event with identity preference
-            socket.emit('student-action', {
-                room: roomId,
-                action: 'raise_hand',
-                identity: questionIdentity,
-                timestamp: new Date().toISOString()
-            });
-            
-            showNotification('info', 'Hand Raised', 
-                questionIdentity === 'public' ? 
-                'Teacher and class can see your name' : 
-                'Only teacher can see your name');
-            
-            // Visual feedback
-            raiseHand.innerHTML = '<i class="fas fa-hand-paper fa-bounce"></i> Hand Raised';
-            raiseHand.disabled = true;
-            
-            setTimeout(() => {
-                raiseHand.innerHTML = '<i class="fas fa-hand-paper"></i> Raise Hand';
-                raiseHand.disabled = false;
-            }, 5000);
-        }
-
-        function sendStruggleSignal(signalType) {
-            if (currentStruggleSignal === signalType) {
-                // Reset if clicking the same button
-                resetStruggleButtons();
-                socket.emit('student-action', {
-                    room: roomId,
-                    action: 'struggle_signal',
-                    signal_type: 'clear',
-                    timestamp: new Date().toISOString()
-                });
-                return;
-            }
-            
-            // Send struggle signal
-            socket.emit('student-action', {
-                room: roomId,
-                action: 'struggle_signal',
-                signal_type: signalType,
-                timestamp: new Date().toISOString()
-            });
-            
-            // Update UI
-            resetStruggleButtons();
-            currentStruggleSignal = signalType;
-            
-            const buttonMap = {
-                'confused': confusedBtn,
-                'too_fast': tooFastBtn,
-                'got_it': gotItBtn,
-                'need_help': needHelpBtn
-            };
-            
-            if (buttonMap[signalType]) {
-                buttonMap[signalType].classList.add('active');
-            }
-            
-            const messageMap = {
-                'confused': 'Teacher notified: You\'re confused',
-                'too_fast': 'Teacher notified: Pace is too fast',
-                'got_it': 'Teacher notified: You understand',
-                'need_help': 'Teacher notified: You need help'
-            };
-            
-            showNotification('info', 'Learning Status', messageMap[signalType] || 'Status sent to teacher');
-        }
-
-        function resetStruggleButtons() {
-            [confusedBtn, tooFastBtn, gotItBtn, needHelpBtn].forEach(btn => {
-                btn.classList.remove('active');
-            });
-            currentStruggleSignal = null;
-        }
-
-        async function toggleStudentCamera() {
-            if (toggleCameraBtn.disabled) return;
-            
-            studentCameraEnabled = !studentCameraEnabled;
-            
-            try {
-                if (studentCameraEnabled) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: {
-                            width: { ideal: 640 },
-                            height: { ideal: 480 }
-                        }
-                    });
-                    
-                    // Send camera stream to teacher if needed
-                    if (peerConnection) {
-                        stream.getTracks().forEach(track => {
-                            peerConnection.addTrack(track, stream);
-                        });
-                    }
-                    
-                    toggleCameraBtn.innerHTML = '<i class="fas fa-video"></i> Camera On';
-                    showNotification('success', 'Camera On', 'Your camera is now visible to teacher');
-                } else {
-                    toggleCameraBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Off';
-                    showNotification('info', 'Camera Off', 'Your camera is now hidden');
-                }
-            } catch (error) {
-                console.error('Error accessing camera:', error);
-                studentCameraEnabled = false;
-                toggleCameraBtn.innerHTML = '<i class="fas fa-video-slash"></i> Camera Error';
-                showNotification('error', 'Camera Error', 'Could not access camera');
-            }
-        }
-
-        async function toggleStudentMic() {
-            if (toggleMicBtn.disabled) return;
-            
-            studentMicEnabled = !studentMicEnabled;
-            
-            try {
-                if (studentMicEnabled) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true
-                        }
-                    });
-                    
-                    // Send audio stream to teacher if needed
-                    if (peerConnection) {
-                        stream.getTracks().forEach(track => {
-                            peerConnection.addTrack(track, stream);
-                        });
-                    }
-                    
-                    toggleMicBtn.innerHTML = '<i class="fas fa-microphone"></i> Mic On';
-                    showNotification('success', 'Microphone On', 'Your microphone is now active');
-                } else {
-                    toggleMicBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mic Off';
-                    showNotification('info', 'Microphone Off', 'Your microphone is now muted');
-                }
-            } catch (error) {
-                console.error('Error accessing microphone:', error);
-                studentMicEnabled = false;
-                toggleMicBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Mic Error';
-                showNotification('error', 'Microphone Error', 'Could not access microphone');
-            }
         }
 
         function toggleAIListener() {
@@ -1674,7 +2028,6 @@
         }
 
         function toggleChatVisibility() {
-            // This would toggle chat visibility if chat was implemented
             showNotification('info', 'Chat Hidden', 'Chat is now hidden. Click again to show.');
         }
 
@@ -1754,6 +2107,14 @@
                     teacherVideo.srcObject.getTracks().forEach(track => track.stop());
                 }
                 
+                if (studentVideoTrack) {
+                    studentVideoTrack.stop();
+                }
+                
+                if (studentAudioTrack) {
+                    studentAudioTrack.stop();
+                }
+                
                 socket.disconnect();
                 
                 // Redirect to home
@@ -1809,7 +2170,8 @@
             const icons = {
                 success: 'fa-check-circle',
                 error: 'fa-exclamation-circle',
-                info: 'fa-info-circle'
+                info: 'fa-info-circle',
+                warning: 'fa-exclamation-triangle'
             };
             
             notification.className = `notification ${type}`;
