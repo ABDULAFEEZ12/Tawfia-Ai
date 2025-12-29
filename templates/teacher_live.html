@@ -117,12 +117,11 @@
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
         
-        /* Teacher video container - TOP */
-        .teacher-video-container {
+        .video-container {
             background: #000;
             border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             position: relative;
             aspect-ratio: 16/9;
         }
@@ -131,38 +130,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-        
-        /* Student video container - BELOW teacher */
-        .student-video-container {
-            background: #000;
-            border-radius: 10px;
-            overflow: hidden;
-            height: 200px;
-            position: relative;
-            border: 3px solid #2ed573;
-        }
-        
-        #studentVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1); /* Mirror effect */
-        }
-        
-        .student-video-label {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px 10px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            z-index: 10;
         }
         
         .video-overlay {
@@ -454,9 +421,6 @@
                 min-width: 100px;
                 padding: 10px 15px;
             }
-            .student-video-container {
-                height: 180px;
-            }
         }
         
         @media (max-width: 768px) {
@@ -473,9 +437,6 @@
             }
             .controls-section {
                 grid-template-columns: 1fr;
-            }
-            .student-video-container {
-                height: 150px;
             }
         }
     </style>
@@ -513,8 +474,7 @@
         
         <div class="main-content">
             <div class="video-section">
-                <!-- Teacher video on TOP -->
-                <div class="teacher-video-container">
+                <div class="video-container">
                     <video id="teacherVideo" autoplay playsinline muted></video>
                     <div class="video-overlay">
                         <div class="video-label">
@@ -531,15 +491,6 @@
                                 <i class="fas fa-desktop"></i>
                             </button>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- Student video BELOW teacher -->
-                <div class="student-video-container">
-                    <video id="studentVideo" autoplay playsinline></video>
-                    <div class="student-video-label">
-                        <i class="fas fa-user-graduate"></i>
-                        <span id="studentVideoLabel">Student View</span>
                     </div>
                 </div>
                 
@@ -604,12 +555,9 @@
         let sessionTimer = null;
         let students = {};
         let mySid = null;
-        let currentStudentVideoSid = null;
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
-        const studentVideo = document.getElementById('studentVideo');
-        const studentVideoLabel = document.getElementById('studentVideoLabel');
         const toggleVideo = document.getElementById('toggleVideo');
         const toggleAudio = document.getElementById('toggleAudio');
         const toggleScreenShare = document.getElementById('toggleScreenShare');
@@ -626,7 +574,9 @@
         const notification = document.getElementById('notification');
         const debugLog = document.getElementById('debugLog');
 
-        // WebRTC Config
+        // ============================================
+        // ✅ FIXED WEBRTC CONFIG FOR RENDER
+        // ============================================
         const WEBRTC_CONFIG = {
             iceServers: [
                 {
@@ -693,14 +643,13 @@
                 username,
                 connected: true,
                 status: 'connecting',
-                peerConnection: null,
-                stream: null,
-                streamAttached: false  // ADDED: Track if stream has been attached
+                peerConnection: null
             };
             updateStudentsList();
             showNotification('info', 'Student joined', `${username} has joined the classroom.`);
             logDebug(`Student joined: ${username} (SID: ${sid})`);
 
+            // If broadcasting, establish connection with new student
             if (isBroadcasting && localStream) {
                 createPeerConnection(sid);
             }
@@ -711,22 +660,15 @@
             if (students[sid]) {
                 students[sid].connected = false;
                 students[sid].status = 'disconnected';
-                students[sid].streamAttached = false; // RESET when student leaves
                 updateStudentsList();
                 logDebug(`Student left: ${students[sid].username} (SID: ${sid})`);
 
-                if (currentStudentVideoSid === sid) {
-                    studentVideo.srcObject = null;
-                    studentVideoLabel.textContent = 'Student View';
-                    currentStudentVideoSid = null;
-                }
-
+                // Clean up peer connection
                 if (peerConnections[sid]) {
                     peerConnections[sid].close();
                     delete peerConnections[sid];
                 }
                 delete students[sid].peerConnection;
-                delete students[sid].stream;
             }
         }
 
@@ -735,6 +677,7 @@
             logDebug(`Broadcast ready. Student SIDs: ${JSON.stringify(student_sids)}`);
             showNotification('success', 'Broadcast started', `Connected to ${student_count} students.`);
 
+            // Create peer connections for all students
             student_sids.forEach(sid => {
                 if (students[sid]) {
                     createPeerConnection(sid);
@@ -747,6 +690,7 @@
                 updateConnectionStatus('connecting');
                 logDebug('Starting broadcast...');
 
+                // Get media stream
                 localStream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         width: { ideal: 1280 },
@@ -760,9 +704,11 @@
                     }
                 });
 
+                // Display local stream
                 teacherVideo.srcObject = localStream;
                 logDebug('Local stream obtained and displayed');
 
+                // Start broadcast
                 socket.emit('start-broadcast', { room: roomId });
                 logDebug('start-broadcast event emitted');
 
@@ -772,6 +718,7 @@
                 startBroadcast.classList.add('danger');
                 showNotification('success', 'Broadcast started', 'You are now broadcasting to students.');
 
+                // Create peer connections for existing students
                 Object.keys(students).forEach(sid => {
                     if (students[sid].connected) {
                         createPeerConnection(sid);
@@ -792,38 +739,22 @@
             logDebug(`Creating peer connection for student: ${studentSid}`);
 
             try {
+                // ✅ CRITICAL: Use the simplified Render-compatible config
                 const peerConnection = new RTCPeerConnection({
                     iceServers: WEBRTC_CONFIG.iceServers,
-                    iceTransportPolicy: "relay",
+                    iceTransportPolicy: "relay",  // ✅ Force TURN only
                     bundlePolicy: 'max-bundle',
                     rtcpMuxPolicy: 'require'
                 });
 
                 logDebug('PeerConnection created with forced TURN relay mode');
 
+                // Add local stream tracks
                 localStream.getTracks().forEach(track => {
                     peerConnection.addTrack(track, localStream);
                 });
 
-                peerConnection.ontrack = (event) => {
-                    logDebug(`Received ${event.track.kind} track from student: ${studentSid}`);
-                    
-                    if (event.streams && event.streams[0]) {
-                        const stream = event.streams[0];
-                        students[studentSid].stream = stream;
-                        logDebug(`Student ${studentSid} stream stored. Has video: ${stream.getVideoTracks().length > 0}`);
-                        
-                        // 🔒 CRITICAL FIX: Only attach stream once, not per track
-                        if (!students[studentSid].streamAttached) {
-                            students[studentSid].streamAttached = true;
-                            
-                            if (!currentStudentVideoSid || currentStudentVideoSid === studentSid) {
-                                displayStudentVideo(studentSid, stream);
-                            }
-                        }
-                    }
-                };
-
+                // ICE candidate handler
                 peerConnection.onicecandidate = (event) => {
                     if (event.candidate) {
                         const candidateType = getCandidateType(event.candidate);
@@ -838,26 +769,21 @@
                     }
                 };
 
+                // ICE candidate error handler
                 peerConnection.onicecandidateerror = (event) => {
                     logDebug(`ICE candidate error for ${studentSid}: ${event.errorCode} ${event.errorText}`);
                 };
 
+                // Connection state changes
                 peerConnection.onconnectionstatechange = () => {
                     logDebug(`Peer connection state for ${studentSid}: ${peerConnection.connectionState}`);
                     if (students[studentSid]) {
                         students[studentSid].status = peerConnection.connectionState;
                         updateStudentsList();
-                        
-                        if ((peerConnection.connectionState === 'disconnected' || 
-                             peerConnection.connectionState === 'failed') && 
-                            currentStudentVideoSid === studentSid) {
-                            studentVideo.srcObject = null;
-                            studentVideoLabel.textContent = 'Student View';
-                            currentStudentVideoSid = null;
-                        }
                     }
                 };
 
+                // ICE connection state changes
                 peerConnection.oniceconnectionstatechange = () => {
                     logDebug(`ICE connection state for ${studentSid}: ${peerConnection.iceConnectionState}`);
                     
@@ -872,6 +798,7 @@
                 students[studentSid].peerConnection = peerConnection;
                 students[studentSid].status = 'connecting';
 
+                // Create and send offer
                 peerConnection.createOffer({
                     offerToReceiveAudio: true,
                     offerToReceiveVideo: true,
@@ -898,39 +825,6 @@
             } catch (error) {
                 console.error('Error creating peer connection:', error);
                 logDebug(`Error creating peer connection for ${studentSid}: ${error.message}`);
-            }
-        }
-
-        function displayStudentVideo(studentSid, stream) {
-            if (!stream || !students[studentSid]) return;
-            
-            try {
-                studentVideo.srcObject = stream;
-                studentVideoLabel.textContent = students[studentSid].username;
-                currentStudentVideoSid = studentSid;
-                
-                logDebug(`Displaying video from student: ${students[studentSid].username}`);
-                
-                studentVideo.play().then(() => {
-                    logDebug(`Student video playing for ${students[studentSid].username}`);
-                }).catch(err => {
-                    logDebug(`Error playing student video: ${err.message}`);
-                });
-                
-                stream.getVideoTracks().forEach(track => {
-                    track.onended = () => {
-                        logDebug(`Student ${studentSid} video track ended`);
-                        if (currentStudentVideoSid === studentSid) {
-                            studentVideo.srcObject = null;
-                            studentVideoLabel.textContent = 'Student View';
-                            currentStudentVideoSid = null;
-                        }
-                    };
-                });
-                
-            } catch (error) {
-                console.error('Error displaying student video:', error);
-                logDebug(`Error displaying student video: ${error.message}`);
             }
         }
 
@@ -988,11 +882,13 @@
         async function toggleScreenSharing() {
             try {
                 if (!screenStream) {
+                    // Start screen sharing
                     screenStream = await navigator.mediaDevices.getDisplayMedia({
                         video: { cursor: "always", displaySurface: "monitor" },
                         audio: true
                     });
 
+                    // Replace video track in all peer connections
                     const screenTrack = screenStream.getVideoTracks()[0];
                     Object.values(peerConnections).forEach(pc => {
                         const sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
@@ -1001,15 +897,18 @@
                         }
                     });
 
+                    // Display screen share in teacher video
                     teacherVideo.srcObject = screenStream;
                     toggleScreenShare.classList.add('active');
                     toggleScreenShare.innerHTML = '<i class="fas fa-stop"></i>';
                     showNotification('info', 'Screen sharing', 'Your screen is now being shared with students.');
                     logDebug('Screen sharing started');
                 } else {
+                    // Stop screen sharing
                     screenStream.getTracks().forEach(track => track.stop());
                     screenStream = null;
 
+                    // Restore camera track
                     if (localStream) {
                         const cameraTrack = localStream.getVideoTracks()[0];
                         Object.values(peerConnections).forEach(pc => {
@@ -1063,11 +962,12 @@
             liveStudentCount.textContent = connectedStudents.length;
             
             if (connectedStudents.length === 0) {
-                studentsList.innerHTML = 
-                    `<div class="empty-state">
+                studentsList.innerHTML = `
+                    <div class="empty-state">
                         <i class="fas fa-user-friends"></i>
                         <p>Waiting for students to join...</p>
-                    </div>`;
+                    </div>
+                `;
             } else {
                 studentsList.innerHTML = connectedStudents.map(([sid, student]) => {
                     let statusClass = 'connecting';
@@ -1085,7 +985,7 @@
                     }
                     
                     return `
-                        <div class="student-item" data-sid="${sid}" style="cursor: pointer;">
+                        <div class="student-item">
                             <div class="student-avatar">${student.username.charAt(0).toUpperCase()}</div>
                             <div class="student-info">
                                 <h4>${student.username}</h4>
@@ -1096,16 +996,6 @@
                         </div>
                     `;
                 }).join('');
-                
-                document.querySelectorAll('.student-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const sid = item.dataset.sid;
-                        if (students[sid] && students[sid].stream) {
-                            displayStudentVideo(sid, students[sid].stream);
-                            showNotification('info', 'Viewing Student', `Now viewing ${students[sid].username}`);
-                        }
-                    });
-                });
             }
         }
 
@@ -1165,6 +1055,7 @@
 
         function endTeachingSession() {
             if (confirm('Are you sure you want to end the teaching session? All students will be disconnected.')) {
+                // Stop all media streams
                 if (localStream) {
                     localStream.getTracks().forEach(track => track.stop());
                 }
@@ -1172,12 +1063,13 @@
                     screenStream.getTracks().forEach(track => track.stop());
                 }
                 
+                // Close all peer connections
                 Object.values(peerConnections).forEach(pc => pc.close());
                 
-                studentVideo.srcObject = null;
-                
+                // Disconnect socket
                 socket.disconnect();
                 
+                // Redirect to home
                 window.location.href = '/';
             }
         }
@@ -1195,12 +1087,13 @@
             };
             
             notification.className = `notification ${type}`;
-            notification.innerHTML = 
-                `<i class="fas ${icons[type]}"></i>
+            notification.innerHTML = `
+                <i class="fas ${icons[type]}"></i>
                 <div class="notification-content">
                     <div class="notification-title">${title}</div>
                     <div class="notification-message">${message}</div>
-                </div>`;
+                </div>
+            `;
             notification.classList.add('show');
             
             setTimeout(() => {
@@ -1214,11 +1107,13 @@
             logEntry.textContent = `[${timestamp}] ${message}`;
             debugLog.prepend(logEntry);
             
+            // Keep only last 20 log entries
             while (debugLog.children.length > 20) {
                 debugLog.removeChild(debugLog.lastChild);
             }
         }
 
+        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (socket) socket.disconnect();
         });
