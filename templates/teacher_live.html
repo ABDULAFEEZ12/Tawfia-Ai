@@ -234,6 +234,11 @@
             box-shadow: none;
         }
         
+        .action-btn.small {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+        
         .students-section {
             background: white;
             border-radius: 15px;
@@ -410,6 +415,129 @@
             color: #1a2980;
         }
         
+        /* Teacher Authority Controls */
+        .teacher-controls-panel {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .control-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        /* AI Assistant Panel */
+        .ai-section {
+            margin-top: 15px;
+        }
+        
+        .prompt-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .prompt-time {
+            background: #007bff;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .prompt-text {
+            flex: 1;
+        }
+        
+        /* Mistake Alerts */
+        .mistake-alert {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .dismiss-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+            margin-left: auto;
+        }
+        
+        .dismiss-btn:hover {
+            color: #333;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-switch label {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-switch label:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        .toggle-switch input:checked + label {
+            background-color: #28a745;
+        }
+        
+        .toggle-switch input:checked + label:before {
+            transform: translateX(26px);
+        }
+        
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -420,6 +548,9 @@
             .stat-card {
                 min-width: 100px;
                 padding: 10px 15px;
+            }
+            .control-grid {
+                grid-template-columns: 1fr;
             }
         }
         
@@ -514,6 +645,116 @@
                     </button>
                 </div>
                 
+                <!-- Teacher Authority Controls -->
+                <div class="teacher-controls-panel">
+                    <h3 style="color: #1a2980; margin-bottom: 15px;">
+                        <i class="fas fa-crown"></i> Teacher Authority Controls
+                    </h3>
+                    
+                    <div class="control-grid">
+                        <!-- Camera Control -->
+                        <div class="control-card">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <i class="fas fa-video"></i>
+                                <h4 style="margin: 0;">Camera Control</h4>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="action-btn small" id="allowAllCameras">
+                                    <i class="fas fa-check-circle"></i> Allow All
+                                </button>
+                                <button class="action-btn small danger" id="disableAllCameras">
+                                    <i class="fas fa-ban"></i> Disable All
+                                </button>
+                            </div>
+                            <div class="status" id="cameraStatus" style="font-size: 12px; color: #666; margin-top: 5px;">
+                                Status: Cameras allowed
+                            </div>
+                        </div>
+                        
+                        <!-- Microphone Control -->
+                        <div class="control-card">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <i class="fas fa-microphone"></i>
+                                <h4 style="margin: 0;">Microphone Control</h4>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="action-btn small" id="allowAllMics">
+                                    <i class="fas fa-volume-up"></i> Allow All
+                                </button>
+                                <button class="action-btn small danger" id="muteAllMics">
+                                    <i class="fas fa-volume-mute"></i> Mute All
+                                </button>
+                            </div>
+                            <div class="status" id="micStatus" style="font-size: 12px; color: #666; margin-top: 5px;">
+                                Status: Microphones allowed
+                            </div>
+                        </div>
+                        
+                        <!-- Question Control -->
+                        <div class="control-card">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <i class="fas fa-question-circle"></i>
+                                <h4 style="margin: 0;">Questions</h4>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="action-btn small" id="allowQuestions">
+                                    <i class="fas fa-unlock"></i> Allow
+                                </button>
+                                <button class="action-btn small" id="disableQuestions">
+                                    <i class="fas fa-lock"></i> Disable
+                                </button>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <label style="font-size: 12px;">
+                                    <input type="checkbox" id="showNamesWithQuestions" checked>
+                                    Show student names with questions
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Assistant Panel (Private to Teacher) -->
+                    <div id="aiAssistantPanel" style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="margin: 0; color: #856404;">
+                                <i class="fas fa-robot"></i> AI Teaching Assistant (PRIVATE)
+                            </h4>
+                            <button id="toggleAIPanel" class="control-btn small">
+                                <i class="fas fa-eye-slash"></i> Hide
+                            </button>
+                        </div>
+                        
+                        <!-- AI Prompter -->
+                        <div class="ai-section">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                                <i class="fas fa-bullhorn"></i>
+                                <h5 style="margin: 0;">Live Prompter</h5>
+                            </div>
+                            <div id="aiPrompter" style="background: white; padding: 10px; border-radius: 5px; min-height: 60px; font-size: 14px;">
+                                <div class="prompt-item">
+                                    <span class="prompt-time">⏱️ 5min</span>
+                                    <span class="prompt-text">Cover examples for current topic</span>
+                                </div>
+                                <div class="prompt-item">
+                                    <span class="prompt-time">⏱️ 10min</span>
+                                    <span class="prompt-text">Review key formulas</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mistake Guard -->
+                        <div class="ai-section" style="margin-top: 15px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                                <i class="fas fa-shield-alt"></i>
+                                <h5 style="margin: 0;">Mistake Guard</h5>
+                            </div>
+                            <div id="mistakeAlerts" style="background: white; padding: 10px; border-radius: 5px; min-height: 40px; font-size: 13px; color: #dc3545;">
+                                <!-- Alerts will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Debug Information Panel -->
                 <div class="debug-info">
                     <h4><i class="fas fa-bug"></i> Debug Information</h4>
@@ -556,6 +797,19 @@
         let students = {};
         let mySid = null;
 
+        // ============================================
+        // TEACHER AUTHORITY SYSTEM
+        // ============================================
+        let classroomSettings = {
+            camerasAllowed: true,
+            microphonesAllowed: true,
+            questionsAllowed: true,
+            showNamesWithQuestions: true,
+            presentationMode: false,
+            privateSlides: false,
+            aiAssistEnabled: true
+        };
+
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
         const toggleVideo = document.getElementById('toggleVideo');
@@ -594,6 +848,7 @@
             connectToRoom();
             setupEventListeners();
             startSessionTimer();
+            initializeTeacherControls();
         });
 
         function connectToRoom() {
@@ -618,6 +873,8 @@
             socket.on('rtc-ice-candidate', handleRTCIceCandidate);
             socket.on('error', handleError);
             socket.on('broadcast-ready', handleBroadcastReady);
+            socket.on('student-struggle', handleStudentStruggle);
+            socket.on('student-question', handleStudentQuestion);
 
             // Button events
             startBroadcast.addEventListener('click', startBroadcasting);
@@ -628,6 +885,171 @@
             toggleAudio.addEventListener('click', toggleAudioStream);
             toggleScreenShare.addEventListener('click', toggleScreenSharing);
         }
+
+        function initializeTeacherControls() {
+            // Camera Controls
+            document.getElementById('allowAllCameras').addEventListener('click', () => {
+                classroomSettings.camerasAllowed = true;
+                updateCameraStatus();
+                socket.emit('teacher-command', {
+                    room: roomId,
+                    command: 'allow-cameras',
+                    value: true
+                });
+                showNotification('success', 'Camera Control', 'Students can now enable their cameras');
+            });
+            
+            document.getElementById('disableAllCameras').addEventListener('click', () => {
+                classroomSettings.camerasAllowed = false;
+                updateCameraStatus();
+                socket.emit('teacher-command', {
+                    room: roomId,
+                    command: 'allow-cameras',
+                    value: false
+                });
+                showNotification('warning', 'Camera Control', 'All student cameras disabled');
+            });
+            
+            // Microphone Controls
+            document.getElementById('allowAllMics').addEventListener('click', () => {
+                classroomSettings.microphonesAllowed = true;
+                updateMicStatus();
+                socket.emit('teacher-command', {
+                    room: roomId,
+                    command: 'allow-microphones',
+                    value: true
+                });
+                showNotification('success', 'Microphone Control', 'Students can now unmute');
+            });
+            
+            document.getElementById('muteAllMics').addEventListener('click', () => {
+                classroomSettings.microphonesAllowed = false;
+                updateMicStatus();
+                socket.emit('teacher-command', {
+                    room: roomId,
+                    command: 'allow-microphones',
+                    value: false
+                });
+                showNotification('warning', 'Microphone Control', 'All student microphones muted');
+            });
+            
+            // Question Controls
+            document.getElementById('allowQuestions').addEventListener('click', () => {
+                classroomSettings.questionsAllowed = true;
+                socket.emit('teacher-command', {
+                    room: roomId,
+                    command: 'allow-questions',
+                    value: true
+                });
+                showNotification('success', 'Questions', 'Students can now ask questions');
+            });
+            
+            document.getElementById('disableQuestions').addEventListener('click', () => {
+                classroomSettings.questionsAllowed = false;
+                socket.emit('teacher-command', {
+                    room: roomId,
+                    command: 'allow-questions',
+                    value: false
+                });
+                showNotification('warning', 'Questions', 'Questions disabled');
+            });
+            
+            document.getElementById('showNamesWithQuestions').addEventListener('change', (e) => {
+                classroomSettings.showNamesWithQuestions = e.target.checked;
+            });
+            
+            // AI Panel Toggle
+            document.getElementById('toggleAIPanel').addEventListener('click', (e) => {
+                const panel = document.getElementById('aiAssistantPanel');
+                const isHidden = panel.style.display === 'none';
+                panel.style.display = isHidden ? 'block' : 'none';
+                e.target.innerHTML = isHidden ? 
+                    '<i class="fas fa-eye-slash"></i> Hide' : 
+                    '<i class="fas fa-eye"></i> Show';
+            });
+            
+            // Start AI Prompter
+            startAIPrompter();
+        }
+
+        function updateCameraStatus() {
+            const statusEl = document.getElementById('cameraStatus');
+            statusEl.textContent = classroomSettings.camerasAllowed ? 
+                'Status: Cameras allowed' : 
+                'Status: Cameras disabled';
+            statusEl.style.color = classroomSettings.camerasAllowed ? '#28a745' : '#dc3545';
+        }
+
+        function updateMicStatus() {
+            const statusEl = document.getElementById('micStatus');
+            statusEl.textContent = classroomSettings.microphonesAllowed ? 
+                'Status: Microphones allowed' : 
+                'Status: Microphones muted';
+            statusEl.style.color = classroomSettings.microphonesAllowed ? '#28a745' : '#dc3545';
+        }
+
+        // AI Prompter System
+        function startAIPrompter() {
+            setInterval(() => {
+                if (classroomSettings.aiAssistEnabled) {
+                    simulateAIPrompt();
+                }
+            }, 30000); // Every 30 seconds
+        }
+
+        function simulateAIPrompt() {
+            const prompts = [
+                { time: "5min", text: "Check if students understand current concept" },
+                { time: "10min", text: "Time for a quick example" },
+                { time: "15min", text: "Consider taking questions now" },
+                { time: "20min", text: "Review key points before moving on" }
+            ];
+            
+            const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            
+            const promptElement = document.createElement('div');
+            promptElement.className = 'prompt-item';
+            promptElement.innerHTML = `
+                <span class="prompt-time">⏱️ ${randomPrompt.time}</span>
+                <span class="prompt-text">${randomPrompt.text}</span>
+            `;
+            
+            const prompter = document.getElementById('aiPrompter');
+            prompter.prepend(promptElement);
+            
+            // Keep only last 3 prompts
+            while (prompter.children.length > 3) {
+                prompter.removeChild(prompter.lastChild);
+            }
+        }
+
+        // Mistake Guard System (Simulated)
+        function simulateMistakeAlert(message) {
+            if (!classroomSettings.aiAssistEnabled) return;
+            
+            const alertElement = document.createElement('div');
+            alertElement.className = 'mistake-alert';
+            alertElement.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>${message}</span>
+                <button class="dismiss-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            const alertsContainer = document.getElementById('mistakeAlerts');
+            alertsContainer.prepend(alertElement);
+            
+            // Auto-remove after 30 seconds
+            setTimeout(() => {
+                if (alertElement.parentElement) {
+                    alertElement.remove();
+                }
+            }, 30000);
+        }
+
+        // Simulate a mistake detection (for demo)
+        setTimeout(() => {
+            simulateMistakeAlert("Check: Verify formula sign in equation");
+        }, 10000);
 
         function handleRoomJoined(data) {
             mySid = data.sid;
@@ -683,6 +1105,41 @@
                     createPeerConnection(sid);
                 }
             });
+        }
+
+        function handleStudentStruggle(data) {
+            const { studentId, studentName, struggleType } = data;
+            
+            if (!students[studentId]) return;
+            
+            if (!students[studentId].struggles) {
+                students[studentId].struggles = [];
+            }
+            
+            students[studentId].struggles.push({
+                type: struggleType,
+                time: new Date().toLocaleTimeString(),
+                resolved: false
+            });
+            
+            // Show notification to teacher
+            showNotification('info', 'Student Feedback', 
+                `${studentName} is struggling with: ${struggleType}`);
+            
+            // Update student list display
+            updateStudentsList();
+        }
+
+        function handleStudentQuestion(data) {
+            const { question, studentId, studentName, timestamp } = data;
+            
+            let displayName = classroomSettings.showNamesWithQuestions && studentName ? 
+                studentName : 'Anonymous Student';
+            
+            showNotification('info', 'Student Question', 
+                `${displayName} asked: ${question}`);
+            
+            logDebug(`Question from ${displayName}: ${question}`);
         }
 
         async function startBroadcasting() {
@@ -984,6 +1441,17 @@
                         statusText = student.status.charAt(0).toUpperCase() + student.status.slice(1);
                     }
                     
+                    // Add struggle indicator if student has struggles
+                    let struggleIndicator = '';
+                    if (student.struggles && student.struggles.length > 0) {
+                        const unresolved = student.struggles.filter(s => !s.resolved).length;
+                        if (unresolved > 0) {
+                            struggleIndicator = `<div class="struggle-indicator" style="color: #ff4757; font-size: 10px; margin-top: 2px;">
+                                <i class="fas fa-exclamation-circle"></i> Needs help
+                            </div>`;
+                        }
+                    }
+                    
                     return `
                         <div class="student-item">
                             <div class="student-avatar">${student.username.charAt(0).toUpperCase()}</div>
@@ -992,6 +1460,7 @@
                                 <div class="status ${statusClass}">
                                     <i class="fas fa-circle"></i> ${statusText}
                                 </div>
+                                ${struggleIndicator}
                             </div>
                         </div>
                     `;
