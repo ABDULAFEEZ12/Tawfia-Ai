@@ -107,11 +107,12 @@
             backdrop-filter: blur(10px);
         }
 
-        .video-container {
+        /* Teacher video container - TOP */
+        .teacher-video-container {
             background: #000;
             border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             position: relative;
             aspect-ratio: 16/9;
         }
@@ -123,19 +124,14 @@
             background: #000;
         }
 
-        /* ✅ ADDED: Student self-view container */
+        /* Student self-view container - BELOW teacher */
         .student-selfview-container {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 200px;
-            height: 150px;
             background: #000;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
+            height: 180px;
+            position: relative;
             border: 3px solid #667eea;
-            z-index: 10;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
         }
 
         #studentVideo {
@@ -147,7 +143,7 @@
 
         .student-selfview-label {
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
             right: 0;
             background: rgba(0, 0, 0, 0.7);
@@ -157,6 +153,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            z-index: 10;
         }
 
         .video-overlay {
@@ -492,8 +489,7 @@
             }
             
             .student-selfview-container {
-                width: 150px;
-                height: 112px;
+                height: 160px;
             }
         }
 
@@ -523,10 +519,7 @@
             }
             
             .student-selfview-container {
-                width: 120px;
-                height: 90px;
-                bottom: 10px;
-                right: 10px;
+                height: 140px;
             }
         }
     </style>
@@ -551,17 +544,9 @@
 
         <div class="main-content">
             <div class="video-section">
-                <div class="video-container">
+                <!-- Teacher video on TOP -->
+                <div class="teacher-video-container">
                     <video id="teacherVideo" autoplay playsinline></video>
-                    
-                    <!-- ✅ ADDED: Student self-view -->
-                    <div class="student-selfview-container">
-                        <video id="studentVideo" autoplay playsinline muted></video>
-                        <div class="student-selfview-label">
-                            <i class="fas fa-user"></i>
-                            <span>You</span>
-                        </div>
-                    </div>
                     
                     <div class="empty-video" id="emptyVideo">
                         <i class="fas fa-chalkboard-teacher"></i>
@@ -581,6 +566,15 @@
                                 <i class="fas fa-volume-up"></i>
                             </button>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Student self-view BELOW teacher -->
+                <div class="student-selfview-container">
+                    <video id="studentVideo" autoplay playsinline muted></video>
+                    <div class="student-selfview-label">
+                        <i class="fas fa-user"></i>
+                        <span>You</span>
                     </div>
                 </div>
 
@@ -680,11 +674,11 @@
         let studentName = localStorage.getItem('studentName') || `Student_${Math.floor(Math.random() * 1000)}`;
         let teacherSid = null;
         let connectionState = 'disconnected';
-        let studentStream = null; // ✅ ADDED: To store student's own stream
+        let studentStream = null;
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
-        const studentVideo = document.getElementById('studentVideo'); // ✅ ADDED
+        const studentVideo = document.getElementById('studentVideo');
         const emptyVideo = document.getElementById('emptyVideo');
         const videoLabel = document.getElementById('videoLabel');
         const toggleFullscreen = document.getElementById('toggleFullscreen');
@@ -703,9 +697,7 @@
         const streamQualityElement = document.getElementById('streamQuality');
         const connectionTypeElement = document.getElementById('connectionType');
 
-        // ============================================
-        // ✅ FIXED WEBRTC CONFIG FOR RENDER
-        // ============================================
+        // WebRTC Config
         const WEBRTC_CONFIG = {
             iceServers: [
                 {
@@ -722,7 +714,6 @@
             logDebug('Student page loaded. Room: ' + roomId);
             logDebug('Using Metered TURN over TCP 443 (Render compatible)');
             
-            // ✅ CRITICAL FIX: Get student's own media FIRST
             initializeStudentMedia().then(() => {
                 connectToRoom();
             }).catch(error => {
@@ -734,7 +725,6 @@
             startSessionTimer();
         });
 
-        // ✅ CRITICAL FIX: Initialize student's own media stream
         async function initializeStudentMedia() {
             try {
                 logDebug('Requesting student camera and microphone...');
@@ -751,9 +741,8 @@
                     }
                 });
                 
-                // Set up student's self-view
                 studentVideo.srcObject = studentStream;
-                studentVideo.muted = true; // CRITICAL: Prevents echo/feedback loop
+                studentVideo.muted = true;
                 await studentVideo.play().catch(e => console.log("Student video autoplay prevented:", e));
                 
                 logDebug(`Student media obtained: ${studentStream.getVideoTracks().length} video track(s), ${studentStream.getAudioTracks().length} audio track(s)`);
@@ -777,7 +766,6 @@
         }
 
         function setupEventListeners() {
-            // Socket.IO events
             socket.on('connect', () => {
                 logDebug('Socket.IO connected');
             });
@@ -797,7 +785,6 @@
                 logDebug('Pong received - connection alive');
             });
 
-            // Button events
             toggleFullscreen.addEventListener('click', toggleFullscreenMode);
             toggleMute.addEventListener('click', toggleVideoMute);
             raiseHand.addEventListener('click', raiseHandAction);
@@ -813,7 +800,6 @@
             updateConnectionStatus('connected', 'Connected to classroom');
             showNotification('success', 'Connected', 'Successfully joined the classroom.');
             
-            // Update teacher name if available
             if (data.teacher_name) {
                 teacherNameElement.textContent = data.teacher_name;
             }
@@ -833,22 +819,19 @@
                 logDebug(`Received WebRTC offer from teacher: ${from_teacher}`);
                 updateConnectionStatus('connecting', 'Establishing connection with teacher...');
                 
-                // Clean up existing connection if any
                 if (peerConnection) {
                     peerConnection.close();
                 }
                 
-                // ✅ CRITICAL: Use the simplified Render-compatible config
                 peerConnection = new RTCPeerConnection({
                     iceServers: WEBRTC_CONFIG.iceServers,
-                    iceTransportPolicy: "relay",  // ✅ Force TURN only
+                    iceTransportPolicy: "relay",
                     bundlePolicy: 'max-bundle',
                     rtcpMuxPolicy: 'require'
                 });
 
                 logDebug('PeerConnection created with forced TURN relay mode');
 
-                // ✅ CRITICAL FIX: Add student's own tracks to the connection BEFORE setting remote description
                 if (studentStream) {
                     logDebug('Adding student tracks to peer connection...');
                     studentStream.getTracks().forEach(track => {
@@ -856,7 +839,6 @@
                         peerConnection.addTrack(track, studentStream);
                     });
                     
-                    // Verify tracks were added
                     setTimeout(() => {
                         const senders = peerConnection.getSenders();
                         logDebug(`Added ${senders.length} track(s) to peer connection:`);
@@ -868,7 +850,6 @@
                     logDebug('WARNING: No student stream available to add to peer connection');
                 }
 
-                // Handle incoming stream from teacher
                 peerConnection.ontrack = (event) => {
                     logDebug(`Received media track from teacher: ${event.track.kind}`);
                     if (teacherVideo.srcObject !== event.streams[0]) {
@@ -885,7 +866,6 @@
                     }
                 };
 
-                // ICE candidate handler
                 peerConnection.onicecandidate = (event) => {
                     if (event.candidate) {
                         const candidateType = getCandidateType(event.candidate);
@@ -900,12 +880,10 @@
                     }
                 };
 
-                // ICE candidate error handler
                 peerConnection.onicecandidateerror = (event) => {
                     logDebug(`ICE candidate error: ${event.errorCode} ${event.errorText}`);
                 };
 
-                // Connection state changes
                 peerConnection.onconnectionstatechange = () => {
                     logDebug(`Peer connection state: ${peerConnection.connectionState}`);
                     updateConnectionStatus(peerConnection.connectionState, 
@@ -920,7 +898,6 @@
                     }
                 };
 
-                // ICE connection state changes
                 peerConnection.oniceconnectionstatechange = () => {
                     logDebug(`ICE connection state: ${peerConnection.iceConnectionState}`);
                     connectionTypeElement.textContent = peerConnection.iceConnectionState;
@@ -930,11 +907,9 @@
                     }
                 };
 
-                // Set remote description
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
                 logDebug('Remote description set successfully');
 
-                // Create and send answer
                 const answer = await peerConnection.createAnswer({
                     offerToReceiveAudio: true,
                     offerToReceiveVideo: true
@@ -942,14 +917,12 @@
                 await peerConnection.setLocalDescription(answer);
                 logDebug('Created and set local description (answer)');
 
-                // Send answer to teacher
                 socket.emit('rtc-answer', {
                     room: roomId,
                     answer: peerConnection.localDescription
                 });
                 logDebug('Sent answer to teacher');
 
-                // ✅ DEBUG: Check if video is in SDP
                 console.log("SDP contains student video?", answer.sdp.includes("m=video"));
                 console.log("SDP contains student audio?", answer.sdp.includes("m=audio"));
 
@@ -992,19 +965,16 @@
             showNotification('error', 'Teacher disconnected', 'The teacher has left the classroom.');
             updateConnectionStatus('error', 'Teacher disconnected');
             
-            // Stop video stream
             if (teacherVideo.srcObject) {
                 teacherVideo.srcObject.getTracks().forEach(track => track.stop());
                 teacherVideo.srcObject = null;
             }
             
-            // Show empty state
             emptyVideo.style.display = 'flex';
             teacherVideo.style.display = 'none';
             raiseHand.disabled = true;
             connectionState = 'disconnected';
             
-            // Clean up peer connection
             if (peerConnection) {
                 peerConnection.close();
                 peerConnection = null;
@@ -1057,7 +1027,6 @@
                 
                 logDebug(`Stream settings: ${settings.width}x${settings.height} @ ${settings.frameRate}fps`);
                 
-                // Update quality display
                 if (settings.width >= 1920) {
                     streamQualityElement.textContent = '1080p HD';
                 } else if (settings.width >= 1280) {
@@ -1112,7 +1081,6 @@
             showNotification('info', 'Hand Raised', 'Teacher has been notified that you have a question.');
             logDebug('Raised hand');
             
-            // Visual feedback
             raiseHand.innerHTML = '<i class="fas fa-hand-paper fa-bounce"></i> Hand Raised';
             raiseHand.disabled = true;
             
@@ -1133,7 +1101,6 @@
                         }
                     });
                     
-                    // Update student video with audio
                     studentVideo.srcObject = studentStream;
                 }
                 
@@ -1152,7 +1119,6 @@
                         logDebug('Microphone enabled');
                     }
                     
-                    // If we have a peer connection, we need to replace the audio track
                     if (peerConnection && peerConnection.getSenders().length > 0) {
                         const audioSender = peerConnection.getSenders().find(
                             sender => sender.track && sender.track.kind === 'audio'
@@ -1187,7 +1153,6 @@
             if (confirm('Are you sure you want to leave the classroom?')) {
                 logDebug('Leaving classroom');
                 
-                // Clean up
                 if (peerConnection) {
                     peerConnection.close();
                 }
@@ -1203,7 +1168,6 @@
                 
                 socket.disconnect();
                 
-                // Redirect to home
                 window.location.href = '/live_meeting';
             }
         }
@@ -1258,19 +1222,15 @@
             `;
             debugLog.prepend(logEntry);
             
-            // Keep only last 20 log entries
             while (debugLog.children.length > 20) {
                 debugLog.removeChild(debugLog.lastChild);
             }
             
-            // Auto-scroll to top
             debugLog.scrollTop = 0;
             
-            // Also log to console
             console.debug(`[${timestamp}] ${message}`);
         }
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (socket) socket.disconnect();
             if (peerConnection) peerConnection.close();
@@ -1281,7 +1241,6 @@
             logDebug('Page unloading - cleaning up');
         });
 
-        // Fullscreen change handler
         document.addEventListener('fullscreenchange', () => {
             if (!document.fullscreenElement) {
                 toggleFullscreen.innerHTML = '<i class="fas fa-expand"></i>';
