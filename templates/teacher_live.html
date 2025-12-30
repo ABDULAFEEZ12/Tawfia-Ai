@@ -626,11 +626,11 @@
         const notification = document.getElementById('notification');
         const debugLog = document.getElementById('debugLog');
 
-        // WebRTC Config
+        // WebRTC Config - FIX #1: Correct TURN endpoint for trial plan
         const WEBRTC_CONFIG = {
             iceServers: [
                 {
-                    urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                    urls: "turns:standard.relay.metered.ca:443?transport=tcp", // ✅ FIXED: Changed from 'global' to 'standard'
                     username: "459b679e028c3f37200569ec",
                     credential: "7Y4blbcvHOg1Uhwm"
                 }
@@ -640,7 +640,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             logDebug('Teacher page loaded. Room: ' + roomId);
-            logDebug('Using Metered TURN over TCP 443 (Render compatible)');
+            logDebug('Using correct TURN endpoint for trial plan (standard.relay.metered.ca)'); // Updated log
             connectToRoom();
             setupEventListeners();
             startSessionTimer();
@@ -684,7 +684,7 @@
             logDebug(`Room joined. My SID: ${mySid}, Role: ${data.role}`);
             showNotification('success', 'Connected to room', 'You are now the teacher in this classroom.');
             updateConnectionStatus('connected');
-            logDebug('Using fixed Metered TURN config for Render compatibility');
+            logDebug('TURN configuration ready for trial plan');
         }
 
         function handleStudentJoined(data) {
@@ -740,6 +740,7 @@
             });
         }
 
+        // FIX #2: Wait for video playback before signaling
         async function startBroadcasting() {
             try {
                 updateConnectionStatus('connecting');
@@ -759,7 +760,9 @@
                 });
 
                 teacherVideo.srcObject = localStream;
-                logDebug('Local stream obtained and displayed');
+                // ✅ FIXED: Wait for the video to actually start playing
+                await teacherVideo.play();
+                logDebug('Teacher video playing, frames flowing'); // Updated log
 
                 socket.emit('start-broadcast', { room: roomId });
                 logDebug('start-broadcast event emitted');
@@ -790,14 +793,15 @@
             logDebug(`Creating peer connection for student: ${studentSid}`);
 
             try {
+                // FIX #3: Removed forced relay policy temporarily
                 const peerConnection = new RTCPeerConnection({
                     iceServers: WEBRTC_CONFIG.iceServers,
-                    iceTransportPolicy: "relay",
+                    // ✅ FIXED: Removed 'iceTransportPolicy: "relay",' to let ICE complete normally
                     bundlePolicy: 'max-bundle',
                     rtcpMuxPolicy: 'require'
                 });
 
-                logDebug('PeerConnection created with forced TURN relay mode');
+                logDebug('PeerConnection created'); // Updated log
 
                 localStream.getTracks().forEach(track => {
                     peerConnection.addTrack(track, localStream);
@@ -854,7 +858,7 @@
                     logDebug(`ICE connection state for ${studentSid}: ${peerConnection.iceConnectionState}`);
                     
                     if (peerConnection.iceConnectionState === 'connected') {
-                        logDebug(`✅ ICE connected to ${studentSid} via TURN relay`);
+                        logDebug(`✅ ICE connected to ${studentSid}`);
                     } else if (peerConnection.iceConnectionState === 'failed') {
                         logDebug(`❌ ICE failed for ${studentSid}`);
                     }
