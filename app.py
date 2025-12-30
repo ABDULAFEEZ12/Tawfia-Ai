@@ -49,11 +49,9 @@ with app.app_context():
 # ============================================
 # In-Memory Storage
 # ============================================
-rooms = {}
-sessions = {}
-
-# Room authority state (NELAVISTA Phase 1)
-room_authority = {}
+rooms = {}           # room_id -> room data
+participants = {}    # socket_id -> participant info
+room_authority = {}  # room_id -> authority state
 
 # ============================================
 # Helper Functions
@@ -62,8 +60,8 @@ def get_or_create_room(room_id):
     """Get existing room or create new one"""
     if room_id not in rooms:
         rooms[room_id] = {
+            'participants': {},      # socket_id -> {'username', 'role', 'joined_at'}
             'teacher_sid': None,
-            'students': {},
             'created_at': datetime.utcnow().isoformat()
         }
     return rooms[room_id]
@@ -72,20 +70,37 @@ def get_room_authority(room_id):
     """Get or create authority state for a room"""
     if room_id not in room_authority:
         room_authority[room_id] = {
-            'teacher_sid': None,
             'muted_all': False,
             'cameras_disabled': False,
-            'mic_requests': {},  # {student_sid: username}
+            'mic_requests': {},
             'questions_enabled': True,
             'question_visibility': 'public'
         }
     return room_authority[room_id]
 
+def get_participants_list(room_id, exclude_sid=None):
+    """Get list of all participants in room except exclude_sid"""
+    if room_id not in rooms:
+        return []
+    
+    room = rooms[room_id]
+    result = []
+    
+    for sid, info in room['participants'].items():
+        if sid != exclude_sid:
+            result.append({
+                'sid': sid,
+                'username': info['username'],
+                'role': info['role']
+            })
+    
+    return result
+
 def cleanup_room(room_id):
     """Remove empty rooms"""
     if room_id in rooms:
         room = rooms[room_id]
-        if not room['teacher_sid'] and not room['students']:
+        if not room['participants']:
             del rooms[room_id]
             if room_id in room_authority:
                 del room_authority[room_id]
@@ -99,70 +114,59 @@ def cleanup_room(room_id):
 @socketio.on('connect')
 def handle_connect():
     sid = request.sid
-    sessions[sid] = {'room': None, 'role': None, 'username': None}
+    participants[sid] = {'room_id': None, 'username': None, 'role': None}
     print(f"✅ Client connected: {sid}")
 
 @socketio.on('disconnect')
 def handle_disconnect():
     sid = request.sid
-    if sid in sessions:
-        session_data = sessions[sid]
-        room_id = session_data.get('room')
+    
+    # Find which room this participant is in
+    participant = participants.get(sid)
+    if not participant:
+        return
+    
+    room_id = participant['room_id']
+    
+    if room_id in rooms:
+        room = rooms[room_id]
         
-        if room_id:
-            # Clean up authority state
-            if room_id in room_authority:
-                authority_state = room_authority[room_id]
-                
-                if sid == authority_state['teacher_sid']:
-                    # Teacher disconnected, reset authority state
-                    authority_state['teacher_sid'] = None
-                    authority_state['muted_all'] = False
-                    authority_state['cameras_disabled'] = False
-                    authority_state['mic_requests'] = {}
-                
-                # Remove student from mic requests
-                if sid in authority_state['mic_requests']:
-                    del authority_state['mic_requests'][sid]
-                    
-                    # Notify teacher if still connected
-                    if authority_state['teacher_sid']:
-                        emit('mic-requests-update', {
-                            'count': len(authority_state['mic_requests'])
-                        }, room=authority_state['teacher_sid'])
+        # Notify all other participants
+        if sid in room['participants']:
+            participant_info = room['participants'][sid]
             
-            # Clean up room
-            if room_id in rooms:
-                room = rooms[room_id]
-                
-                if session_data['role'] == 'teacher':
-                    room['teacher_sid'] = None
-                    with app.app_context():
-                        room_db = Room.query.get(room_id)
-                        if room_db:
-                            room_db.teacher_id = None
-                            db.session.commit()
-                    for student_sid in room['students']:
-                        emit('teacher-disconnected', room=student_sid)
-                elif session_data['role'] == 'student':
-                    if sid in room['students']:
-                        del room['students'][sid]
-                        if room['teacher_sid']:
-                            emit('student-left', {'sid': sid}, room=room['teacher_sid'])
-                
-                cleanup_room(room_id)
+            # Remove from room
+            del room['participants'][sid]
+            
+            # Update teacher_sid if teacher left
+            if sid == room['teacher_sid']:
+                room['teacher_sid'] = None
+                emit('teacher-disconnected', room=room_id, skip_sid=sid)
+            
+            # Notify others
+            emit('participant-left', {
+                'sid': sid,
+                'username': participant_info['username'],
+                'role': participant_info['role']
+            }, room=room_id, skip_sid=sid)
+            
+            print(f"❌ {participant_info['username']} left room {room_id}")
         
-        del sessions[sid]
-    print(f"❌ Client disconnected: {sid}")
+        # Clean up empty room
+        cleanup_room(room_id)
+    
+    # Remove from participants
+    if sid in participants:
+        del participants[sid]
 
 @socketio.on('join-room')
 def handle_join_room(data):
-    """One join path for both teacher and student"""
+    """Join room and get all existing participants"""
     try:
         sid = request.sid
         room_id = data.get('room')
         role = data.get('role', 'student')
-        username = data.get('username', 'User' if role == 'teacher' else 'Student')
+        username = data.get('username', 'Teacher' if role == 'teacher' else f'Student_{sid[:6]}')
         
         if not room_id:
             emit('error', {'message': 'Room ID required'})
@@ -173,11 +177,25 @@ def handle_join_room(data):
         room = get_or_create_room(room_id)
         authority_state = get_room_authority(room_id)
         
+        # Check if teacher already exists
+        if role == 'teacher' and room['teacher_sid']:
+            emit('error', {'message': 'Room already has a teacher'})
+            return
+        
+        # Check if student is trying to join without teacher
+        if role == 'student' and not room['teacher_sid']:
+            emit('error', {'message': 'Teacher not in room. Please wait.'})
+            return
+        
+        # Add to room
+        room['participants'][sid] = {
+            'username': username,
+            'role': role,
+            'joined_at': datetime.utcnow().isoformat()
+        }
+        
+        # Update teacher reference
         if role == 'teacher':
-            if room['teacher_sid']:
-                emit('error', {'message': 'Room already has a teacher'})
-                return
-            
             room['teacher_sid'] = sid
             authority_state['teacher_sid'] = sid
             
@@ -195,60 +213,155 @@ def handle_join_room(data):
                     existing_room.teacher_id = sid
                     existing_room.teacher_name = username
                 db.session.commit()
-            
-            emit('room-joined', {
-                'role': 'teacher',
-                'room': room_id,
-                'message': 'You are now the teacher',
-                'sid': sid
-            })
-            
-            print(f"✅ Teacher joined room: {room_id}")
-            
-        else:
-            if not room['teacher_sid']:
-                emit('error', {'message': 'Teacher not in room. Please wait.'})
-                return
-            
-            room['students'][sid] = username
-            
-            # Send current room state to student
-            emit('room-joined', {
-                'role': 'student',
-                'room': room_id,
-                'message': 'Joined classroom successfully',
-                'sid': sid,
-                'teacher_sid': room['teacher_sid'],
-                'teacher_name': 'Teacher'  # Default name
-            })
-            
-            # Send initial authority state
+        
+        # Update participant info
+        participants[sid] = {
+            'room_id': room_id,
+            'username': username,
+            'role': role
+        }
+        
+        # Join the socket room
+        join_room(room_id)
+        
+        # Get all existing participants (excluding self)
+        existing_participants = get_participants_list(room_id, exclude_sid=sid)
+        
+        # Send room joined confirmation
+        emit('room-joined', {
+            'room': room_id,
+            'sid': sid,
+            'username': username,
+            'role': role,
+            'existing_participants': existing_participants,
+            'teacher_sid': room['teacher_sid']
+        })
+        
+        # Notify all other participants about new joiner
+        emit('new-participant', {
+            'sid': sid,
+            'username': username,
+            'role': role
+        }, room=room_id, skip_sid=sid)
+        
+        # Send authority state if student
+        if role == 'student':
             emit('room-state', {
                 'muted_all': authority_state['muted_all'],
                 'cameras_disabled': authority_state['cameras_disabled'],
                 'questions_enabled': authority_state['questions_enabled'],
                 'question_visibility': authority_state['question_visibility']
-            }, room=sid)
-            
-            emit('student-joined', {
-                'sid': sid,
-                'username': username
-            }, room=room['teacher_sid'])
-            
-            print(f"✅ Student joined room: {room_id}")
+            })
         
-        sessions[sid]['room'] = room_id
-        sessions[sid]['role'] = role
-        sessions[sid]['username'] = username
-        
-        join_room(room_id)
+        # Log room status
+        print(f"✅ {username} joined room {room_id}. Total participants: {len(room['participants'])}")
         
     except Exception as e:
         print(f"❌ Error in join-room: {e}")
         emit('error', {'message': str(e)})
 
 # ============================================
-# NELAVISTA Phase 1: Teacher Authority Events
+# WebRTC Signaling - Full Mesh Support
+# ============================================
+@socketio.on('webrtc-offer')
+def handle_webrtc_offer(data):
+    """Relay WebRTC offer to specific participant"""
+    try:
+        room_id = data.get('room')
+        target_sid = data.get('target_sid')
+        offer = data.get('offer')
+        
+        if not all([room_id, target_sid, offer]):
+            return
+        
+        # Verify both are in the same room
+        sender = participants.get(request.sid)
+        target = participants.get(target_sid)
+        
+        if not sender or not target:
+            return
+        
+        if sender['room_id'] != room_id or target['room_id'] != room_id:
+            return
+        
+        print(f"📨 {request.sid[:8]} → offer → {target_sid[:8]}")
+        
+        # Relay offer to target
+        emit('webrtc-offer', {
+            'from_sid': request.sid,
+            'offer': offer,
+            'room': room_id
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error relaying offer: {e}")
+
+@socketio.on('webrtc-answer')
+def handle_webrtc_answer(data):
+    """Relay WebRTC answer to specific participant"""
+    try:
+        room_id = data.get('room')
+        target_sid = data.get('target_sid')
+        answer = data.get('answer')
+        
+        if not all([room_id, target_sid, answer]):
+            return
+        
+        # Verify both are in the same room
+        sender = participants.get(request.sid)
+        target = participants.get(target_sid)
+        
+        if not sender or not target:
+            return
+        
+        if sender['room_id'] != room_id or target['room_id'] != room_id:
+            return
+        
+        print(f"📨 {request.sid[:8]} → answer → {target_sid[:8]}")
+        
+        # Relay answer to target
+        emit('webrtc-answer', {
+            'from_sid': request.sid,
+            'answer': answer,
+            'room': room_id
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error relaying answer: {e}")
+
+@socketio.on('webrtc-ice-candidate')
+def handle_webrtc_ice_candidate(data):
+    """Relay ICE candidate to specific participant"""
+    try:
+        room_id = data.get('room')
+        target_sid = data.get('target_sid')
+        candidate = data.get('candidate')
+        
+        if not all([room_id, target_sid, candidate]):
+            return
+        
+        # Verify both are in the same room
+        sender = participants.get(request.sid)
+        target = participants.get(target_sid)
+        
+        if not sender or not target:
+            return
+        
+        if sender['room_id'] != room_id or target['room_id'] != room_id:
+            return
+        
+        # Relay candidate to target
+        emit('webrtc-ice-candidate', {
+            'from_sid': request.sid,
+            'candidate': candidate,
+            'room': room_id
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error relaying ICE candidate: {e}")
+
+# ============================================
+# Teacher Authority System
 # ============================================
 @socketio.on('teacher-mute-all')
 def handle_teacher_mute_all(data):
@@ -256,34 +369,28 @@ def handle_teacher_mute_all(data):
     try:
         room_id = data.get('room')
         
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
+        if not room_id or room_id not in rooms:
             return
         
-        authority_state = get_room_authority(room_id)
+        room = rooms[room_id]
         teacher_sid = request.sid
         
         # Verify this is the teacher
-        if teacher_sid != authority_state['teacher_sid']:
-            emit('error', {'message': 'Not authorized'}, room=teacher_sid)
+        if teacher_sid != room['teacher_sid']:
             return
         
-        authority_state['muted_all'] = True
+        authority = get_room_authority(room_id)
+        authority['muted_all'] = True
         
-        # Broadcast to all students EXCEPT teacher
-        emit('room-muted', {'muted': True}, room=room_id, skip_sid=teacher_sid)
+        # Notify all students
+        for sid in room['participants']:
+            if room['participants'][sid]['role'] == 'student':
+                emit('room-muted', {'muted': True}, room=sid)
         
-        # Confirm to teacher
-        emit('command-executed', {
-            'command': 'mute-all',
-            'status': 'success'
-        }, room=teacher_sid)
-        
-        print(f"🔇 Teacher muted all students in room: {room_id}")
+        print(f"🔇 Teacher muted all in room {room_id}")
         
     except Exception as e:
         print(f"❌ Error in teacher-mute-all: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('teacher-unmute-all')
 def handle_teacher_unmute_all(data):
@@ -291,33 +398,26 @@ def handle_teacher_unmute_all(data):
     try:
         room_id = data.get('room')
         
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
+        if not room_id or room_id not in rooms:
             return
         
-        authority_state = get_room_authority(room_id)
+        room = rooms[room_id]
         teacher_sid = request.sid
         
-        if teacher_sid != authority_state['teacher_sid']:
-            emit('error', {'message': 'Not authorized'}, room=teacher_sid)
+        if teacher_sid != room['teacher_sid']:
             return
         
-        authority_state['muted_all'] = False
+        authority = get_room_authority(room_id)
+        authority['muted_all'] = False
         
-        # Broadcast to all students EXCEPT teacher
-        emit('room-muted', {'muted': False}, room=room_id, skip_sid=teacher_sid)
+        for sid in room['participants']:
+            if room['participants'][sid]['role'] == 'student':
+                emit('room-muted', {'muted': False}, room=sid)
         
-        # Confirm to teacher
-        emit('command-executed', {
-            'command': 'unmute-all',
-            'status': 'success'
-        }, room=teacher_sid)
-        
-        print(f"🔊 Teacher unmuted all students in room: {room_id}")
+        print(f"🔊 Teacher unmuted all in room {room_id}")
         
     except Exception as e:
         print(f"❌ Error in teacher-unmute-all: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('teacher-disable-cameras')
 def handle_teacher_disable_cameras(data):
@@ -325,33 +425,26 @@ def handle_teacher_disable_cameras(data):
     try:
         room_id = data.get('room')
         
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
+        if not room_id or room_id not in rooms:
             return
         
-        authority_state = get_room_authority(room_id)
+        room = rooms[room_id]
         teacher_sid = request.sid
         
-        if teacher_sid != authority_state['teacher_sid']:
-            emit('error', {'message': 'Not authorized'}, room=teacher_sid)
+        if teacher_sid != room['teacher_sid']:
             return
         
-        authority_state['cameras_disabled'] = True
+        authority = get_room_authority(room_id)
+        authority['cameras_disabled'] = True
         
-        # Broadcast to all students EXCEPT teacher
-        emit('cameras-disabled', {'disabled': True}, room=room_id, skip_sid=teacher_sid)
+        for sid in room['participants']:
+            if room['participants'][sid]['role'] == 'student':
+                emit('cameras-disabled', {'disabled': True}, room=sid)
         
-        # Confirm to teacher
-        emit('command-executed', {
-            'command': 'disable-cameras',
-            'status': 'success'
-        }, room=teacher_sid)
-        
-        print(f"📷 Teacher disabled all cameras in room: {room_id}")
+        print(f"📷 Teacher disabled cameras in room {room_id}")
         
     except Exception as e:
         print(f"❌ Error in teacher-disable-cameras: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('teacher-enable-cameras')
 def handle_teacher_enable_cameras(data):
@@ -359,33 +452,26 @@ def handle_teacher_enable_cameras(data):
     try:
         room_id = data.get('room')
         
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
+        if not room_id or room_id not in rooms:
             return
         
-        authority_state = get_room_authority(room_id)
+        room = rooms[room_id]
         teacher_sid = request.sid
         
-        if teacher_sid != authority_state['teacher_sid']:
-            emit('error', {'message': 'Not authorized'}, room=teacher_sid)
+        if teacher_sid != room['teacher_sid']:
             return
         
-        authority_state['cameras_disabled'] = False
+        authority = get_room_authority(room_id)
+        authority['cameras_disabled'] = False
         
-        # Broadcast to all students EXCEPT teacher
-        emit('cameras-disabled', {'disabled': False}, room=room_id, skip_sid=teacher_sid)
+        for sid in room['participants']:
+            if room['participants'][sid]['role'] == 'student':
+                emit('cameras-disabled', {'disabled': False}, room=sid)
         
-        # Confirm to teacher
-        emit('command-executed', {
-            'command': 'enable-cameras',
-            'status': 'success'
-        }, room=teacher_sid)
-        
-        print(f"📸 Teacher enabled all cameras in room: {room_id}")
+        print(f"📸 Teacher enabled cameras in room {room_id}")
         
     except Exception as e:
         print(f"❌ Error in teacher-enable-cameras: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('student-request-mic')
 def handle_student_mic_request(data):
@@ -393,41 +479,39 @@ def handle_student_mic_request(data):
     try:
         room_id = data.get('room')
         
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
+        if not room_id or room_id not in rooms:
             return
         
-        authority_state = get_room_authority(room_id)
+        room = rooms[room_id]
         student_sid = request.sid
         
+        # Check if student is in room
+        if student_sid not in room['participants']:
+            return
+        
+        student_info = room['participants'][student_sid]
+        authority = get_room_authority(room_id)
+        
         # Check if room is muted
-        if authority_state['muted_all']:
+        if authority['muted_all']:
             emit('error', {'message': 'Room is muted by teacher'}, room=student_sid)
             return
         
-        # Check if student is in room
-        if room_id not in rooms or student_sid not in rooms[room_id]['students']:
-            emit('error', {'message': 'Student not in room'}, room=student_sid)
-            return
-        
-        student_username = rooms[room_id]['students'][student_sid]
-        
         # Add to pending requests
-        authority_state['mic_requests'][student_sid] = student_username
+        authority['mic_requests'][student_sid] = student_info['username']
         
-        # Notify teacher if connected
-        if authority_state['teacher_sid']:
+        # Notify teacher
+        if room['teacher_sid']:
             emit('mic-request-received', {
                 'student_sid': student_sid,
-                'username': student_username,
-                'count': len(authority_state['mic_requests'])
-            }, room=authority_state['teacher_sid'])
+                'username': student_info['username'],
+                'count': len(authority['mic_requests'])
+            }, room=room['teacher_sid'])
         
-        print(f"🎤 Student {student_username} requested mic in room: {room_id}")
+        print(f"🎤 {student_info['username']} requested mic in room {room_id}")
         
     except Exception as e:
         print(f"❌ Error in student-request-mic: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('teacher-approve-mic')
 def handle_teacher_approve_mic(data):
@@ -437,35 +521,36 @@ def handle_teacher_approve_mic(data):
         student_sid = data.get('student_sid')
         
         if not room_id or not student_sid:
-            emit('error', {'message': 'Room ID and student SID required'})
             return
         
-        authority_state = get_room_authority(room_id)
+        room = rooms.get(room_id)
+        if not room:
+            return
+        
         teacher_sid = request.sid
         
-        if teacher_sid != authority_state['teacher_sid']:
-            emit('error', {'message': 'Not authorized'}, room=teacher_sid)
+        # Verify this is the teacher
+        if teacher_sid != room['teacher_sid']:
             return
         
-        if student_sid in authority_state['mic_requests']:
+        authority = get_room_authority(room_id)
+        
+        if student_sid in authority['mic_requests']:
             # Remove from pending requests
-            del authority_state['mic_requests'][student_sid]
+            del authority['mic_requests'][student_sid]
             
-            # Notify the specific student
+            # Notify the student
             emit('mic-approved', {'approved': True}, room=student_sid)
             
             # Update teacher's request count
             emit('mic-requests-update', {
-                'count': len(authority_state['mic_requests'])
+                'count': len(authority['mic_requests'])
             }, room=teacher_sid)
             
-            print(f"✅ Teacher approved mic for student {student_sid} in room: {room_id}")
-        else:
-            emit('error', {'message': 'No pending request for this student'}, room=teacher_sid)
+            print(f"✅ Teacher approved mic for student {student_sid} in room {room_id}")
         
     except Exception as e:
         print(f"❌ Error in teacher-approve-mic: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('student-struggle-signal')
 def handle_struggle_signal(data):
@@ -475,32 +560,32 @@ def handle_struggle_signal(data):
         signal = data.get('signal')  # 'confused', 'too_fast', 'got_it'
         
         if not room_id or not signal:
-            emit('error', {'message': 'Room ID and signal required'})
             return
         
-        authority_state = get_room_authority(room_id)
+        room = rooms.get(room_id)
+        if not room:
+            return
+        
         student_sid = request.sid
         
         # Check if student is in room
-        if room_id not in rooms or student_sid not in rooms[room_id]['students']:
-            emit('error', {'message': 'Student not in room'}, room=student_sid)
+        if student_sid not in room['participants']:
             return
         
-        student_username = rooms[room_id]['students'][student_sid]
+        student_info = room['participants'][student_sid]
         
         # Forward to teacher only
-        if authority_state['teacher_sid']:
+        if room['teacher_sid']:
             emit('student-struggling', {
                 'student_sid': student_sid,
-                'username': student_username,
+                'username': student_info['username'],
                 'signal': signal
-            }, room=authority_state['teacher_sid'])
+            }, room=room['teacher_sid'])
         
-        print(f"💡 Student {student_username} sent {signal} signal in room: {room_id}")
+        print(f"💡 {student_info['username']} sent {signal} signal in room {room_id}")
         
     except Exception as e:
         print(f"❌ Error in student-struggle-signal: {e}")
-        emit('error', {'message': str(e)})
 
 @socketio.on('teacher-toggle-questions')
 def handle_teacher_toggle_questions(data):
@@ -508,195 +593,29 @@ def handle_teacher_toggle_questions(data):
     try:
         room_id = data.get('room')
         
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        authority_state = get_room_authority(room_id)
-        teacher_sid = request.sid
-        
-        if teacher_sid != authority_state['teacher_sid']:
-            emit('error', {'message': 'Not authorized'}, room=teacher_sid)
-            return
-        
-        # Toggle question status
-        authority_state['questions_enabled'] = not authority_state['questions_enabled']
-        
-        # Broadcast to all students
-        emit('questions-toggled', {
-            'enabled': authority_state['questions_enabled']
-        }, room=room_id, skip_sid=teacher_sid)
-        
-        # Confirm to teacher
-        emit('command-executed', {
-            'command': 'toggle-questions',
-            'status': 'success',
-            'enabled': authority_state['questions_enabled']
-        }, room=teacher_sid)
-        
-        print(f"❓ Teacher {'enabled' if authority_state['questions_enabled'] else 'disabled'} questions in room: {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in teacher-toggle-questions: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('teacher-set-question-visibility')
-def handle_teacher_set_question_visibility(data):
-    """Teacher sets question visibility mode"""
-    try:
-        room_id = data.get('room')
-        visibility = data.get('visibility')  # 'public' or 'anonymous'
-        
-        if not room_id or visibility not in ['public', 'anonymous']:
-            emit('error', {'message': 'Valid room ID and visibility required'})
-            return
-        
-        authority_state = get_room_authority(room_id)
-        teacher_sid = request.sid
-        
-        if teacher_sid != authority_state['teacher_sid']:
-            emit('error', {'message': 'Not authorized'}, room=teacher_sid)
-            return
-        
-        authority_state['question_visibility'] = visibility
-        
-        # Broadcast to all students
-        emit('question-visibility-changed', {
-            'visibility': visibility
-        }, room=room_id, skip_sid=teacher_sid)
-        
-        # Confirm to teacher
-        emit('command-executed', {
-            'command': 'set-question-visibility',
-            'status': 'success',
-            'visibility': visibility
-        }, room=teacher_sid)
-        
-        print(f"👁️ Teacher set question visibility to {visibility} in room: {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in teacher-set-question-visibility: {e}")
-        emit('error', {'message': str(e)})
-
-# ============================================
-# WebRTC Signaling (SIMPLE RELAY ONLY)
-# ============================================
-@socketio.on('rtc-offer')
-def handle_rtc_offer(data):
-    """Teacher sends offer to specific student"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        offer = data.get('offer')
-        
-        if not all([room_id, target_sid, offer]):
-            emit('error', {'message': 'Missing offer data'})
-            return
-        
-        if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
+        if not room_id or room_id not in rooms:
             return
         
         room = rooms[room_id]
         teacher_sid = request.sid
         
         if teacher_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can send offers'})
             return
         
-        if target_sid not in room['students']:
-            emit('error', {'message': 'Student not found in room'})
-            return
+        authority = get_room_authority(room_id)
+        authority['questions_enabled'] = not authority['questions_enabled']
         
-        print(f"🎥 Teacher sending offer to student {target_sid}")
+        # Notify all participants except teacher
+        for sid in room['participants']:
+            if sid != teacher_sid:
+                emit('questions-toggled', {
+                    'enabled': authority['questions_enabled']
+                }, room=sid)
         
-        emit('rtc-offer', {
-            'offer': offer,
-            'from_teacher': teacher_sid,
-            'room': room_id
-        }, room=target_sid)
+        print(f"❓ Teacher {'enabled' if authority['questions_enabled'] else 'disabled'} questions in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in rtc-offer: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('rtc-answer')
-def handle_rtc_answer(data):
-    """Student sends answer to teacher"""
-    try:
-        room_id = data.get('room')
-        answer = data.get('answer')
-        
-        if not all([room_id, answer]):
-            emit('error', {'message': 'Missing answer data'})
-            return
-        
-        if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        room = rooms[room_id]
-        student_sid = request.sid
-        
-        if student_sid not in room['students']:
-            emit('error', {'message': 'Not authorized'})
-            return
-        
-        if not room['teacher_sid']:
-            emit('error', {'message': 'Teacher not available'})
-            return
-        
-        print(f"🎥 Student {student_sid} sending answer to teacher")
-        
-        emit('rtc-answer', {
-            'answer': answer,
-            'from_student': student_sid,
-            'room': room_id
-        }, room=room['teacher_sid'])
-        
-    except Exception as e:
-        print(f"❌ Error in rtc-answer: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('rtc-ice-candidate')
-def handle_rtc_ice_candidate(data):
-    """Exchange ICE candidates (SIMPLE RELAY)"""
-    try:
-        room_id = data.get('room')
-        candidate = data.get('candidate')
-        target_sid = data.get('target_sid')
-        
-        if not all([room_id, candidate, target_sid]):
-            return  # Silently ignore, some candidates may be incomplete
-        
-        if room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        sender_sid = request.sid
-        
-        is_teacher = (sender_sid == room['teacher_sid'])
-        is_student = (sender_sid in room['students'])
-        
-        if not (is_teacher or is_student):
-            return
-        
-        is_target_teacher = (target_sid == room['teacher_sid'])
-        is_target_student = (target_sid in room['students'])
-        
-        if not (is_target_teacher or is_target_student):
-            return
-        
-        # RELAY THE CANDIDATE WITHOUT MODIFICATION
-        emit('rtc-ice-candidate', {
-            'candidate': candidate,
-            'from_sid': sender_sid,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        print(f"❌ Error relaying ICE candidate: {e}")
-        # Don't emit error, just log it
+        print(f"❌ Error in teacher-toggle-questions: {e}")
 
 # ============================================
 # Control Events
@@ -720,7 +639,11 @@ def handle_start_broadcast(data):
         
         print(f"📢 Teacher starting broadcast in room: {room_id}")
         
-        student_sids = list(room['students'].keys())
+        # Get all student SIDs
+        student_sids = []
+        for sid, info in room['participants'].items():
+            if info['role'] == 'student':
+                student_sids.append(sid)
         
         emit('broadcast-ready', {
             'student_sids': student_sids,
@@ -820,10 +743,10 @@ def debug_rooms():
     """Debug endpoint to view current room states"""
     debug_info = {
         'rooms': rooms,
+        'participants': participants,
         'room_authority': room_authority,
-        'sessions': sessions,
         'total_rooms': len(rooms),
-        'total_connections': len(sessions)
+        'total_participants': len(participants)
     }
     return json.dumps(debug_info, indent=2, default=str)
 
@@ -832,17 +755,12 @@ def debug_rooms():
 # ============================================
 if __name__ == '__main__':
     print(f"\n{'='*60}")
-    print("🚀 WebRTC Broadcast System - SIGNALING ONLY")
-    print("🌟 NELAVISTA LIVE Phase 1: Teacher Authority Enabled")
+    print("🚀 NELAVISTA LIVE - Full Mesh WebRTC")
+    print("🌟 Teacher Authority + Full Mesh Networking")
     print(f"{'='*60}")
-    print("✅ Backend handles signaling only (NO TURN/STUN config)")
-    print("✅ Teacher authority features implemented:")
-    print("   • Mute/Unmute all students")
-    print("   • Disable/Enable all cameras")
-    print("   • Approve microphone requests")
-    print("   • Receive student struggle signals")
-    print("   • Control question visibility")
-    print("✅ TURN configuration is frontend-only")
+    print("✅ Full mesh topology (everyone sees everyone)")
+    print("✅ Teacher authority system")
+    print("✅ WebRTC signaling with STUN/TURN")
     print("✅ Production ready for Render deployment")
     print(f"{'='*60}\n")
     
