@@ -95,7 +95,7 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr 350px;
             gap: 20px;
         }
 
@@ -204,6 +204,16 @@
 
         .control-btn.active {
             background: #ff4757;
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .control-btn:disabled:hover {
+            transform: none;
+            background: rgba(0, 0, 0, 0.7);
         }
 
         .connection-status {
@@ -358,6 +368,10 @@
             background: #ff4757;
         }
 
+        .action-btn.success {
+            background: #2ed573;
+        }
+
         .action-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -483,6 +497,97 @@
             color: #00ff00;
         }
 
+        /* NELAVISTA Student Controls */
+        .student-controls-panel {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px solid #667eea;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .struggle-signals {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .struggle-btn {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .struggle-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .struggle-btn.confused {
+            background: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+        }
+
+        .struggle-btn.too-fast {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffe0b2;
+        }
+
+        .struggle-btn.got-it {
+            background: #e8f5e9;
+            color: #388e3c;
+            border: 1px solid #c8e6c9;
+        }
+
+        .mic-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .mic-status.pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .mic-status.approved {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .teacher-restriction {
+            background: #ffebee;
+            border-left: 4px solid #ff4757;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -520,6 +625,10 @@
             
             .student-selfview-container {
                 height: 140px;
+            }
+
+            .struggle-signals {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -578,6 +687,52 @@
                     </div>
                 </div>
 
+                <!-- NELAVISTA Student Controls -->
+                <div class="student-controls-panel">
+                    <h3 style="color: #667eea; margin-bottom: 15px; font-size: 18px;">
+                        <i class="fas fa-user-cog"></i> Your Controls
+                    </h3>
+                    
+                    <div class="control-row">
+                        <button class="action-btn success" id="requestMicBtn">
+                            <i class="fas fa-microphone"></i> Request to Speak
+                        </button>
+                        <button class="action-btn secondary" id="toggleMyAudio">
+                            <i class="fas fa-microphone"></i> My Mic: ON
+                        </button>
+                        <button class="action-btn secondary" id="toggleMyVideo">
+                            <i class="fas fa-video"></i> My Camera: ON
+                        </button>
+                    </div>
+
+                    <div class="mic-status" id="micStatus" style="display: none;">
+                        <i class="fas fa-clock"></i>
+                        <span>Mic request pending...</span>
+                    </div>
+
+                    <div id="teacherRestrictions" style="display: none;">
+                        <!-- Will show teacher restrictions -->
+                    </div>
+
+                    <h4 style="margin-top: 20px; margin-bottom: 10px; color: #666;">
+                        <i class="fas fa-comment-medical"></i> Quick Feedback
+                    </h4>
+                    <div class="struggle-signals">
+                        <button class="struggle-btn confused" onclick="sendStruggleSignal('confused')">
+                            <i class="fas fa-question-circle"></i>
+                            <span>I'm confused</span>
+                        </button>
+                        <button class="struggle-btn too-fast" onclick="sendStruggleSignal('too_fast')">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Too fast</span>
+                        </button>
+                        <button class="struggle-btn got-it" onclick="sendStruggleSignal('got_it')">
+                            <i class="fas fa-check-circle"></i>
+                            <span>I get it</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="connection-status" id="connectionStatus">
                     <i class="fas fa-sync-alt fa-spin"></i>
                     <span>Connecting to classroom...</span>
@@ -592,9 +747,6 @@
                 <div class="controls">
                     <button class="action-btn" id="raiseHand" disabled>
                         <i class="fas fa-hand-paper"></i> Raise Hand
-                    </button>
-                    <button class="action-btn secondary" id="toggleAudio">
-                        <i class="fas fa-microphone"></i> Enable Microphone
                     </button>
                     <button class="action-btn danger" id="leaveClass">
                         <i class="fas fa-sign-out-alt"></i> Leave Class
@@ -640,17 +792,32 @@
                 </div>
 
                 <div class="section-title">
-                    <i class="fas fa-cogs"></i>
-                    <h2>Settings</h2>
+                    <i class="fas fa-user-shield"></i>
+                    <h2>Classroom Status</h2>
                 </div>
 
-                <div class="controls">
-                    <button class="action-btn secondary" id="toggleVideoQuality">
-                        <i class="fas fa-tachometer-alt"></i> Adjust Quality
-                    </button>
-                    <button class="action-btn secondary" id="reportIssue">
-                        <i class="fas fa-flag"></i> Report Issue
-                    </button>
+                <div class="class-info">
+                    <div class="info-item">
+                        <i class="fas fa-microphone"></i>
+                        <div>
+                            <div class="label">Audio Permission</div>
+                            <div class="value" id="audioPermission">Allowed</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-video"></i>
+                        <div>
+                            <div class="label">Camera Permission</div>
+                            <div class="value" id="cameraPermission">Allowed</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-bullhorn"></i>
+                        <div>
+                            <div class="label">Questions</div>
+                            <div class="value" id="questionsStatus">Enabled</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -675,6 +842,15 @@
         let teacherSid = null;
         let connectionState = 'disconnected';
         let studentStream = null;
+        
+        // NELAVISTA State
+        let roomState = {
+            muted_all: false,
+            cameras_disabled: false,
+            questions_enabled: true,
+            question_visibility: 'public',
+            mic_approved: false
+        };
 
         // DOM Elements
         const teacherVideo = document.getElementById('teacherVideo');
@@ -684,24 +860,29 @@
         const toggleFullscreen = document.getElementById('toggleFullscreen');
         const toggleMute = document.getElementById('toggleMute');
         const raiseHand = document.getElementById('raiseHand');
-        const toggleAudioBtn = document.getElementById('toggleAudio');
+        const toggleMyAudio = document.getElementById('toggleMyAudio');
+        const toggleMyVideo = document.getElementById('toggleMyVideo');
         const leaveClass = document.getElementById('leaveClass');
         const connectionStatus = document.getElementById('connectionStatus');
         const studentNameElement = document.getElementById('studentName');
         const sessionTimeElement = document.getElementById('sessionTime');
         const teacherNameElement = document.getElementById('teacherName');
         const notification = document.getElementById('notification');
-        const toggleVideoQuality = document.getElementById('toggleVideoQuality');
-        const reportIssue = document.getElementById('reportIssue');
         const debugLog = document.getElementById('debugLog');
         const streamQualityElement = document.getElementById('streamQuality');
         const connectionTypeElement = document.getElementById('connectionType');
+        const audioPermissionElement = document.getElementById('audioPermission');
+        const cameraPermissionElement = document.getElementById('cameraPermission');
+        const questionsStatusElement = document.getElementById('questionsStatus');
+        const requestMicBtn = document.getElementById('requestMicBtn');
+        const micStatus = document.getElementById('micStatus');
+        const teacherRestrictions = document.getElementById('teacherRestrictions');
 
         // WebRTC Config
         const WEBRTC_CONFIG = {
             iceServers: [
                 {
-                    urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                    urls: "turns:standard.relay.metered.ca:443?transport=tcp",
                     username: "459b679e028c3f37200569ec",
                     credential: "7Y4blbcvHOg1Uhwm"
                 }
@@ -746,7 +927,9 @@
                 await studentVideo.play().catch(e => console.log("Student video autoplay prevented:", e));
                 
                 logDebug(`Student media obtained: ${studentStream.getVideoTracks().length} video track(s), ${studentStream.getAudioTracks().length} audio track(s)`);
-                console.log("Student video track:", studentStream.getVideoTracks()[0]?.getSettings());
+                
+                // Initialize control buttons
+                updateControlButtons();
                 
                 showNotification('success', 'Camera Ready', 'Your camera and microphone are active');
                 return true;
@@ -775,6 +958,7 @@
                 updateConnectionStatus('error', 'Disconnected from server');
             });
 
+            // Existing WebRTC events
             socket.on('room-joined', handleRoomJoined);
             socket.on('teacher-ready', handleTeacherReady);
             socket.on('rtc-offer', handleRTCOffer);
@@ -785,15 +969,340 @@
                 logDebug('Pong received - connection alive');
             });
 
+            // NELAVISTA Teacher Authority Events
+            socket.on('room-state', handleRoomState);
+            socket.on('room-muted', handleRoomMuted);
+            socket.on('cameras-disabled', handleCamerasDisabled);
+            socket.on('mic-approved', handleMicApproved);
+            socket.on('questions-toggled', handleQuestionsToggled);
+
+            // Button events
             toggleFullscreen.addEventListener('click', toggleFullscreenMode);
             toggleMute.addEventListener('click', toggleVideoMute);
             raiseHand.addEventListener('click', raiseHandAction);
-            toggleAudioBtn.addEventListener('click', toggleStudentAudio);
+            toggleMyAudio.addEventListener('click', toggleStudentAudio);
+            toggleMyVideo.addEventListener('click', toggleStudentVideo);
+            requestMicBtn.addEventListener('click', requestMicrophone);
             leaveClass.addEventListener('click', leaveClassroom);
-            toggleVideoQuality.addEventListener('click', adjustVideoQuality);
-            reportIssue.addEventListener('click', reportTechnicalIssue);
         }
 
+        // NELAVISTA Student Compliance Functions
+        function handleRoomState(data) {
+            logDebug('Received room state from server');
+            roomState = { ...roomState, ...data };
+            applyRoomState();
+        }
+
+        function handleRoomMuted(data) {
+            const { muted } = data;
+            roomState.muted_all = muted;
+            
+            if (muted) {
+                disableStudentMicrophone();
+                showNotification('info', 'Class Muted', 'Teacher has muted all students');
+                audioPermissionElement.textContent = 'Disabled by Teacher';
+                audioPermissionElement.style.color = '#ff4757';
+            } else {
+                // Mic still needs approval for speaking
+                audioPermissionElement.textContent = roomState.mic_approved ? 'Approved' : 'Request Required';
+                audioPermissionElement.style.color = roomState.mic_approved ? '#2ed573' : '#ffa502';
+            }
+            
+            updateControlButtons();
+        }
+
+        function handleCamerasDisabled(data) {
+            const { disabled } = data;
+            roomState.cameras_disabled = disabled;
+            
+            if (disabled) {
+                disableStudentCamera();
+                showNotification('info', 'Cameras Disabled', 'Teacher has disabled all student cameras');
+                cameraPermissionElement.textContent = 'Disabled by Teacher';
+                cameraPermissionElement.style.color = '#ff4757';
+            } else {
+                cameraPermissionElement.textContent = 'Allowed';
+                cameraPermissionElement.style.color = '#2ed573';
+            }
+            
+            updateControlButtons();
+            updateTeacherRestrictionsUI();
+        }
+
+        function handleMicApproved(data) {
+            if (data.approved) {
+                roomState.mic_approved = true;
+                showNotification('success', 'Microphone Approved', 'Teacher has approved your microphone request');
+                micStatus.className = 'mic-status approved';
+                micStatus.innerHTML = '<i class="fas fa-check-circle"></i><span>Mic approved! You can speak.</span>';
+                audioPermissionElement.textContent = 'Approved';
+                audioPermissionElement.style.color = '#2ed573';
+                
+                // Enable microphone if it was disabled
+                if (studentStream) {
+                    studentStream.getAudioTracks().forEach(track => {
+                        track.enabled = true;
+                    });
+                }
+            }
+        }
+
+        function handleQuestionsToggled(data) {
+            const { enabled } = data;
+            roomState.questions_enabled = enabled;
+            questionsStatusElement.textContent = enabled ? 'Enabled' : 'Disabled';
+            questionsStatusElement.style.color = enabled ? '#2ed573' : '#ff4757';
+            
+            if (!enabled) {
+                showNotification('info', 'Questions Disabled', 'Teacher has disabled questions');
+            }
+        }
+
+        function applyRoomState() {
+            logDebug('Applying room state restrictions');
+            
+            if (roomState.muted_all) {
+                disableStudentMicrophone();
+            }
+            
+            if (roomState.cameras_disabled) {
+                disableStudentCamera();
+            }
+            
+            updateControlButtons();
+            updateTeacherRestrictionsUI();
+        }
+
+        function disableStudentMicrophone() {
+            if (studentStream) {
+                studentStream.getAudioTracks().forEach(track => {
+                    track.enabled = false;
+                });
+                toggleMyAudio.innerHTML = '<i class="fas fa-microphone-slash"></i> My Mic: OFF (Teacher)';
+                toggleMyAudio.classList.add('disabled');
+                toggleMyAudio.disabled = true;
+            }
+        }
+
+        function disableStudentCamera() {
+            if (studentStream) {
+                studentStream.getVideoTracks().forEach(track => {
+                    track.enabled = false;
+                });
+                toggleMyVideo.innerHTML = '<i class="fas fa-video-slash"></i> My Camera: OFF (Teacher)';
+                toggleMyVideo.classList.add('disabled');
+                toggleMyVideo.disabled = true;
+            }
+        }
+
+        function updateControlButtons() {
+            // Update microphone button
+            if (roomState.muted_all) {
+                toggleMyAudio.innerHTML = '<i class="fas fa-microphone-slash"></i> My Mic: OFF (Teacher)';
+                toggleMyAudio.classList.add('disabled');
+                toggleMyAudio.disabled = true;
+            } else {
+                const audioEnabled = studentStream && studentStream.getAudioTracks()[0]?.enabled;
+                toggleMyAudio.innerHTML = audioEnabled ? 
+                    '<i class="fas fa-microphone"></i> My Mic: ON' : 
+                    '<i class="fas fa-microphone-slash"></i> My Mic: OFF';
+                toggleMyAudio.disabled = false;
+                toggleMyAudio.classList.remove('disabled');
+            }
+
+            // Update camera button
+            if (roomState.cameras_disabled) {
+                toggleMyVideo.innerHTML = '<i class="fas fa-video-slash"></i> My Camera: OFF (Teacher)';
+                toggleMyVideo.classList.add('disabled');
+                toggleMyVideo.disabled = true;
+            } else {
+                const videoEnabled = studentStream && studentStream.getVideoTracks()[0]?.enabled;
+                toggleMyVideo.innerHTML = videoEnabled ? 
+                    '<i class="fas fa-video"></i> My Camera: ON' : 
+                    '<i class="fas fa-video-slash"></i> My Camera: OFF';
+                toggleMyVideo.disabled = false;
+                toggleMyVideo.classList.remove('disabled');
+            }
+
+            // Update request mic button
+            requestMicBtn.disabled = roomState.muted_all;
+            if (roomState.muted_all) {
+                requestMicBtn.title = 'Class is muted by teacher';
+            }
+        }
+
+        function updateTeacherRestrictionsUI() {
+            const restrictions = [];
+            
+            if (roomState.muted_all) {
+                restrictions.push('<i class="fas fa-volume-mute"></i> Class audio muted by teacher');
+            }
+            
+            if (roomState.cameras_disabled) {
+                restrictions.push('<i class="fas fa-video-slash"></i> Cameras disabled by teacher');
+            }
+            
+            if (!roomState.questions_enabled) {
+                restrictions.push('<i class="fas fa-comment-slash"></i> Questions disabled by teacher');
+            }
+            
+            if (restrictions.length > 0) {
+                teacherRestrictions.innerHTML = restrictions.map(r => 
+                    `<div class="teacher-restriction">${r}</div>`
+                ).join('');
+                teacherRestrictions.style.display = 'block';
+            } else {
+                teacherRestrictions.style.display = 'none';
+            }
+        }
+
+        // Student Control Functions
+        function requestMicrophone() {
+            if (roomState.muted_all) {
+                showNotification('error', 'Class Muted', 'Teacher has muted the entire class');
+                return;
+            }
+            
+            socket.emit('student-request-mic', { room: roomId });
+            showNotification('info', 'Request Sent', 'Waiting for teacher approval');
+            
+            micStatus.className = 'mic-status pending';
+            micStatus.innerHTML = '<i class="fas fa-clock"></i><span>Mic request pending...</span>';
+            micStatus.style.display = 'flex';
+            
+            requestMicBtn.disabled = true;
+            requestMicBtn.innerHTML = '<i class="fas fa-clock"></i> Request Sent';
+            
+            logDebug('Requested microphone permission');
+        }
+
+        function sendStruggleSignal(signal) {
+            socket.emit('student-struggle-signal', {
+                room: roomId,
+                signal: signal
+            });
+            
+            const signalMessages = {
+                'confused': 'I\'m confused',
+                'too_fast': 'Too fast',
+                'got_it': 'I get it'
+            };
+            
+            showNotification('info', 'Feedback Sent', `Teacher notified: ${signalMessages[signal]}`);
+            logDebug(`Sent struggle signal: ${signal}`);
+        }
+
+        async function toggleStudentAudio() {
+            if (roomState.muted_all) {
+                showNotification('error', 'Cannot Unmute', 'Teacher has muted the entire class');
+                return;
+            }
+            
+            if (!roomState.mic_approved) {
+                showNotification('info', 'Approval Needed', 'Please request microphone permission from teacher first');
+                return;
+            }
+            
+            try {
+                if (!studentStream) {
+                    studentStream = await navigator.mediaDevices.getUserMedia({ 
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    });
+                    
+                    studentVideo.srcObject = studentStream;
+                    studentVideo.muted = true;
+                }
+                
+                const audioTrack = studentStream.getAudioTracks()[0];
+                
+                if (audioTrack) {
+                    if (audioTrack.enabled) {
+                        audioTrack.enabled = false;
+                        toggleMyAudio.innerHTML = '<i class="fas fa-microphone-slash"></i> My Mic: OFF';
+                        showNotification('info', 'Microphone off', 'Your microphone is now disabled.');
+                        logDebug('Microphone disabled by student');
+                    } else {
+                        audioTrack.enabled = true;
+                        toggleMyAudio.innerHTML = '<i class="fas fa-microphone"></i> My Mic: ON';
+                        showNotification('info', 'Microphone on', 'Your microphone is now enabled.');
+                        logDebug('Microphone enabled by student');
+                    }
+                    
+                    // Update peer connection if exists
+                    if (peerConnection && peerConnection.getSenders().length > 0) {
+                        const audioSender = peerConnection.getSenders().find(
+                            sender => sender.track && sender.track.kind === 'audio'
+                        );
+                        if (audioSender) {
+                            audioSender.replaceTrack(audioTrack);
+                            logDebug('Replaced audio track in peer connection');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                showNotification('error', 'Microphone Error', 'Could not access microphone. Please check permissions.');
+                logDebug(`Microphone error: ${error.message}`);
+            }
+        }
+
+        async function toggleStudentVideo() {
+            if (roomState.cameras_disabled) {
+                showNotification('error', 'Cannot Enable Camera', 'Teacher has disabled all student cameras');
+                return;
+            }
+            
+            try {
+                if (!studentStream) {
+                    studentStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: {
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        }
+                    });
+                    
+                    studentVideo.srcObject = studentStream;
+                    studentVideo.muted = true;
+                }
+                
+                const videoTrack = studentStream.getVideoTracks()[0];
+                
+                if (videoTrack) {
+                    if (videoTrack.enabled) {
+                        videoTrack.enabled = false;
+                        toggleMyVideo.innerHTML = '<i class="fas fa-video-slash"></i> My Camera: OFF';
+                        showNotification('info', 'Camera off', 'Your camera is now disabled.');
+                        logDebug('Camera disabled by student');
+                    } else {
+                        videoTrack.enabled = true;
+                        toggleMyVideo.innerHTML = '<i class="fas fa-video"></i> My Camera: ON';
+                        showNotification('info', 'Camera on', 'Your camera is now enabled.');
+                        logDebug('Camera enabled by student');
+                    }
+                    
+                    // Update peer connection if exists
+                    if (peerConnection && peerConnection.getSenders().length > 0) {
+                        const videoSender = peerConnection.getSenders().find(
+                            sender => sender.track && sender.track.kind === 'video'
+                        );
+                        if (videoSender) {
+                            videoSender.replaceTrack(videoTrack);
+                            logDebug('Replaced video track in peer connection');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                showNotification('error', 'Camera Error', 'Could not access camera. Please check permissions.');
+                logDebug(`Camera error: ${error.message}`);
+            }
+        }
+
+        // Existing WebRTC functions (kept from your original code with minimal changes)
         function handleRoomJoined(data) {
             logDebug(`Room joined. My SID: ${data.sid}, Teacher SID: ${data.teacher_sid || 'Not yet available'}`);
             teacherSid = data.teacher_sid;
@@ -825,12 +1334,11 @@
                 
                 peerConnection = new RTCPeerConnection({
                     iceServers: WEBRTC_CONFIG.iceServers,
-                    iceTransportPolicy: "relay",
                     bundlePolicy: 'max-bundle',
                     rtcpMuxPolicy: 'require'
                 });
 
-                logDebug('PeerConnection created with forced TURN relay mode');
+                logDebug('PeerConnection created');
 
                 if (studentStream) {
                     logDebug('Adding student tracks to peer connection...');
@@ -838,14 +1346,6 @@
                         logDebug(`Adding track: ${track.kind} (${track.id})`);
                         peerConnection.addTrack(track, studentStream);
                     });
-                    
-                    setTimeout(() => {
-                        const senders = peerConnection.getSenders();
-                        logDebug(`Added ${senders.length} track(s) to peer connection:`);
-                        senders.forEach(sender => {
-                            logDebug(`  - ${sender.track?.kind}: ${sender.track?.id}`);
-                        });
-                    }, 100);
                 } else {
                     logDebug('WARNING: No student stream available to add to peer connection');
                 }
@@ -903,7 +1403,7 @@
                     connectionTypeElement.textContent = peerConnection.iceConnectionState;
                     
                     if (peerConnection.iceConnectionState === 'connected') {
-                        logDebug('✅ ICE connected via TURN relay');
+                        logDebug('✅ ICE connected');
                     }
                 };
 
@@ -922,9 +1422,6 @@
                     answer: peerConnection.localDescription
                 });
                 logDebug('Sent answer to teacher');
-
-                console.log("SDP contains student video?", answer.sdp.includes("m=video"));
-                console.log("SDP contains student audio?", answer.sdp.includes("m=audio"));
 
             } catch (error) {
                 console.error('Error handling RTC offer:', error);
@@ -981,6 +1478,7 @@
             }
         }
 
+        // Remaining helper functions (kept from your original code)
         function updateConnectionStatus(status, message) {
             let icon, color, statusClass;
             
@@ -1078,6 +1576,11 @@
         }
 
         function raiseHandAction() {
+            if (!roomState.questions_enabled) {
+                showNotification('error', 'Questions Disabled', 'Teacher has disabled questions');
+                return;
+            }
+            
             showNotification('info', 'Hand Raised', 'Teacher has been notified that you have a question.');
             logDebug('Raised hand');
             
@@ -1088,65 +1591,6 @@
                 raiseHand.innerHTML = '<i class="fas fa-hand-paper"></i> Raise Hand';
                 raiseHand.disabled = false;
             }, 5000);
-        }
-
-        async function toggleStudentAudio() {
-            try {
-                if (!studentStream) {
-                    studentStream = await navigator.mediaDevices.getUserMedia({ 
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true
-                        }
-                    });
-                    
-                    studentVideo.srcObject = studentStream;
-                }
-                
-                const audioTrack = studentStream.getAudioTracks()[0];
-                
-                if (audioTrack) {
-                    if (audioTrack.enabled) {
-                        audioTrack.enabled = false;
-                        toggleAudioBtn.innerHTML = '<i class="fas fa-microphone-slash"></i> Enable Microphone';
-                        showNotification('info', 'Microphone off', 'Your microphone is now disabled.');
-                        logDebug('Microphone disabled');
-                    } else {
-                        audioTrack.enabled = true;
-                        toggleAudioBtn.innerHTML = '<i class="fas fa-microphone"></i> Disable Microphone';
-                        showNotification('info', 'Microphone on', 'Your microphone is now enabled.');
-                        logDebug('Microphone enabled');
-                    }
-                    
-                    if (peerConnection && peerConnection.getSenders().length > 0) {
-                        const audioSender = peerConnection.getSenders().find(
-                            sender => sender.track && sender.track.kind === 'audio'
-                        );
-                        if (audioSender) {
-                            audioSender.replaceTrack(audioTrack);
-                            logDebug('Replaced audio track in peer connection');
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Error accessing microphone:', error);
-                showNotification('error', 'Microphone Error', 'Could not access microphone. Please check permissions.');
-                logDebug(`Microphone error: ${error.message}`);
-            }
-        }
-
-        function adjustVideoQuality() {
-            showNotification('info', 'Quality Settings', 'Video quality adjustment is not yet implemented.');
-            logDebug('Requested quality adjustment');
-        }
-
-        function reportTechnicalIssue() {
-            const issue = prompt('Please describe the issue you are experiencing:');
-            if (issue) {
-                showNotification('success', 'Issue Reported', 'Thank you for reporting the issue. The teacher has been notified.');
-                logDebug(`Issue reported: ${issue}`);
-            }
         }
 
         function leaveClassroom() {
