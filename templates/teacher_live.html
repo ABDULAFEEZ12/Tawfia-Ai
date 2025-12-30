@@ -442,7 +442,125 @@
             margin-bottom: 10px;
             color: #1a2980;
         }
-        
+
+        /* Teacher Authority Panel Styles */
+        .authority-panel {
+            margin: 25px 0;
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+            border: 2px solid #2ed573;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .authority-panel h3 {
+            color: #1a2980;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .control-group {
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border: 1px solid #e6e9ff;
+        }
+
+        .control-group h4 {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mic-request-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid #ffa502;
+        }
+
+        .signal-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            border-left: 3px solid #1a2980;
+        }
+
+        /* AI Prompter Styles */
+        #aiPrompter {
+            position: fixed;
+            right: 20px;
+            top: 120px;
+            width: 300px;
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid #e6e9ff;
+        }
+
+        .prompter-header {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prompter-header h4 {
+            margin: 0;
+            color: white;
+        }
+
+        #prompterContent {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .prompter-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: flex-start;
+        }
+
+        .prompter-item:last-child {
+            border-bottom: none;
+        }
+
+        .prompter-bullet {
+            color: #1a2980;
+            font-weight: bold;
+            min-width: 20px;
+        }
+
+        .time-alert {
+            background: #fff3e0;
+            border-left: 3px solid #ffa502;
+            margin-top: 10px;
+        }
+
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -456,6 +574,13 @@
             }
             .student-video-container {
                 height: 180px;
+            }
+            #aiPrompter {
+                position: relative;
+                width: 100%;
+                top: 0;
+                right: 0;
+                margin-top: 20px;
             }
         }
         
@@ -476,6 +601,9 @@
             }
             .student-video-container {
                 height: 150px;
+            }
+            .control-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -548,6 +676,7 @@
                     <span>Connecting to classroom...</span>
                 </div>
                 
+                <!-- Existing Controls -->
                 <div class="controls-section">
                     <button class="action-btn success" id="startBroadcast">
                         <i class="fas fa-play"></i> Start Broadcast
@@ -555,12 +684,60 @@
                     <button class="action-btn" id="copyRoomId">
                         <i class="fas fa-copy"></i> Copy Room ID
                     </button>
-                    <button class="action-btn secondary" id="muteAll">
-                        <i class="fas fa-volume-mute"></i> Mute All
+                    <button class="action-btn secondary" id="togglePrompterBtn">
+                        <i class="fas fa-robot"></i> AI Prompter
                     </button>
                     <button class="action-btn danger" id="endSession">
                         <i class="fas fa-power-off"></i> End Session
                     </button>
+                </div>
+                
+                <!-- Teacher Authority Panel -->
+                <div class="authority-panel">
+                    <h3><i class="fas fa-crown"></i> Classroom Controls</h3>
+                    
+                    <div class="control-grid">
+                        <!-- Audio Controls -->
+                        <div class="control-group">
+                            <h4><i class="fas fa-volume-mute"></i> Audio</h4>
+                            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                                <button class="action-btn danger" id="muteAllBtn" style="flex: 1;">
+                                    <i class="fas fa-volume-mute"></i> Mute All
+                                </button>
+                                <button class="action-btn success" id="unmuteAllBtn" style="flex: 1;">
+                                    <i class="fas fa-volume-up"></i> Unmute
+                                </button>
+                            </div>
+                            <div id="micRequestContainer" style="display: none;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px;">Mic Requests:</span>
+                                    <span id="micRequestBadge" style="background: #ff4757; color: white; border-radius: 10px; padding: 2px 8px; font-size: 12px;">0</span>
+                                </div>
+                                <div id="micRequestList" style="max-height: 120px; overflow-y: auto;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Video Controls -->
+                        <div class="control-group">
+                            <h4><i class="fas fa-video"></i> Video</h4>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="action-btn danger" id="disableCamsBtn" style="flex: 1;">
+                                    <i class="fas fa-video-slash"></i> Disable Cams
+                                </button>
+                                <button class="action-btn success" id="enableCamsBtn" style="flex: 1;">
+                                    <i class="fas fa-video"></i> Enable
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Student Signals -->
+                        <div class="control-group">
+                            <h4><i class="fas fa-heartbeat"></i> Student Signals</h4>
+                            <div id="struggleSignals" style="min-height: 100px; max-height: 150px; overflow-y: auto;">
+                                <p class="empty-state" style="font-size: 13px; padding: 20px 0;">No signals yet</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Debug Information Panel -->
@@ -581,6 +758,34 @@
                         <p>Waiting for students to join...</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Prompter (Hidden by default) -->
+    <div id="aiPrompter" style="display: none;">
+        <div class="prompter-header">
+            <h4><i class="fas fa-robot"></i> AI Prompter</h4>
+            <button onclick="toggleAIPrompter()" style="background: none; border: none; color: white; cursor: pointer; font-size: 20px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="prompterContent">
+            <div class="prompter-item">
+                <span class="prompter-bullet">•</span>
+                <span>Welcome students and set agenda (2 min)</span>
+            </div>
+            <div class="prompter-item">
+                <span class="prompter-bullet">•</span>
+                <span>Review previous lesson (3 min)</span>
+            </div>
+            <div class="prompter-item">
+                <span class="prompter-bullet">•</span>
+                <span>Introduce new topic (5 min)</span>
+            </div>
+            <div class="prompter-item time-alert">
+                <span class="prompter-bullet">⏰</span>
+                <span>You planned 5 minutes for examples</span>
             </div>
         </div>
     </div>
@@ -615,7 +820,7 @@
         const toggleScreenShare = document.getElementById('toggleScreenShare');
         const startBroadcast = document.getElementById('startBroadcast');
         const copyRoomId = document.getElementById('copyRoomId');
-        const muteAll = document.getElementById('muteAll');
+        const togglePrompterBtn = document.getElementById('togglePrompterBtn');
         const endSession = document.getElementById('endSession');
         const studentsList = document.getElementById('studentsList');
         const studentCount = document.getElementById('studentCount');
@@ -626,11 +831,21 @@
         const notification = document.getElementById('notification');
         const debugLog = document.getElementById('debugLog');
 
-        // WebRTC Config - FIX #1: Correct TURN endpoint for trial plan
+        // Teacher Authority DOM Elements
+        const muteAllBtn = document.getElementById('muteAllBtn');
+        const unmuteAllBtn = document.getElementById('unmuteAllBtn');
+        const disableCamsBtn = document.getElementById('disableCamsBtn');
+        const enableCamsBtn = document.getElementById('enableCamsBtn');
+        const micRequestContainer = document.getElementById('micRequestContainer');
+        const micRequestBadge = document.getElementById('micRequestBadge');
+        const micRequestList = document.getElementById('micRequestList');
+        const struggleSignals = document.getElementById('struggleSignals');
+
+        // WebRTC Config
         const WEBRTC_CONFIG = {
             iceServers: [
                 {
-                    urls: "turns:standard.relay.metered.ca:443?transport=tcp", // ✅ FIXED: Changed from 'global' to 'standard'
+                    urls: "turns:standard.relay.metered.ca:443?transport=tcp",
                     username: "459b679e028c3f37200569ec",
                     credential: "7Y4blbcvHOg1Uhwm"
                 }
@@ -640,9 +855,10 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             logDebug('Teacher page loaded. Room: ' + roomId);
-            logDebug('Using correct TURN endpoint for trial plan (standard.relay.metered.ca)'); // Updated log
+            logDebug('Using correct TURN endpoint for trial plan (standard.relay.metered.ca)');
             connectToRoom();
             setupEventListeners();
+            setupTeacherAuthorityListeners();
             startSessionTimer();
         });
 
@@ -669,14 +885,42 @@
             socket.on('error', handleError);
             socket.on('broadcast-ready', handleBroadcastReady);
 
+            // Teacher Authority Socket Events
+            socket.on('mic-request-received', handleMicRequestReceived);
+            socket.on('student-struggling', handleStudentStruggling);
+            socket.on('command-executed', handleCommandExecuted);
+
             // Button events
             startBroadcast.addEventListener('click', startBroadcasting);
             copyRoomId.addEventListener('click', copyRoomIdToClipboard);
-            muteAll.addEventListener('click', muteAllStudents);
+            togglePrompterBtn.addEventListener('click', toggleAIPrompter);
             endSession.addEventListener('click', endTeachingSession);
             toggleVideo.addEventListener('click', toggleVideoStream);
             toggleAudio.addEventListener('click', toggleAudioStream);
             toggleScreenShare.addEventListener('click', toggleScreenSharing);
+        }
+
+        function setupTeacherAuthorityListeners() {
+            // Teacher authority button listeners
+            muteAllBtn.addEventListener('click', () => {
+                socket.emit('teacher-mute-all', { room: roomId });
+                logDebug('Teacher: Muted all students');
+            });
+
+            unmuteAllBtn.addEventListener('click', () => {
+                socket.emit('teacher-unmute-all', { room: roomId });
+                logDebug('Teacher: Unmuted all students');
+            });
+
+            disableCamsBtn.addEventListener('click', () => {
+                socket.emit('teacher-disable-cameras', { room: roomId });
+                logDebug('Teacher: Disabled all cameras');
+            });
+
+            enableCamsBtn.addEventListener('click', () => {
+                socket.emit('teacher-enable-cameras', { room: roomId });
+                logDebug('Teacher: Enabled all cameras');
+            });
         }
 
         function handleRoomJoined(data) {
@@ -740,7 +984,123 @@
             });
         }
 
-        // FIX #2: Wait for video playback before signaling
+        // Teacher Authority Functions
+        function handleMicRequestReceived(data) {
+            const { student_sid, username, count } = data;
+            
+            // Show mic request container if hidden
+            micRequestContainer.style.display = 'block';
+            micRequestBadge.textContent = count;
+            
+            // Check if request already exists
+            const existingRequest = Array.from(micRequestList.children).find(item => 
+                item.dataset.sid === student_sid
+            );
+            
+            if (!existingRequest) {
+                const requestItem = document.createElement('div');
+                requestItem.className = 'mic-request-item';
+                requestItem.dataset.sid = student_sid;
+                requestItem.innerHTML = `
+                    <span>${username}</span>
+                    <button onclick="approveMicRequest('${student_sid}')" class="action-btn success" style="padding: 4px 12px; font-size: 12px;">
+                        Approve
+                    </button>
+                `;
+                micRequestList.appendChild(requestItem);
+            }
+            
+            showNotification('info', 'Mic Request', `${username} wants to speak`);
+        }
+
+        function handleStudentStruggling(data) {
+            const { student_sid, signal } = data;
+            const signalsDiv = struggleSignals;
+            
+            // Remove empty state if present
+            const emptyState = signalsDiv.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+            
+            const signalItem = document.createElement('div');
+            signalItem.className = 'signal-item';
+            
+            const studentName = students[student_sid] ? students[student_sid].username : student_sid.substring(0, 8);
+            const signalText = {
+                'confused': 'is confused',
+                'too_fast': 'says too fast',
+                'got_it': 'understands'
+            }[signal] || signal;
+            
+            // Set background color based on signal
+            if (signal === 'got_it') {
+                signalItem.style.background = '#e8f5e9';
+                signalItem.style.borderLeftColor = '#2ed573';
+            } else if (signal === 'too_fast') {
+                signalItem.style.background = '#fff3e0';
+                signalItem.style.borderLeftColor = '#ffa502';
+            } else {
+                signalItem.style.background = '#ffebee';
+                signalItem.style.borderLeftColor = '#ff4757';
+            }
+            
+            signalItem.innerHTML = `<strong>${studentName}</strong>: ${signalText}`;
+            signalsDiv.prepend(signalItem);
+            
+            // Auto-remove after 30 seconds
+            setTimeout(() => {
+                if (signalItem.parentNode) signalItem.remove();
+                if (signalsDiv.children.length === 0) {
+                    signalsDiv.innerHTML = '<p class="empty-state" style="font-size: 13px; padding: 20px 0;">No signals yet</p>';
+                }
+            }, 30000);
+            
+            logDebug(`Student signal: ${studentName} - ${signal}`);
+        }
+
+        function handleCommandExecuted(data) {
+            logDebug(`Command ${data.command} executed: ${data.status}`);
+            showNotification('success', 'Command Executed', `${data.command} completed successfully`);
+        }
+
+        function approveMicRequest(studentSid) {
+            socket.emit('teacher-approve-mic', {
+                room: roomId,
+                student_sid: studentSid
+            });
+            
+            // Remove from UI
+            const requestItem = micRequestList.querySelector(`[data-sid="${studentSid}"]`);
+            if (requestItem) {
+                requestItem.remove();
+            }
+            
+            // Update count
+            const currentCount = parseInt(micRequestBadge.textContent) - 1;
+            micRequestBadge.textContent = Math.max(0, currentCount);
+            
+            if (currentCount <= 0) {
+                micRequestContainer.style.display = 'none';
+                micRequestList.innerHTML = '';
+            }
+            
+            logDebug(`Approved mic for student: ${studentSid}`);
+        }
+
+        // AI Prompter Functions
+        function toggleAIPrompter() {
+            const prompter = document.getElementById('aiPrompter');
+            if (prompter.style.display === 'none' || prompter.style.display === '') {
+                prompter.style.display = 'block';
+                togglePrompterBtn.innerHTML = '<i class="fas fa-robot"></i> Hide Prompter';
+                togglePrompterBtn.classList.add('active');
+            } else {
+                prompter.style.display = 'none';
+                togglePrompterBtn.innerHTML = '<i class="fas fa-robot"></i> AI Prompter';
+                togglePrompterBtn.classList.remove('active');
+            }
+        }
+
+        // WebRTC Functions (unchanged from your working version)
         async function startBroadcasting() {
             try {
                 updateConnectionStatus('connecting');
@@ -760,9 +1120,8 @@
                 });
 
                 teacherVideo.srcObject = localStream;
-                // ✅ FIXED: Wait for the video to actually start playing
                 await teacherVideo.play();
-                logDebug('Teacher video playing, frames flowing'); // Updated log
+                logDebug('Teacher video playing, frames flowing');
 
                 socket.emit('start-broadcast', { room: roomId });
                 logDebug('start-broadcast event emitted');
@@ -793,15 +1152,13 @@
             logDebug(`Creating peer connection for student: ${studentSid}`);
 
             try {
-                // FIX #3: Removed forced relay policy temporarily
                 const peerConnection = new RTCPeerConnection({
                     iceServers: WEBRTC_CONFIG.iceServers,
-                    // ✅ FIXED: Removed 'iceTransportPolicy: "relay",' to let ICE complete normally
                     bundlePolicy: 'max-bundle',
                     rtcpMuxPolicy: 'require'
                 });
 
-                logDebug('PeerConnection created'); // Updated log
+                logDebug('PeerConnection created');
 
                 localStream.getTracks().forEach(track => {
                     peerConnection.addTrack(track, localStream);
@@ -875,7 +1232,6 @@
                 })
                 .then(offer => {
                     logDebug(`Created offer for ${studentSid}`);
-                    console.log("SDP Offer includes receive:", offer.sdp.includes("a=recvonly") || offer.sdp.includes("a=sendrecv"));
                     return peerConnection.setLocalDescription(offer);
                 })
                 .then(() => {
@@ -898,6 +1254,12 @@
             }
         }
 
+        // ... (rest of your existing WebRTC functions remain unchanged: displayStudentVideo, getCandidateType, 
+        // handleRTCAnswer, handleRTCIceCandidate, toggleScreenSharing, toggleVideoStream, toggleAudioStream,
+        // updateStudentsList, updateConnectionStatus, startSessionTimer, copyRoomIdToClipboard, 
+        // endTeachingSession, handleError, showNotification, logDebug)
+
+        // I'll include the remaining functions but keep them brief since they're already in your code
         function displayStudentVideo(studentSid, stream) {
             if (!stream || !students[studentSid]) return;
             
@@ -1155,10 +1517,6 @@
                 .catch(err => {
                     showNotification('error', 'Error', 'Could not copy Room ID.');
                 });
-        }
-
-        function muteAllStudents() {
-            showNotification('info', 'Students muted', 'All students have been muted.');
         }
 
         function endTeachingSession() {
