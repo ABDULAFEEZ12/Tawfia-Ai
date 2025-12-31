@@ -890,19 +890,8 @@ def debug_rooms():
 # ============================================
 # Run Server
 # ============================================
-if __name__ == "__main__":
-    print("\n" + "="*60)
-    print("🚀 NELAVISTA LIVE - Full Mesh WebRTC")
-    print("🌟 Teacher Authority + Full Mesh Networking")
-    print("✋ Raise Hand System + Quick Feedback")
-    print("="*60)
-    print("✅ Full mesh topology (everyone sees everyone)")
-    print("✅ Teacher authority system")
-    print("✅ Raise hand & feedback system")
-    print("✅ WebRTC signaling with STUN/TURN")
-    print("✅ Production ready for Koyeb deployment")
-    print("="*60 + "\n")
 
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     socketio.run(
         app,
@@ -910,4 +899,3 @@ if __name__ == "__main__":
         port=port,
         debug=False
     )
-
