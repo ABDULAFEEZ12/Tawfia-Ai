@@ -21,6 +21,13 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Debug mode - set to False in production
+DEBUG_MODE = True
+
+def debug_print(*args, **kwargs):
+    if DEBUG_MODE:
+        print(*args, **kwargs)
+
 # Initialize extensions
 db = SQLAlchemy(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
@@ -44,7 +51,7 @@ class Room(db.Model):
 # Create tables
 with app.app_context():
     db.create_all()
-    print("✅ Database tables created")
+    debug_print("✅ Database tables created")
 
 # ============================================
 # In-Memory Storage
@@ -115,7 +122,7 @@ def cleanup_room(room_id):
 def handle_connect():
     sid = request.sid
     participants[sid] = {'room_id': None, 'username': None, 'role': None}
-    print(f"✅ Client connected: {sid}")
+    debug_print(f"✅ Client connected: {sid}")
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -150,7 +157,7 @@ def handle_disconnect():
                 'role': participant_info['role']
             }, room=room_id, skip_sid=sid)
             
-            print(f"❌ {participant_info['username']} left room {room_id}")
+            debug_print(f"❌ {participant_info['username']} left room {room_id}")
         
         # Clean up empty room
         cleanup_room(room_id)
@@ -172,7 +179,7 @@ def handle_join_room(data):
             emit('error', {'message': 'Room ID required'})
             return
         
-        print(f"👤 {username} ({role}) joining room: {room_id}")
+        debug_print(f"👤 {username} ({role}) joining room: {room_id}")
         
         room = get_or_create_room(room_id)
         authority_state = get_room_authority(room_id)
@@ -254,10 +261,10 @@ def handle_join_room(data):
             })
         
         # Log room status
-        print(f"✅ {username} joined room {room_id}. Total participants: {len(room['participants'])}")
+        debug_print(f"✅ {username} joined room {room_id}. Total participants: {len(room['participants'])}")
         
     except Exception as e:
-        print(f"❌ Error in join-room: {e}")
+        debug_print(f"❌ Error in join-room: {e}")
         emit('error', {'message': str(e)})
 
 # ============================================
@@ -284,7 +291,7 @@ def handle_webrtc_offer(data):
         if sender['room_id'] != room_id or target['room_id'] != room_id:
             return
         
-        print(f"📨 {request.sid[:8]} → offer → {target_sid[:8]}")
+        debug_print(f"📨 {request.sid[:8]} → offer → {target_sid[:8]}")
         
         # Relay offer to target
         emit('webrtc-offer', {
@@ -294,7 +301,7 @@ def handle_webrtc_offer(data):
         }, room=target_sid)
         
     except Exception as e:
-        print(f"❌ Error relaying offer: {e}")
+        debug_print(f"❌ Error relaying offer: {e}")
 
 @socketio.on('webrtc-answer')
 def handle_webrtc_answer(data):
@@ -317,7 +324,7 @@ def handle_webrtc_answer(data):
         if sender['room_id'] != room_id or target['room_id'] != room_id:
             return
         
-        print(f"📨 {request.sid[:8]} → answer → {target_sid[:8]}")
+        debug_print(f"📨 {request.sid[:8]} → answer → {target_sid[:8]}")
         
         # Relay answer to target
         emit('webrtc-answer', {
@@ -327,7 +334,7 @@ def handle_webrtc_answer(data):
         }, room=target_sid)
         
     except Exception as e:
-        print(f"❌ Error relaying answer: {e}")
+        debug_print(f"❌ Error relaying answer: {e}")
 
 @socketio.on('webrtc-ice-candidate')
 def handle_webrtc_ice_candidate(data):
@@ -358,7 +365,7 @@ def handle_webrtc_ice_candidate(data):
         }, room=target_sid)
         
     except Exception as e:
-        print(f"❌ Error relaying ICE candidate: {e}")
+        debug_print(f"❌ Error relaying ICE candidate: {e}")
 
 # ============================================
 # Teacher Authority System
@@ -387,10 +394,10 @@ def handle_teacher_mute_all(data):
             if room['participants'][sid]['role'] == 'student':
                 emit('room-muted', {'muted': True}, room=sid)
         
-        print(f"🔇 Teacher muted all in room {room_id}")
+        debug_print(f"🔇 Teacher muted all in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in teacher-mute-all: {e}")
+        debug_print(f"❌ Error in teacher-mute-all: {e}")
 
 @socketio.on('teacher-unmute-all')
 def handle_teacher_unmute_all(data):
@@ -414,10 +421,10 @@ def handle_teacher_unmute_all(data):
             if room['participants'][sid]['role'] == 'student':
                 emit('room-muted', {'muted': False}, room=sid)
         
-        print(f"🔊 Teacher unmuted all in room {room_id}")
+        debug_print(f"🔊 Teacher unmuted all in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in teacher-unmute-all: {e}")
+        debug_print(f"❌ Error in teacher-unmute-all: {e}")
 
 @socketio.on('teacher-disable-cameras')
 def handle_teacher_disable_cameras(data):
@@ -441,10 +448,10 @@ def handle_teacher_disable_cameras(data):
             if room['participants'][sid]['role'] == 'student':
                 emit('cameras-disabled', {'disabled': True}, room=sid)
         
-        print(f"📷 Teacher disabled cameras in room {room_id}")
+        debug_print(f"📷 Teacher disabled cameras in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in teacher-disable-cameras: {e}")
+        debug_print(f"❌ Error in teacher-disable-cameras: {e}")
 
 @socketio.on('teacher-enable-cameras')
 def handle_teacher_enable_cameras(data):
@@ -468,10 +475,10 @@ def handle_teacher_enable_cameras(data):
             if room['participants'][sid]['role'] == 'student':
                 emit('cameras-disabled', {'disabled': False}, room=sid)
         
-        print(f"📸 Teacher enabled cameras in room {room_id}")
+        debug_print(f"📸 Teacher enabled cameras in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in teacher-enable-cameras: {e}")
+        debug_print(f"❌ Error in teacher-enable-cameras: {e}")
 
 @socketio.on('student-request-mic')
 def handle_student_mic_request(data):
@@ -508,10 +515,10 @@ def handle_student_mic_request(data):
                 'count': len(authority['mic_requests'])
             }, room=room['teacher_sid'])
         
-        print(f"🎤 {student_info['username']} requested mic in room {room_id}")
+        debug_print(f"🎤 {student_info['username']} requested mic in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in student-request-mic: {e}")
+        debug_print(f"❌ Error in student-request-mic: {e}")
 
 @socketio.on('teacher-approve-mic')
 def handle_teacher_approve_mic(data):
@@ -547,10 +554,10 @@ def handle_teacher_approve_mic(data):
                 'count': len(authority['mic_requests'])
             }, room=teacher_sid)
             
-            print(f"✅ Teacher approved mic for student {student_sid} in room {room_id}")
+            debug_print(f"✅ Teacher approved mic for student {student_sid} in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in teacher-approve-mic: {e}")
+        debug_print(f"❌ Error in teacher-approve-mic: {e}")
 
 @socketio.on('student-struggle-signal')
 def handle_struggle_signal(data):
@@ -582,10 +589,10 @@ def handle_struggle_signal(data):
                 'signal': signal
             }, room=room['teacher_sid'])
         
-        print(f"💡 {student_info['username']} sent {signal} signal in room {room_id}")
+        debug_print(f"💡 {student_info['username']} sent {signal} signal in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in student-struggle-signal: {e}")
+        debug_print(f"❌ Error in student-struggle-signal: {e}")
 
 @socketio.on('teacher-toggle-questions')
 def handle_teacher_toggle_questions(data):
@@ -612,10 +619,140 @@ def handle_teacher_toggle_questions(data):
                     'enabled': authority['questions_enabled']
                 }, room=sid)
         
-        print(f"❓ Teacher {'enabled' if authority['questions_enabled'] else 'disabled'} questions in room {room_id}")
+        debug_print(f"❓ Teacher {'enabled' if authority['questions_enabled'] else 'disabled'} questions in room {room_id}")
         
     except Exception as e:
-        print(f"❌ Error in teacher-toggle-questions: {e}")
+        debug_print(f"❌ Error in teacher-toggle-questions: {e}")
+
+# ============================================
+# Raise Hand & Feedback System
+# ============================================
+
+@socketio.on('raise-hand')
+def handle_raise_hand(data):
+    """Student raises hand"""
+    try:
+        room_id = data.get('room')
+        student_name = data.get('studentName', 'Student')
+        
+        if not room_id or room_id not in rooms:
+            return
+        
+        room = rooms[room_id]
+        student_sid = request.sid
+        
+        # Check if student is in room
+        if student_sid not in room['participants']:
+            return
+        
+        # Store student name if not already stored
+        room['participants'][student_sid]['username'] = student_name
+        
+        # Notify teacher only
+        if room['teacher_sid']:
+            emit('student-raised-hand', {
+                'sid': student_sid,
+                'studentName': student_name,
+                'timestamp': datetime.utcnow().isoformat()
+            }, room=room['teacher_sid'])
+        
+        debug_print(f"✋ {student_name} raised hand in room {room_id}")
+        
+    except Exception as e:
+        debug_print(f"❌ Error in raise-hand: {e}")
+
+@socketio.on('lower-hand')
+def handle_lower_hand(data):
+    """Student lowers hand"""
+    try:
+        room_id = data.get('room')
+        
+        if not room_id or room_id not in rooms:
+            return
+        
+        room = rooms[room_id]
+        student_sid = request.sid
+        
+        # Notify teacher only
+        if room['teacher_sid']:
+            emit('student-lowered-hand', {
+                'sid': student_sid
+            }, room=room['teacher_sid'])
+        
+        debug_print(f"✋ Student lowered hand in room {room_id}")
+        
+    except Exception as e:
+        debug_print(f"❌ Error in lower-hand: {e}")
+
+@socketio.on('student-feedback')
+def handle_student_feedback(data):
+    """Student sends quick feedback (buttons or text)"""
+    try:
+        room_id = data.get('room')
+        feedback_type = data.get('type')  # 'confused', 'fast', 'gotit', 'text'
+        student_name = data.get('studentName', 'Student')
+        text = data.get('text', '')
+        
+        if not room_id or not feedback_type:
+            return
+        
+        room = rooms.get(room_id)
+        if not room:
+            return
+        
+        student_sid = request.sid
+        
+        # Forward to teacher only
+        if room['teacher_sid']:
+            feedback_data = {
+                'sid': student_sid,
+                'studentName': student_name,
+                'type': feedback_type,
+                'timestamp': datetime.utcnow().isoformat()
+            }
+            
+            if feedback_type == 'text' and text:
+                feedback_data['text'] = text
+            
+            emit('student-feedback', feedback_data, room=room['teacher_sid'])
+        
+        debug_print(f"💬 {student_name} sent feedback: {feedback_type} in room {room_id}")
+        
+    except Exception as e:
+        debug_print(f"❌ Error in student-feedback: {e}")
+
+@socketio.on('teacher-acknowledge-hand')
+def handle_teacher_acknowledge_hand(data):
+    """Teacher acknowledges a raised hand"""
+    try:
+        room_id = data.get('room')
+        student_sid = data.get('student_sid')
+        
+        if not room_id or not student_sid:
+            return
+        
+        room = rooms.get(room_id)
+        if not room:
+            return
+        
+        teacher_sid = request.sid
+        
+        # Verify this is the teacher
+        if teacher_sid != room['teacher_sid']:
+            return
+        
+        teacher_name = room['participants'][teacher_sid]['username']
+        
+        # Notify the student
+        emit('hand-acknowledged', {
+            'teacher': teacher_name,
+            'message': f'{teacher_name} acknowledged your hand'
+        }, room=student_sid)
+        
+        debug_print(f"✅ Teacher acknowledged hand for student {student_sid} in room {room_id}")
+        
+    except Exception as e:
+        debug_print(f"❌ Error in teacher-acknowledge-hand: {e}")
 
 # ============================================
 # Control Events
@@ -637,7 +774,7 @@ def handle_start_broadcast(data):
             emit('error', {'message': 'Only teacher can start broadcast'})
             return
         
-        print(f"📢 Teacher starting broadcast in room: {room_id}")
+        debug_print(f"📢 Teacher starting broadcast in room: {room_id}")
         
         # Get all student SIDs
         student_sids = []
@@ -658,7 +795,7 @@ def handle_start_broadcast(data):
             }, room=student_sid)
         
     except Exception as e:
-        print(f"❌ Error in start-broadcast: {e}")
+        debug_print(f"❌ Error in start-broadcast: {e}")
         emit('error', {'message': str(e)})
 
 @socketio.on('ping')
@@ -757,12 +894,14 @@ if __name__ == '__main__':
     print(f"\n{'='*60}")
     print("🚀 NELAVISTA LIVE - Full Mesh WebRTC")
     print("🌟 Teacher Authority + Full Mesh Networking")
+    print("✋ Raise Hand System + Quick Feedback")
     print(f"{'='*60}")
     print("✅ Full mesh topology (everyone sees everyone)")
     print("✅ Teacher authority system")
+    print("✅ Raise hand & feedback system")
     print("✅ WebRTC signaling with STUN/TURN")
     print("✅ Production ready for Render deployment")
     print(f"{'='*60}\n")
     
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port, debug=True)
+    socketio.run(app, host='0.0.0.0', port=port, debug=DEBUG_MODE)
