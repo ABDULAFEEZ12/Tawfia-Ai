@@ -807,7 +807,14 @@ def handle_ping(data):
 # Flask Routes
 # ============================================
 @app.route('/')
+def live_check():
+    """Required: Fast HTTP response for Railway's public edge."""
+    return "NELAVISTA LIVE", 200
+
+# Keep your existing index route but change its path
+@app.route('/app')
 def index():
+    """Your main application page."""
     return render_template('index.html')
 
 @app.route('/teacher')
