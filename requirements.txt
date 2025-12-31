@@ -1,8 +1,9 @@
 Flask==2.3.3
 Flask-SocketIO==5.3.4
 eventlet==0.33.3
+gunicorn==21.2.0
 redis==4.6.0
 python-dotenv==1.0.0
 Flask-SQLAlchemy==3.0.5
 psycopg2-binary==2.9.9
-requests==2.31.0  # ← ADD THIS LINE
+requests==2.31.0
