@@ -22,7 +22,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Debug mode - set to False in production
-DEBUG_MODE = True
+DEBUG_MODE = False  # CHANGED FROM True
 
 def debug_print(*args, **kwargs):
     if DEBUG_MODE:
@@ -832,6 +832,14 @@ def join_room_post():
     return redirect(f'/student/{room_id}')
 
 # ============================================
+# Health Check Route (CRITICAL FIX FOR RAILWAY)
+# ============================================
+@app.route('/health')
+def health():
+    """Railway health check - MUST return 200 OK"""
+    return "OK", 200
+
+# ============================================
 # Live Meeting Routes
 # ============================================
 @app.route('/live-meeting')
@@ -888,7 +896,8 @@ def debug_rooms():
     return json.dumps(debug_info, indent=2, default=str)
 
 # ============================================
-# Run Server
+# Local Development Server (Optional)
 # ============================================
-
+if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
+    socketio.run(app, host='0.0.0.0', port=port, debug=DEBUG_MODE)
