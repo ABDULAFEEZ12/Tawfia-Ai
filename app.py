@@ -811,32 +811,41 @@ def live_check():
     """Required: Fast HTTP response for Railway's public edge."""
     return "NELAVISTA LIVE", 200
 
-# Keep your existing index route but change its path
 @app.route('/app')
 def index():
     """Your main application page."""
     return render_template('index.html')
 
-@app.route('/teacher')
+@app.route('/app/teacher')
 def teacher_create():
     room_id = str(uuid.uuid4())[:8]
-    return redirect(f'/teacher/{room_id}')
+    return redirect(f'/app/teacher/{room_id}')
 
-@app.route('/teacher/<room_id>')
+@app.route('/app/teacher/<room_id>')
 def teacher_view(room_id):
     return render_template('teacher.html', room_id=room_id)
 
-@app.route('/student/<room_id>')
+@app.route('/app/student/<room_id>')
 def student_view(room_id):
     return render_template('student.html', room_id=room_id)
 
-@app.route('/join', methods=['POST'])
+# This route handles the form submission from index.html
+@app.route('/app/join', methods=['POST'])
 def join_room_post():
     room_id = request.form.get('room_id', '').strip()
     if not room_id:
         flash('Please enter a room ID')
+        return redirect('/app')
+    return redirect(f'/app/student/{room_id}')
+
+# Keep the old /join route for compatibility (redirects to /app/join)
+@app.route('/join', methods=['POST'])
+def old_join_room_post():
+    room_id = request.form.get('room_id', '').strip()
+    if not room_id:
+        flash('Please enter a room ID')
         return redirect('/')
-    return redirect(f'/student/{room_id}')
+    return redirect(f'/app/student/{room_id}')
 
 # ============================================
 # Health Check Route (CRITICAL FIX FOR RAILWAY)
