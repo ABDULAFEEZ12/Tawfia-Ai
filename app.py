@@ -18,7 +18,17 @@ import uuid
 # ============================================
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
+
+# Database configuration with SSL handling for Render
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
+if database_url.startswith('postgres://'):
+    # Convert postgres:// to postgresql:// (required by SQLAlchemy)
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    # Ensure SSL is required for Render PostgreSQL
+    if 'sslmode' not in database_url:
+        database_url += '?sslmode=require'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Debug mode - set to False in production
@@ -48,10 +58,20 @@ class Room(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Create tables
-with app.app_context():
-    db.create_all()
-    debug_print("✅ Database tables created")
+# ============================================
+# Safe Database Initialization Function
+# ============================================
+def init_db():
+    """Initialize database tables only when explicitly called, not at import time"""
+    try:
+        with app.app_context():
+            db.create_all()
+            debug_print("✅ Database tables created successfully")
+    except Exception as e:
+        # Don't crash the app if DB isn't available at startup
+        debug_print(f"⚠️ Database initialization failed: {e}")
+        debug_print("⚠️ App will continue with in-memory storage only")
+        debug_print("⚠️ Note: Database-backed features (persistent rooms) will be unavailable")
 
 # ============================================
 # In-Memory Storage
@@ -111,9 +131,12 @@ def cleanup_room(room_id):
             del rooms[room_id]
             if room_id in room_authority:
                 del room_authority[room_id]
-            with app.app_context():
-                Room.query.filter_by(id=room_id).delete()
-                db.session.commit()
+            try:
+                with app.app_context():
+                    Room.query.filter_by(id=room_id).delete()
+                    db.session.commit()
+            except Exception as e:
+                debug_print(f"⚠️ Database cleanup failed for room {room_id}: {e}")
 
 # ============================================
 # Socket.IO Event Handlers
@@ -206,20 +229,25 @@ def handle_join_room(data):
             room['teacher_sid'] = sid
             authority_state['teacher_sid'] = sid
             
-            with app.app_context():
-                existing_room = Room.query.get(room_id)
-                if not existing_room:
-                    room_db = Room(
-                        id=room_id,
-                        teacher_id=sid,
-                        teacher_name=username,
-                        is_active=True
-                    )
-                    db.session.add(room_db)
-                else:
-                    existing_room.teacher_id = sid
-                    existing_room.teacher_name = username
-                db.session.commit()
+            # Database operations with error handling
+            try:
+                with app.app_context():
+                    existing_room = Room.query.get(room_id)
+                    if not existing_room:
+                        room_db = Room(
+                            id=room_id,
+                            teacher_id=sid,
+                            teacher_name=username,
+                            is_active=True
+                        )
+                        db.session.add(room_db)
+                    else:
+                        existing_room.teacher_id = sid
+                        existing_room.teacher_name = username
+                    db.session.commit()
+            except Exception as e:
+                debug_print(f"⚠️ Database write failed: {e}")
+                # Continue without database persistence
         
         # Update participant info
         participants[sid] = {
@@ -891,6 +919,9 @@ def debug_rooms():
 # Run Server
 # ============================================
 if __name__ == '__main__':
+    # Initialize database only when running directly (not under Gunicorn)
+    init_db()
+    
     print(f"\n{'='*60}")
     print("🚀 NELAVISTA LIVE - Full Mesh WebRTC")
     print("🌟 Teacher Authority + Full Mesh Networking")
