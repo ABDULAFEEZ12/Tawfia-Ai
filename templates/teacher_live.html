@@ -316,10 +316,6 @@
             background: #2ed573;
         }
         
-        .action-btn.warning {
-            background: #ff9800;
-        }
-        
         .action-btn.disabled {
             background: #cccccc;
             cursor: not-allowed;
@@ -372,11 +368,6 @@
         .student-item:hover {
             background: #edf2ff;
             transform: translateX(5px);
-        }
-        
-        .student-item.raised-hand {
-            background: #FFF3E0;
-            border-left: 4px solid #ff9800;
         }
         
         .student-avatar {
@@ -437,7 +428,6 @@
             color: #d32f2f;
         }
         
-        /* Notification System */
         .notification {
             position: fixed;
             bottom: 20px;
@@ -470,15 +460,6 @@
             border-left: 4px solid #1a2980;
         }
         
-        .notification.warning {
-            border-left: 4px solid #ff9800;
-        }
-        
-        .notification.hand {
-            border-left: 4px solid #ff9800;
-            background: #FFF3E0;
-        }
-        
         .notification i {
             font-size: 24px;
         }
@@ -493,14 +474,6 @@
         
         .notification.info i {
             color: #1a2980;
-        }
-        
-        .notification.warning i {
-            color: #ff9800;
-        }
-        
-        .notification.hand i {
-            color: #ff9800;
         }
         
         .empty-state {
@@ -588,46 +561,6 @@
             border-radius: 6px;
             font-size: 13px;
             border-left: 3px solid #1a2980;
-        }
-        
-        /* Raised Hands Panel */
-        .raised-hands-panel {
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8f9ff;
-            border-radius: 10px;
-            border: 2px solid #ff9800;
-        }
-        
-        .raised-hand-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: #FFF3E0;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            border-left: 4px solid #ff9800;
-        }
-        
-        .hand-time {
-            font-size: 12px;
-            color: #666;
-            margin-right: 10px;
-        }
-        
-        .btn-small {
-            padding: 4px 10px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .btn-small:hover {
-            background: #45a049;
         }
 
         /* AI Prompter Styles */
@@ -788,9 +721,9 @@
                     <div class="label">Students</div>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-hand-paper"></i>
-                    <div class="count" id="raisedHandsCount">0</div>
-                    <div class="label">Raised Hands</div>
+                    <i class="fas fa-signal"></i>
+                    <div class="count" id="connectionStatus">●</div>
+                    <div class="label">Status</div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-clock"></i>
@@ -834,19 +767,6 @@
                 <div class="connection-status" id="connectionStatusBar">
                     <i class="fas fa-sync-alt fa-spin"></i>
                     <span>Connecting to classroom...</span>
-                </div>
-                
-                <!-- Raised Hands Panel -->
-                <div class="raised-hands-panel">
-                    <div class="section-title" style="margin-bottom: 15px;">
-                        <i class="fas fa-hand-paper" style="color: #ff9800;"></i>
-                        <h3>Raised Hands (<span id="raisedHandsCountBadge">0</span>)</h3>
-                    </div>
-                    <div id="raisedHandsList" style="max-height: 200px; overflow-y: auto;">
-                        <div class="empty-state" style="padding: 20px; font-size: 14px;">
-                            No hands raised yet
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Existing Controls -->
@@ -905,9 +825,9 @@
                         
                         <!-- Student Signals -->
                         <div class="control-group">
-                            <h4><i class="fas fa-comment-medical"></i> Student Feedback</h4>
-                            <div id="studentFeedback" style="min-height: 100px; max-height: 150px; overflow-y: auto;">
-                                <p class="empty-state" style="font-size: 13px; padding: 20px 0;">No feedback yet</p>
+                            <h4><i class="fas fa-heartbeat"></i> Student Signals</h4>
+                            <div id="struggleSignals" style="min-height: 100px; max-height: 150px; overflow-y: auto;">
+                                <p class="empty-state" style="font-size: 13px; padding: 20px 0;">No signals yet</p>
                             </div>
                         </div>
                     </div>
@@ -973,23 +893,6 @@
 
     <script>
         // ============================================
-        // Configuration
-        // ============================================
-        const DEBUG = false;
-        
-        function debugLog(...args) {
-            if (DEBUG) console.log(...args);
-        }
-        
-        function debugWarn(...args) {
-            if (DEBUG) console.warn(...args);
-        }
-        
-        function debugError(...args) {
-            if (DEBUG) console.error(...args);
-        }
-
-        // ============================================
         // Teacher WebRTC Mesh - Full Implementation
         // ============================================
 
@@ -1011,12 +914,6 @@
         const audioAnalysers = {};       // socket_id -> {analyser, dataArray} for speaker detection
 
         // ============================================
-        // Raise Hand & Feedback State
-        // ============================================
-        const raisedHands = new Map();   // sid -> {name, time}
-        const studentFeedback = [];      // Array of feedback objects
-
-        // ============================================
         // DOM Elements
         // ============================================
         const teacherVideo = document.getElementById('teacherVideo');
@@ -1030,13 +927,11 @@
         const studentsList = document.getElementById('studentsList');
         const studentCount = document.getElementById('studentCount');
         const liveStudentCount = document.getElementById('liveStudentCount');
-        const raisedHandsCount = document.getElementById('raisedHandsCount');
-        const raisedHandsCountBadge = document.getElementById('raisedHandsCountBadge');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const connectionStatusBar = document.getElementById('connectionStatusBar');
         const sessionTime = document.getElementById('sessionTime');
         const notification = document.getElementById('notification');
-        const debugLogElement = document.getElementById('debugLog');
-        const raisedHandsList = document.getElementById('raisedHandsList');
-        const studentFeedbackElement = document.getElementById('studentFeedback');
+        const debugLog = document.getElementById('debugLog');
 
         // Teacher Authority DOM Elements
         const muteAllBtn = document.getElementById('muteAllBtn');
@@ -1046,6 +941,7 @@
         const micRequestContainer = document.getElementById('micRequestContainer');
         const micRequestBadge = document.getElementById('micRequestBadge');
         const micRequestList = document.getElementById('micRequestList');
+        const struggleSignals = document.getElementById('struggleSignals');
 
         // ============================================
         // WebRTC Configuration
@@ -1084,7 +980,7 @@
         // Initialize Teacher
         // ============================================
         document.addEventListener('DOMContentLoaded', async function() {
-            debugLog('Teacher page loaded. Room: ' + roomId);
+            logDebug('Teacher page loaded. Room: ' + roomId);
             
             try {
                 // Get teacher's local media
@@ -1095,7 +991,7 @@
                 setupEventListeners();
                 startSessionTimer();
                 
-                debugLog('Teacher initialized successfully');
+                logDebug('Teacher initialized successfully');
             } catch (error) {
                 console.error('Error initializing teacher:', error);
                 showNotification('error', 'Initialization Error', error.message);
@@ -1123,7 +1019,7 @@
                 teacherVideo.srcObject = localStream;
                 await teacherVideo.play();
                 
-                debugLog('Teacher local media obtained:', {
+                logDebug('Teacher local media obtained:', {
                     video: localStream.getVideoTracks().length,
                     audio: localStream.getAudioTracks().length
                 });
@@ -1143,12 +1039,12 @@
         function setupEventListeners() {
             // Connection events
             socket.on('connect', () => {
-                debugLog('✅ Connected to server');
+                logDebug('✅ Connected to server');
                 updateConnectionStatus('connected');
             });
             
             socket.on('disconnect', () => {
-                debugLog('❌ Disconnected from server');
+                logDebug('❌ Disconnected from server');
                 updateConnectionStatus('disconnected');
             });
             
@@ -1164,13 +1060,9 @@
             
             // Teacher authority events
             socket.on('mic-request-received', handleMicRequestReceived);
-            socket.on('mic-requests-update', handleMicRequestsUpdate);
             socket.on('student-struggling', handleStudentStruggling);
-            
-            // NEW: Raise Hand & Feedback Events
-            socket.on('student-raised-hand', handleStudentRaisedHand);
-            socket.on('student-lowered-hand', handleStudentLoweredHand);
-            socket.on('student-feedback', handleStudentFeedback);
+            socket.on('command-executed', handleCommandExecuted);
+            socket.on('room-state', handleRoomState);
             
             // Error handling
             socket.on('error', handleError);
@@ -1186,240 +1078,30 @@
             // Teacher authority button listeners
             muteAllBtn?.addEventListener('click', () => {
                 socket.emit('teacher-mute-all', { room: roomId });
-                debugLog('Teacher: Muted all students');
+                logDebug('Teacher: Muted all students');
                 showNotification('info', 'Mute All', 'All students have been muted');
             });
             
             unmuteAllBtn?.addEventListener('click', () => {
                 socket.emit('teacher-unmute-all', { room: roomId });
-                debugLog('Teacher: Unmuted all students');
+                logDebug('Teacher: Unmuted all students');
                 showNotification('info', 'Unmute All', 'All students have been unmuted');
             });
             
             disableCamsBtn?.addEventListener('click', () => {
                 socket.emit('teacher-disable-cameras', { room: roomId });
-                debugLog('Teacher: Disabled all cameras');
+                logDebug('Teacher: Disabled all cameras');
                 showNotification('info', 'Cameras Disabled', 'All student cameras have been disabled');
             });
             
             enableCamsBtn?.addEventListener('click', () => {
                 socket.emit('teacher-enable-cameras', { room: roomId });
-                debugLog('Teacher: Enabled all cameras');
+                logDebug('Teacher: Enabled all cameras');
                 showNotification('info', 'Cameras Enabled', 'All student cameras have been enabled');
             });
 
             // AI Prompter button
             document.getElementById('togglePrompterBtn')?.addEventListener('click', toggleAIPrompter);
-        }
-
-        // ============================================
-        // Raise Hand & Feedback Handlers
-        // ============================================
-        function handleStudentRaisedHand(data) {
-            const { sid, studentName, timestamp } = data;
-            
-            // Add to raised hands map
-            raisedHands.set(sid, {
-                name: studentName,
-                time: new Date(timestamp)
-            });
-            
-            // Update UI
-            updateRaisedHandsList();
-            updateRaisedHandsCount();
-            
-            // Show notification
-            showNotification('hand', '✋ Hand Raised', `${studentName} raised their hand`);
-            
-            // Update student list to show hand icon
-            updateStudentItem(sid, true);
-            
-            debugLog(`Student raised hand: ${studentName} (${sid})`);
-        }
-        
-        function handleStudentLoweredHand(data) {
-            const { sid } = data;
-            
-            if (raisedHands.has(sid)) {
-                const studentName = raisedHands.get(sid).name;
-                raisedHands.delete(sid);
-                
-                // Update UI
-                updateRaisedHandsList();
-                updateRaisedHandsCount();
-                
-                // Update student list to remove hand icon
-                updateStudentItem(sid, false);
-                
-                debugLog(`Student lowered hand: ${studentName} (${sid})`);
-            }
-        }
-        
-        function handleStudentFeedback(data) {
-            const { sid, studentName, type, text } = data;
-            
-            let message = '';
-            let icon = '💬';
-            
-            switch(type) {
-                case 'confused':
-                    message = `${studentName} is confused 😕`;
-                    icon = '❓';
-                    break;
-                case 'fast':
-                    message = `${studentName} says "Too fast" ⏩`;
-                    icon = '⚡';
-                    break;
-                case 'gotit':
-                    message = `${studentName} says "I get it!" ✅`;
-                    icon = '✅';
-                    break;
-                case 'text':
-                    if (text) {
-                        message = `${studentName}: ${text}`;
-                        icon = '💬';
-                    }
-                    break;
-            }
-            
-            if (message) {
-                // Add to feedback list
-                const feedback = {
-                    sid,
-                    studentName,
-                    type,
-                    text: type === 'text' ? text : '',
-                    time: new Date(),
-                    message,
-                    icon
-                };
-                
-                studentFeedback.unshift(feedback);
-                if (studentFeedback.length > 10) {
-                    studentFeedback.pop();
-                }
-                
-                // Update feedback UI
-                updateStudentFeedbackUI();
-                
-                // Show notification
-                showNotification('info', 'Student Feedback', message);
-                
-                debugLog(`Student feedback: ${studentName} - ${type}`, text ? `"${text}"` : '');
-            }
-        }
-        
-        function updateRaisedHandsList() {
-            if (!raisedHandsList) return;
-            
-            if (raisedHands.size === 0) {
-                raisedHandsList.innerHTML = `
-                    <div class="empty-state" style="padding: 20px; font-size: 14px;">
-                        No hands raised yet
-                    </div>
-                `;
-                return;
-            }
-            
-            const listItems = [];
-            
-            raisedHands.forEach((student, sid) => {
-                const timeAgo = Math.floor((new Date() - student.time) / 1000);
-                const minutes = Math.floor(timeAgo / 60);
-                const seconds = timeAgo % 60;
-                
-                listItems.push(`
-                    <div class="raised-hand-item" data-sid="${sid}">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-hand-paper" style="color: #ff9800;"></i>
-                            <span style="font-weight: 600;">${student.name}</span>
-                        </div>
-                        <div style="display: flex; align-items: center;">
-                            <span class="hand-time">${minutes}m ${seconds}s</span>
-                            <button class="btn-small" onclick="acknowledgeHand('${sid}')">✓ Acknowledge</button>
-                        </div>
-                    </div>
-                `);
-            });
-            
-            raisedHandsList.innerHTML = listItems.join('');
-        }
-        
-        function updateRaisedHandsCount() {
-            if (raisedHandsCount) {
-                raisedHandsCount.textContent = raisedHands.size;
-            }
-            if (raisedHandsCountBadge) {
-                raisedHandsCountBadge.textContent = raisedHands.size;
-            }
-        }
-        
-        function updateStudentFeedbackUI() {
-            if (!studentFeedbackElement) return;
-            
-            if (studentFeedback.length === 0) {
-                studentFeedbackElement.innerHTML = `
-                    <p class="empty-state" style="font-size: 13px; padding: 20px 0;">No feedback yet</p>
-                `;
-                return;
-            }
-            
-            const feedbackItems = studentFeedback.map(feedback => `
-                <div class="signal-item" style="background: ${getFeedbackColor(feedback.type)}; border-left-color: ${getFeedbackBorderColor(feedback.type)};">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                        <span style="font-size: 14px;">${feedback.icon}</span>
-                        <span style="font-weight: 600;">${feedback.studentName}</span>
-                    </div>
-                    <div style="font-size: 12px;">
-                        ${feedback.type === 'text' ? `"${feedback.text}"` : feedback.message.split(': ')[1]}
-                    </div>
-                </div>
-            `).join('');
-            
-            studentFeedbackElement.innerHTML = feedbackItems;
-        }
-        
-        function getFeedbackColor(type) {
-            switch(type) {
-                case 'confused': return '#ffebee';
-                case 'fast': return '#fff3e0';
-                case 'gotit': return '#e8f5e9';
-                case 'text': return '#f0f4ff';
-                default: return '#f8f9ff';
-            }
-        }
-        
-        function getFeedbackBorderColor(type) {
-            switch(type) {
-                case 'confused': return '#ff4757';
-                case 'fast': return '#ffa502';
-                case 'gotit': return '#2ed573';
-                case 'text': return '#1a2980';
-                default: return '#1a2980';
-            }
-        }
-        
-        function acknowledgeHand(sid) {
-            if (!raisedHands.has(sid)) return;
-            
-            const studentName = raisedHands.get(sid).name;
-            
-            // Send acknowledgment to student
-            socket.emit('teacher-acknowledge-hand', {
-                room: roomId,
-                student_sid: sid
-            });
-            
-            // Remove from raised hands
-            raisedHands.delete(sid);
-            updateRaisedHandsList();
-            updateRaisedHandsCount();
-            updateStudentItem(sid, false);
-            
-            // Show notification
-            showNotification('success', 'Hand Acknowledged', `Acknowledged ${studentName}'s hand`);
-            
-            debugLog(`Acknowledged hand for: ${studentName}`);
         }
 
         // ============================================
@@ -1431,14 +1113,14 @@
                 role: 'teacher',
                 username: 'Teacher'
             });
-            debugLog('Connecting to room: ' + roomId);
+            logDebug('Connecting to room: ' + roomId);
         }
 
         function handleRoomJoined(data) {
             const { sid, username, role, existing_participants } = data;
             
             mySid = sid;
-            debugLog(`✅ Room joined. My SID: ${mySid}, Role: ${role}, Existing participants: ${existing_participants.length}`);
+            logDebug(`✅ Room joined. My SID: ${mySid}, Role: ${role}, Existing participants: ${existing_participants.length}`);
             
             // Store participants
             existing_participants.forEach(participant => {
@@ -1458,7 +1140,7 @@
         function handleNewParticipant(data) {
             const { sid, username, role } = data;
             
-            debugLog(`👋 New participant: ${username} (${sid})`);
+            logDebug(`👋 New participant: ${username} (${sid})`);
             
             // Store participant info
             participants[sid] = { username, role };
@@ -1474,20 +1156,13 @@
         function handleParticipantLeft(data) {
             const { sid, username, role } = data;
             
-            debugLog(`👋 Participant left: ${username} (${sid})`);
+            logDebug(`👋 Participant left: ${username} (${sid})`);
             
             // Cleanup connection
             cleanupConnection(sid);
             
             // Remove from participants
             delete participants[sid];
-            
-            // Remove from raised hands if present
-            if (raisedHands.has(sid)) {
-                raisedHands.delete(sid);
-                updateRaisedHandsList();
-                updateRaisedHandsCount();
-            }
             
             // Update UI
             updateStudentCount();
@@ -1498,7 +1173,7 @@
         // WebRTC Peer Connection Management
         // ============================================
         function createPeerConnection(targetSid, targetUsername, targetRole) {
-            debugLog(`🔗 Creating connection to ${targetUsername} (${targetSid})`);
+            logDebug(`🔗 Creating connection to ${targetUsername} (${targetSid})`);
             
             // Don't connect to self or existing connection
             if (targetSid === mySid || peerConnections[targetSid]) {
@@ -1519,7 +1194,7 @@
                 
                 // Handle incoming stream
                 peerConnection.ontrack = (event) => {
-                    debugLog(`📥 Received stream from ${targetUsername}`);
+                    logDebug(`📥 Received stream from ${targetUsername}`);
                     
                     if (event.streams && event.streams[0]) {
                         remoteStreams[targetSid] = event.streams[0];
@@ -1545,15 +1220,15 @@
                 
                 // Handle connection state
                 peerConnection.onconnectionstatechange = () => {
-                    debugLog(`🔌 ${targetUsername} connection: ${peerConnection.connectionState}`);
+                    logDebug(`🔌 ${targetUsername} connection: ${peerConnection.connectionState}`);
                     
                     if (peerConnection.connectionState === 'connected') {
-                        debugLog(`✅ Connected to ${targetUsername}`);
+                        logDebug(`✅ Connected to ${targetUsername}`);
                         updateConnectionStatus('connected');
                         updateStudentConnectionStatus(targetSid, 'connected');
                     } else if (peerConnection.connectionState === 'failed' || 
                               peerConnection.connectionState === 'disconnected') {
-                        debugLog(`❌ Connection to ${targetUsername} failed`);
+                        logDebug(`❌ Connection to ${targetUsername} failed`);
                         updateStudentConnectionStatus(targetSid, 'disconnected');
                         cleanupConnection(targetSid);
                     }
@@ -1561,7 +1236,7 @@
                 
                 // Handle ICE connection state
                 peerConnection.oniceconnectionstatechange = () => {
-                    debugLog(`🧊 ICE connection to ${targetUsername}: ${peerConnection.iceConnectionState}`);
+                    logDebug(`🧊 ICE connection to ${targetUsername}: ${peerConnection.iceConnectionState}`);
                 };
                 
                 // Create and send offer if we're the initiator
@@ -1570,11 +1245,11 @@
                     createAndSendOffer(peerConnection, targetSid);
                 }
                 
-                debugLog(`✅ Peer connection created for ${targetUsername}`);
+                logDebug(`✅ Peer connection created for ${targetUsername}`);
                 
             } catch (error) {
                 console.error(`❌ Error creating connection to ${targetSid}:`, error);
-                debugLog(`Error: ${error.message}`);
+                logDebug(`Error: ${error.message}`);
             }
         }
 
@@ -1593,11 +1268,11 @@
                     offer: peerConnection.localDescription
                 });
                 
-                debugLog(`📤 Offer sent to ${targetSid}`);
+                logDebug(`📤 Offer sent to ${targetSid}`);
                 
             } catch (error) {
                 console.error(`❌ Error creating offer:`, error);
-                debugLog(`Error: ${error.message}`);
+                logDebug(`Error: ${error.message}`);
             }
         }
 
@@ -1606,11 +1281,11 @@
             const participant = participants[from_sid];
             
             if (!participant) {
-                debugLog(`❌ Unknown participant: ${from_sid}`);
+                logDebug(`❌ Unknown participant: ${from_sid}`);
                 return;
             }
             
-            debugLog(`📥 Received offer from ${participant.username}`);
+            logDebug(`📥 Received offer from ${participant.username}`);
             
             // Create connection if it doesn't exist
             if (!peerConnections[from_sid]) {
@@ -1639,11 +1314,11 @@
                     answer: peerConnection.localDescription
                 });
                 
-                debugLog(`📤 Answer sent to ${participant.username}`);
+                logDebug(`📤 Answer sent to ${participant.username}`);
                 
             } catch (error) {
                 console.error(`❌ Error handling offer:`, error);
-                debugLog(`Error: ${error.message}`);
+                logDebug(`Error: ${error.message}`);
             }
         }
 
@@ -1651,16 +1326,16 @@
             const { from_sid, answer } = data;
             const participant = participants[from_sid];
             
-            debugLog(`📥 Received answer from ${participant?.username || from_sid}`);
+            logDebug(`📥 Received answer from ${participant?.username || from_sid}`);
             
             const peerConnection = peerConnections[from_sid];
             if (peerConnection) {
                 try {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                    debugLog(`✅ Remote description set for ${from_sid}`);
+                    logDebug(`✅ Remote description set for ${from_sid}`);
                 } catch (error) {
                     console.error(`❌ Error setting remote description:`, error);
-                    debugLog(`Error: ${error.message}`);
+                    logDebug(`Error: ${error.message}`);
                 }
             }
         }
@@ -1672,11 +1347,11 @@
             if (peerConnection) {
                 peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
                     .then(() => {
-                        debugLog(`✅ ICE candidate added from ${from_sid}`);
+                        logDebug(`✅ ICE candidate added from ${from_sid}`);
                     })
                     .catch(error => {
                         console.error(`❌ Error adding ICE candidate:`, error);
-                        debugLog(`Error: ${error.message}`);
+                        logDebug(`Error: ${error.message}`);
                     });
             }
         }
@@ -1925,46 +1600,65 @@
             
             showNotification('info', 'Mic Request', `${username} wants to speak`);
         }
-        
-        function handleMicRequestsUpdate(data) {
-            const { count } = data;
-            if (micRequestBadge) {
-                micRequestBadge.textContent = count;
-                if (count === 0 && micRequestContainer) {
-                    micRequestContainer.style.display = 'none';
-                    micRequestList.innerHTML = '';
-                }
-            }
-        }
 
         function handleStudentStruggling(data) {
-            const { student_sid, username, signal } = data;
-            if (!studentFeedbackElement) return;
+            const { student_sid, signal } = data;
+            if (!struggleSignals) return;
             
-            // Convert old signal format to new format
-            const feedback = {
-                sid: student_sid,
-                studentName: username,
-                type: signal,
-                time: new Date(),
-                icon: getSignalIcon(signal)
-            };
+            // Remove empty state if present
+            const emptyState = struggleSignals.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
             
-            studentFeedback.unshift(feedback);
-            if (studentFeedback.length > 10) {
-                studentFeedback.pop();
+            const studentName = participants[student_sid] ? participants[student_sid].username : student_sid.substring(0, 8);
+            const signalText = {
+                'confused': 'is confused',
+                'too_fast': 'says too fast',
+                'got_it': 'understands'
+            }[signal] || signal;
+            
+            const signalItem = document.createElement('div');
+            signalItem.className = 'signal-item';
+            
+            // Set background color based on signal
+            if (signal === 'got_it') {
+                signalItem.style.background = '#e8f5e9';
+                signalItem.style.borderLeftColor = '#2ed573';
+            } else if (signal === 'too_fast') {
+                signalItem.style.background = '#fff3e0';
+                signalItem.style.borderLeftColor = '#ffa502';
+            } else {
+                signalItem.style.background = '#ffebee';
+                signalItem.style.borderLeftColor = '#ff4757';
             }
             
-            updateStudentFeedbackUI();
+            signalItem.innerHTML = `<strong>${studentName}</strong>: ${signalText}`;
+            struggleSignals.prepend(signalItem);
             
-            debugLog(`Student signal (old format): ${username} - ${signal}`);
+            // Auto-remove after 30 seconds
+            setTimeout(() => {
+                if (signalItem.parentNode) signalItem.remove();
+                if (struggleSignals.children.length === 0) {
+                    struggleSignals.innerHTML = '<p class="empty-state" style="font-size: 13px; padding: 20px 0;">No signals yet</p>';
+                }
+            }, 30000);
+            
+            logDebug(`Student signal: ${studentName} - ${signal}`);
+        }
+
+        function handleCommandExecuted(data) {
+            logDebug(`Command ${data.command} executed: ${data.status}`);
+            showNotification('success', 'Command Executed', `${data.command} completed successfully`);
+        }
+
+        function handleRoomState(data) {
+            logDebug('Room state updated:', data);
         }
 
         // ============================================
         // Utility Functions
         // ============================================
         function cleanupConnection(sid) {
-            debugLog(`🧹 Cleaning up connection to ${sid}`);
+            logDebug(`🧹 Cleaning up connection to ${sid}`);
             
             // Close peer connection
             if (peerConnections[sid]) {
@@ -2028,15 +1722,11 @@
                     status = connection.connectionState;
                 }
                 
-                const hasRaisedHand = raisedHands.has(sid);
-                
                 return `
-                    <div class="student-item ${hasRaisedHand ? 'raised-hand' : ''}" data-sid="${sid}" onclick="focusStudentVideo('${sid}')">
+                    <div class="student-item" data-sid="${sid}" onclick="focusStudentVideo('${sid}')">
                         <div class="student-avatar">${username.charAt(0).toUpperCase()}</div>
                         <div class="student-info">
-                            <h4>${username} 
-                                ${hasRaisedHand ? '<i class="fas fa-hand-paper" style="color: #ff9800; margin-left: 5px;"></i>' : ''}
-                            </h4>
+                            <h4>${username}</h4>
                             <div class="status ${status}">
                                 <i class="fas fa-circle"></i> ${status.charAt(0).toUpperCase() + status.slice(1)}
                             </div>
@@ -2044,27 +1734,6 @@
                     </div>
                 `;
             }).join('');
-        }
-        
-        function updateStudentItem(sid, hasRaisedHand) {
-            const studentItem = document.querySelector(`.student-item[data-sid="${sid}"]`);
-            if (studentItem) {
-                if (hasRaisedHand) {
-                    studentItem.classList.add('raised-hand');
-                    // Add hand icon to name if not already there
-                    const nameElement = studentItem.querySelector('h4');
-                    if (nameElement && !nameElement.innerHTML.includes('fa-hand-paper')) {
-                        nameElement.innerHTML = nameElement.innerHTML.replace('</h4>', ' <i class="fas fa-hand-paper" style="color: #ff9800; margin-left: 5px;"></i></h4>');
-                    }
-                } else {
-                    studentItem.classList.remove('raised-hand');
-                    // Remove hand icon from name
-                    const nameElement = studentItem.querySelector('h4');
-                    if (nameElement) {
-                        nameElement.innerHTML = nameElement.innerHTML.replace(' <i class="fas fa-hand-paper" style="color: #ff9800; margin-left: 5px;"></i>', '');
-                    }
-                }
-            }
         }
 
         function updateStudentConnectionStatus(sid, status) {
@@ -2079,19 +1748,24 @@
         }
 
         function updateConnectionStatus(status) {
-            const connectionStatusBar = document.getElementById('connectionStatusBar');
-            if (!connectionStatusBar) return;
+            if (!connectionStatus || !connectionStatusBar) return;
             
             switch(status) {
                 case 'connected':
+                    connectionStatus.textContent = '●';
+                    connectionStatus.style.color = '#2ed573';
                     connectionStatusBar.innerHTML = `<i class="fas fa-check-circle" style="color:#2ed573"></i><span>Connected to classroom</span>`;
                     connectionStatusBar.className = 'connection-status';
                     break;
                 case 'connecting':
+                    connectionStatus.textContent = '↻';
+                    connectionStatus.style.color = '#ffa502';
                     connectionStatusBar.innerHTML = `<i class="fas fa-sync-alt fa-spin" style="color:#ffa502"></i><span>Connecting to classroom...</span>`;
                     connectionStatusBar.className = 'connection-status connecting';
                     break;
                 case 'disconnected':
+                    connectionStatus.textContent = '●';
+                    connectionStatus.style.color = '#ff4757';
                     connectionStatusBar.innerHTML = `<i class="fas fa-exclamation-circle" style="color:#ff4757"></i><span>Disconnected</span>`;
                     connectionStatusBar.className = 'connection-status error';
                     break;
@@ -2167,7 +1841,7 @@
                         }
                     });
                     
-                    debugLog(`Video ${videoTrack.enabled ? 'enabled' : 'disabled'}`);
+                    logDebug(`Video ${videoTrack.enabled ? 'enabled' : 'disabled'}`);
                 }
             }
         }
@@ -2191,7 +1865,7 @@
                         }
                     });
                     
-                    debugLog(`Audio ${audioTrack.enabled ? 'enabled' : 'disabled'}`);
+                    logDebug(`Audio ${audioTrack.enabled ? 'enabled' : 'disabled'}`);
                 }
             }
         }
@@ -2306,6 +1980,10 @@
             }
             
             // Update count
+            const micRequestBadge = document.getElementById('micRequestBadge');
+            const micRequestList = document.getElementById('micRequestList');
+            const micRequestContainer = document.getElementById('micRequestContainer');
+            
             if (micRequestBadge) {
                 const currentCount = parseInt(micRequestBadge.textContent) - 1;
                 micRequestBadge.textContent = Math.max(0, currentCount);
@@ -2316,7 +1994,7 @@
                 micRequestContainer.style.display = 'none';
             }
             
-            debugLog(`Approved mic for student: ${studentSid}`);
+            logDebug(`Approved mic for student: ${studentSid}`);
         }
 
         // AI Prompter Functions
@@ -2388,17 +2066,8 @@
         }
 
         function handleError(data) {
-            debugLog(`Error received: ${data.message}`);
+            logDebug(`Error received: ${data.message}`);
             showNotification('error', 'Error', data.message);
-        }
-        
-        function getSignalIcon(signal) {
-            switch(signal) {
-                case 'confused': return '❓';
-                case 'too_fast': return '⚡';
-                case 'got_it': return '✅';
-                default: return '💬';
-            }
         }
 
         function showNotification(type, title, message) {
@@ -2407,9 +2076,7 @@
             const icons = {
                 success: 'fa-check-circle',
                 error: 'fa-exclamation-circle',
-                info: 'fa-info-circle',
-                warning: 'fa-exclamation-triangle',
-                hand: 'fa-hand-paper'
+                info: 'fa-info-circle'
             };
             
             notification.className = `notification ${type}`;
@@ -2427,24 +2094,24 @@
             }, 3000);
         }
 
-        function debugLog(message, data) {
-            if (!DEBUG || !debugLogElement) return;
+        function logDebug(message, data) {
+            if (!debugLog) return;
             
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
             logEntry.textContent = `[${timestamp}] ${message}`;
-            debugLogElement.prepend(logEntry);
+            debugLog.prepend(logEntry);
             
             if (data) {
                 const dataEntry = document.createElement('div');
                 dataEntry.textContent = JSON.stringify(data, null, 2);
                 dataEntry.style.fontSize = '10px';
                 dataEntry.style.color = '#666';
-                debugLogElement.prepend(dataEntry);
+                debugLog.prepend(dataEntry);
             }
             
-            while (debugLogElement.children.length > 20) {
-                debugLogElement.removeChild(debugLogElement.lastChild);
+            while (debugLog.children.length > 20) {
+                debugLog.removeChild(debugLog.lastChild);
             }
         }
 
