@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Live - Room {{ room_id }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -12,7 +12,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -20,124 +19,109 @@
             background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
             min-height: 100vh;
             color: #333;
-            -webkit-text-size-adjust: 100%;
-            -webkit-font-smoothing: antialiased;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 20px;
         }
         
         .header {
             background: white;
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin-bottom: 15px;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            flex-wrap: wrap;
-            gap: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
         
         .room-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex: 1;
-            min-width: 250px;
+            gap: 15px;
         }
         
         .room-icon {
             background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
-            flex-shrink: 0;
+            font-size: 22px;
         }
         
         .room-details h1 {
-            font-size: 20px;
+            font-size: 24px;
             color: #1a2980;
-            margin-bottom: 4px;
-            line-height: 1.2;
+            margin-bottom: 5px;
         }
         
         .room-details .room-id {
             background: #f0f8ff;
-            padding: 4px 12px;
+            padding: 5px 15px;
             border-radius: 20px;
             font-family: monospace;
-            font-size: 16px;
+            font-size: 18px;
             color: #1a2980;
             font-weight: 600;
-            display: inline-block;
         }
         
         .stats {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 25px;
         }
         
         .stat-card {
             text-align: center;
-            padding: 8px 15px;
+            padding: 10px 20px;
             background: #f8f9ff;
-            border-radius: 8px;
-            min-width: 90px;
-            flex: 1;
+            border-radius: 10px;
+            min-width: 120px;
         }
         
         .stat-card i {
-            font-size: 20px;
+            font-size: 24px;
             color: #1a2980;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         
         .stat-card .count {
-            font-size: 22px;
+            font-size: 28px;
             font-weight: 700;
             color: #1a2980;
-            line-height: 1;
         }
         
         .stat-card .label {
-            font-size: 11px;
+            font-size: 12px;
             color: #666;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
+            letter-spacing: 1px;
         }
         
         .main-content {
             display: grid;
             grid-template-columns: 1fr 400px;
-            gap: 15px;
+            gap: 20px;
         }
         
         .video-section {
             background: white;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
         
         .teacher-video-container {
             background: #000;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             position: relative;
             aspect-ratio: 16/9;
         }
@@ -150,19 +134,19 @@
         
         .students-video-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 15px;
-            padding: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            min-height: 150px;
+            border-radius: 15px;
+            min-height: 200px;
         }
         
         .student-video-item {
             position: relative;
             background: #000;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             aspect-ratio: 16/9;
             border: 2px solid #667eea;
@@ -177,13 +161,13 @@
         
         .student-video-item.active-speaker {
             border-color: #ffa502;
-            box-shadow: 0 0 15px rgba(255, 165, 2, 0.5);
+            box-shadow: 0 0 20px rgba(255, 165, 2, 0.5);
             animation: pulse 2s infinite;
         }
         
         .student-video-item.highlighted {
             border-color: #2ed573;
-            box-shadow: 0 0 15px rgba(46, 213, 115, 0.5);
+            box-shadow: 0 0 20px rgba(46, 213, 115, 0.5);
         }
         
         .student-video {
@@ -200,28 +184,32 @@
             right: 0;
             background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 6px 10px;
-            font-size: 11px;
+            padding: 8px 12px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         
         .student-video-controls {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 10px;
+            right: 10px;
             display: flex;
-            gap: 4px;
-            opacity: 1;
+            gap: 5px;
+            opacity: 0;
             transition: opacity 0.3s;
+        }
+        
+        .student-video-item:hover .student-video-controls {
+            opacity: 1;
         }
         
         .video-overlay {
             position: absolute;
-            bottom: 15px;
-            left: 15px;
-            right: 15px;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -229,18 +217,18 @@
         
         .video-controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
         
         .control-btn {
             background: rgba(0, 0, 0, 0.7);
             color: white;
             border: none;
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 20px;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
@@ -264,51 +252,54 @@
             background: rgba(0, 0, 0, 0.7);
             color: white;
             border: none;
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
+        .control-btn.small:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
         .video-label {
             background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 6px 12px;
+            padding: 8px 15px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 14px;
         }
         
         .controls-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
         
         .action-btn {
             background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            text-align: center;
+            gap: 10px;
         }
         
         .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.3);
+            box-shadow: 0 7px 20px rgba(26, 41, 128, 0.3);
         }
         
         .action-btn.secondary {
@@ -329,40 +320,45 @@
             opacity: 0.6;
         }
         
+        .action-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
         .students-section {
             background: white;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
             height: fit-content;
         }
         
         .section-title {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
             color: #1a2980;
-            font-size: 18px;
-        }
-        
-        .section-title i {
             font-size: 20px;
         }
         
+        .section-title i {
+            font-size: 24px;
+        }
+        
         .students-list {
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
         }
         
         .student-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px;
+            gap: 15px;
+            padding: 15px;
             background: #f8f9ff;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            border-radius: 10px;
+            margin-bottom: 10px;
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -373,8 +369,8 @@
         }
         
         .student-avatar {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
             border-radius: 50%;
             display: flex;
@@ -382,21 +378,20 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            flex-shrink: 0;
         }
         
         .student-info h4 {
-            font-size: 15px;
+            font-size: 16px;
             color: #333;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
         
         .student-info .status {
-            font-size: 11px;
+            font-size: 12px;
             color: #666;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
         
         .status.connected {
@@ -414,12 +409,12 @@
         .connection-status {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             margin-top: 10px;
-            padding: 8px;
+            padding: 10px;
             background: #e8f5e9;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 14px;
         }
         
         .connection-status.connecting {
@@ -436,17 +431,15 @@
             bottom: 20px;
             right: 20px;
             background: white;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 15px 25px;
+            border-radius: 10px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             z-index: 1000;
             transform: translateX(120%);
             transition: transform 0.3s ease;
-            max-width: 400px;
-            min-width: 300px;
         }
         
         .notification.show {
@@ -465,13 +458,8 @@
             border-left: 4px solid #1a2980;
         }
         
-        .notification.warning {
-            border-left: 4px solid #ffa502;
-        }
-        
         .notification i {
-            font-size: 22px;
-            flex-shrink: 0;
+            font-size: 24px;
         }
         
         .notification.success i {
@@ -488,74 +476,94 @@
         
         .empty-state {
             text-align: center;
-            padding: 30px 15px;
+            padding: 40px 20px;
             color: #666;
         }
         
         .empty-state i {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 48px;
+            margin-bottom: 15px;
             color: #ccc;
+        }
+        
+        .debug-info {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .debug-info h4 {
+            margin-bottom: 10px;
+            color: #1a2980;
         }
 
         .authority-panel {
-            margin: 20px 0;
-            padding: 15px;
+            margin: 25px 0;
+            padding: 20px;
             background: #fff;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 2px solid #2ed573;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .authority-panel h3 {
             color: #1a2980;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 18px;
+            gap: 10px;
         }
 
         .control-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
 
         .control-group {
-            padding: 12px;
+            padding: 15px;
             background: #f8f9ff;
             border-radius: 8px;
             border: 1px solid #e6e9ff;
         }
 
         .control-group h4 {
-            font-size: 14px;
+            font-size: 15px;
             color: #666;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .mic-request-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 10px;
+            padding: 8px 12px;
             background: white;
             border-radius: 6px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             border-left: 3px solid #ffa502;
         }
 
         .signal-item {
-            padding: 6px 10px;
-            margin-bottom: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 13px;
             border-left: 3px solid #1a2980;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .signal-item:hover {
+            transform: translateX(5px);
         }
 
         #aiPrompter {
@@ -564,9 +572,9 @@
             top: 120px;
             width: 300px;
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 0;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
             z-index: 1000;
             overflow: hidden;
             border: 1px solid #e6e9ff;
@@ -575,7 +583,7 @@
         .prompter-header {
             background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
             color: white;
-            padding: 12px;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -587,424 +595,38 @@
         }
 
         #prompterContent {
-            padding: 12px;
-            max-height: 350px;
+            padding: 15px;
+            max-height: 400px;
             overflow-y: auto;
         }
 
         .prompter-item {
             display: flex;
-            gap: 8px;
-            padding: 8px;
+            gap: 10px;
+            padding: 10px;
             border-bottom: 1px solid #f0f0f0;
             align-items: flex-start;
+        }
+
+        .prompter-item:last-child {
+            border-bottom: none;
         }
 
         .prompter-bullet {
             color: #1a2980;
             font-weight: bold;
-            min-width: 18px;
+            min-width: 20px;
         }
 
         .time-alert {
             background: #fff3e0;
             border-left: 3px solid #ffa502;
-            margin-top: 8px;
-        }
-
-        /* Mobile Teacher Floating Button */
-        .mobile-teacher-fab {
-            position: fixed;
-            bottom: 30px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            z-index: 1002;
-            display: none;
-        }
-
-        .mobile-teacher-fab .fab-button {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
-            border: none;
-            color: white;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .mobile-teacher-fab .fab-button:active {
-            transform: scale(0.95);
-            opacity: 0.8;
-        }
-
-        .mobile-teacher-fab .fab-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff4757;
-            color: white;
-            border-radius: 50%;
-            min-width: 20px;
-            height: 20px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            padding: 0 4px;
-        }
-
-        /* Bottom Sheet for Mobile Teacher Controls */
-        .mobile-bottom-sheet {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 20px 20px 0 0;
-            z-index: 1001;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            max-height: 80vh;
-            overflow: hidden;
-            display: none;
-            box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .mobile-bottom-sheet.open {
-            transform: translateY(0);
-        }
-
-        .mobile-bottom-sheet .bottom-sheet-header {
-            padding: 18px 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-        }
-
-        .mobile-bottom-sheet .bottom-sheet-header h3 {
-            margin: 0;
-            color: #1a2980;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .mobile-bottom-sheet .close-bottom-sheet {
-            background: none;
-            border: none;
-            font-size: 22px;
-            color: #666;
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        .mobile-bottom-sheet .bottom-sheet-content {
-            padding: 0;
-            max-height: calc(80vh - 70px);
-            overflow-y: auto;
-        }
-
-        .mobile-bottom-sheet .bottom-sheet-section {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .mobile-bottom-sheet .bottom-sheet-section:last-child {
-            border-bottom: none;
-        }
-
-        .mobile-bottom-sheet .bottom-sheet-section h4 {
-            margin-bottom: 12px;
-            color: #1a2980;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .mobile-bottom-sheet .mic-request-item {
-            margin-bottom: 8px;
-            padding: 10px;
-            background: #f8f9ff;
-            border-left: 4px solid #ffa502;
-        }
-
-        .mobile-bottom-sheet .signal-item {
-            margin-bottom: 8px;
-            padding: 10px;
-            background: #f8f9ff;
-            border-left: 4px solid #1a2980;
-            font-size: 13px;
-        }
-
-        .mobile-bottom-sheet-tabs {
-            display: flex;
-            background: #f8f9ff;
-            border-bottom: 1px solid #e6e9ff;
-        }
-
-        .mobile-bottom-sheet-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            background: none;
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .mobile-bottom-sheet-tab.active {
-            color: #1a2980;
-            background: white;
-        }
-
-        .mobile-bottom-sheet-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
-        }
-
-        .mobile-bottom-sheet-tab-badge {
-            background: #ff4757;
-            color: white;
-            border-radius: 10px;
-            padding: 2px 6px;
-            font-size: 11px;
-            margin-left: 4px;
-            min-width: 18px;
-            display: inline-block;
-            text-align: center;
-        }
-
-        /* Teacher Message Center */
-        .teacher-message-center {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border: 2px solid #e6e9ff;
-        }
-
-        .teacher-message-center h3 {
-            color: #1a2980;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 18px;
-        }
-
-        .message-tabs {
-            display: flex;
-            background: #f8f9ff;
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 15px;
-        }
-
-        .message-tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            background: none;
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-
-        .message-tab.active {
-            background: white;
-            color: #1a2980;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .message-tab-badge {
-            background: #ff4757;
-            color: white;
-            border-radius: 10px;
-            padding: 2px 6px;
-            font-size: 11px;
-            margin-left: 4px;
-            min-width: 18px;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .messages-container {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .message-item {
-            padding: 12px;
-            margin-bottom: 8px;
-            background: #f8f9ff;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s ease;
-        }
-
-        .message-item:hover {
-            background: #edf2ff;
-            transform: translateX(2px);
-        }
-
-        .message-item.critical {
-            border-left-color: #ff4757;
-            background: #ffebee;
-        }
-
-        .message-item.high {
-            border-left-color: #ffa502;
-            background: #fff3e0;
-        }
-
-        .message-item.medium {
-            border-left-color: #1a2980;
-            background: #e3f2fd;
-        }
-
-        .message-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .message-sender {
-            font-weight: 600;
-            color: #1a2980;
-            font-size: 14px;
-        }
-
-        .message-time {
-            font-size: 11px;
-            color: #666;
-        }
-
-        .message-content {
-            font-size: 13px;
-            color: #333;
-            line-height: 1.4;
-        }
-
-        .message-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            justify-content: flex-end;
-        }
-
-        .message-action-btn {
-            padding: 4px 10px;
-            border-radius: 4px;
-            border: none;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .message-action-btn.approve {
-            background: #2ed573;
-            color: white;
-        }
-
-        .message-action-btn.deny {
-            background: #ff4757;
-            color: white;
-        }
-
-        .message-action-btn.view {
-            background: #667eea;
-            color: white;
-        }
-
-        .empty-message-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-
-        .empty-message-state i {
-            font-size: 40px;
-            margin-bottom: 10px;
-            color: #ccc;
-        }
-
-        /* Mobile Connection Status */
-        .mobile-connection-status {
-            display: none;
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            z-index: 10001;
-            align-items: center;
-            gap: 6px;
-            max-width: 90%;
-        }
-
-        /* Mobile Alert */
-        .mobile-alert {
-            display: none;
-            position: fixed;
-            bottom: 70px;
-            left: 10px;
-            right: 10px;
-            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            z-index: 9998;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            animation: slideInMobile 0.3s ease;
-        }
-
-        @keyframes slideInMobile {
-            from {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            margin-top: 10px;
         }
 
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(255, 165, 2, 0.5); }
-            50% { box-shadow: 0 0 25px rgba(255, 165, 2, 0.8); }
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 165, 2, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 165, 2, 0.8); }
         }
         
         @keyframes slideIn {
@@ -1018,87 +640,57 @@
             }
         }
 
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr 350px;
-            }
-        }
-
+        /* Mobile-specific styles */
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
             }
-            .students-section {
-                order: -1;
-                margin-bottom: 15px;
-            }
+            
             .stats {
-                justify-content: flex-start;
+                gap: 15px;
             }
+            
+            .stat-card {
+                min-width: 100px;
+                padding: 10px 15px;
+            }
+            
+            .students-video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
             #aiPrompter {
                 position: relative;
                 width: 100%;
                 top: 0;
                 right: 0;
-                margin-top: 15px;
+                margin-top: 20px;
             }
         }
-
+        
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
             .header {
                 flex-direction: column;
-                align-items: stretch;
+                gap: 15px;
                 text-align: center;
-                gap: 12px;
-                padding: 12px;
             }
             
             .room-info {
                 justify-content: center;
-                text-align: center;
             }
             
             .stats {
                 justify-content: center;
-                width: 100%;
-            }
-            
-            .stat-card {
-                min-width: 80px;
-                padding: 8px 10px;
-            }
-            
-            .stat-card .count {
-                font-size: 20px;
-            }
-            
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .students-section {
-                order: -1;
-                margin-bottom: 10px;
+                flex-wrap: wrap;
             }
             
             .controls-section {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-            
-            .action-btn {
-                padding: 14px 8px;
-                font-size: 13px;
+                grid-template-columns: 1fr;
             }
             
             .students-video-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-                gap: 8px;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
                 padding: 10px;
             }
             
@@ -1106,36 +698,18 @@
                 aspect-ratio: 4/3;
             }
             
-            .teacher-video-container {
-                aspect-ratio: 4/3;
+            .control-grid {
+                grid-template-columns: 1fr;
             }
             
-            .video-controls .control-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-            }
-            
-            .authority-panel {
-                display: none !important; /* Hide on mobile, use bottom sheet */
-            }
-            
-            .teacher-message-center {
-                display: none !important; /* Hide on mobile, use bottom sheet */
-            }
-            
-            .mobile-teacher-fab {
-                display: block;
-            }
-            
+            /* Mobile notification */
             .notification {
                 position: fixed;
-                top: 10px;
-                left: 10px;
+                top: 20px;
                 right: 10px;
+                left: 10px;
                 bottom: auto;
                 max-width: 100%;
-                min-width: 0;
                 z-index: 10000;
                 transform: translateY(-100%);
             }
@@ -1144,218 +718,67 @@
                 transform: translateY(0);
             }
             
-            .notification-content {
-                flex: 1;
+            /* Mobile authority panel */
+            .authority-panel {
+                margin: 15px 0;
+                padding: 15px;
             }
             
-            .notification-title {
-                font-size: 14px;
-                font-weight: 600;
-            }
-            
-            .notification-message {
-                font-size: 13px;
-            }
-            
-            .mobile-connection-status {
-                display: flex;
-            }
-            
-            .mobile-alert {
-                display: flex;
-            }
-            
-            .mobile-alert button {
-                background: white;
-                color: #1a2980;
-                border: none;
-                padding: 6px 12px;
-                border-radius: 4px;
-                font-weight: 600;
-                font-size: 12px;
-                margin-left: 8px;
-                flex-shrink: 0;
-            }
-            
+            /* Ensure video controls are visible on mobile */
             .student-video-controls {
-                opacity: 1;
-                background: rgba(0, 0, 0, 0.5);
-                border-radius: 15px;
-                padding: 4px;
+                opacity: 1 !important;
+            }
+            
+            .control-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+            
+            .video-controls {
+                gap: 5px;
             }
         }
 
         @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
             .room-details h1 {
-                font-size: 18px;
+                font-size: 20px;
             }
             
             .room-details .room-id {
-                font-size: 14px;
-                padding: 3px 10px;
+                font-size: 16px;
+                padding: 4px 12px;
             }
             
-            .room-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
+            .stat-card {
+                min-width: 80px;
+                padding: 8px 12px;
+            }
+            
+            .stat-card .count {
+                font-size: 22px;
             }
             
             .students-video-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
             
-            .student-video-label {
-                font-size: 10px;
-                padding: 4px 8px;
-            }
-            
-            .section-title {
-                font-size: 16px;
-            }
-            
-            .notification {
-                padding: 10px 15px;
-            }
-            
-            .notification i {
-                font-size: 20px;
-            }
-
-            .controls-section {
-                grid-template-columns: 1fr;
-            }
-
             .action-btn {
                 padding: 12px;
                 font-size: 14px;
-            }
-
-            .mobile-teacher-fab {
-                bottom: 20px;
-                right: 15px;
-                width: 50px;
-                height: 50px;
-            }
-
-            .mobile-teacher-fab .fab-button {
-                font-size: 20px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .stats {
-                gap: 8px;
-            }
-            
-            .stat-card {
-                min-width: 70px;
-                padding: 6px 8px;
-            }
-            
-            .stat-card .count {
-                font-size: 18px;
-            }
-            
-            .stat-card .label {
-                font-size: 10px;
-            }
-            
-            .students-video-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
-
-            .mobile-bottom-sheet .bottom-sheet-section {
-                padding: 12px 15px;
-            }
-        }
-
-        /* Landscape mode adjustments */
-        @media (max-height: 600px) and (orientation: landscape) {
-            .mobile-bottom-sheet {
-                max-height: 90vh;
-            }
-
-            .mobile-bottom-sheet .bottom-sheet-content {
-                max-height: calc(90vh - 70px);
-            }
-
-            .mobile-teacher-fab {
-                bottom: 15px;
-                right: 15px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Mobile Connection Status -->
-    <div class="mobile-connection-status" id="mobileConnectionStatus">
-        <i class="fas fa-wifi"></i>
-        <span id="mobileStatusText">Connecting...</span>
-    </div>
-    
-    <!-- Mobile Teacher Floating Button -->
-    <div class="mobile-teacher-fab" id="mobileTeacherFab">
-        <button class="fab-button" id="mobileFabButton">
-            <i class="fas fa-bell"></i>
-            <span class="fab-badge" id="mobileFabBadge">0</span>
-        </button>
-    </div>
-    
-    <!-- Mobile Bottom Sheet -->
-    <div class="mobile-bottom-sheet" id="mobileBottomSheet">
-        <div class="bottom-sheet-header">
-            <h3><i class="fas fa-comments"></i> Student Messages</h3>
-            <button class="close-bottom-sheet" id="closeBottomSheet">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <div class="mobile-bottom-sheet-tabs">
-            <button class="mobile-bottom-sheet-tab active" data-tab="all">
-                <i class="fas fa-inbox"></i> All
-                <span class="mobile-bottom-sheet-tab-badge" id="mobileAllBadge">0</span>
-            </button>
-            <button class="mobile-bottom-sheet-tab" data-tab="requests">
-                <i class="fas fa-microphone"></i> Requests
-                <span class="mobile-bottom-sheet-tab-badge" id="mobileRequestBadge">0</span>
-            </button>
-            <button class="mobile-bottom-sheet-tab" data-tab="messages">
-                <i class="fas fa-comment"></i> Messages
-                <span class="mobile-bottom-sheet-tab-badge" id="mobileMessageBadge">0</span>
-            </button>
-        </div>
-        
-        <div class="bottom-sheet-content">
-            <!-- All Messages Tab -->
-            <div class="bottom-sheet-section" data-tab-content="all">
-                <div id="mobileAllMessages">
-                    <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
-                        No messages yet
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Requests Tab -->
-            <div class="bottom-sheet-section" data-tab-content="requests" style="display: none;">
-                <div id="mobileMicRequestList">
-                    <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
-                        No pending mic requests
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Messages Tab -->
-            <div class="bottom-sheet-section" data-tab-content="messages" style="display: none;">
-                <div id="mobileMessageList">
-                    <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
-                        No messages from students
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <div class="container">
         <div class="header">
             <div class="room-info">
@@ -1383,35 +806,17 @@
                     <div class="count" id="sessionTime">00:00</div>
                     <div class="label">Time</div>
                 </div>
-                <div class="stat-card">
-                    <i class="fas fa-bell"></i>
-                    <div class="count" id="messageCount">0</div>
-                    <div class="label">Messages</div>
-                </div>
             </div>
         </div>
         
         <div class="main-content">
-            <div class="students-section">
-                <div class="section-title">
-                    <i class="fas fa-user-graduate"></i>
-                    <h2>Students (<span id="liveStudentCount">0</span>)</h2>
-                </div>
-                <div class="students-list" id="studentsList">
-                    <div class="empty-state">
-                        <i class="fas fa-user-friends"></i>
-                        <p>Waiting for students to join...</p>
-                    </div>
-                </div>
-            </div>
-            
             <div class="video-section">
-                <!-- Teacher Video -->
+                <!-- Teacher video -->
                 <div class="teacher-video-container">
                     <video id="teacherVideo" autoplay playsinline muted></video>
                     <div class="video-overlay">
                         <div class="video-label">
-                            <i class="fas fa-user-tie"></i> Teacher
+                            <i class="fas fa-user-tie"></i> You (Teacher)
                         </div>
                         <div class="video-controls">
                             <button class="control-btn" id="toggleVideo" title="Toggle Video">
@@ -1427,7 +832,7 @@
                     </div>
                 </div>
                 
-                <!-- Students Video Grid -->
+                <!-- Students video grid -->
                 <div class="students-video-grid" id="studentsVideoGrid">
                     <div class="empty-state">
                         <i class="fas fa-user-friends"></i>
@@ -1440,7 +845,7 @@
                     <span>Connecting to classroom...</span>
                 </div>
                 
-                <!-- Control Buttons -->
+                <!-- Controls -->
                 <div class="controls-section">
                     <button class="action-btn success" id="startBroadcast">
                         <i class="fas fa-play"></i> Start Broadcast
@@ -1456,75 +861,70 @@
                     </button>
                 </div>
                 
-                <!-- Teacher Message Center (Desktop) -->
-                <div class="teacher-message-center" id="teacherMessageCenter">
-                    <h3><i class="fas fa-comments"></i> Student Messages Center</h3>
-                    
-                    <div class="message-tabs">
-                        <button class="message-tab active" data-tab="all">
-                            All Messages <span class="message-tab-badge" id="allBadge">0</span>
-                        </button>
-                        <button class="message-tab" data-tab="requests">
-                            Mic Requests <span class="message-tab-badge" id="requestsBadge">0</span>
-                        </button>
-                        <button class="message-tab" data-tab="messages">
-                            Messages <span class="message-tab-badge" id="messagesBadge">0</span>
-                        </button>
-                    </div>
-                    
-                    <div class="messages-container" id="desktopMessagesContainer">
-                        <!-- All Messages will be inserted here -->
-                        <div class="empty-message-state">
-                            <i class="fas fa-comment-slash"></i>
-                            <p>No messages from students yet</p>
-                            <p style="font-size: 12px; margin-top: 5px;">Students' messages will appear here</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Teacher Authority Panel (Desktop Only) -->
-                <div class="authority-panel" id="desktopAuthorityPanel">
+                <!-- Teacher Authority Panel -->
+                <div class="authority-panel">
                     <h3><i class="fas fa-crown"></i> Classroom Controls</h3>
                     
                     <div class="control-grid">
                         <!-- Audio Controls -->
                         <div class="control-group">
-                            <h4><i class="fas fa-volume-mute"></i> Audio Controls</h4>
-                            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                                <button class="action-btn danger" id="muteAllBtn" style="flex: 1; padding: 8px; font-size: 13px;">
+                            <h4><i class="fas fa-volume-mute"></i> Audio</h4>
+                            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                                <button class="action-btn danger" id="muteAllBtn" style="flex: 1;">
                                     <i class="fas fa-volume-mute"></i> Mute All
                                 </button>
-                                <button class="action-btn success" id="unmuteAllBtn" style="flex: 1; padding: 8px; font-size: 13px;">
-                                    <i class="fas fa-volume-up"></i> Unmute All
+                                <button class="action-btn success" id="unmuteAllBtn" style="flex: 1;">
+                                    <i class="fas fa-volume-up"></i> Unmute
                                 </button>
+                            </div>
+                            <div id="micRequestContainer">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px;">Mic Requests:</span>
+                                    <span id="micRequestBadge" style="background: #ff4757; color: white; border-radius: 10px; padding: 2px 8px; font-size: 12px;">0</span>
+                                </div>
+                                <div id="micRequestList" style="max-height: 120px; overflow-y: auto;"></div>
                             </div>
                         </div>
                         
                         <!-- Video Controls -->
                         <div class="control-group">
-                            <h4><i class="fas fa-video"></i> Video Controls</h4>
+                            <h4><i class="fas fa-video"></i> Video</h4>
                             <div style="display: flex; gap: 8px;">
-                                <button class="action-btn danger" id="disableCamsBtn" style="flex: 1; padding: 8px; font-size: 13px;">
+                                <button class="action-btn danger" id="disableCamsBtn" style="flex: 1;">
                                     <i class="fas fa-video-slash"></i> Disable Cams
                                 </button>
-                                <button class="action-btn success" id="enableCamsBtn" style="flex: 1; padding: 8px; font-size: 13px;">
-                                    <i class="fas fa-video"></i> Enable Cams
+                                <button class="action-btn success" id="enableCamsBtn" style="flex: 1;">
+                                    <i class="fas fa-video"></i> Enable
                                 </button>
                             </div>
                         </div>
                         
-                        <!-- Quick Actions -->
+                        <!-- Student Signals -->
                         <div class="control-group">
-                            <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="action-btn" id="clearMessagesBtn" style="flex: 1; padding: 8px; font-size: 13px;">
-                                    <i class="fas fa-trash"></i> Clear Messages
-                                </button>
-                                <button class="action-btn success" id="markAllReadBtn" style="flex: 1; padding: 8px; font-size: 13px;">
-                                    <i class="fas fa-check"></i> Mark All Read
-                                </button>
+                            <h4><i class="fas fa-heartbeat"></i> Student Signals</h4>
+                            <div id="struggleSignals" style="min-height: 100px; max-height: 150px; overflow-y: auto;">
+                                <p class="empty-state" style="font-size: 13px; padding: 20px 0;">No signals yet</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Debug Information -->
+                <div class="debug-info">
+                    <h4><i class="fas fa-bug"></i> Debug Information</h4>
+                    <div id="debugLog"></div>
+                </div>
+            </div>
+            
+            <div class="students-section">
+                <div class="section-title">
+                    <i class="fas fa-user-graduate"></i>
+                    <h2>Students (<span id="liveStudentCount">0</span>)</h2>
+                </div>
+                <div class="students-list" id="studentsList">
+                    <div class="empty-state">
+                        <i class="fas fa-user-friends"></i>
+                        <p>Waiting for students to join...</p>
                     </div>
                 </div>
             </div>
@@ -1535,7 +935,7 @@
     <div id="aiPrompter" style="display: none;">
         <div class="prompter-header">
             <h4><i class="fas fa-robot"></i> AI Prompter</h4>
-            <button onclick="toggleAIPrompter()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">
+            <button onclick="toggleAIPrompter()" style="background: none; border: none; color: white; cursor: pointer; font-size: 20px;">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -1592,11 +992,6 @@
         let sessionTimer = null;
         let mySid = null;
         
-        // Message Management
-        let allMessages = [];
-        let unreadCount = 0;
-        let activeTab = 'all';
-        
         // WebRTC Data Structures
         const peerConnections = {};
         const remoteStreams = {};
@@ -1632,41 +1027,25 @@
         const connectionStatusBar = document.getElementById('connectionStatusBar');
         const sessionTime = document.getElementById('sessionTime');
         const notification = document.getElementById('notification');
-        const messageCount = document.getElementById('messageCount');
+        const debugLog = document.getElementById('debugLog');
         
-        // Mobile UI Elements
-        const mobileTeacherFab = document.getElementById('mobileTeacherFab');
-        const mobileFabButton = document.getElementById('mobileFabButton');
-        const mobileFabBadge = document.getElementById('mobileFabBadge');
-        const mobileBottomSheet = document.getElementById('mobileBottomSheet');
-        const closeBottomSheet = document.getElementById('closeBottomSheet');
-        const mobileAllBadge = document.getElementById('mobileAllBadge');
-        const mobileRequestBadge = document.getElementById('mobileRequestBadge');
-        const mobileMessageBadge = document.getElementById('mobileMessageBadge');
-        
-        // Message Center Elements
-        const teacherMessageCenter = document.getElementById('teacherMessageCenter');
-        const desktopMessagesContainer = document.getElementById('desktopMessagesContainer');
-        const allBadge = document.getElementById('allBadge');
-        const requestsBadge = document.getElementById('requestsBadge');
-        const messagesBadge = document.getElementById('messagesBadge');
+        // Teacher Authority Elements
+        const micRequestContainer = document.getElementById('micRequestContainer');
+        const micRequestBadge = document.getElementById('micRequestBadge');
+        const micRequestList = document.getElementById('micRequestList');
+        const struggleSignals = document.getElementById('struggleSignals');
 
         // ============================================
         // INITIALIZATION
         // ============================================
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Teacher page loaded. Room: ' + roomId);
-            console.log('Mobile device: ' + isMobile);
             
+            // Show appropriate notification
             if (isMobile) {
-                document.body.classList.add('mobile-device');
-                showNotification('info', 'Mobile Mode', 'Touch-optimized interface enabled');
-                setupMobileUI();
+                console.log('Running in mobile mode');
             } else {
-                // Show desktop message center
-                teacherMessageCenter.style.display = 'block';
-                desktopAuthorityPanel.style.display = 'block';
-                setupDesktopUI();
+                console.log('Running in desktop mode');
             }
             
             try {
@@ -1681,134 +1060,6 @@
                 showNotification('error', 'Initialization Error', error.message);
             }
         });
-
-        // ============================================
-        // MOBILE UI SETUP
-        // ============================================
-        function setupMobileUI() {
-            // Setup FAB click
-            mobileFabButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                openBottomSheet();
-            });
-
-            // Setup bottom sheet
-            closeBottomSheet.addEventListener('click', closeBottomSheetHandler);
-            
-            // Setup tab switching
-            document.querySelectorAll('.mobile-bottom-sheet-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabName = this.dataset.tab;
-                    switchMobileTab(tabName);
-                });
-            });
-
-            // Setup swipe to close
-            setupSwipeGestures();
-            
-            // Setup backdrop click
-            mobileBottomSheet.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeBottomSheetHandler();
-                }
-            });
-
-            console.log('Mobile UI setup complete');
-        }
-
-        function setupDesktopUI() {
-            // Setup tab switching
-            document.querySelectorAll('.message-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabName = this.dataset.tab;
-                    switchDesktopTab(tabName);
-                });
-            });
-
-            // Setup clear messages button
-            document.getElementById('clearMessagesBtn').addEventListener('click', clearAllMessages);
-            
-            // Setup mark all read button
-            document.getElementById('markAllReadBtn').addEventListener('click', markAllMessagesAsRead);
-        }
-
-        function setupSwipeGestures() {
-            let startY;
-            const sheet = mobileBottomSheet;
-            
-            sheet.addEventListener('touchstart', function(e) {
-                startY = e.touches[0].clientY;
-            }, { passive: true });
-
-            sheet.addEventListener('touchmove', function(e) {
-                if (!startY) return;
-                
-                const currentY = e.touches[0].clientY;
-                const diff = currentY - startY;
-                
-                // Only allow swipe down to close
-                if (diff > 50) {
-                    e.preventDefault();
-                    sheet.style.transform = `translateY(${diff}px)`;
-                }
-            }, { passive: false });
-
-            sheet.addEventListener('touchend', function(e) {
-                if (!startY) return;
-                
-                const currentY = e.changedTouches[0].clientY;
-                const diff = currentY - startY;
-                
-                if (diff > 100) {
-                    closeBottomSheetHandler();
-                } else {
-                    sheet.style.transform = 'translateY(0)';
-                }
-                
-                startY = null;
-            }, { passive: true });
-        }
-
-        function openBottomSheet() {
-            mobileBottomSheet.style.display = 'block';
-            setTimeout(() => {
-                mobileBottomSheet.classList.add('open');
-                updateMobileMessages();
-                markAllMessagesAsRead();
-            }, 10);
-        }
-
-        function closeBottomSheetHandler() {
-            mobileBottomSheet.classList.remove('open');
-            setTimeout(() => {
-                mobileBottomSheet.style.display = 'none';
-            }, 300);
-        }
-
-        function switchMobileTab(tabName) {
-            // Update active tab
-            document.querySelectorAll('.mobile-bottom-sheet-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
-            });
-
-            // Show/hide tab content
-            document.querySelectorAll('[data-tab-content]').forEach(content => {
-                content.style.display = content.dataset.tabContent === tabName ? 'block' : 'none';
-            });
-
-            activeTab = tabName;
-        }
-
-        function switchDesktopTab(tabName) {
-            // Update active tab
-            document.querySelectorAll('.message-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
-            });
-
-            // Update messages display
-            updateDesktopMessages();
-            activeTab = tabName;
-        }
 
         // ============================================
         // NOTIFICATION SYSTEM
@@ -1836,325 +1087,14 @@
             // Show notification
             notification.classList.add('show');
             
-            // Auto-hide
+            // Log for debugging
+            logDebug(`${type.toUpperCase()}: ${title} - ${message}`);
+            
+            // Auto-hide (longer on mobile)
             const delay = isMobile ? 4000 : 3000;
             setTimeout(() => {
                 notification.classList.remove('show');
             }, delay);
-        }
-
-        function updateMobileStatus(type, message) {
-            if (!mobileConnectionStatus || !mobileStatusText) return;
-            
-            const icons = {
-                success: 'fa-wifi',
-                error: 'fa-wifi-slash',
-                info: 'fa-sync-alt',
-                warning: 'fa-exclamation-triangle'
-            };
-            
-            mobileStatusText.textContent = message;
-            const icon = icons[type] || 'fa-wifi';
-            mobileConnectionStatus.innerHTML = `<i class="fas ${icon}"></i> <span id="mobileStatusText">${message}</span>`;
-            
-            // Color coding
-            mobileConnectionStatus.style.background = 
-                type === 'success' ? 'rgba(46, 213, 115, 0.9)' :
-                type === 'error' ? 'rgba(255, 71, 87, 0.9)' :
-                type === 'warning' ? 'rgba(255, 165, 2, 0.9)' :
-                'rgba(26, 41, 128, 0.9)';
-            
-            // Auto-hide mobile status after 5 seconds
-            if (type === 'success') {
-                setTimeout(() => {
-                    mobileConnectionStatus.style.opacity = '0';
-                    mobileConnectionStatus.style.transition = 'opacity 1s';
-                    setTimeout(() => {
-                        mobileConnectionStatus.style.display = 'none';
-                    }, 1000);
-                }, 5000);
-            } else {
-                mobileConnectionStatus.style.display = 'flex';
-                mobileConnectionStatus.style.opacity = '1';
-            }
-        }
-
-        // ============================================
-        // MESSAGE MANAGEMENT
-        // ============================================
-        function addMessage(type, data) {
-            const message = {
-                id: Date.now() + Math.random(),
-                type: type,
-                timestamp: Date.now(),
-                read: false,
-                ...data
-            };
-            
-            allMessages.unshift(message); // Add to beginning for chronological order
-            unreadCount++;
-            
-            // Update UI
-            updateMessageBadges();
-            
-            // Show notification
-            const notificationTitle = getMessageTypeTitle(type);
-            showNotification('info', notificationTitle, `${data.username}: ${data.message || data.content}`);
-            
-            // Update message displays
-            if (isMobile) {
-                updateMobileMessages();
-            } else {
-                updateDesktopMessages();
-            }
-            
-            // Auto-remove old messages (keep only last 50)
-            if (allMessages.length > 50) {
-                allMessages = allMessages.slice(0, 50);
-            }
-            
-            return message;
-        }
-
-        function getMessageTypeTitle(type) {
-            const titles = {
-                'mic_request': '🎤 Mic Request',
-                'student_signal': '📢 Student Signal',
-                'chat_message': '💬 Chat Message',
-                'feedback': '📝 Feedback'
-            };
-            return titles[type] || 'New Message';
-        }
-
-        function updateMessageBadges() {
-            // Update total message count
-            if (messageCount) {
-                messageCount.textContent = allMessages.length;
-            }
-            
-            // Update unread badge on mobile FAB
-            if (mobileFabBadge) {
-                mobileFabBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                mobileFabBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
-            }
-            
-            // Update desktop badges
-            const micRequests = allMessages.filter(m => m.type === 'mic_request').length;
-            const chatMessages = allMessages.filter(m => m.type === 'chat_message' || m.type === 'student_signal').length;
-            
-            if (allBadge) allBadge.textContent = allMessages.length;
-            if (requestsBadge) requestsBadge.textContent = micRequests;
-            if (messagesBadge) messagesBadge.textContent = chatMessages;
-            
-            // Update mobile badges
-            if (mobileAllBadge) mobileAllBadge.textContent = allMessages.length;
-            if (mobileRequestBadge) mobileRequestBadge.textContent = micRequests;
-            if (mobileMessageBadge) mobileMessageBadge.textContent = chatMessages;
-        }
-
-        function markAllMessagesAsRead() {
-            unreadCount = 0;
-            allMessages.forEach(m => m.read = true);
-            updateMessageBadges();
-            
-            if (mobileFabBadge) {
-                mobileFabBadge.style.display = 'none';
-            }
-        }
-
-        function clearAllMessages() {
-            if (confirm('Clear all messages? This cannot be undone.')) {
-                allMessages = [];
-                unreadCount = 0;
-                updateMessageBadges();
-                
-                // Update displays
-                if (isMobile) {
-                    updateMobileMessages();
-                } else {
-                    updateDesktopMessages();
-                }
-                
-                showNotification('info', 'Messages Cleared', 'All messages have been cleared');
-            }
-        }
-
-        function updateDesktopMessages() {
-            if (!desktopMessagesContainer) return;
-            
-            let filteredMessages = allMessages;
-            
-            if (activeTab === 'requests') {
-                filteredMessages = allMessages.filter(m => m.type === 'mic_request');
-            } else if (activeTab === 'messages') {
-                filteredMessages = allMessages.filter(m => m.type === 'chat_message' || m.type === 'student_signal');
-            }
-            
-            if (filteredMessages.length === 0) {
-                desktopMessagesContainer.innerHTML = `
-                    <div class="empty-message-state">
-                        <i class="fas fa-comment-slash"></i>
-                        <p>No ${activeTab === 'all' ? 'messages' : activeTab} yet</p>
-                        <p style="font-size: 12px; margin-top: 5px;">Students' ${activeTab === 'all' ? 'messages' : activeTab} will appear here</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            desktopMessagesContainer.innerHTML = filteredMessages.map(message => {
-                const time = new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const priorityClass = getPriorityClass(message);
-                
-                let actions = '';
-                if (message.type === 'mic_request') {
-                    actions = `
-                        <div class="message-actions">
-                            <button class="message-action-btn approve" onclick="approveMicRequest('${message.student_sid}')">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                            <button class="message-action-btn deny" onclick="denyMicRequest('${message.student_sid}')">
-                                <i class="fas fa-times"></i> Deny
-                            </button>
-                        </div>
-                    `;
-                } else if (message.type === 'student_signal') {
-                    actions = `
-                        <div class="message-actions">
-                            <button class="message-action-btn view" onclick="focusStudentVideo('${message.student_sid}')">
-                                <i class="fas fa-eye"></i> View Student
-                            </button>
-                        </div>
-                    `;
-                }
-                
-                return `
-                    <div class="message-item ${priorityClass}" data-message-id="${message.id}">
-                        <div class="message-item-header">
-                            <span class="message-sender">
-                                <i class="fas ${getMessageIcon(message.type)}"></i>
-                                ${message.username}
-                            </span>
-                            <span class="message-time">${time}</span>
-                        </div>
-                        <div class="message-content">
-                            ${message.message || message.content}
-                        </div>
-                        ${actions}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function updateMobileMessages() {
-            // Update all messages tab
-            updateMobileTab('all');
-            
-            // Update requests tab
-            updateMobileTab('requests');
-            
-            // Update messages tab
-            updateMobileTab('messages');
-        }
-
-        function updateMobileTab(tabName) {
-            const containerId = tabName === 'all' ? 'mobileAllMessages' : 
-                               tabName === 'requests' ? 'mobileMicRequestList' : 
-                               'mobileMessageList';
-            
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            let filteredMessages = allMessages;
-            
-            if (tabName === 'requests') {
-                filteredMessages = allMessages.filter(m => m.type === 'mic_request');
-            } else if (tabName === 'messages') {
-                filteredMessages = allMessages.filter(m => m.type === 'chat_message' || m.type === 'student_signal');
-            }
-            
-            if (filteredMessages.length === 0) {
-                container.innerHTML = `<p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
-                    No ${tabName === 'all' ? 'messages' : tabName} yet
-                </p>`;
-                return;
-            }
-            
-            container.innerHTML = filteredMessages.map(message => {
-                const time = new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                let actions = '';
-                if (message.type === 'mic_request') {
-                    actions = `
-                        <div style="display: flex; gap: 5px; margin-top: 8px;">
-                            <button onclick="approveMicRequest('${message.student_sid}')" 
-                                    style="background: #2ed573; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; flex: 1;">
-                                Approve
-                            </button>
-                            <button onclick="denyMicRequest('${message.student_sid}')" 
-                                    style="background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; flex: 1;">
-                                Deny
-                            </button>
-                        </div>
-                    `;
-                } else if (message.type === 'student_signal') {
-                    actions = `
-                        <div style="margin-top: 8px;">
-                            <button onclick="focusStudentVideo('${message.student_sid}')" 
-                                    style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; width: 100%;">
-                                View Student
-                            </button>
-                        </div>
-                    `;
-                }
-                
-                return `
-                    <div class="${tabName === 'requests' ? 'mic-request-item' : 'signal-item'}" 
-                         style="margin-bottom: 10px; padding: 12px; background: #f8f9ff; border-radius: 8px; border-left: 4px solid ${getMessageColor(message.type)};">
-                        <div style="margin-bottom: 6px;">
-                            <div style="font-weight: 600; font-size: 14px; color: #1a2980; display: flex; align-items: center; gap: 6px;">
-                                <i class="fas ${getMessageIcon(message.type)}"></i>
-                                ${message.username}
-                            </div>
-                            <div style="font-size: 11px; color: #666; margin-top: 2px;">
-                                ${time}
-                            </div>
-                        </div>
-                        <div style="font-size: 13px; color: #333; margin-bottom: 8px;">
-                            ${message.message || message.content}
-                        </div>
-                        ${actions}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getMessageIcon(type) {
-            const icons = {
-                'mic_request': 'fa-microphone',
-                'student_signal': 'fa-comment',
-                'chat_message': 'fa-comment-alt',
-                'feedback': 'fa-star'
-            };
-            return icons[type] || 'fa-envelope';
-        }
-
-        function getMessageColor(type) {
-            const colors = {
-                'mic_request': '#ffa502',
-                'student_signal': '#1a2980',
-                'chat_message': '#667eea',
-                'feedback': '#2ed573'
-            };
-            return colors[type] || '#666';
-        }
-
-        function getPriorityClass(message) {
-            if (message.type === 'mic_request') return 'high';
-            if (message.message?.toLowerCase().includes('urgent') || 
-                message.message?.toLowerCase().includes('emergency')) {
-                return 'critical';
-            }
-            return 'medium';
         }
 
         // ============================================
@@ -2162,19 +1102,7 @@
         // ============================================
         async function initializeLocalMedia() {
             try {
-                const constraints = isMobile ? {
-                    video: {
-                        width: { ideal: 640 },
-                        height: { ideal: 480 },
-                        frameRate: { ideal: 24 },
-                        facingMode: 'user'
-                    },
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    }
-                } : {
+                const constraints = {
                     video: {
                         width: { ideal: 1280 },
                         height: { ideal: 720 },
@@ -2191,12 +1119,7 @@
                 teacherVideo.srcObject = localStream;
                 await teacherVideo.play();
                 
-                console.log('Local media obtained:', {
-                    video: localStream.getVideoTracks()[0]?.label,
-                    audio: localStream.getAudioTracks()[0]?.label,
-                    mobile: isMobile
-                });
-                
+                console.log('Local media obtained');
                 showNotification('success', 'Media Ready', 'Camera and microphone are active');
                 
             } catch (error) {
@@ -2222,25 +1145,21 @@
             socket.on('connect', () => {
                 console.log('✅ Connected to server');
                 updateConnectionStatus('connected');
-                updateMobileStatus('success', 'Connected');
             });
             
             socket.on('disconnect', () => {
                 console.log('❌ Disconnected from server');
                 updateConnectionStatus('disconnected');
-                updateMobileStatus('error', 'Disconnected');
             });
             
             socket.on('reconnect', () => {
                 console.log('🔄 Reconnected to server');
                 showNotification('info', 'Reconnected', 'Connection restored');
-                updateMobileStatus('success', 'Reconnected');
                 socket.emit('rejoin-room', { room: roomId, role: 'teacher' });
             });
             
             socket.on('reconnect_attempt', () => {
                 console.log('Attempting to reconnect...');
-                updateMobileStatus('info', 'Reconnecting...');
             });
             
             // Room events
@@ -2253,10 +1172,9 @@
             socket.on('webrtc-answer', handleWebRTCAnswer);
             socket.on('webrtc-ice-candidate', handleWebRTCIceCandidate);
             
-            // Teacher authority events
+            // Teacher authority events - THESE ARE CRITICAL
             socket.on('mic-request-received', handleMicRequestReceived);
             socket.on('student-struggling', handleStudentStruggling);
-            socket.on('student-message', handleStudentMessage);
             socket.on('command-executed', handleCommandExecuted);
             socket.on('room-state', handleRoomState);
             
@@ -2341,12 +1259,7 @@
             createPeerConnection(sid, username, role);
             
             updateStudentCount();
-            addMessage('chat_message', {
-                student_sid: sid,
-                username: username,
-                content: `${username} has joined the class`,
-                priority: 'info'
-            });
+            showNotification('info', 'Student Joined', `${username} has joined the class`);
         }
 
         function handleParticipantLeft(data) {
@@ -2358,55 +1271,92 @@
             delete participants[sid];
             
             updateStudentCount();
-            addMessage('chat_message', {
-                student_sid: sid,
-                username: username,
-                content: `${username} has left the class`,
-                priority: 'info'
-            });
+            showNotification('info', 'Student Left', `${username} has left the class`);
         }
 
         // ============================================
-        // MESSAGE HANDLERS
+        // TEACHER AUTHORITY FUNCTIONS (WORK ON BOTH MOBILE & DESKTOP)
         // ============================================
         function handleMicRequestReceived(data) {
             const { student_sid, username } = data;
             
             console.log(`🎤 MIC REQUEST from ${username}`);
             
-            addMessage('mic_request', {
-                student_sid: student_sid,
-                username: username,
-                message: `${username} wants to speak`,
-                priority: 'high'
-            });
+            // Update badge count
+            const currentCount = parseInt(micRequestBadge.textContent);
+            micRequestBadge.textContent = currentCount + 1;
+            
+            // Add to request list
+            const requestItem = document.createElement('div');
+            requestItem.className = 'mic-request-item';
+            requestItem.innerHTML = `
+                <span style="font-weight: 500;">${username}</span>
+                <div>
+                    <button onclick="approveMicRequest('${student_sid}')" 
+                            style="background: #2ed573; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; margin-right: 5px;">
+                        Approve
+                    </button>
+                    <button onclick="denyMicRequest('${student_sid}')" 
+                            style="background: #ff4757; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px;">
+                        Deny
+                    </button>
+                </div>
+            `;
+            micRequestList.appendChild(requestItem);
+            
+            // Show notification
+            showNotification('info', '🎤 Mic Request', `${username} wants to speak`);
+            
+            // Scroll to show new request
+            requestItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function handleStudentStruggling(data) {
-            const { student_sid, signal, message, username } = data;
+            const { student_sid, signal, username } = data;
             
-            console.log(`📢 STUDENT SIGNAL from ${username}: ${signal} - ${message}`);
+            console.log(`📢 STUDENT SIGNAL from ${username}: ${signal}`);
             
-            addMessage('student_signal', {
-                student_sid: student_sid,
-                username: username,
-                message: message || getSignalText(signal),
-                signal: signal,
-                priority: 'medium'
-            });
-        }
-
-        function handleStudentMessage(data) {
-            const { student_sid, message, username } = data;
+            // Remove empty state if present
+            const emptyState = struggleSignals.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
             
-            console.log(`💬 CHAT MESSAGE from ${username}: ${message}`);
+            const studentName = username || 'Student';
+            const signalText = getSignalText(signal);
             
-            addMessage('chat_message', {
-                student_sid: student_sid,
-                username: username,
-                content: message,
-                priority: 'medium'
-            });
+            // Create signal item
+            const signalItem = document.createElement('div');
+            signalItem.className = 'signal-item';
+            signalItem.style.background = getSignalColor(signal);
+            signalItem.style.borderLeftColor = getSignalBorderColor(signal);
+            
+            signalItem.innerHTML = `
+                <strong>${studentName}</strong>: ${signalText}
+                <small style="float: right; color: #666; font-size: 11px;">
+                    ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                </small>
+            `;
+            
+            // Click to focus student
+            signalItem.onclick = () => {
+                focusStudentVideo(student_sid);
+                showNotification('info', 'Student Focused', `Scrolled to ${studentName}`);
+            };
+            
+            struggleSignals.prepend(signalItem);
+            
+            // Show notification
+            const icon = getSignalIcon(signal);
+            showNotification('info', `${icon} Student Signal`, `${studentName}: ${signalText}`);
+            
+            // Auto-remove after 30 seconds
+            setTimeout(() => {
+                if (signalItem.parentNode) {
+                    signalItem.remove();
+                    if (struggleSignals.children.length === 0) {
+                        struggleSignals.innerHTML = '<p class="empty-state" style="font-size: 13px; padding: 20px 0;">No signals yet</p>';
+                    }
+                }
+            }, 30000);
         }
 
         function getSignalText(signal) {
@@ -2420,6 +1370,33 @@
                 'repeat': 'please repeat'
             };
             return signals[signal] || signal;
+        }
+
+        function getSignalIcon(signal) {
+            const icons = {
+                'confused': '❓',
+                'too_fast': '⏩',
+                'got_it': '✅',
+                'help': '🆘',
+                'question': '❓',
+                'slow_down': '🐌',
+                'repeat': '🔁'
+            };
+            return icons[signal] || '📢';
+        }
+
+        function getSignalColor(signal) {
+            if (signal === 'got_it') return '#e8f5e9';
+            if (signal === 'too_fast') return '#fff3e0';
+            if (signal === 'help' || signal === 'question') return '#e3f2fd';
+            return '#ffebee';
+        }
+
+        function getSignalBorderColor(signal) {
+            if (signal === 'got_it') return '#2ed573';
+            if (signal === 'too_fast') return '#ffa502';
+            if (signal === 'help' || signal === 'question') return '#2196f3';
+            return '#ff4757';
         }
 
         function handleCommandExecuted(data) {
@@ -2445,16 +1422,17 @@
                 student_sid: studentSid
             });
             
-            // Remove mic request from messages
-            allMessages = allMessages.filter(m => !(m.type === 'mic_request' && m.student_sid === studentSid));
+            // Remove from UI
+            const requestItems = document.querySelectorAll('.mic-request-item');
+            requestItems.forEach(item => {
+                if (item.innerHTML.includes(studentSid)) {
+                    item.remove();
+                }
+            });
             
-            // Update UI
-            updateMessageBadges();
-            if (isMobile) {
-                updateMobileMessages();
-            } else {
-                updateDesktopMessages();
-            }
+            // Update badge count
+            const currentCount = parseInt(micRequestBadge.textContent);
+            micRequestBadge.textContent = Math.max(0, currentCount - 1);
             
             console.log(`Approved mic for student: ${studentSid}`);
             showNotification('success', 'Mic Approved', 'Student can now speak');
@@ -2466,16 +1444,17 @@
                 student_sid: studentSid
             });
             
-            // Remove mic request from messages
-            allMessages = allMessages.filter(m => !(m.type === 'mic_request' && m.student_sid === studentSid));
+            // Remove from UI
+            const requestItems = document.querySelectorAll('.mic-request-item');
+            requestItems.forEach(item => {
+                if (item.innerHTML.includes(studentSid)) {
+                    item.remove();
+                }
+            });
             
-            // Update UI
-            updateMessageBadges();
-            if (isMobile) {
-                updateMobileMessages();
-            } else {
-                updateDesktopMessages();
-            }
+            // Update badge count
+            const currentCount = parseInt(micRequestBadge.textContent);
+            micRequestBadge.textContent = Math.max(0, currentCount - 1);
             
             console.log(`Denied mic for student: ${studentSid}`);
             showNotification('info', 'Mic Denied', 'Student cannot speak');
@@ -2815,6 +1794,19 @@
                     sessionTime.textContent = `${minutes}:${seconds}`;
                 }
             }, 1000);
+        }
+
+        function logDebug(message) {
+            if (!debugLog) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            debugLog.prepend(logEntry);
+            
+            while (debugLog.children.length > 20) {
+                debugLog.removeChild(debugLog.lastChild);
+            }
         }
 
         // ============================================
