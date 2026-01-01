@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teacher Live - Room {{ room_id }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -19,6 +19,8 @@
             background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
             min-height: 100vh;
             color: #333;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
         
         .container {
@@ -442,6 +444,7 @@
             z-index: 1000;
             transform: translateX(120%);
             transition: transform 0.3s ease;
+            max-width: 400px;
         }
         
         .notification.show {
@@ -458,6 +461,10 @@
         
         .notification.info {
             border-left: 4px solid #1a2980;
+        }
+        
+        .notification.warning {
+            border-left: 4px solid #ffa502;
         }
         
         .notification i {
@@ -561,6 +568,12 @@
             border-radius: 6px;
             font-size: 13px;
             border-left: 3px solid #1a2980;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .signal-item:hover {
+            transform: translateX(5px);
         }
 
         /* AI Prompter Styles */
@@ -650,6 +663,25 @@
             }
         }
 
+        /* Mobile Connection Status */
+        .mobile-connection-status {
+            display: none;
+        }
+
+        /* Mobile Alert */
+        .mobile-alert {
+            display: none;
+        }
+
+        /* Touch optimization */
+        .touch-optimized {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Mobile-specific styles */
         @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -671,6 +703,11 @@
                 right: 0;
                 margin-top: 20px;
             }
+            .notification {
+                max-width: 90%;
+                right: 5%;
+                left: 5%;
+            }
         }
         
         @media (max-width: 768px) {
@@ -684,6 +721,7 @@
             }
             .stats {
                 justify-content: center;
+                flex-wrap: wrap;
             }
             .controls-section {
                 grid-template-columns: 1fr;
@@ -699,10 +737,158 @@
             .control-grid {
                 grid-template-columns: 1fr;
             }
+            
+            /* Mobile notification */
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 10px;
+                left: 10px;
+                bottom: auto;
+                width: auto;
+                max-width: 100%;
+                z-index: 10000;
+                transform: translateY(-100%);
+                animation: slideInMobile 0.3s ease;
+            }
+            
+            .notification.show {
+                transform: translateY(0);
+            }
+            
+            @keyframes slideInMobile {
+                from {
+                    transform: translateY(-100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            /* Mobile connection status */
+            .mobile-connection-status {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 12px;
+                z-index: 10001;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            /* Mobile authority panel */
+            .authority-panel {
+                max-height: 300px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Mobile video controls */
+            .control-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            
+            .student-video-controls {
+                opacity: 1 !important;
+                background: rgba(0, 0, 0, 0.5);
+                border-radius: 20px;
+                padding: 5px;
+            }
+            
+            /* Mobile action buttons */
+            .action-btn {
+                padding: 18px;
+                font-size: 16px;
+                min-height: 60px;
+            }
+            
+            /* Mobile scrollable areas */
+            #micRequestList, #struggleSignals {
+                max-height: 150px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Mobile debug info */
+            .debug-info {
+                font-size: 10px;
+                padding: 10px;
+            }
+            
+            /* Mobile alert */
+            .mobile-alert {
+                display: block;
+                position: fixed;
+                bottom: 80px;
+                left: 10px;
+                right: 10px;
+                background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+                color: white;
+                padding: 15px;
+                border-radius: 10px;
+                z-index: 9998;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                animation: slideInMobile 0.3s ease;
+            }
+            
+            .mobile-alert button {
+                background: white;
+                color: #1a2980;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            .header {
+                padding: 15px;
+            }
+            .room-details h1 {
+                font-size: 20px;
+            }
+            .room-details .room-id {
+                font-size: 16px;
+                padding: 4px 12px;
+            }
+            .stat-card {
+                min-width: 80px;
+                padding: 8px 12px;
+            }
+            .stat-card .count {
+                font-size: 22px;
+            }
+            .students-video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
         }
     </style>
 </head>
-<body>
+<body class="touch-optimized">
+    <!-- Mobile Connection Status Indicator -->
+    <div class="mobile-connection-status" id="mobileConnectionStatus">
+        <i class="fas fa-wifi"></i> <span>Connecting...</span>
+    </div>
+    
     <div class="container">
         <div class="header">
             <div class="room-info">
@@ -883,6 +1069,7 @@
         </div>
     </div>
     
+    <!-- Notification -->
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
         <div class="notification-content">
@@ -897,13 +1084,27 @@
         // ============================================
 
         const roomId = "{{ room_id }}";
-        const socket = io();
+        const socket = io({
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            timeout: 20000
+        });
+        
         let localStream = null;
         let screenStream = null;
         let isBroadcasting = false;
         let sessionStartTime = null;
         let sessionTimer = null;
         let mySid = null;
+
+        // Detect mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Store notification history for mobile
+        let notificationHistory = [];
+        const MAX_NOTIFICATIONS_HISTORY = 10;
 
         // ============================================
         // Core WebRTC Data Structures
@@ -981,6 +1182,13 @@
         // ============================================
         document.addEventListener('DOMContentLoaded', async function() {
             logDebug('Teacher page loaded. Room: ' + roomId);
+            logDebug('Mobile device: ' + (isMobile ? 'Yes' : 'No'));
+            
+            // Show mobile optimization message
+            if (isMobile) {
+                showNotification('info', 'Mobile Mode', 'Optimized for touch interaction');
+                setTimeout(resizeVideoElements, 100);
+            }
             
             try {
                 // Get teacher's local media
@@ -989,6 +1197,7 @@
                 // Connect to room
                 connectToRoom();
                 setupEventListeners();
+                setupMobileEventListeners();
                 startSessionTimer();
                 
                 logDebug('Teacher initialized successfully');
@@ -999,11 +1208,75 @@
         });
 
         // ============================================
+        // Mobile-Specific Event Handlers
+        // ============================================
+        function setupMobileEventListeners() {
+            if (!isMobile) return;
+            
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Handle touch events for video controls
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                btn.addEventListener('touchstart', function(e) {
+                    this.style.transform = 'scale(0.95)';
+                    e.preventDefault();
+                });
+                
+                btn.addEventListener('touchend', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Make sure all interactive elements are touch-friendly
+            document.querySelectorAll('.action-btn, .student-item, button').forEach(el => {
+                el.classList.add('touch-optimized');
+            });
+            
+            // Handle orientation changes
+            window.addEventListener('orientationchange', function() {
+                logDebug('Orientation changed: ' + window.orientation);
+                // Reset video displays on orientation change
+                setTimeout(resizeVideoElements, 300);
+            });
+            
+            // Handle visibility changes (app switching)
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    logDebug('App backgrounded');
+                } else {
+                    logDebug('App foregrounded');
+                    // Re-check connections
+                    setTimeout(checkAllConnections, 1000);
+                }
+            });
+        }
+
+        // ============================================
         // Media Initialization
         // ============================================
         async function initializeLocalMedia() {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({
+                // On mobile, request simpler constraints for better performance
+                const constraints = isMobile ? {
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        frameRate: { ideal: 24 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                } : {
                     video: {
                         width: { ideal: 1280 },
                         height: { ideal: 720 },
@@ -1014,14 +1287,17 @@
                         noiseSuppression: true,
                         autoGainControl: true
                     }
-                });
+                };
+                
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
                 
                 teacherVideo.srcObject = localStream;
                 await teacherVideo.play();
                 
                 logDebug('Teacher local media obtained:', {
                     video: localStream.getVideoTracks().length,
-                    audio: localStream.getAudioTracks().length
+                    audio: localStream.getAudioTracks().length,
+                    mobile: isMobile
                 });
                 
                 showNotification('success', 'Media Ready', 'Camera and microphone are ready');
@@ -1029,7 +1305,15 @@
             } catch (error) {
                 console.error('Error getting local media:', error);
                 showNotification('error', 'Media Error', 'Could not access camera/microphone. Please check permissions.');
-                throw error;
+                
+                // Try audio-only mode as fallback
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    teacherVideo.srcObject = null;
+                    showNotification('warning', 'Audio Only', 'Running in audio-only mode');
+                } catch (audioError) {
+                    throw error;
+                }
             }
         }
 
@@ -1041,11 +1325,13 @@
             socket.on('connect', () => {
                 logDebug('✅ Connected to server');
                 updateConnectionStatus('connected');
+                updateMobileConnectionStatus('success', 'Connected');
             });
             
             socket.on('disconnect', () => {
                 logDebug('❌ Disconnected from server');
                 updateConnectionStatus('disconnected');
+                updateMobileConnectionStatus('error', 'Disconnected');
             });
             
             // Room events
@@ -1063,6 +1349,27 @@
             socket.on('student-struggling', handleStudentStruggling);
             socket.on('command-executed', handleCommandExecuted);
             socket.on('room-state', handleRoomState);
+            
+            // Enhanced socket event handlers for mobile reliability
+            socket.on('reconnect', () => {
+                logDebug('🔄 Reconnected to server');
+                showNotification('info', 'Reconnected', 'Connection restored');
+                updateMobileConnectionStatus('success', 'Reconnected');
+                
+                // Re-sync room state
+                socket.emit('get-room-state', { room: roomId });
+            });
+            
+            socket.on('reconnect_attempt', () => {
+                logDebug('🔄 Attempting to reconnect...');
+                updateConnectionStatus('connecting');
+                updateMobileConnectionStatus('warning', 'Reconnecting...');
+            });
+            
+            socket.on('reconnect_error', (error) => {
+                logDebug('❌ Reconnection error:', error);
+                updateMobileConnectionStatus('error', 'Connection failed');
+            });
             
             // Error handling
             socket.on('error', handleError);
@@ -1102,6 +1409,163 @@
 
             // AI Prompter button
             document.getElementById('togglePrompterBtn')?.addEventListener('click', toggleAIPrompter);
+        }
+
+        // ============================================
+        // Enhanced Notification System for Mobile
+        // ============================================
+        function showNotification(type, title, message) {
+            if (!notification) return;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle',
+                warning: 'fa-exclamation-triangle'
+            };
+            
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${icons[type] || 'fa-info-circle'}"></i>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+            `;
+            
+            // Add to history
+            notificationHistory.unshift({
+                type,
+                title,
+                message,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            // Keep only recent notifications
+            if (notificationHistory.length > MAX_NOTIFICATIONS_HISTORY) {
+                notificationHistory.pop();
+            }
+            
+            // Show notification
+            notification.classList.add('show');
+            
+            // Log for debugging
+            logDebug(`Notification: ${type} - ${title}: ${message}`);
+            
+            // Auto-hide after delay (longer on mobile)
+            const delay = isMobile ? 5000 : 3000;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, delay);
+            
+            // Vibrate on mobile for important notifications
+            if (isMobile && (type === 'error' || type === 'warning')) {
+                try {
+                    if (navigator.vibrate) {
+                        navigator.vibrate(200);
+                    }
+                } catch (e) {
+                    // Vibration not supported
+                }
+            }
+            
+            // Create mobile alert for critical notifications
+            if (isMobile && (type === 'error' || title.includes('Mic Request') || title.includes('Student Feedback'))) {
+                createMobileAlert(type, title, message);
+            }
+        }
+        
+        function updateMobileConnectionStatus(type, message) {
+            const mobileStatus = document.getElementById('mobileConnectionStatus');
+            if (!mobileStatus) return;
+            
+            const icons = {
+                success: 'fa-wifi',
+                error: 'fa-wifi-slash',
+                info: 'fa-sync-alt',
+                warning: 'fa-exclamation-triangle'
+            };
+            
+            mobileStatus.innerHTML = `<i class="fas ${icons[type] || 'fa-wifi'}"></i> <span>${message}</span>`;
+            
+            // Color coding
+            mobileStatus.style.background = type === 'success' ? 'rgba(46, 213, 115, 0.9)' :
+                                          type === 'error' ? 'rgba(255, 71, 87, 0.9)' :
+                                          type === 'warning' ? 'rgba(255, 165, 2, 0.9)' :
+                                          'rgba(26, 41, 128, 0.9)';
+        }
+
+        // ============================================
+        // Mobile Helper Functions
+        // ============================================
+        function createMobileAlert(type, title, message) {
+            if (!isMobile) return;
+            
+            // Remove existing alerts
+            document.querySelectorAll('.mobile-alert').forEach(alert => alert.remove());
+            
+            const alertId = `mobile-alert-${Date.now()}`;
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'mobile-alert';
+            alertDiv.id = alertId;
+            
+            alertDiv.innerHTML = `
+                <div>
+                    <i class="fas fa-bell" style="margin-right: 10px;"></i>
+                    <span>${title}: ${message}</span>
+                </div>
+                <button onclick="document.getElementById('${alertId}').remove();" 
+                        style="background: white; color: #1a2980; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold;">
+                    OK
+                </button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) alert.remove();
+            }, 10000);
+        }
+        
+        function resizeVideoElements() {
+            // Adjust video grid layout for mobile
+            if (isMobile) {
+                const studentsGrid = document.getElementById('studentsVideoGrid');
+                if (studentsGrid) {
+                    const isPortrait = window.innerHeight > window.innerWidth;
+                    const columns = isPortrait ? 2 : 3;
+                    
+                    studentsGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+                    
+                    // Adjust video sizes
+                    document.querySelectorAll('.student-video-item').forEach(video => {
+                        video.style.aspectRatio = isPortrait ? '4/3' : '16/9';
+                    });
+                }
+            }
+        }
+        
+        function checkAllConnections() {
+            // Re-check all peer connections
+            Object.entries(peerConnections).forEach(([sid, pc]) => {
+                if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                    logDebug(`Reconnecting to ${sid}`);
+                    // Try to re-establish connection
+                    cleanupConnection(sid);
+                    const participant = participants[sid];
+                    if (participant) {
+                        createPeerConnection(sid, participant.username, participant.role);
+                    }
+                }
+            });
+            
+            // Re-check socket connection
+            if (!socket.connected) {
+                logDebug('Socket disconnected, reconnecting...');
+                socket.connect();
+            }
         }
 
         // ============================================
@@ -1370,6 +1834,11 @@
                 videoContainer.className = 'student-video-item';
                 videoContainer.dataset.sid = sid;
                 
+                // On mobile, always show controls
+                if (isMobile) {
+                    videoContainer.classList.add('touch-optimized');
+                }
+                
                 // Create video element
                 const video = document.createElement('video');
                 video.id = `remote-video-${sid}`;
@@ -1388,6 +1857,9 @@
                 // Create controls
                 const controls = document.createElement('div');
                 controls.className = 'student-video-controls';
+                if (isMobile) {
+                    controls.style.opacity = '1';
+                }
                 controls.innerHTML = `
                     <button class="control-btn small" onclick="toggleRemoteMute('${sid}')" title="Mute/Unmute">
                         <i class="fas fa-volume-up"></i>
@@ -1544,7 +2016,7 @@
             `;
             notification.style.cssText = `
                 position: fixed;
-                bottom: 80px;
+                bottom: ${isMobile ? '120px' : '80px'};
                 right: 20px;
                 background: rgba(255, 165, 2, 0.9);
                 color: white;
@@ -1574,6 +2046,9 @@
         function handleMicRequestReceived(data) {
             const { student_sid, username, count } = data;
             
+            // Always log for debugging
+            logDebug(`MIC REQUEST from ${username} (${student_sid}) - Total: ${count}`);
+            
             // Update mic request UI
             if (micRequestBadge) micRequestBadge.textContent = count;
             if (micRequestContainer) micRequestContainer.style.display = 'block';
@@ -1590,30 +2065,47 @@
                     requestItem.dataset.sid = student_sid;
                     requestItem.innerHTML = `
                         <span>${username}</span>
-                        <button onclick="approveMicRequest('${student_sid}')" class="action-btn success" style="padding: 4px 12px; font-size: 12px;">
-                            Approve
-                        </button>
+                        <div>
+                            <button onclick="approveMicRequest('${student_sid}')" class="action-btn success" style="padding: 4px 12px; font-size: 12px; margin-right: 5px;">
+                                Approve
+                            </button>
+                            <button onclick="denyMicRequest('${student_sid}')" class="action-btn danger" style="padding: 4px 12px; font-size: 12px;">
+                                Deny
+                            </button>
+                        </div>
                     `;
                     micRequestList.appendChild(requestItem);
+                    
+                    // Scroll to show new request on mobile
+                    if (isMobile) {
+                        requestItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
                 }
             }
             
-            showNotification('info', 'Mic Request', `${username} wants to speak`);
+            // Enhanced notification for mobile
+            const notificationMessage = `${username} wants to speak`;
+            showNotification('info', '🎤 Mic Request', notificationMessage);
         }
-
+        
         function handleStudentStruggling(data) {
-            const { student_sid, signal } = data;
+            const { student_sid, signal, message } = data;
             if (!struggleSignals) return;
+            
+            // Always log for debugging
+            logDebug(`STUDENT SIGNAL from ${student_sid}: ${signal} - ${message}`);
             
             // Remove empty state if present
             const emptyState = struggleSignals.querySelector('.empty-state');
             if (emptyState) emptyState.remove();
             
             const studentName = participants[student_sid] ? participants[student_sid].username : student_sid.substring(0, 8);
-            const signalText = {
+            const signalText = message || {
                 'confused': 'is confused',
                 'too_fast': 'says too fast',
-                'got_it': 'understands'
+                'got_it': 'understands',
+                'help': 'needs help',
+                'question': 'has a question'
             }[signal] || signal;
             
             const signalItem = document.createElement('div');
@@ -1626,30 +2118,52 @@
             } else if (signal === 'too_fast') {
                 signalItem.style.background = '#fff3e0';
                 signalItem.style.borderLeftColor = '#ffa502';
+            } else if (signal === 'help' || signal === 'question') {
+                signalItem.style.background = '#e3f2fd';
+                signalItem.style.borderLeftColor = '#2196f3';
             } else {
                 signalItem.style.background = '#ffebee';
                 signalItem.style.borderLeftColor = '#ff4757';
             }
             
-            signalItem.innerHTML = `<strong>${studentName}</strong>: ${signalText}`;
+            signalItem.innerHTML = `
+                <strong>${studentName}</strong>: ${signalText}
+                <small style="float: right; color: #666;">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+            `;
+            
+            // Add click handler to focus student
+            signalItem.style.cursor = 'pointer';
+            signalItem.onclick = () => {
+                focusStudentVideo(student_sid);
+                if (isMobile) {
+                    showNotification('info', 'Student Focused', `Scrolled to ${studentName}`);
+                }
+            };
+            
             struggleSignals.prepend(signalItem);
             
-            // Auto-remove after 30 seconds
+            // Show notification
+            const icon = signal === 'got_it' ? '✅' : 
+                        signal === 'too_fast' ? '⏩' : 
+                        signal === 'help' ? '🆘' : 
+                        signal === 'question' ? '❓' : '⚠️';
+            
+            showNotification('info', `${icon} Student Feedback`, `${studentName}: ${signalText}`);
+            
+            // Auto-remove after 45 seconds (longer for mobile)
             setTimeout(() => {
                 if (signalItem.parentNode) signalItem.remove();
                 if (struggleSignals.children.length === 0) {
                     struggleSignals.innerHTML = '<p class="empty-state" style="font-size: 13px; padding: 20px 0;">No signals yet</p>';
                 }
-            }, 30000);
-            
-            logDebug(`Student signal: ${studentName} - ${signal}`);
+            }, isMobile ? 45000 : 30000);
         }
-
+        
         function handleCommandExecuted(data) {
             logDebug(`Command ${data.command} executed: ${data.status}`);
             showNotification('success', 'Command Executed', `${data.command} completed successfully`);
         }
-
+        
         function handleRoomState(data) {
             logDebug('Room state updated:', data);
         }
@@ -1685,7 +2199,7 @@
                 activeSpeaker = null;
             }
         }
-
+        
         function updateStudentCount() {
             const studentParticipants = Object.values(participants).filter(p => p.role === 'student');
             const count = studentParticipants.length;
@@ -1696,7 +2210,7 @@
             // Update students list
             updateStudentsList();
         }
-
+        
         function updateStudentsList() {
             if (!studentsList) return;
             
@@ -1735,7 +2249,7 @@
                 `;
             }).join('');
         }
-
+        
         function updateStudentConnectionStatus(sid, status) {
             const studentItem = document.querySelector(`.student-item[data-sid="${sid}"]`);
             if (studentItem) {
@@ -1746,7 +2260,7 @@
                 }
             }
         }
-
+        
         function updateConnectionStatus(status) {
             if (!connectionStatus || !connectionStatusBar) return;
             
@@ -1771,7 +2285,7 @@
                     break;
             }
         }
-
+        
         function startSessionTimer() {
             sessionStartTime = new Date();
             if (sessionTimer) clearInterval(sessionTimer);
@@ -1821,7 +2335,7 @@
                 showNotification('success', 'Broadcast Started', 'Now broadcasting to all students');
             }
         }
-
+        
         function toggleVideoStream() {
             if (localStream) {
                 const videoTrack = localStream.getVideoTracks()[0];
@@ -1845,7 +2359,7 @@
                 }
             }
         }
-
+        
         function toggleAudioStream() {
             if (localStream) {
                 const audioTrack = localStream.getAudioTracks()[0];
@@ -1869,7 +2383,7 @@
                 }
             }
         }
-
+        
         async function toggleScreenSharing() {
             try {
                 if (!screenStream) {
@@ -1928,7 +2442,7 @@
                 showNotification('error', 'Error', 'Could not share screen. Please try again.');
             }
         }
-
+        
         function toggleRemoteMute(sid) {
             const video = document.getElementById(`remote-video-${sid}`);
             if (video) {
@@ -1941,7 +2455,7 @@
                 }
             }
         }
-
+        
         function pinStudentVideo(sid) {
             const videoContainer = document.getElementById(`video-${sid}`);
             if (videoContainer) {
@@ -1957,7 +2471,7 @@
                 studentsVideoGrid.insertBefore(videoContainer, studentsVideoGrid.firstChild);
             }
         }
-
+        
         function focusStudentVideo(sid) {
             const videoContainer = document.getElementById(`video-${sid}`);
             if (videoContainer) {
@@ -1966,7 +2480,7 @@
                 setTimeout(() => videoContainer.classList.remove('highlighted'), 2000);
             }
         }
-
+        
         function approveMicRequest(studentSid) {
             socket.emit('teacher-approve-mic', {
                 room: roomId,
@@ -1980,21 +2494,44 @@
             }
             
             // Update count
+            updateMicRequestCount();
+            
+            logDebug(`Approved mic for student: ${studentSid}`);
+            showNotification('success', 'Mic Approved', 'Student can now speak');
+        }
+        
+        function denyMicRequest(studentSid) {
+            socket.emit('teacher-deny-mic', {
+                room: roomId,
+                student_sid: studentSid
+            });
+            
+            // Remove from UI
+            const requestItem = document.querySelector(`.mic-request-item[data-sid="${studentSid}"]`);
+            if (requestItem) {
+                requestItem.remove();
+            }
+            
+            updateMicRequestCount();
+            
+            logDebug(`Denied mic for student: ${studentSid}`);
+            showNotification('info', 'Mic Request Denied', 'Student will be notified');
+        }
+        
+        function updateMicRequestCount() {
             const micRequestBadge = document.getElementById('micRequestBadge');
             const micRequestList = document.getElementById('micRequestList');
             const micRequestContainer = document.getElementById('micRequestContainer');
             
-            if (micRequestBadge) {
-                const currentCount = parseInt(micRequestBadge.textContent) - 1;
-                micRequestBadge.textContent = Math.max(0, currentCount);
+            if (micRequestBadge && micRequestList) {
+                const currentCount = micRequestList.children.length;
+                micRequestBadge.textContent = currentCount;
+                
+                // Hide container if no requests
+                if (currentCount === 0 && micRequestContainer) {
+                    micRequestContainer.style.display = 'none';
+                }
             }
-            
-            // Hide container if no requests
-            if (micRequestList && micRequestList.children.length === 0 && micRequestContainer) {
-                micRequestContainer.style.display = 'none';
-            }
-            
-            logDebug(`Approved mic for student: ${studentSid}`);
         }
 
         // AI Prompter Functions
@@ -2016,7 +2553,7 @@
                 }
             }
         }
-
+        
         function copyRoomIdToClipboard() {
             navigator.clipboard.writeText(roomId)
                 .then(() => {
@@ -2026,7 +2563,7 @@
                     showNotification('error', 'Error', 'Could not copy Room ID.');
                 });
         }
-
+        
         function endTeachingSession() {
             if (confirm('Are you sure you want to end the teaching session? All students will be disconnected.')) {
                 // Cleanup all connections
@@ -2064,36 +2601,12 @@
                 window.location.href = '/';
             }
         }
-
+        
         function handleError(data) {
             logDebug(`Error received: ${data.message}`);
             showNotification('error', 'Error', data.message);
         }
-
-        function showNotification(type, title, message) {
-            if (!notification) return;
-            
-            const icons = {
-                success: 'fa-check-circle',
-                error: 'fa-exclamation-circle',
-                info: 'fa-info-circle'
-            };
-            
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <i class="fas ${icons[type]}"></i>
-                <div class="notification-content">
-                    <div class="notification-title">${title}</div>
-                    <div class="notification-message">${message}</div>
-                </div>
-            `;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
+        
         function logDebug(message, data) {
             if (!debugLog) return;
             
