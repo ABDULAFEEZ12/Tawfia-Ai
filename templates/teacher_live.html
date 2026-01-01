@@ -130,6 +130,7 @@
             border-radius: 12px;
             padding: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         
         .teacher-video-container {
@@ -627,20 +628,360 @@
             margin-top: 8px;
         }
 
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(255, 165, 2, 0.5); }
-            50% { box-shadow: 0 0 25px rgba(255, 165, 2, 0.8); }
+        /* Mobile Teacher Floating Button */
+        .mobile-teacher-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            z-index: 1002;
+            display: none;
         }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+
+        .mobile-teacher-fab .fab-button {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            border: none;
+            color: white;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-teacher-fab .fab-button:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .mobile-teacher-fab .fab-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            min-width: 20px;
+            height: 20px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            padding: 0 4px;
+        }
+
+        .mobile-teacher-fab .fab-hint {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .mobile-teacher-fab:hover .fab-hint {
+            opacity: 1;
+        }
+
+        /* Bottom Sheet for Mobile Teacher Controls */
+        .mobile-bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 80vh;
+            overflow: hidden;
+            display: none;
+            box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-bottom-sheet.open {
+            transform: translateY(0);
+        }
+
+        .mobile-bottom-sheet .bottom-sheet-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+        }
+
+        .mobile-bottom-sheet .bottom-sheet-header h3 {
+            margin: 0;
+            color: #1a2980;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mobile-bottom-sheet .close-bottom-sheet {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .mobile-bottom-sheet .bottom-sheet-content {
+            padding: 0;
+            max-height: calc(80vh - 70px);
+            overflow-y: auto;
+        }
+
+        .mobile-bottom-sheet .bottom-sheet-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .mobile-bottom-sheet .bottom-sheet-section:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-bottom-sheet .bottom-sheet-section h4 {
+            margin-bottom: 12px;
+            color: #1a2980;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mobile-bottom-sheet .mic-request-item {
+            margin-bottom: 8px;
+            padding: 10px;
+            background: #f8f9ff;
+            border-left: 4px solid #ffa502;
+        }
+
+        .mobile-bottom-sheet .signal-item {
+            margin-bottom: 8px;
+            padding: 10px;
+            background: #f8f9ff;
+            border-left: 4px solid #1a2980;
+            font-size: 13px;
+        }
+
+        .mobile-bottom-sheet-tabs {
+            display: flex;
+            background: #f8f9ff;
+            border-bottom: 1px solid #e6e9ff;
+        }
+
+        .mobile-bottom-sheet-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .mobile-bottom-sheet-tab.active {
+            color: #1a2980;
+            background: white;
+        }
+
+        .mobile-bottom-sheet-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+        }
+
+        .mobile-bottom-sheet-tab-badge {
+            background: #ff4757;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 11px;
+            margin-left: 4px;
+            min-width: 18px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* Busy Mode Widget */
+        .busy-mode-widget {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 999;
+            display: none;
+        }
+
+        .busy-toggle {
+            background: rgba(255, 165, 2, 0.9);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(255, 165, 2, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .busy-toggle.active {
+            background: rgba(255, 71, 87, 0.9);
+            animation: pulse 1.5s infinite;
+        }
+
+        .busy-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 120px;
+        }
+
+        .busy-toggle.active + .busy-options {
+            display: flex;
+        }
+
+        .busy-options button {
+            background: #f8f9ff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.2s;
+        }
+
+        .busy-options button:hover {
+            background: #e6e9ff;
+        }
+
+        /* Priority Toast */
+        .priority-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1003;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 350px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+
+        .priority-toast.show {
+            transform: translateX(0);
+        }
+
+        .priority-toast.critical {
+            border-left: 4px solid #ff4757;
+            animation: criticalPulse 2s infinite;
+        }
+
+        .priority-toast.high {
+            border-left: 4px solid #ffa502;
+        }
+
+        .priority-toast.medium {
+            border-left: 4px solid #1a2980;
+        }
+
+        /* Quick Preview Modal */
+        .quick-preview-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 1004;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .quick-preview-modal.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .quick-preview-modal .preview-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quick-preview-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f8f9ff;
+        }
+
+        .quick-preview-item.critical {
+            background: #ffebee;
+        }
+
+        .quick-preview-item.high {
+            background: #fff3e0;
+        }
+
+        /* Scroll Lock */
+        body.scroll-locked {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
         }
 
         /* Mobile Connection Status */
@@ -690,33 +1031,40 @@
             }
         }
 
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr 350px;
+        @keyframes criticalPulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 71, 87, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 71, 87, 0.8); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 165, 2, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 165, 2, 0.8); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
         }
 
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            .students-section {
-                order: -1;
-                margin-bottom: 15px;
-            }
-            .stats {
-                justify-content: flex-start;
-            }
-            #aiPrompter {
-                position: relative;
-                width: 100%;
-                top: 0;
-                right: 0;
-                margin-top: 15px;
+        /* Tablet detection */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .tablet-device .authority-panel {
+                display: block !important;
             }
         }
 
+        /* Mobile-specific styles */
         @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+            }
+
             .container {
                 padding: 10px;
             }
@@ -748,14 +1096,24 @@
                 font-size: 20px;
             }
             
-            .controls-section {
+            .main-content {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .students-section {
+                order: -1;
+                margin-bottom: 10px;
+            }
+            
+            .controls-section {
+                grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
             }
             
             .action-btn {
-                padding: 14px;
-                font-size: 14px;
+                padding: 14px 8px;
+                font-size: 13px;
             }
             
             .students-video-grid {
@@ -768,10 +1126,6 @@
                 aspect-ratio: 4/3;
             }
             
-            .control-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .teacher-video-container {
                 aspect-ratio: 4/3;
             }
@@ -782,7 +1136,30 @@
                 font-size: 16px;
             }
             
-            /* Mobile Notifications */
+            .authority-panel {
+                display: none !important; /* Hide on mobile, use bottom sheet */
+            }
+            
+            .mobile-teacher-fab {
+                display: block;
+            }
+            
+            .busy-mode-widget {
+                display: block;
+            }
+            
+            .priority-toast {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                transform: translateY(-100%);
+            }
+            
+            .priority-toast.show {
+                transform: translateY(0);
+            }
+            
             .notification {
                 position: fixed;
                 top: 10px;
@@ -793,7 +1170,6 @@
                 min-width: 0;
                 z-index: 10000;
                 transform: translateY(-100%);
-                animation: slideInMobile 0.3s ease;
             }
             
             .notification.show {
@@ -813,25 +1189,10 @@
                 font-size: 13px;
             }
             
-            /* Mobile Connection Status */
             .mobile-connection-status {
                 display: flex;
             }
             
-            /* Mobile Authority Panel */
-            .authority-panel {
-                max-height: 350px;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            #micRequestList, #struggleSignals {
-                max-height: 120px;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            /* Mobile Alert */
             .mobile-alert {
                 display: flex;
             }
@@ -848,7 +1209,6 @@
                 flex-shrink: 0;
             }
             
-            /* Mobile Video Controls Always Visible */
             .student-video-controls {
                 opacity: 1;
                 background: rgba(0, 0, 0, 0.5);
@@ -856,11 +1216,19 @@
                 padding: 4px;
             }
             
-            /* Mobile Debug Info */
             .debug-info {
                 font-size: 10px;
                 padding: 10px;
                 max-height: 120px;
+            }
+
+            /* Adjust bottom sheet height based on orientation */
+            .mobile-bottom-sheet {
+                max-height: 85vh;
+            }
+
+            .mobile-bottom-sheet .bottom-sheet-content {
+                max-height: calc(85vh - 70px);
             }
         }
 
@@ -900,6 +1268,26 @@
             .notification i {
                 font-size: 20px;
             }
+
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+
+            .action-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .mobile-teacher-fab {
+                bottom: 20px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .mobile-teacher-fab .fab-button {
+                font-size: 20px;
+            }
         }
 
         @media (max-width: 360px) {
@@ -923,6 +1311,26 @@
             .students-video-grid {
                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             }
+
+            .mobile-bottom-sheet .bottom-sheet-section {
+                padding: 12px 15px;
+            }
+        }
+
+        /* Landscape mode adjustments */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .mobile-bottom-sheet {
+                max-height: 90vh;
+            }
+
+            .mobile-bottom-sheet .bottom-sheet-content {
+                max-height: calc(90vh - 70px);
+            }
+
+            .mobile-teacher-fab {
+                bottom: 15px;
+                right: 15px;
+            }
         }
     </style>
 </head>
@@ -931,6 +1339,105 @@
     <div class="mobile-connection-status" id="mobileConnectionStatus">
         <i class="fas fa-wifi"></i>
         <span id="mobileStatusText">Connecting...</span>
+    </div>
+    
+    <!-- Busy Mode Widget -->
+    <div class="busy-mode-widget" id="busyModeWidget">
+        <button class="busy-toggle" id="busyToggle">
+            <span class="busy-icon">⏸️</span>
+            <span class="busy-label">Busy Mode</span>
+        </button>
+        <div class="busy-options">
+            <button onclick="setBusyMode(2)">2 minutes</button>
+            <button onclick="setBusyMode(5)">5 minutes</button>
+            <button onclick="setBusyMode(10)">10 minutes</button>
+            <button onclick="cancelBusyMode()">Cancel</button>
+        </div>
+    </div>
+    
+    <!-- Priority Toast -->
+    <div class="priority-toast" id="priorityToast">
+        <i class="fas fa-exclamation-circle"></i>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle">Priority Alert</div>
+            <div class="toast-message" id="toastMessage">New notification</div>
+        </div>
+        <button onclick="closeToast()" style="background:none; border:none; color:#666; margin-left:auto;">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <!-- Quick Preview Modal -->
+    <div class="quick-preview-modal" id="quickPreviewModal">
+        <div class="preview-content" id="quickPreviewContent">
+            <h4 style="margin-bottom: 15px; color: #1a2980;">Quick Preview</h4>
+            <!-- Content will be populated dynamically -->
+        </div>
+    </div>
+    
+    <!-- Mobile Teacher Floating Button -->
+    <div class="mobile-teacher-fab" id="mobileTeacherFab">
+        <button class="fab-button" id="mobileFabButton">
+            <i class="fas fa-bell"></i>
+            <span class="fab-badge" id="mobileFabBadge">0</span>
+        </button>
+        <div class="fab-hint">Tap for controls · Hold for quick view</div>
+    </div>
+    
+    <!-- Mobile Bottom Sheet -->
+    <div class="mobile-bottom-sheet" id="mobileBottomSheet">
+        <div class="bottom-sheet-header">
+            <h3><i class="fas fa-crown"></i> Classroom Controls</h3>
+            <button class="close-bottom-sheet" id="closeBottomSheet">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="mobile-bottom-sheet-tabs">
+            <button class="mobile-bottom-sheet-tab active" data-tab="requests">
+                <i class="fas fa-microphone"></i> Requests
+                <span class="mobile-bottom-sheet-tab-badge" id="mobileRequestBadge">0</span>
+            </button>
+            <button class="mobile-bottom-sheet-tab" data-tab="signals">
+                <i class="fas fa-comments"></i> Signals
+                <span class="mobile-bottom-sheet-tab-badge" id="mobileSignalBadge">0</span>
+            </button>
+            <button class="mobile-bottom-sheet-tab" data-tab="students">
+                <i class="fas fa-users"></i> Students
+            </button>
+        </div>
+        
+        <div class="bottom-sheet-content">
+            <!-- Requests Tab -->
+            <div class="bottom-sheet-section" data-tab-content="requests">
+                <h4><i class="fas fa-microphone"></i> Mic Requests</h4>
+                <div id="mobileMicRequestList">
+                    <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
+                        No pending mic requests
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Signals Tab -->
+            <div class="bottom-sheet-section" data-tab-content="signals" style="display: none;">
+                <h4><i class="fas fa-comments"></i> Student Signals</h4>
+                <div id="mobileStruggleSignals">
+                    <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
+                        No recent signals from students
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Students Tab -->
+            <div class="bottom-sheet-section" data-tab-content="students" style="display: none;">
+                <h4><i class="fas fa-users"></i> Connected Students</h4>
+                <div id="mobileStudentsList">
+                    <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
+                        Loading students...
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="container">
@@ -1028,8 +1535,8 @@
                     </button>
                 </div>
                 
-                <!-- Teacher Authority Panel -->
-                <div class="authority-panel">
+                <!-- Teacher Authority Panel (Desktop Only) -->
+                <div class="authority-panel" id="desktopAuthorityPanel">
                     <h3><i class="fas fa-crown"></i> Classroom Controls</h3>
                     
                     <div class="control-grid">
@@ -1044,7 +1551,7 @@
                                     <i class="fas fa-volume-up"></i> Unmute All
                                 </button>
                             </div>
-                            <div id="micRequestContainer" style="display: none;">
+                            <div id="micRequestContainer">
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
                                     <span style="font-size: 13px; font-weight: 500;">Mic Requests:</span>
                                     <span id="micRequestBadge" style="background: #ff4757; color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; min-width: 20px; text-align: center;">0</span>
@@ -1124,6 +1631,320 @@
 
     <script>
         // ============================================
+        // ENHANCED DEVICE DETECTION
+        // ============================================
+        class DeviceDetector {
+            constructor() {
+                this.state = {
+                    isMobile: false,
+                    isTablet: false,
+                    isDesktop: true,
+                    orientation: 'portrait',
+                    userAgent: navigator.userAgent,
+                    screenWidth: window.innerWidth,
+                    screenHeight: window.innerHeight
+                };
+                
+                this._checkDevice();
+                this._setupListeners();
+            }
+
+            _checkDevice() {
+                const ua = this.state.userAgent.toLowerCase();
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                
+                // Enhanced device detection
+                this.state.isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+                this.state.isTablet = /ipad|tablet|playbook|silk/i.test(ua) || 
+                                     (this.state.isMobile && width >= 768 && width <= 1024);
+                
+                // Adjust for desktop browsers in mobile emulation
+                if (!this.state.isMobile && width <= 1024 && height <= 768) {
+                    this.state.isMobile = true; // Treat as mobile for UX purposes
+                }
+                
+                // Orientation
+                this.state.orientation = width > height ? 'landscape' : 'portrait';
+                this.state.screenWidth = width;
+                this.state.screenHeight = height;
+                
+                // Update body classes
+                this._updateBodyClasses();
+                
+                return this.state;
+            }
+
+            _updateBodyClasses() {
+                const body = document.body;
+                body.classList.toggle('mobile-device', this.state.isMobile);
+                body.classList.toggle('tablet-device', this.state.isTablet);
+                body.classList.toggle('desktop-device', !this.state.isMobile && !this.state.isTablet);
+                body.classList.toggle('portrait-mode', this.state.orientation === 'portrait');
+                body.classList.toggle('landscape-mode', this.state.orientation === 'landscape');
+            }
+
+            _setupListeners() {
+                // Debounced resize handler
+                let resizeTimeout;
+                const handleResize = () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        const oldState = {...this.state};
+                        this._checkDevice();
+                        
+                        // Notify orientation change
+                        if (oldState.orientation !== this.state.orientation) {
+                            this._onOrientationChange();
+                        }
+                        
+                        // Notify screen size change
+                        if (oldState.screenWidth !== this.state.screenWidth || 
+                            oldState.screenHeight !== this.state.screenHeight) {
+                            this._onScreenResize();
+                        }
+                    }, 250);
+                };
+
+                window.addEventListener('resize', handleResize);
+                window.addEventListener('orientationchange', handleResize);
+            }
+
+            _onOrientationChange() {
+                console.log(`Orientation changed to: ${this.state.orientation}`);
+                if (window.onOrientationChange) {
+                    window.onOrientationChange(this.state.orientation);
+                }
+            }
+
+            _onScreenResize() {
+                console.log(`Screen resized: ${this.state.screenWidth}x${this.state.screenHeight}`);
+                if (window.onScreenResize) {
+                    window.onScreenResize(this.state.screenWidth, this.state.screenHeight);
+                }
+            }
+
+            isMobileHost(userRole) {
+                return (this.state.isMobile || this.state.isTablet) && userRole === 'host';
+            }
+
+            getDeviceType() {
+                if (this.state.isMobile) return 'mobile';
+                if (this.state.isTablet) return 'tablet';
+                return 'desktop';
+            }
+        }
+
+        // Initialize device detector
+        const deviceDetector = new DeviceDetector();
+        const isMobileHost = deviceDetector.isMobileHost('teacher');
+
+        // ============================================
+        // EVENT PRIORITY SYSTEM
+        // ============================================
+        const EVENT_PRIORITY = {
+            CRITICAL: { level: 5, vibration: true, sound: true, toast: true, color: '#ff4757' },
+            HIGH: { level: 4, vibration: true, sound: false, toast: true, color: '#ffa502' },
+            MEDIUM: { level: 3, vibration: false, sound: false, toast: false, color: '#1a2980' },
+            LOW: { level: 2, vibration: false, sound: false, toast: false, color: '#6c757d' },
+            INFO: { level: 1, vibration: false, sound: false, toast: false, color: '#95a5a6' }
+        };
+
+        class EventPrioritizer {
+            constructor() {
+                this.keywords = {
+                    critical: ["can't hear", "no audio", "no video", "broken", "emergency", "help", "urgent", "911"],
+                    high: ["too fast", "too slow", "confused", "lost", "repeat", "don't understand", "question", "what?"],
+                    medium: ["explain", "example", "clarify", "review", "summary"],
+                    low: ["good", "thanks", "ok", "understood", "got it", "perfect"]
+                };
+                
+                this.eventFrequency = {};
+                this.lastEventTimestamps = {};
+            }
+
+            getPriority(event) {
+                const { type, message, category, studentName } = event;
+                
+                // Rule-based priority assignment
+                switch(type) {
+                    case 'mic_request':
+                        return EVENT_PRIORITY.HIGH;
+                        
+                    case 'student_signal':
+                        return this._evaluateSignalPriority(message, studentName);
+                        
+                    case 'technical_issue':
+                        return this._evaluateTechnicalIssue(message);
+                        
+                    case 'connection_lost':
+                        return EVENT_PRIORITY.CRITICAL;
+                        
+                    case 'student_joined':
+                    case 'student_left':
+                        return EVENT_PRIORITY.INFO;
+                        
+                    default:
+                        return EVENT_PRIORITY.MEDIUM;
+                }
+            }
+
+            _evaluateSignalPriority(message, studentName) {
+                const lowerMsg = message.toLowerCase();
+                
+                // Check for critical keywords
+                if (this.keywords.critical.some(kw => lowerMsg.includes(kw))) {
+                    return EVENT_PRIORITY.CRITICAL;
+                }
+                
+                // Check for high priority keywords
+                if (this.keywords.high.some(kw => lowerMsg.includes(kw))) {
+                    return EVENT_PRIORITY.HIGH;
+                }
+                
+                // Check for medium priority keywords
+                if (this.keywords.medium.some(kw => lowerMsg.includes(kw))) {
+                    return EVENT_PRIORITY.MEDIUM;
+                }
+                
+                // Check frequency for same student
+                const key = `signal_${studentName}`;
+                const now = Date.now();
+                const fiveMinutesAgo = now - (5 * 60 * 1000);
+                
+                if (!this.eventFrequency[key]) {
+                    this.eventFrequency[key] = [];
+                }
+                
+                // Clean old events
+                this.eventFrequency[key] = this.eventFrequency[key].filter(time => time > fiveMinutesAgo);
+                
+                // Add current event
+                this.eventFrequency[key].push(now);
+                
+                // If same student sent many signals recently, elevate priority
+                if (this.eventFrequency[key].length > 3) {
+                    return EVENT_PRIORITY.HIGH;
+                }
+                
+                return EVENT_PRIORITY.LOW;
+            }
+
+            _evaluateTechnicalIssue(message) {
+                const lowerMsg = message.toLowerCase();
+                
+                if (this.keywords.critical.some(kw => lowerMsg.includes(kw))) {
+                    return EVENT_PRIORITY.CRITICAL;
+                }
+                
+                // Check frequency of technical issues
+                const now = Date.now();
+                const tenMinutesAgo = now - (10 * 60 * 1000);
+                const recentIssues = Object.values(this.lastEventTimestamps)
+                    .filter(time => time > tenMinutesAgo)
+                    .length;
+                
+                if (recentIssues > 2) {
+                    return EVENT_PRIORITY.CRITICAL;
+                }
+                
+                this.lastEventTimestamps[Date.now()] = now;
+                
+                return EVENT_PRIORITY.HIGH;
+            }
+        }
+
+        const eventPrioritizer = new EventPrioritizer();
+
+        // ============================================
+        // MOBILE TEACHER STATE MANAGEMENT
+        // ============================================
+        const mobileTeacherState = {
+            notifications: {
+                micRequests: [],
+                studentSignals: [],
+                all: [],
+                unreadCount: 0
+            },
+            ui: {
+                bottomSheetOpen: false,
+                activeTab: 'requests',
+                quickPreviewOpen: false,
+                busyMode: {
+                    active: false,
+                    until: null,
+                    timer: null,
+                    settings: {
+                        silenceVibrations: true,
+                        showBadges: true,
+                        autoExtend: false
+                    }
+                }
+            },
+            settings: {
+                vibrateOnHighPriority: true,
+                soundOnNotification: false,
+                autoClearToast: 3000,
+                priorityFilter: ['CRITICAL', 'HIGH']
+            }
+        };
+
+        // ============================================
+        // SCROLL LOCK MANAGEMENT
+        // ============================================
+        class ScrollLock {
+            constructor() {
+                this.originalStyle = '';
+                this.isLocked = false;
+            }
+
+            lock() {
+                if (this.isLocked) return;
+                
+                this.originalStyle = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+                document.body.classList.add('scroll-locked');
+                
+                // Also lock any scrollable containers
+                const scrollableParents = document.querySelectorAll('.students-list, .students-video-grid, #prompterContent');
+                scrollableParents.forEach(el => {
+                    el.dataset.originalOverflow = el.style.overflow;
+                    el.style.overflow = 'hidden';
+                });
+                
+                this.isLocked = true;
+                console.log('Scroll locked');
+            }
+
+            unlock() {
+                if (!this.isLocked) return;
+                
+                document.body.style.overflow = this.originalStyle;
+                document.body.classList.remove('scroll-locked');
+                
+                // Restore scrollable containers
+                const scrollableParents = document.querySelectorAll('[data-original-overflow]');
+                scrollableParents.forEach(el => {
+                    el.style.overflow = el.dataset.originalOverflow || '';
+                    delete el.dataset.originalOverflow;
+                });
+                
+                this.isLocked = false;
+                console.log('Scroll unlocked');
+            }
+
+            toggle() {
+                if (this.isLocked) {
+                    this.unlock();
+                } else {
+                    this.lock();
+                }
+            }
+        }
+
+        const scrollLock = new ScrollLock();
+
+        // ============================================
         // CONFIGURATION
         // ============================================
         const roomId = "{{ room_id }}";
@@ -1132,12 +1953,13 @@
             reconnectionAttempts: 10,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
-            timeout: 20000
+            timeout: 20000,
+            transports: ['websocket', 'polling'],
+            query: {
+                deviceType: deviceDetector.getDeviceType(),
+                role: 'teacher'
+            }
         });
-        
-        // Detect mobile device
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        console.log('Mobile device detected:', isMobile);
         
         // Global variables
         let localStream = null;
@@ -1194,23 +2016,44 @@
         const mobileConnectionStatus = document.getElementById('mobileConnectionStatus');
         const mobileStatusText = document.getElementById('mobileStatusText');
         
+        // Mobile UI Elements
+        const mobileTeacherFab = document.getElementById('mobileTeacherFab');
+        const mobileFabButton = document.getElementById('mobileFabButton');
+        const mobileFabBadge = document.getElementById('mobileFabBadge');
+        const mobileBottomSheet = document.getElementById('mobileBottomSheet');
+        const closeBottomSheet = document.getElementById('closeBottomSheet');
+        const mobileRequestBadge = document.getElementById('mobileRequestBadge');
+        const mobileSignalBadge = document.getElementById('mobileSignalBadge');
+        const priorityToast = document.getElementById('priorityToast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMessage = document.getElementById('toastMessage');
+        const quickPreviewModal = document.getElementById('quickPreviewModal');
+        const quickPreviewContent = document.getElementById('quickPreviewContent');
+        const busyModeWidget = document.getElementById('busyModeWidget');
+        const busyToggle = document.getElementById('busyToggle');
+        
         // Teacher Authority Elements
         const micRequestContainer = document.getElementById('micRequestContainer');
         const micRequestBadge = document.getElementById('micRequestBadge');
         const micRequestList = document.getElementById('micRequestList');
         const struggleSignals = document.getElementById('struggleSignals');
-        
+        const desktopAuthorityPanel = document.getElementById('desktopAuthorityPanel');
+
         // ============================================
         // INITIALIZATION
         // ============================================
         document.addEventListener('DOMContentLoaded', async function() {
             logDebug('Teacher page loaded. Room: ' + roomId);
-            logDebug('Mobile device: ' + isMobile);
+            logDebug('Device type: ' + deviceDetector.getDeviceType());
+            logDebug('Is mobile host: ' + isMobileHost);
             
-            if (isMobile) {
-                document.body.classList.add('mobile-device');
+            // Setup mobile-specific UI if needed
+            if (isMobileHost) {
+                setupMobileTeacherUI();
                 showNotification('info', 'Mobile Mode', 'Touch-optimized interface enabled');
-                setupMobileTouchEvents();
+            } else {
+                // Show desktop authority panel
+                desktopAuthorityPanel.style.display = 'block';
             }
             
             try {
@@ -1225,74 +2068,260 @@
                 showNotification('error', 'Initialization Error', error.message);
             }
         });
-        
+
         // ============================================
-        // MOBILE-SPECIFIC FUNCTIONS
+        // MOBILE TEACHER UI SETUP
         // ============================================
-        function setupMobileTouchEvents() {
-            // Prevent zoom on double tap
-            let lastTouchEnd = 0;
-            document.addEventListener('touchend', function(event) {
-                const now = Date.now();
-                if (now - lastTouchEnd <= 300) {
-                    event.preventDefault();
+        function setupMobileTeacherUI() {
+            // Setup FAB long press
+            let pressTimer;
+            mobileFabButton.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                pressTimer = setTimeout(() => {
+                    showQuickPreview();
+                }, 800);
+            });
+
+            mobileFabButton.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                clearTimeout(pressTimer);
+            });
+
+            mobileFabButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearTimeout(pressTimer);
+                openBottomSheet();
+            });
+
+            // Setup bottom sheet
+            closeBottomSheet.addEventListener('click', closeBottomSheetHandler);
+            
+            // Setup tab switching
+            document.querySelectorAll('.mobile-bottom-sheet-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+
+            // Setup busy mode
+            busyToggle.addEventListener('click', function() {
+                if (mobileTeacherState.ui.busyMode.active) {
+                    cancelBusyMode();
+                } else {
+                    this.classList.add('active');
                 }
-                lastTouchEnd = now;
+            });
+
+            // Setup swipe to close for bottom sheet
+            setupSwipeGestures();
+            
+            // Setup escape key handler
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (mobileBottomSheet.classList.contains('open')) {
+                        closeBottomSheetHandler();
+                    }
+                    if (quickPreviewModal.classList.contains('show')) {
+                        hideQuickPreview();
+                    }
+                }
+            });
+
+            // Setup backdrop click
+            mobileBottomSheet.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeBottomSheetHandler();
+                }
+            });
+
+            logDebug('Mobile teacher UI setup complete');
+        }
+
+        function setupSwipeGestures() {
+            let startY;
+            const sheet = mobileBottomSheet;
+            
+            sheet.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+            }, { passive: true });
+
+            sheet.addEventListener('touchmove', function(e) {
+                if (!startY) return;
+                
+                const currentY = e.touches[0].clientY;
+                const diff = currentY - startY;
+                
+                // Only allow swipe down to close
+                if (diff > 50) {
+                    e.preventDefault();
+                    sheet.style.transform = `translateY(${diff}px)`;
+                }
             }, { passive: false });
-            
-            // Better touch feedback for buttons
-            document.querySelectorAll('button').forEach(btn => {
-                btn.addEventListener('touchstart', function() {
-                    this.style.opacity = '0.8';
-                });
-                btn.addEventListener('touchend', function() {
-                    this.style.opacity = '1';
-                });
-                btn.addEventListener('touchcancel', function() {
-                    this.style.opacity = '1';
-                });
-            });
-            
-            // Handle orientation changes
-            window.addEventListener('orientationchange', function() {
-                logDebug('Orientation changed to: ' + window.orientation);
-                setTimeout(() => {
-                    adjustMobileLayout();
-                    checkAllConnections();
-                }, 300);
-            });
-            
-            // Handle visibility changes (app switching)
-            document.addEventListener('visibilitychange', function() {
-                if (!document.hidden) {
-                    logDebug('App came to foreground');
-                    setTimeout(checkAllConnections, 500);
+
+            sheet.addEventListener('touchend', function(e) {
+                if (!startY) return;
+                
+                const currentY = e.changedTouches[0].clientY;
+                const diff = currentY - startY;
+                
+                if (diff > 100) {
+                    closeBottomSheetHandler();
+                } else {
+                    sheet.style.transform = 'translateY(0)';
                 }
-            });
+                
+                startY = null;
+            }, { passive: true });
         }
-        
-        function adjustMobileLayout() {
-            // Adjust video grid based on orientation
-            if (!isMobile) return;
-            
-            const studentsGrid = document.getElementById('studentsVideoGrid');
-            if (!studentsGrid) return;
-            
-            const isPortrait = window.innerHeight > window.innerWidth;
-            const columns = isPortrait ? 2 : 3;
-            
-            studentsGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${isPortrait ? '140px' : '160px'}, 1fr))`;
-            
-            // Adjust video aspect ratio
-            document.querySelectorAll('.student-video-item').forEach(video => {
-                video.style.aspectRatio = isPortrait ? '4/3' : '16/9';
-            });
-            
-            logDebug('Mobile layout adjusted for ' + (isPortrait ? 'portrait' : 'landscape'));
+
+        function openBottomSheet() {
+            mobileBottomSheet.style.display = 'block';
+            setTimeout(() => {
+                mobileBottomSheet.classList.add('open');
+                scrollLock.lock();
+                mobileTeacherState.ui.bottomSheetOpen = true;
+                
+                // Mark all as read when opening
+                markAllNotificationsAsRead();
+                
+                // Update students list
+                updateMobileStudentsList();
+            }, 10);
         }
-        
+
+        function closeBottomSheetHandler() {
+            mobileBottomSheet.classList.remove('open');
+            setTimeout(() => {
+                mobileBottomSheet.style.display = 'none';
+                scrollLock.unlock();
+                mobileTeacherState.ui.bottomSheetOpen = false;
+            }, 300);
+        }
+
+        function switchTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.mobile-bottom-sheet-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+
+            // Show/hide tab content
+            document.querySelectorAll('[data-tab-content]').forEach(content => {
+                content.style.display = content.dataset.tabContent === tabName ? 'block' : 'none';
+            });
+
+            mobileTeacherState.ui.activeTab = tabName;
+        }
+
+        function showQuickPreview() {
+            const content = quickPreviewContent;
+            content.innerHTML = '';
+            
+            // Add mic requests
+            if (mobileTeacherState.notifications.micRequests.length > 0) {
+                const requestsDiv = document.createElement('div');
+                requestsDiv.innerHTML = '<h5 style="margin-bottom: 10px; color: #1a2980;">🎤 Mic Requests</h5>';
+                
+                mobileTeacherState.notifications.micRequests.slice(0, 3).forEach(req => {
+                    const item = document.createElement('div');
+                    item.className = 'quick-preview-item high';
+                    item.innerHTML = `
+                        <i class="fas fa-user" style="color: #ffa502;"></i>
+                        <span style="flex: 1;">${req.username}</span>
+                        <button onclick="approveMicRequestFromQuickPreview('${req.sid}')" 
+                                style="background: #2ed573; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+                            Approve
+                        </button>
+                    `;
+                    requestsDiv.appendChild(item);
+                });
+                
+                content.appendChild(requestsDiv);
+            }
+
+            // Add critical signals
+            const criticalSignals = mobileTeacherState.notifications.studentSignals.filter(
+                signal => signal.priority === 'CRITICAL'
+            );
+            
+            if (criticalSignals.length > 0) {
+                const signalsDiv = document.createElement('div');
+                signalsDiv.innerHTML = '<h5 style="margin-bottom: 10px; color: #ff4757;">🚨 Critical Signals</h5>';
+                
+                criticalSignals.slice(0, 3).forEach(signal => {
+                    const item = document.createElement('div');
+                    item.className = 'quick-preview-item critical';
+                    item.innerHTML = `
+                        <i class="fas fa-exclamation-triangle" style="color: #ff4757;"></i>
+                        <span style="flex: 1;">${signal.username}: ${signal.message.substring(0, 30)}...</span>
+                    `;
+                    signalsDiv.appendChild(item);
+                });
+                
+                content.appendChild(signalsDiv);
+            }
+
+            // Show modal
+            quickPreviewModal.classList.add('show');
+            mobileTeacherState.ui.quickPreviewOpen = true;
+            scrollLock.lock();
+        }
+
+        function hideQuickPreview() {
+            quickPreviewModal.classList.remove('show');
+            mobileTeacherState.ui.quickPreviewOpen = false;
+            scrollLock.unlock();
+        }
+
         // ============================================
-        // NOTIFICATION SYSTEM (WORKS ON MOBILE & DESKTOP)
+        // BUSY MODE FUNCTIONS
+        // ============================================
+        function setBusyMode(minutes) {
+            mobileTeacherState.ui.busyMode.active = true;
+            mobileTeacherState.ui.busyMode.until = Date.now() + (minutes * 60000);
+            
+            // Update UI
+            busyToggle.classList.add('active');
+            busyToggle.querySelector('.busy-label').textContent = `Busy (${minutes}m)`;
+            
+            // Start timer
+            if (mobileTeacherState.ui.busyMode.timer) {
+                clearInterval(mobileTeacherState.ui.busyMode.timer);
+            }
+            
+            mobileTeacherState.ui.busyMode.timer = setInterval(() => {
+                const remaining = mobileTeacherState.ui.busyMode.until - Date.now();
+                if (remaining <= 0) {
+                    cancelBusyMode();
+                } else {
+                    const mins = Math.floor(remaining / 60000);
+                    const secs = Math.floor((remaining % 60000) / 1000);
+                    busyToggle.querySelector('.busy-label').textContent = `Busy (${mins}:${secs.toString().padStart(2, '0')})`;
+                }
+            }, 1000);
+            
+            showNotification('info', 'Busy Mode', `Active for ${minutes} minutes. Notifications are silenced.`);
+        }
+
+        function cancelBusyMode() {
+            mobileTeacherState.ui.busyMode.active = false;
+            mobileTeacherState.ui.busyMode.until = null;
+            
+            // Clear timer
+            if (mobileTeacherState.ui.busyMode.timer) {
+                clearInterval(mobileTeacherState.ui.busyMode.timer);
+                mobileTeacherState.ui.busyMode.timer = null;
+            }
+            
+            // Update UI
+            busyToggle.classList.remove('active');
+            busyToggle.querySelector('.busy-label').textContent = 'Busy Mode';
+            
+            showNotification('info', 'Busy Mode', 'Deactivated');
+        }
+
+        // ============================================
+        // NOTIFICATION SYSTEM
         // ============================================
         function showNotification(type, title, message) {
             if (!notification) return;
@@ -1303,6 +2332,12 @@
                 info: 'fa-info-circle',
                 warning: 'fa-exclamation-triangle'
             };
+            
+            // Check busy mode
+            if (mobileTeacherState.ui.busyMode.active && type !== 'error' && type !== 'critical') {
+                logDebug(`Notification suppressed by busy mode: ${title}`);
+                return;
+            }
             
             // Update notification
             notification.className = `notification ${type}`;
@@ -1330,32 +2365,60 @@
             // Log for debugging
             logDebug(`NOTIFICATION: ${type} - ${title}: ${message}`);
             
-            // Update mobile connection status if relevant
-            if (title.includes('Connected') || title.includes('Connection')) {
-                updateMobileStatus(type, message);
-            }
-            
-            // Create mobile alert for important notifications
-            if (isMobile && (type === 'info' || type === 'warning')) {
-                createMobileAlert(type, title, message);
-            }
-            
-            // Vibrate on mobile for important notifications
-            if (isMobile && (type === 'error' || type === 'warning')) {
-                try {
-                    if (navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
-                    }
-                } catch (e) {}
-            }
-            
-            // Auto-hide (longer on mobile)
-            const delay = isMobile ? 4000 : 3000;
+            // Auto-hide
+            const delay = isMobileHost ? 4000 : 3000;
             setTimeout(() => {
                 notification.classList.remove('show');
             }, delay);
         }
-        
+
+        function showPriorityToast(priority, title, message) {
+            if (!priorityToast || !toastTitle || !toastMessage) return;
+            
+            // Check if user wants to see this priority
+            if (!mobileTeacherState.settings.priorityFilter.includes(priority)) {
+                return;
+            }
+            
+            // Check busy mode
+            if (mobileTeacherState.ui.busyMode.active && priority !== 'CRITICAL') {
+                return;
+            }
+            
+            // Update toast
+            priorityToast.className = `priority-toast ${priority.toLowerCase()}`;
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            
+            // Set icon based on priority
+            const iconMap = {
+                'CRITICAL': 'fa-exclamation-triangle',
+                'HIGH': 'fa-exclamation-circle',
+                'MEDIUM': 'fa-info-circle',
+                'LOW': 'fa-info-circle',
+                'INFO': 'fa-info-circle'
+            };
+            
+            priorityToast.querySelector('i').className = `fas ${iconMap[priority] || 'fa-info-circle'}`;
+            
+            // Show toast
+            priorityToast.classList.add('show');
+            
+            // Vibrate on mobile for high priority
+            if (isMobileHost && priority === 'CRITICAL' && 'vibrate' in navigator) {
+                navigator.vibrate([200, 100, 200]);
+            }
+            
+            // Auto-hide
+            setTimeout(() => {
+                priorityToast.classList.remove('show');
+            }, mobileTeacherState.settings.autoClearToast);
+        }
+
+        function closeToast() {
+            priorityToast.classList.remove('show');
+        }
+
         function updateMobileStatus(type, message) {
             if (!mobileConnectionStatus || !mobileStatusText) return;
             
@@ -1391,9 +2454,9 @@
                 mobileConnectionStatus.style.opacity = '1';
             }
         }
-        
+
         function createMobileAlert(type, title, message) {
-            if (!isMobile) return;
+            if (!isMobileHost) return;
             
             const alertId = 'mobile-alert-' + Date.now();
             
@@ -1425,13 +2488,97 @@
                 if (alert) alert.remove();
             }, 8000);
         }
-        
+
+        // ============================================
+        // NOTIFICATION MANAGEMENT
+        // ============================================
+        function addNotification(event) {
+            const priority = eventPrioritizer.getPriority(event);
+            const notification = {
+                ...event,
+                id: Date.now() + Math.random(),
+                timestamp: Date.now(),
+                priority: priority,
+                read: false
+            };
+            
+            // Add to appropriate category
+            if (event.type === 'mic_request') {
+                mobileTeacherState.notifications.micRequests.push(notification);
+                updateMobileRequestBadge();
+            } else if (event.type === 'student_signal') {
+                mobileTeacherState.notifications.studentSignals.push(notification);
+                updateMobileSignalBadge();
+            }
+            
+            // Add to all notifications
+            mobileTeacherState.notifications.all.push(notification);
+            
+            // Update unread count (if not in bottom sheet)
+            if (!mobileTeacherState.ui.bottomSheetOpen) {
+                mobileTeacherState.notifications.unreadCount++;
+                updateFabBadge();
+            }
+            
+            // Show appropriate notification
+            if (priority.toast) {
+                showPriorityToast(priority, event.title || 'New Notification', event.message);
+            }
+            
+            // Update UI
+            updateNotificationUI(notification);
+        }
+
+        function markAllNotificationsAsRead() {
+            mobileTeacherState.notifications.unreadCount = 0;
+            mobileTeacherState.notifications.all.forEach(n => n.read = true);
+            updateFabBadge();
+        }
+
+        function updateFabBadge() {
+            if (!mobileFabBadge) return;
+            
+            const count = mobileTeacherState.notifications.unreadCount;
+            mobileFabBadge.textContent = count > 99 ? '99+' : count;
+            mobileFabBadge.style.display = count > 0 ? 'flex' : 'none';
+        }
+
+        function updateMobileRequestBadge() {
+            if (!mobileRequestBadge) return;
+            
+            const count = mobileTeacherState.notifications.micRequests.length;
+            mobileRequestBadge.textContent = count;
+            mobileRequestBadge.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+
+        function updateMobileSignalBadge() {
+            if (!mobileSignalBadge) return;
+            
+            const count = mobileTeacherState.notifications.studentSignals.length;
+            mobileSignalBadge.textContent = count;
+            mobileSignalBadge.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+
+        function updateNotificationUI(notification) {
+            // Update desktop UI
+            if (notification.type === 'mic_request' && !isMobileHost) {
+                updateDesktopMicRequestUI(notification);
+            } else if (notification.type === 'student_signal' && !isMobileHost) {
+                updateDesktopSignalUI(notification);
+            }
+            
+            // Update mobile bottom sheet if open
+            if (mobileTeacherState.ui.bottomSheetOpen) {
+                updateMobileBottomSheetUI(notification);
+            }
+        }
+
         // ============================================
         // MEDIA INITIALIZATION
         // ============================================
         async function initializeLocalMedia() {
             try {
-                const constraints = isMobile ? {
+                const constraints = isMobileHost ? {
                     video: {
                         width: { ideal: 640 },
                         height: { ideal: 480 },
@@ -1463,7 +2610,7 @@
                 logDebug('Local media obtained:', {
                     video: localStream.getVideoTracks()[0]?.label,
                     audio: localStream.getAudioTracks()[0]?.label,
-                    mobile: isMobile
+                    mobile: isMobileHost
                 });
                 
                 showNotification('success', 'Media Ready', 'Camera and microphone are active');
@@ -1482,7 +2629,7 @@
                 }
             }
         }
-        
+
         // ============================================
         // SOCKET.IO EVENT HANDLERS
         // ============================================
@@ -1522,7 +2669,7 @@
             socket.on('webrtc-answer', handleWebRTCAnswer);
             socket.on('webrtc-ice-candidate', handleWebRTCIceCandidate);
             
-            // Teacher authority events - THESE ARE CRITICAL FOR MOBILE
+            // Teacher authority events
             socket.on('mic-request-received', handleMicRequestReceived);
             socket.on('student-struggling', handleStudentStruggling);
             socket.on('command-executed', handleCommandExecuted);
@@ -1534,7 +2681,7 @@
             // Button event listeners
             setupButtonListeners();
         }
-        
+
         function setupButtonListeners() {
             // Media controls
             document.getElementById('toggleVideo')?.addEventListener('click', toggleVideoStream);
@@ -1568,7 +2715,7 @@
                 showNotification('info', 'Cameras Enabled', 'All student cameras enabled');
             });
         }
-        
+
         // ============================================
         // ROOM MANAGEMENT
         // ============================================
@@ -1576,11 +2723,12 @@
             socket.emit('join-room', {
                 room: roomId,
                 role: 'teacher',
-                username: 'Teacher'
+                username: 'Teacher',
+                deviceType: deviceDetector.getDeviceType()
             });
             logDebug('Connecting to room: ' + roomId);
         }
-        
+
         function handleRoomJoined(data) {
             const { sid, username, role, existing_participants } = data;
             
@@ -1599,7 +2747,7 @@
             // Auto-start broadcasting
             setTimeout(toggleBroadcast, 1000);
         }
-        
+
         function handleNewParticipant(data) {
             const { sid, username, role } = data;
             
@@ -1609,9 +2757,14 @@
             createPeerConnection(sid, username, role);
             
             updateStudentCount();
-            showNotification('info', 'Student Joined', `${username} has joined`);
+            addNotification({
+                type: 'student_joined',
+                message: `${username} has joined the class`,
+                username: username,
+                sid: sid
+            });
         }
-        
+
         function handleParticipantLeft(data) {
             const { sid, username } = data;
             
@@ -1621,9 +2774,348 @@
             delete participants[sid];
             
             updateStudentCount();
-            showNotification('info', 'Student Left', `${username} has left`);
+            addNotification({
+                type: 'student_left',
+                message: `${username} has left the class`,
+                username: username,
+                sid: sid
+            });
         }
-        
+
+        // ============================================
+        // TEACHER AUTHORITY FUNCTIONS
+        // ============================================
+        function handleMicRequestReceived(data) {
+            const { student_sid, username, count } = data;
+            
+            logDebug(`🎤 MIC REQUEST from ${username} (Total: ${count})`);
+            
+            // Add notification
+            addNotification({
+                type: 'mic_request',
+                message: `${username} wants to speak`,
+                username: username,
+                sid: student_sid,
+                title: '🎤 Mic Request'
+            });
+            
+            // Update desktop UI
+            if (!isMobileHost && micRequestList) {
+                const existingRequest = document.querySelector(`.mic-request-item[data-sid="${student_sid}"]`);
+                
+                if (!existingRequest) {
+                    const requestItem = document.createElement('div');
+                    requestItem.className = 'mic-request-item';
+                    requestItem.dataset.sid = student_sid;
+                    requestItem.innerHTML = `
+                        <span style="font-weight: 500;">${username}</span>
+                        <div>
+                            <button onclick="approveMicRequest('${student_sid}')" 
+                                    style="background: #2ed573; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; margin-right: 5px;">
+                                Approve
+                            </button>
+                            <button onclick="denyMicRequest('${student_sid}')" 
+                                    style="background: #ff4757; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px;">
+                                Deny
+                            </button>
+                        </div>
+                    `;
+                    micRequestList.appendChild(requestItem);
+                }
+            }
+        }
+
+        function handleStudentStruggling(data) {
+            const { student_sid, signal, message, username } = data;
+            
+            logDebug(`📢 STUDENT SIGNAL from ${username}: ${signal} - ${message}`);
+            
+            // Add notification
+            addNotification({
+                type: 'student_signal',
+                message: message || getSignalText(signal),
+                username: username,
+                sid: student_sid,
+                signal: signal,
+                title: '📢 Student Signal'
+            });
+            
+            // Update desktop UI
+            if (!isMobileHost && struggleSignals) {
+                const emptyState = struggleSignals.querySelector('.empty-state');
+                if (emptyState) emptyState.remove();
+                
+                const studentName = username || participants[student_sid]?.username || 'Student';
+                const signalText = message || getSignalText(signal);
+                
+                const signalItem = document.createElement('div');
+                signalItem.className = 'signal-item';
+                
+                // Style based on signal type
+                if (signal === 'got_it') {
+                    signalItem.style.background = '#e8f5e9';
+                    signalItem.style.borderLeftColor = '#2ed573';
+                } else if (signal === 'too_fast') {
+                    signalItem.style.background = '#fff3e0';
+                    signalItem.style.borderLeftColor = '#ffa502';
+                } else if (signal === 'help' || signal === 'question') {
+                    signalItem.style.background = '#e3f2fd';
+                    signalItem.style.borderLeftColor = '#2196f3';
+                } else {
+                    signalItem.style.background = '#ffebee';
+                    signalItem.style.borderLeftColor = '#ff4757';
+                }
+                
+                signalItem.innerHTML = `
+                    <strong>${studentName}</strong>: ${signalText}
+                    <small style="float: right; color: #666; font-size: 10px;">
+                        ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </small>
+                `;
+                
+                // Click to focus student
+                signalItem.onclick = () => {
+                    focusStudentVideo(student_sid);
+                };
+                
+                struggleSignals.prepend(signalItem);
+            }
+        }
+
+        function updateDesktopMicRequestUI(notification) {
+            if (!micRequestBadge || !micRequestContainer) return;
+            
+            const count = document.querySelectorAll('.mic-request-item').length + 1;
+            micRequestBadge.textContent = count;
+            micRequestContainer.style.display = 'block';
+        }
+
+        function updateDesktopSignalUI(notification) {
+            // Implementation for desktop signal UI
+        }
+
+        function updateMobileBottomSheetUI(notification) {
+            if (notification.type === 'mic_request') {
+                updateMobileMicRequestList(notification);
+            } else if (notification.type === 'student_signal') {
+                updateMobileSignalList(notification);
+            }
+        }
+
+        function updateMobileMicRequestList(notification) {
+            const list = document.getElementById('mobileMicRequestList');
+            if (!list) return;
+            
+            // Remove empty state
+            const emptyState = list.querySelector('p');
+            if (emptyState) emptyState.remove();
+            
+            // Check if already exists
+            const existing = list.querySelector(`[data-sid="${notification.sid}"]`);
+            if (existing) return;
+            
+            const item = document.createElement('div');
+            item.className = 'mic-request-item';
+            item.dataset.sid = notification.sid;
+            item.innerHTML = `
+                <div style="flex: 1;">
+                    <strong>${notification.username}</strong>
+                    <div style="font-size: 12px; color: #666;">${notification.message}</div>
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button onclick="approveMicRequest('${notification.sid}')" 
+                            style="background: #2ed573; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px;">
+                        Approve
+                    </button>
+                    <button onclick="denyMicRequest('${notification.sid}')" 
+                            style="background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px;">
+                        Deny
+                    </button>
+                </div>
+            `;
+            
+            list.appendChild(item);
+        }
+
+        function updateMobileSignalList(notification) {
+            const list = document.getElementById('mobileStruggleSignals');
+            if (!list) return;
+            
+            // Remove empty state
+            const emptyState = list.querySelector('p');
+            if (emptyState) emptyState.remove();
+            
+            const item = document.createElement('div');
+            item.className = 'signal-item';
+            item.dataset.sid = notification.sid;
+            
+            // Style based on priority
+            if (notification.priority === 'CRITICAL') {
+                item.style.background = '#ffebee';
+                item.style.borderLeftColor = '#ff4757';
+            } else if (notification.priority === 'HIGH') {
+                item.style.background = '#fff3e0';
+                item.style.borderLeftColor = '#ffa502';
+            } else {
+                item.style.background = '#e3f2fd';
+                item.style.borderLeftColor = '#1a2980';
+            }
+            
+            item.innerHTML = `
+                <div style="flex: 1;">
+                    <strong>${notification.username}</strong>
+                    <div style="font-size: 12px; color: #666; margin-top: 2px;">${notification.message}</div>
+                </div>
+                <small style="color: #666; font-size: 10px; white-space: nowrap;">
+                    ${new Date(notification.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                </small>
+            `;
+            
+            // Click to focus student
+            item.onclick = () => {
+                focusStudentVideo(notification.sid);
+                closeBottomSheetHandler();
+            };
+            
+            list.prepend(item);
+        }
+
+        function updateMobileStudentsList() {
+            const list = document.getElementById('mobileStudentsList');
+            if (!list) return;
+            
+            const studentParticipants = Object.entries(participants)
+                .filter(([_, p]) => p.role === 'student')
+                .map(([sid, participant]) => ({ sid, ...participant }));
+            
+            if (studentParticipants.length === 0) {
+                list.innerHTML = '<p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">No students connected</p>';
+                return;
+            }
+            
+            list.innerHTML = studentParticipants.map(({ sid, username }) => {
+                const connection = peerConnections[sid];
+                let status = 'disconnected';
+                let statusColor = '#ff4757';
+                
+                if (connection) {
+                    status = connection.connectionState;
+                    statusColor = status === 'connected' ? '#2ed573' : 
+                                  status === 'connecting' ? '#ffa502' : '#ff4757';
+                }
+                
+                return `
+                    <div class="student-item" data-sid="${sid}" onclick="focusStudentVideo('${sid}'); closeBottomSheetHandler();" 
+                         style="margin-bottom: 8px; padding: 10px; background: #f8f9ff; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                        <div class="student-avatar" style="width: 30px; height: 30px; font-size: 14px;">
+                            ${username.charAt(0).toUpperCase()}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500; font-size: 14px;">${username}</div>
+                            <div style="font-size: 11px; color: ${statusColor}; display: flex; align-items: center; gap: 4px;">
+                                <i class="fas fa-circle" style="font-size: 8px;"></i>
+                                ${status.charAt(0).toUpperCase() + status.slice(1)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getSignalText(signal) {
+            const signals = {
+                'confused': 'is confused',
+                'too_fast': 'says too fast',
+                'got_it': 'understands',
+                'help': 'needs help',
+                'question': 'has a question',
+                'slow_down': 'please slow down',
+                'repeat': 'please repeat'
+            };
+            return signals[signal] || signal;
+        }
+
+        function handleCommandExecuted(data) {
+            logDebug(`Command ${data.command} executed: ${data.status}`);
+            showNotification('success', 'Command Executed', `${data.command} completed successfully`);
+        }
+
+        function handleRoomState(data) {
+            logDebug('Room state updated:', data);
+        }
+
+        function handleError(data) {
+            logDebug(`Error received: ${data.message}`);
+            showNotification('error', 'Error', data.message);
+        }
+
+        // ============================================
+        // MIC REQUEST FUNCTIONS
+        // ============================================
+        function approveMicRequest(studentSid) {
+            socket.emit('teacher-approve-mic', {
+                room: roomId,
+                student_sid: studentSid
+            });
+            
+            // Remove from all UI
+            removeMicRequestFromUI(studentSid);
+            
+            // Update notification state
+            mobileTeacherState.notifications.micRequests = mobileTeacherState.notifications.micRequests.filter(
+                req => req.sid !== studentSid
+            );
+            
+            updateMobileRequestBadge();
+            
+            logDebug(`Approved mic for student: ${studentSid}`);
+            showNotification('success', 'Mic Approved', 'Student can now speak');
+        }
+
+        function approveMicRequestFromQuickPreview(studentSid) {
+            approveMicRequest(studentSid);
+            hideQuickPreview();
+        }
+
+        function denyMicRequest(studentSid) {
+            socket.emit('teacher-deny-mic', {
+                room: roomId,
+                student_sid: studentSid
+            });
+            
+            // Remove from all UI
+            removeMicRequestFromUI(studentSid);
+            
+            // Update notification state
+            mobileTeacherState.notifications.micRequests = mobileTeacherState.notifications.micRequests.filter(
+                req => req.sid !== studentSid
+            );
+            
+            updateMobileRequestBadge();
+            
+            logDebug(`Denied mic for student: ${studentSid}`);
+            showNotification('info', 'Mic Denied', 'Student cannot speak');
+        }
+
+        function removeMicRequestFromUI(studentSid) {
+            // Remove from desktop UI
+            const desktopItem = document.querySelector(`.mic-request-item[data-sid="${studentSid}"]`);
+            if (desktopItem) desktopItem.remove();
+            
+            // Remove from mobile UI
+            const mobileItem = document.querySelector(`#mobileMicRequestList [data-sid="${studentSid}"]`);
+            if (mobileItem) mobileItem.remove();
+            
+            // Update desktop badge
+            if (micRequestBadge) {
+                const remaining = document.querySelectorAll('.mic-request-item').length;
+                micRequestBadge.textContent = remaining;
+                if (remaining === 0 && micRequestContainer) {
+                    micRequestContainer.style.display = 'none';
+                }
+            }
+        }
+
         // ============================================
         // WEBRTC PEER CONNECTIONS
         // ============================================
@@ -1688,7 +3180,7 @@
                 logDebug(`Error: ${error.message}`);
             }
         }
-        
+
         async function createAndSendOffer(peerConnection, targetSid) {
             try {
                 const offer = await peerConnection.createOffer({
@@ -1709,7 +3201,7 @@
                 console.error('Error creating offer:', error);
             }
         }
-        
+
         async function handleWebRTCOffer(data) {
             const { from_sid, offer } = data;
             const participant = participants[from_sid];
@@ -1748,7 +3240,7 @@
                 console.error('Error handling offer:', error);
             }
         }
-        
+
         async function handleWebRTCAnswer(data) {
             const { from_sid, answer } = data;
             const peerConnection = peerConnections[from_sid];
@@ -1762,7 +3254,7 @@
                 }
             }
         }
-        
+
         function handleWebRTCIceCandidate(data) {
             const { from_sid, candidate } = data;
             const peerConnection = peerConnections[from_sid];
@@ -1772,263 +3264,7 @@
                     .catch(error => console.error('Error adding ICE candidate:', error));
             }
         }
-        
-        // ============================================
-        // TEACHER AUTHORITY FUNCTIONS (MOBILE FIXED)
-        // ============================================
-        function handleMicRequestReceived(data) {
-            const { student_sid, username, count } = data;
-            
-            logDebug(`🎤 MIC REQUEST from ${username} (Total: ${count})`);
-            
-            // Update UI
-            if (micRequestBadge) micRequestBadge.textContent = count;
-            if (micRequestContainer) micRequestContainer.style.display = 'block';
-            
-            // Add to request list
-            if (micRequestList) {
-                const existingRequest = document.querySelector(`.mic-request-item[data-sid="${student_sid}"]`);
-                
-                if (!existingRequest) {
-                    const requestItem = document.createElement('div');
-                    requestItem.className = 'mic-request-item';
-                    requestItem.dataset.sid = student_sid;
-                    requestItem.innerHTML = `
-                        <span style="font-weight: 500;">${username}</span>
-                        <div>
-                            <button onclick="approveMicRequest('${student_sid}')" 
-                                    style="background: #2ed573; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; margin-right: 5px;">
-                                Approve
-                            </button>
-                            <button onclick="denyMicRequest('${student_sid}')" 
-                                    style="background: #ff4757; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px;">
-                                Deny
-                            </button>
-                        </div>
-                    `;
-                    micRequestList.appendChild(requestItem);
-                }
-            }
-            
-            // Show notification
-            showNotification('info', '🎤 Mic Request', `${username} wants to speak`);
-            
-            // Create persistent mobile alert
-            if (isMobile) {
-                createPersistentMobileAlert('mic-request', username, student_sid);
-            }
-        }
-        
-        function handleStudentStruggling(data) {
-            const { student_sid, signal, message, username } = data;
-            
-            logDebug(`📢 STUDENT SIGNAL from ${username}: ${signal} - ${message}`);
-            
-            // Remove empty state if present
-            const emptyState = struggleSignals.querySelector('.empty-state');
-            if (emptyState) emptyState.remove();
-            
-            const studentName = username || participants[student_sid]?.username || 'Student';
-            const signalText = message || getSignalText(signal);
-            
-            // Create signal item
-            const signalItem = document.createElement('div');
-            signalItem.className = 'signal-item';
-            
-            // Style based on signal type
-            if (signal === 'got_it') {
-                signalItem.style.background = '#e8f5e9';
-                signalItem.style.borderLeftColor = '#2ed573';
-            } else if (signal === 'too_fast') {
-                signalItem.style.background = '#fff3e0';
-                signalItem.style.borderLeftColor = '#ffa502';
-            } else if (signal === 'help' || signal === 'question') {
-                signalItem.style.background = '#e3f2fd';
-                signalItem.style.borderLeftColor = '#2196f3';
-            } else {
-                signalItem.style.background = '#ffebee';
-                signalItem.style.borderLeftColor = '#ff4757';
-            }
-            
-            signalItem.innerHTML = `
-                <strong>${studentName}</strong>: ${signalText}
-                <small style="float: right; color: #666; font-size: 10px;">
-                    ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                </small>
-            `;
-            
-            // Click to focus student
-            signalItem.onclick = () => {
-                focusStudentVideo(student_sid);
-                if (isMobile) {
-                    showNotification('info', 'Student Focused', `Scrolled to ${studentName}`);
-                }
-            };
-            
-            struggleSignals.prepend(signalItem);
-            
-            // Show notification with appropriate icon
-            const icon = getSignalIcon(signal);
-            showNotification('info', `${icon} Student Signal`, `${studentName}: ${signalText}`);
-            
-            // Auto-remove after 30 seconds
-            setTimeout(() => {
-                if (signalItem.parentNode) {
-                    signalItem.remove();
-                    if (struggleSignals.children.length === 0) {
-                        struggleSignals.innerHTML = '<p class="empty-state" style="font-size: 12px; padding: 15px 0;">No signals yet</p>';
-                    }
-                }
-            }, 30000);
-        }
-        
-        function getSignalText(signal) {
-            const signals = {
-                'confused': 'is confused',
-                'too_fast': 'says too fast',
-                'got_it': 'understands',
-                'help': 'needs help',
-                'question': 'has a question',
-                'slow_down': 'please slow down',
-                'repeat': 'please repeat'
-            };
-            return signals[signal] || signal;
-        }
-        
-        function getSignalIcon(signal) {
-            const icons = {
-                'confused': '❓',
-                'too_fast': '⏩',
-                'got_it': '✅',
-                'help': '🆘',
-                'question': '❓',
-                'slow_down': '🐌',
-                'repeat': '🔁'
-            };
-            return icons[signal] || '📢';
-        }
-        
-        function createPersistentMobileAlert(type, username, studentSid) {
-            if (!isMobile) return;
-            
-            const alertId = `${type}-${studentSid}`;
-            if (activeAlerts.has(alertId)) return;
-            
-            activeAlerts.add(alertId);
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'mobile-alert';
-            alertDiv.id = alertId;
-            alertDiv.dataset.persistent = 'true';
-            
-            let actionButton = '';
-            if (type === 'mic-request') {
-                actionButton = `
-                    <button onclick="approveMicRequest('${studentSid}'); document.getElementById('${alertId}').remove();" 
-                            style="background: white; color: #1a2980; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 12px; margin-left: 8px;">
-                        Approve
-                    </button>
-                `;
-            }
-            
-            alertDiv.innerHTML = `
-                <div style="flex: 1;">
-                    <i class="fas fa-bell" style="margin-right: 8px;"></i>
-                    <span style="font-size: 13px;"><strong>${type === 'mic-request' ? '🎤 Mic Request' : 'Student Signal'}</strong>: ${username}</span>
-                </div>
-                ${actionButton}
-                <button onclick="document.getElementById('${alertId}').remove()" 
-                        style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 12px; margin-left: 5px;">
-                    Dismiss
-                </button>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            // Auto-remove after 15 seconds
-            setTimeout(() => {
-                const alert = document.getElementById(alertId);
-                if (alert) {
-                    alert.remove();
-                    activeAlerts.delete(alertId);
-                }
-            }, 15000);
-        }
-        
-        function handleCommandExecuted(data) {
-            logDebug(`Command ${data.command} executed: ${data.status}`);
-            showNotification('success', 'Command Executed', `${data.command} completed successfully`);
-        }
-        
-        function handleRoomState(data) {
-            logDebug('Room state updated:', data);
-        }
-        
-        function handleError(data) {
-            logDebug(`Error received: ${data.message}`);
-            showNotification('error', 'Error', data.message);
-        }
-        
-        // ============================================
-        // MIC REQUEST FUNCTIONS
-        // ============================================
-        function approveMicRequest(studentSid) {
-            socket.emit('teacher-approve-mic', {
-                room: roomId,
-                student_sid: studentSid
-            });
-            
-            // Remove from UI
-            const requestItem = document.querySelector(`.mic-request-item[data-sid="${studentSid}"]`);
-            if (requestItem) requestItem.remove();
-            
-            // Remove mobile alert
-            const alertId = `mic-request-${studentSid}`;
-            const alert = document.getElementById(alertId);
-            if (alert) alert.remove();
-            activeAlerts.delete(alertId);
-            
-            // Update count
-            updateMicRequestCount();
-            
-            logDebug(`Approved mic for student: ${studentSid}`);
-            showNotification('success', 'Mic Approved', 'Student can now speak');
-        }
-        
-        function denyMicRequest(studentSid) {
-            socket.emit('teacher-deny-mic', {
-                room: roomId,
-                student_sid: studentSid
-            });
-            
-            // Remove from UI
-            const requestItem = document.querySelector(`.mic-request-item[data-sid="${studentSid}"]`);
-            if (requestItem) requestItem.remove();
-            
-            // Remove mobile alert
-            const alertId = `mic-request-${studentSid}`;
-            const alert = document.getElementById(alertId);
-            if (alert) alert.remove();
-            activeAlerts.delete(alertId);
-            
-            // Update count
-            updateMicRequestCount();
-            
-            logDebug(`Denied mic for student: ${studentSid}`);
-            showNotification('info', 'Mic Denied', 'Student cannot speak');
-        }
-        
-        function updateMicRequestCount() {
-            if (!micRequestList || !micRequestBadge) return;
-            
-            const count = micRequestList.children.length;
-            micRequestBadge.textContent = count;
-            
-            if (count === 0 && micRequestContainer) {
-                micRequestContainer.style.display = 'none';
-            }
-        }
-        
+
         // ============================================
         // VIDEO DISPLAY FUNCTIONS
         // ============================================
@@ -2040,11 +3276,6 @@
                 videoContainer.id = `video-${sid}`;
                 videoContainer.className = 'student-video-item';
                 videoContainer.dataset.sid = sid;
-                
-                // On mobile, ensure controls are always visible
-                if (isMobile) {
-                    videoContainer.classList.add('mobile-video');
-                }
                 
                 // Create video element
                 const video = document.createElement('video');
@@ -2091,7 +3322,7 @@
                 updateStudentConnectionStatus(sid, 'connected');
             }
         }
-        
+
         function removeVideoElement(sid) {
             const videoElement = document.getElementById(`video-${sid}`);
             if (videoElement) videoElement.remove();
@@ -2105,7 +3336,7 @@
                 `;
             }
         }
-        
+
         // ============================================
         // UTILITY FUNCTIONS
         // ============================================
@@ -2129,7 +3360,7 @@
                 activeSpeaker = null;
             }
         }
-        
+
         function updateStudentCount() {
             const studentParticipants = Object.values(participants).filter(p => p.role === 'student');
             const count = studentParticipants.length;
@@ -2139,7 +3370,7 @@
             
             updateStudentsList();
         }
-        
+
         function updateStudentsList() {
             if (!studentsList) return;
             
@@ -2178,7 +3409,7 @@
                 `;
             }).join('');
         }
-        
+
         function updateStudentConnectionStatus(sid, status) {
             const studentItem = document.querySelector(`.student-item[data-sid="${sid}"]`);
             if (studentItem) {
@@ -2189,7 +3420,7 @@
                 }
             }
         }
-        
+
         function updateConnectionStatus(status) {
             if (!connectionStatus || !connectionStatusBar) return;
             
@@ -2214,7 +3445,7 @@
                     break;
             }
         }
-        
+
         function startSessionTimer() {
             sessionStartTime = new Date();
             if (sessionTimer) clearInterval(sessionTimer);
@@ -2230,7 +3461,7 @@
                 }
             }, 1000);
         }
-        
+
         // ============================================
         // CONTROL FUNCTIONS
         // ============================================
@@ -2262,7 +3493,7 @@
                 showNotification('success', 'Broadcast Started', 'Now broadcasting to all students');
             }
         }
-        
+
         function toggleVideoStream() {
             if (localStream) {
                 const videoTrack = localStream.getVideoTracks()[0];
@@ -2286,7 +3517,7 @@
                 }
             }
         }
-        
+
         function toggleAudioStream() {
             if (localStream) {
                 const audioTrack = localStream.getAudioTracks()[0];
@@ -2310,7 +3541,7 @@
                 }
             }
         }
-        
+
         async function toggleScreenSharing() {
             try {
                 if (!screenStream) {
@@ -2364,7 +3595,7 @@
                 showNotification('error', 'Error', 'Could not share screen');
             }
         }
-        
+
         function toggleRemoteMute(sid) {
             const video = document.getElementById(`remote-video-${sid}`);
             if (video) {
@@ -2377,7 +3608,7 @@
                 }
             }
         }
-        
+
         function pinStudentVideo(sid) {
             const videoContainer = document.getElementById(`video-${sid}`);
             if (videoContainer) {
@@ -2386,7 +3617,7 @@
                 studentsVideoGrid.insertBefore(videoContainer, studentsVideoGrid.firstChild);
             }
         }
-        
+
         function focusStudentVideo(sid) {
             const videoContainer = document.getElementById(`video-${sid}`);
             if (videoContainer) {
@@ -2395,7 +3626,7 @@
                 setTimeout(() => videoContainer.classList.remove('highlighted'), 2000);
             }
         }
-        
+
         function toggleAIPrompter() {
             const prompter = document.getElementById('aiPrompter');
             const toggleBtn = document.getElementById('togglePrompterBtn');
@@ -2414,13 +3645,13 @@
                 }
             }
         }
-        
+
         function copyRoomIdToClipboard() {
             navigator.clipboard.writeText(roomId)
                 .then(() => showNotification('success', 'Copied!', 'Room ID copied to clipboard'))
                 .catch(() => showNotification('error', 'Error', 'Could not copy Room ID'));
         }
-        
+
         function endTeachingSession() {
             if (confirm('End teaching session? All students will be disconnected.')) {
                 Object.keys(peerConnections).forEach(sid => cleanupConnection(sid));
@@ -2432,11 +3663,16 @@
                 if (sharedAudioContext) sharedAudioContext.close();
                 if (sessionTimer) clearInterval(sessionTimer);
                 
+                // Cancel busy mode
+                if (mobileTeacherState.ui.busyMode.timer) {
+                    clearInterval(mobileTeacherState.ui.busyMode.timer);
+                }
+                
                 socket.disconnect();
                 window.location.href = '/';
             }
         }
-        
+
         // ============================================
         // AUDIO ANALYSIS FOR SPEAKER DETECTION
         // ============================================
@@ -2470,7 +3706,7 @@
                 console.error(`Error setting up audio analysis:`, error);
             }
         }
-        
+
         function startSpeakerDetection() {
             if (speakerDetectionInterval) return;
             
@@ -2478,7 +3714,7 @@
                 detectActiveSpeaker();
             }, 500);
         }
-        
+
         function detectActiveSpeaker() {
             let maxLevel = 0;
             let newActiveSpeaker = null;
@@ -2519,7 +3755,7 @@
                 activeSpeaker = newActiveSpeaker;
             }
         }
-        
+
         function showSpeakerNotification(username) {
             if (document.querySelector('.speaker-notification')) return;
             
@@ -2531,7 +3767,7 @@
             `;
             notification.style.cssText = `
                 position: fixed;
-                bottom: ${isMobile ? '100px' : '80px'};
+                bottom: ${isMobileHost ? '100px' : '80px'};
                 right: 20px;
                 background: rgba(255, 165, 2, 0.9);
                 color: white;
@@ -2553,7 +3789,7 @@
                 }
             }, 3000);
         }
-        
+
         // ============================================
         // CONNECTION HEALTH CHECK
         // ============================================
@@ -2574,7 +3810,7 @@
                 socket.connect();
             }
         }
-        
+
         // ============================================
         // DEBUG LOGGING
         // ============================================
@@ -2598,7 +3834,7 @@
                 debugLog.removeChild(debugLog.lastChild);
             }
         }
-        
+
         // ============================================
         // CLEANUP ON UNLOAD
         // ============================================
@@ -2612,13 +3848,59 @@
             if (sharedAudioContext) sharedAudioContext.close();
             if (sessionTimer) clearInterval(sessionTimer);
             
+            // Cancel busy mode
+            if (mobileTeacherState.ui.busyMode.timer) {
+                clearInterval(mobileTeacherState.ui.busyMode.timer);
+            }
+            
             if (socket) socket.disconnect();
         });
-        
-        // Adjust layout on initial load for mobile
-        if (isMobile) {
-            setTimeout(adjustMobileLayout, 500);
-        }
+
+        // Global functions for HTML onclick handlers
+        window.approveMicRequest = approveMicRequest;
+        window.denyMicRequest = denyMicRequest;
+        window.focusStudentVideo = focusStudentVideo;
+        window.pinStudentVideo = pinStudentVideo;
+        window.toggleRemoteMute = toggleRemoteMute;
+        window.toggleAIPrompter = toggleAIPrompter;
+        window.setBusyMode = setBusyMode;
+        window.cancelBusyMode = cancelBusyMode;
+        window.closeToast = closeToast;
+        window.approveMicRequestFromQuickPreview = approveMicRequestFromQuickPreview;
+
+        // Orientation change handler
+        window.onOrientationChange = function(orientation) {
+            logDebug(`Orientation changed to ${orientation}`);
+            
+            if (isMobileHost) {
+                // Adjust video grid
+                const studentsGrid = document.getElementById('studentsVideoGrid');
+                if (studentsGrid) {
+                    const isPortrait = orientation === 'portrait';
+                    studentsGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${isPortrait ? '140px' : '160px'}, 1fr))`;
+                }
+                
+                // Adjust bottom sheet height
+                const bottomSheet = document.getElementById('mobileBottomSheet');
+                if (bottomSheet) {
+                    bottomSheet.style.maxHeight = orientation === 'landscape' ? '90vh' : '85vh';
+                }
+            }
+        };
+
+        // Screen resize handler
+        window.onScreenResize = function(width, height) {
+            logDebug(`Screen resized to ${width}x${height}`);
+            
+            // Update any responsive layouts
+            if (isMobileHost) {
+                // Update FAB position if needed
+                const fab = document.getElementById('mobileTeacherFab');
+                if (fab) {
+                    fab.style.bottom = height < 500 ? '15px' : '30px';
+                }
+            }
+        };
     </script>
 </body>
 </html>
