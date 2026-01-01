@@ -497,22 +497,6 @@
             margin-bottom: 10px;
             color: #ccc;
         }
-        
-        .debug-info {
-            background: #f8f9ff;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 15px;
-            font-family: monospace;
-            font-size: 11px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        
-        .debug-info h4 {
-            margin-bottom: 8px;
-            color: #1a2980;
-        }
 
         .authority-panel {
             margin: 20px 0;
@@ -678,25 +662,6 @@
             padding: 0 4px;
         }
 
-        .mobile-teacher-fab .fab-hint {
-            position: absolute;
-            bottom: 70px;
-            right: 0;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .mobile-teacher-fab:hover .fab-hint {
-            opacity: 1;
-        }
-
         /* Bottom Sheet for Mobile Teacher Controls */
         .mobile-bottom-sheet {
             position: fixed;
@@ -830,158 +795,164 @@
             text-align: center;
         }
 
-        /* Busy Mode Widget */
-        .busy-mode-widget {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 999;
-            display: none;
+        /* Teacher Message Center */
+        .teacher-message-center {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e6e9ff;
         }
 
-        .busy-toggle {
-            background: rgba(255, 165, 2, 0.9);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
+        .teacher-message-center h3 {
+            color: #1a2980;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 3px 10px rgba(255, 165, 2, 0.3);
-            transition: all 0.3s ease;
+            font-size: 18px;
         }
 
-        .busy-toggle.active {
-            background: rgba(255, 71, 87, 0.9);
-            animation: pulse 1.5s infinite;
-        }
-
-        .busy-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 8px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            padding: 8px;
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 120px;
-        }
-
-        .busy-toggle.active + .busy-options {
+        .message-tabs {
             display: flex;
-        }
-
-        .busy-options button {
             background: #f8f9ff;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            text-align: left;
-            transition: background 0.2s;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
         }
 
-        .busy-options button:hover {
-            background: #e6e9ff;
-        }
-
-        /* Priority Toast */
-        .priority-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            z-index: 1003;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            max-width: 350px;
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
-        }
-
-        .priority-toast.show {
-            transform: translateX(0);
-        }
-
-        .priority-toast.critical {
-            border-left: 4px solid #ff4757;
-            animation: criticalPulse 2s infinite;
-        }
-
-        .priority-toast.high {
-            border-left: 4px solid #ffa502;
-        }
-
-        .priority-toast.medium {
-            border-left: 4px solid #1a2980;
-        }
-
-        /* Quick Preview Modal */
-        .quick-preview-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            z-index: 1004;
-            max-width: 90vw;
-            max-height: 80vh;
-            overflow: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .quick-preview-modal.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .quick-preview-modal .preview-content {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .quick-preview-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .message-tab {
+            flex: 1;
             padding: 10px;
-            border-radius: 8px;
-            background: #f8f9ff;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-radius: 6px;
         }
 
-        .quick-preview-item.critical {
+        .message-tab.active {
+            background: white;
+            color: #1a2980;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-tab-badge {
+            background: #ff4757;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 11px;
+            margin-left: 4px;
+            min-width: 18px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .messages-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .message-item:hover {
+            background: #edf2ff;
+            transform: translateX(2px);
+        }
+
+        .message-item.critical {
+            border-left-color: #ff4757;
             background: #ffebee;
         }
 
-        .quick-preview-item.high {
+        .message-item.high {
+            border-left-color: #ffa502;
             background: #fff3e0;
         }
 
-        /* Scroll Lock */
-        body.scroll-locked {
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
+        .message-item.medium {
+            border-left-color: #1a2980;
+            background: #e3f2fd;
+        }
+
+        .message-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            color: #1a2980;
+            font-size: 14px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .message-content {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            justify-content: flex-end;
+        }
+
+        .message-action-btn {
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .message-action-btn.approve {
+            background: #2ed573;
+            color: white;
+        }
+
+        .message-action-btn.deny {
+            background: #ff4757;
+            color: white;
+        }
+
+        .message-action-btn.view {
+            background: #667eea;
+            color: white;
+        }
+
+        .empty-message-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-message-state i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #ccc;
         }
 
         /* Mobile Connection Status */
@@ -1031,11 +1002,6 @@
             }
         }
 
-        @keyframes criticalPulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(255, 71, 87, 0.5); }
-            50% { box-shadow: 0 0 25px rgba(255, 71, 87, 0.8); }
-        }
-
         @keyframes pulse {
             0%, 100% { box-shadow: 0 0 15px rgba(255, 165, 2, 0.5); }
             50% { box-shadow: 0 0 25px rgba(255, 165, 2, 0.8); }
@@ -1052,19 +1018,33 @@
             }
         }
 
-        /* Tablet detection */
-        @media (max-width: 1024px) and (min-width: 769px) {
-            .tablet-device .authority-panel {
-                display: block !important;
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr 350px;
             }
         }
 
-        /* Mobile-specific styles */
-        @media (max-width: 768px) {
-            body {
-                overflow-x: hidden;
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
             }
+            .students-section {
+                order: -1;
+                margin-bottom: 15px;
+            }
+            .stats {
+                justify-content: flex-start;
+            }
+            #aiPrompter {
+                position: relative;
+                width: 100%;
+                top: 0;
+                right: 0;
+                margin-top: 15px;
+            }
+        }
 
+        @media (max-width: 768px) {
             .container {
                 padding: 10px;
             }
@@ -1140,24 +1120,12 @@
                 display: none !important; /* Hide on mobile, use bottom sheet */
             }
             
+            .teacher-message-center {
+                display: none !important; /* Hide on mobile, use bottom sheet */
+            }
+            
             .mobile-teacher-fab {
                 display: block;
-            }
-            
-            .busy-mode-widget {
-                display: block;
-            }
-            
-            .priority-toast {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                max-width: none;
-                transform: translateY(-100%);
-            }
-            
-            .priority-toast.show {
-                transform: translateY(0);
             }
             
             .notification {
@@ -1214,21 +1182,6 @@
                 background: rgba(0, 0, 0, 0.5);
                 border-radius: 15px;
                 padding: 4px;
-            }
-            
-            .debug-info {
-                font-size: 10px;
-                padding: 10px;
-                max-height: 120px;
-            }
-
-            /* Adjust bottom sheet height based on orientation */
-            .mobile-bottom-sheet {
-                max-height: 85vh;
-            }
-
-            .mobile-bottom-sheet .bottom-sheet-content {
-                max-height: calc(85vh - 70px);
             }
         }
 
@@ -1341,76 +1294,50 @@
         <span id="mobileStatusText">Connecting...</span>
     </div>
     
-    <!-- Busy Mode Widget -->
-    <div class="busy-mode-widget" id="busyModeWidget">
-        <button class="busy-toggle" id="busyToggle">
-            <span class="busy-icon">⏸️</span>
-            <span class="busy-label">Busy Mode</span>
-        </button>
-        <div class="busy-options">
-            <button onclick="setBusyMode(2)">2 minutes</button>
-            <button onclick="setBusyMode(5)">5 minutes</button>
-            <button onclick="setBusyMode(10)">10 minutes</button>
-            <button onclick="cancelBusyMode()">Cancel</button>
-        </div>
-    </div>
-    
-    <!-- Priority Toast -->
-    <div class="priority-toast" id="priorityToast">
-        <i class="fas fa-exclamation-circle"></i>
-        <div class="toast-content">
-            <div class="toast-title" id="toastTitle">Priority Alert</div>
-            <div class="toast-message" id="toastMessage">New notification</div>
-        </div>
-        <button onclick="closeToast()" style="background:none; border:none; color:#666; margin-left:auto;">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    
-    <!-- Quick Preview Modal -->
-    <div class="quick-preview-modal" id="quickPreviewModal">
-        <div class="preview-content" id="quickPreviewContent">
-            <h4 style="margin-bottom: 15px; color: #1a2980;">Quick Preview</h4>
-            <!-- Content will be populated dynamically -->
-        </div>
-    </div>
-    
     <!-- Mobile Teacher Floating Button -->
     <div class="mobile-teacher-fab" id="mobileTeacherFab">
         <button class="fab-button" id="mobileFabButton">
             <i class="fas fa-bell"></i>
             <span class="fab-badge" id="mobileFabBadge">0</span>
         </button>
-        <div class="fab-hint">Tap for controls · Hold for quick view</div>
     </div>
     
     <!-- Mobile Bottom Sheet -->
     <div class="mobile-bottom-sheet" id="mobileBottomSheet">
         <div class="bottom-sheet-header">
-            <h3><i class="fas fa-crown"></i> Classroom Controls</h3>
+            <h3><i class="fas fa-comments"></i> Student Messages</h3>
             <button class="close-bottom-sheet" id="closeBottomSheet">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         
         <div class="mobile-bottom-sheet-tabs">
-            <button class="mobile-bottom-sheet-tab active" data-tab="requests">
+            <button class="mobile-bottom-sheet-tab active" data-tab="all">
+                <i class="fas fa-inbox"></i> All
+                <span class="mobile-bottom-sheet-tab-badge" id="mobileAllBadge">0</span>
+            </button>
+            <button class="mobile-bottom-sheet-tab" data-tab="requests">
                 <i class="fas fa-microphone"></i> Requests
                 <span class="mobile-bottom-sheet-tab-badge" id="mobileRequestBadge">0</span>
             </button>
-            <button class="mobile-bottom-sheet-tab" data-tab="signals">
-                <i class="fas fa-comments"></i> Signals
-                <span class="mobile-bottom-sheet-tab-badge" id="mobileSignalBadge">0</span>
-            </button>
-            <button class="mobile-bottom-sheet-tab" data-tab="students">
-                <i class="fas fa-users"></i> Students
+            <button class="mobile-bottom-sheet-tab" data-tab="messages">
+                <i class="fas fa-comment"></i> Messages
+                <span class="mobile-bottom-sheet-tab-badge" id="mobileMessageBadge">0</span>
             </button>
         </div>
         
         <div class="bottom-sheet-content">
+            <!-- All Messages Tab -->
+            <div class="bottom-sheet-section" data-tab-content="all">
+                <div id="mobileAllMessages">
+                    <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
+                        No messages yet
+                    </p>
+                </div>
+            </div>
+            
             <!-- Requests Tab -->
-            <div class="bottom-sheet-section" data-tab-content="requests">
-                <h4><i class="fas fa-microphone"></i> Mic Requests</h4>
+            <div class="bottom-sheet-section" data-tab-content="requests" style="display: none;">
                 <div id="mobileMicRequestList">
                     <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
                         No pending mic requests
@@ -1418,22 +1345,11 @@
                 </div>
             </div>
             
-            <!-- Signals Tab -->
-            <div class="bottom-sheet-section" data-tab-content="signals" style="display: none;">
-                <h4><i class="fas fa-comments"></i> Student Signals</h4>
-                <div id="mobileStruggleSignals">
+            <!-- Messages Tab -->
+            <div class="bottom-sheet-section" data-tab-content="messages" style="display: none;">
+                <div id="mobileMessageList">
                     <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
-                        No recent signals from students
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Students Tab -->
-            <div class="bottom-sheet-section" data-tab-content="students" style="display: none;">
-                <h4><i class="fas fa-users"></i> Connected Students</h4>
-                <div id="mobileStudentsList">
-                    <p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
-                        Loading students...
+                        No messages from students
                     </p>
                 </div>
             </div>
@@ -1466,6 +1382,11 @@
                     <i class="fas fa-clock"></i>
                     <div class="count" id="sessionTime">00:00</div>
                     <div class="label">Time</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-bell"></i>
+                    <div class="count" id="messageCount">0</div>
+                    <div class="label">Messages</div>
                 </div>
             </div>
         </div>
@@ -1535,6 +1456,32 @@
                     </button>
                 </div>
                 
+                <!-- Teacher Message Center (Desktop) -->
+                <div class="teacher-message-center" id="teacherMessageCenter">
+                    <h3><i class="fas fa-comments"></i> Student Messages Center</h3>
+                    
+                    <div class="message-tabs">
+                        <button class="message-tab active" data-tab="all">
+                            All Messages <span class="message-tab-badge" id="allBadge">0</span>
+                        </button>
+                        <button class="message-tab" data-tab="requests">
+                            Mic Requests <span class="message-tab-badge" id="requestsBadge">0</span>
+                        </button>
+                        <button class="message-tab" data-tab="messages">
+                            Messages <span class="message-tab-badge" id="messagesBadge">0</span>
+                        </button>
+                    </div>
+                    
+                    <div class="messages-container" id="desktopMessagesContainer">
+                        <!-- All Messages will be inserted here -->
+                        <div class="empty-message-state">
+                            <i class="fas fa-comment-slash"></i>
+                            <p>No messages from students yet</p>
+                            <p style="font-size: 12px; margin-top: 5px;">Students' messages will appear here</p>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Teacher Authority Panel (Desktop Only) -->
                 <div class="authority-panel" id="desktopAuthorityPanel">
                     <h3><i class="fas fa-crown"></i> Classroom Controls</h3>
@@ -1551,13 +1498,6 @@
                                     <i class="fas fa-volume-up"></i> Unmute All
                                 </button>
                             </div>
-                            <div id="micRequestContainer">
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                                    <span style="font-size: 13px; font-weight: 500;">Mic Requests:</span>
-                                    <span id="micRequestBadge" style="background: #ff4757; color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; min-width: 20px; text-align: center;">0</span>
-                                </div>
-                                <div id="micRequestList" style="max-height: 100px; overflow-y: auto;"></div>
-                            </div>
                         </div>
                         
                         <!-- Video Controls -->
@@ -1573,20 +1513,19 @@
                             </div>
                         </div>
                         
-                        <!-- Student Signals -->
+                        <!-- Quick Actions -->
                         <div class="control-group">
-                            <h4><i class="fas fa-heartbeat"></i> Student Signals</h4>
-                            <div id="struggleSignals" style="min-height: 80px; max-height: 120px; overflow-y: auto;">
-                                <p class="empty-state" style="font-size: 12px; padding: 15px 0;">No signals yet</p>
+                            <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="action-btn" id="clearMessagesBtn" style="flex: 1; padding: 8px; font-size: 13px;">
+                                    <i class="fas fa-trash"></i> Clear Messages
+                                </button>
+                                <button class="action-btn success" id="markAllReadBtn" style="flex: 1; padding: 8px; font-size: 13px;">
+                                    <i class="fas fa-check"></i> Mark All Read
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Debug Information -->
-                <div class="debug-info">
-                    <h4><i class="fas fa-bug"></i> Debug Information</h4>
-                    <div id="debugLog"></div>
                 </div>
             </div>
         </div>
@@ -1631,320 +1570,6 @@
 
     <script>
         // ============================================
-        // ENHANCED DEVICE DETECTION
-        // ============================================
-        class DeviceDetector {
-            constructor() {
-                this.state = {
-                    isMobile: false,
-                    isTablet: false,
-                    isDesktop: true,
-                    orientation: 'portrait',
-                    userAgent: navigator.userAgent,
-                    screenWidth: window.innerWidth,
-                    screenHeight: window.innerHeight
-                };
-                
-                this._checkDevice();
-                this._setupListeners();
-            }
-
-            _checkDevice() {
-                const ua = this.state.userAgent.toLowerCase();
-                const width = window.innerWidth;
-                const height = window.innerHeight;
-                
-                // Enhanced device detection
-                this.state.isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
-                this.state.isTablet = /ipad|tablet|playbook|silk/i.test(ua) || 
-                                     (this.state.isMobile && width >= 768 && width <= 1024);
-                
-                // Adjust for desktop browsers in mobile emulation
-                if (!this.state.isMobile && width <= 1024 && height <= 768) {
-                    this.state.isMobile = true; // Treat as mobile for UX purposes
-                }
-                
-                // Orientation
-                this.state.orientation = width > height ? 'landscape' : 'portrait';
-                this.state.screenWidth = width;
-                this.state.screenHeight = height;
-                
-                // Update body classes
-                this._updateBodyClasses();
-                
-                return this.state;
-            }
-
-            _updateBodyClasses() {
-                const body = document.body;
-                body.classList.toggle('mobile-device', this.state.isMobile);
-                body.classList.toggle('tablet-device', this.state.isTablet);
-                body.classList.toggle('desktop-device', !this.state.isMobile && !this.state.isTablet);
-                body.classList.toggle('portrait-mode', this.state.orientation === 'portrait');
-                body.classList.toggle('landscape-mode', this.state.orientation === 'landscape');
-            }
-
-            _setupListeners() {
-                // Debounced resize handler
-                let resizeTimeout;
-                const handleResize = () => {
-                    clearTimeout(resizeTimeout);
-                    resizeTimeout = setTimeout(() => {
-                        const oldState = {...this.state};
-                        this._checkDevice();
-                        
-                        // Notify orientation change
-                        if (oldState.orientation !== this.state.orientation) {
-                            this._onOrientationChange();
-                        }
-                        
-                        // Notify screen size change
-                        if (oldState.screenWidth !== this.state.screenWidth || 
-                            oldState.screenHeight !== this.state.screenHeight) {
-                            this._onScreenResize();
-                        }
-                    }, 250);
-                };
-
-                window.addEventListener('resize', handleResize);
-                window.addEventListener('orientationchange', handleResize);
-            }
-
-            _onOrientationChange() {
-                console.log(`Orientation changed to: ${this.state.orientation}`);
-                if (window.onOrientationChange) {
-                    window.onOrientationChange(this.state.orientation);
-                }
-            }
-
-            _onScreenResize() {
-                console.log(`Screen resized: ${this.state.screenWidth}x${this.state.screenHeight}`);
-                if (window.onScreenResize) {
-                    window.onScreenResize(this.state.screenWidth, this.state.screenHeight);
-                }
-            }
-
-            isMobileHost(userRole) {
-                return (this.state.isMobile || this.state.isTablet) && userRole === 'host';
-            }
-
-            getDeviceType() {
-                if (this.state.isMobile) return 'mobile';
-                if (this.state.isTablet) return 'tablet';
-                return 'desktop';
-            }
-        }
-
-        // Initialize device detector
-        const deviceDetector = new DeviceDetector();
-        const isMobileHost = deviceDetector.isMobileHost('teacher');
-
-        // ============================================
-        // EVENT PRIORITY SYSTEM
-        // ============================================
-        const EVENT_PRIORITY = {
-            CRITICAL: { level: 5, vibration: true, sound: true, toast: true, color: '#ff4757' },
-            HIGH: { level: 4, vibration: true, sound: false, toast: true, color: '#ffa502' },
-            MEDIUM: { level: 3, vibration: false, sound: false, toast: false, color: '#1a2980' },
-            LOW: { level: 2, vibration: false, sound: false, toast: false, color: '#6c757d' },
-            INFO: { level: 1, vibration: false, sound: false, toast: false, color: '#95a5a6' }
-        };
-
-        class EventPrioritizer {
-            constructor() {
-                this.keywords = {
-                    critical: ["can't hear", "no audio", "no video", "broken", "emergency", "help", "urgent", "911"],
-                    high: ["too fast", "too slow", "confused", "lost", "repeat", "don't understand", "question", "what?"],
-                    medium: ["explain", "example", "clarify", "review", "summary"],
-                    low: ["good", "thanks", "ok", "understood", "got it", "perfect"]
-                };
-                
-                this.eventFrequency = {};
-                this.lastEventTimestamps = {};
-            }
-
-            getPriority(event) {
-                const { type, message, category, studentName } = event;
-                
-                // Rule-based priority assignment
-                switch(type) {
-                    case 'mic_request':
-                        return EVENT_PRIORITY.HIGH;
-                        
-                    case 'student_signal':
-                        return this._evaluateSignalPriority(message, studentName);
-                        
-                    case 'technical_issue':
-                        return this._evaluateTechnicalIssue(message);
-                        
-                    case 'connection_lost':
-                        return EVENT_PRIORITY.CRITICAL;
-                        
-                    case 'student_joined':
-                    case 'student_left':
-                        return EVENT_PRIORITY.INFO;
-                        
-                    default:
-                        return EVENT_PRIORITY.MEDIUM;
-                }
-            }
-
-            _evaluateSignalPriority(message, studentName) {
-                const lowerMsg = message.toLowerCase();
-                
-                // Check for critical keywords
-                if (this.keywords.critical.some(kw => lowerMsg.includes(kw))) {
-                    return EVENT_PRIORITY.CRITICAL;
-                }
-                
-                // Check for high priority keywords
-                if (this.keywords.high.some(kw => lowerMsg.includes(kw))) {
-                    return EVENT_PRIORITY.HIGH;
-                }
-                
-                // Check for medium priority keywords
-                if (this.keywords.medium.some(kw => lowerMsg.includes(kw))) {
-                    return EVENT_PRIORITY.MEDIUM;
-                }
-                
-                // Check frequency for same student
-                const key = `signal_${studentName}`;
-                const now = Date.now();
-                const fiveMinutesAgo = now - (5 * 60 * 1000);
-                
-                if (!this.eventFrequency[key]) {
-                    this.eventFrequency[key] = [];
-                }
-                
-                // Clean old events
-                this.eventFrequency[key] = this.eventFrequency[key].filter(time => time > fiveMinutesAgo);
-                
-                // Add current event
-                this.eventFrequency[key].push(now);
-                
-                // If same student sent many signals recently, elevate priority
-                if (this.eventFrequency[key].length > 3) {
-                    return EVENT_PRIORITY.HIGH;
-                }
-                
-                return EVENT_PRIORITY.LOW;
-            }
-
-            _evaluateTechnicalIssue(message) {
-                const lowerMsg = message.toLowerCase();
-                
-                if (this.keywords.critical.some(kw => lowerMsg.includes(kw))) {
-                    return EVENT_PRIORITY.CRITICAL;
-                }
-                
-                // Check frequency of technical issues
-                const now = Date.now();
-                const tenMinutesAgo = now - (10 * 60 * 1000);
-                const recentIssues = Object.values(this.lastEventTimestamps)
-                    .filter(time => time > tenMinutesAgo)
-                    .length;
-                
-                if (recentIssues > 2) {
-                    return EVENT_PRIORITY.CRITICAL;
-                }
-                
-                this.lastEventTimestamps[Date.now()] = now;
-                
-                return EVENT_PRIORITY.HIGH;
-            }
-        }
-
-        const eventPrioritizer = new EventPrioritizer();
-
-        // ============================================
-        // MOBILE TEACHER STATE MANAGEMENT
-        // ============================================
-        const mobileTeacherState = {
-            notifications: {
-                micRequests: [],
-                studentSignals: [],
-                all: [],
-                unreadCount: 0
-            },
-            ui: {
-                bottomSheetOpen: false,
-                activeTab: 'requests',
-                quickPreviewOpen: false,
-                busyMode: {
-                    active: false,
-                    until: null,
-                    timer: null,
-                    settings: {
-                        silenceVibrations: true,
-                        showBadges: true,
-                        autoExtend: false
-                    }
-                }
-            },
-            settings: {
-                vibrateOnHighPriority: true,
-                soundOnNotification: false,
-                autoClearToast: 3000,
-                priorityFilter: ['CRITICAL', 'HIGH']
-            }
-        };
-
-        // ============================================
-        // SCROLL LOCK MANAGEMENT
-        // ============================================
-        class ScrollLock {
-            constructor() {
-                this.originalStyle = '';
-                this.isLocked = false;
-            }
-
-            lock() {
-                if (this.isLocked) return;
-                
-                this.originalStyle = document.body.style.overflow;
-                document.body.style.overflow = 'hidden';
-                document.body.classList.add('scroll-locked');
-                
-                // Also lock any scrollable containers
-                const scrollableParents = document.querySelectorAll('.students-list, .students-video-grid, #prompterContent');
-                scrollableParents.forEach(el => {
-                    el.dataset.originalOverflow = el.style.overflow;
-                    el.style.overflow = 'hidden';
-                });
-                
-                this.isLocked = true;
-                console.log('Scroll locked');
-            }
-
-            unlock() {
-                if (!this.isLocked) return;
-                
-                document.body.style.overflow = this.originalStyle;
-                document.body.classList.remove('scroll-locked');
-                
-                // Restore scrollable containers
-                const scrollableParents = document.querySelectorAll('[data-original-overflow]');
-                scrollableParents.forEach(el => {
-                    el.style.overflow = el.dataset.originalOverflow || '';
-                    delete el.dataset.originalOverflow;
-                });
-                
-                this.isLocked = false;
-                console.log('Scroll unlocked');
-            }
-
-            toggle() {
-                if (this.isLocked) {
-                    this.unlock();
-                } else {
-                    this.lock();
-                }
-            }
-        }
-
-        const scrollLock = new ScrollLock();
-
-        // ============================================
         // CONFIGURATION
         // ============================================
         const roomId = "{{ room_id }}";
@@ -1953,13 +1578,11 @@
             reconnectionAttempts: 10,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
-            timeout: 20000,
-            transports: ['websocket', 'polling'],
-            query: {
-                deviceType: deviceDetector.getDeviceType(),
-                role: 'teacher'
-            }
+            timeout: 20000
         });
+        
+        // Detect mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
         // Global variables
         let localStream = null;
@@ -1968,19 +1591,16 @@
         let sessionStartTime = null;
         let sessionTimer = null;
         let mySid = null;
-        let notificationHistory = [];
-        let activeAlerts = new Set();
+        
+        // Message Management
+        let allMessages = [];
+        let unreadCount = 0;
+        let activeTab = 'all';
         
         // WebRTC Data Structures
         const peerConnections = {};
         const remoteStreams = {};
         const participants = {};
-        const audioAnalysers = {};
-        
-        // Speaker Detection
-        let sharedAudioContext = null;
-        let speakerDetectionInterval = null;
-        let activeSpeaker = null;
         
         // WebRTC Configuration
         const WEBRTC_CONFIG = {
@@ -2012,9 +1632,7 @@
         const connectionStatusBar = document.getElementById('connectionStatusBar');
         const sessionTime = document.getElementById('sessionTime');
         const notification = document.getElementById('notification');
-        const debugLog = document.getElementById('debugLog');
-        const mobileConnectionStatus = document.getElementById('mobileConnectionStatus');
-        const mobileStatusText = document.getElementById('mobileStatusText');
+        const messageCount = document.getElementById('messageCount');
         
         // Mobile UI Elements
         const mobileTeacherFab = document.getElementById('mobileTeacherFab');
@@ -2022,38 +1640,33 @@
         const mobileFabBadge = document.getElementById('mobileFabBadge');
         const mobileBottomSheet = document.getElementById('mobileBottomSheet');
         const closeBottomSheet = document.getElementById('closeBottomSheet');
+        const mobileAllBadge = document.getElementById('mobileAllBadge');
         const mobileRequestBadge = document.getElementById('mobileRequestBadge');
-        const mobileSignalBadge = document.getElementById('mobileSignalBadge');
-        const priorityToast = document.getElementById('priorityToast');
-        const toastTitle = document.getElementById('toastTitle');
-        const toastMessage = document.getElementById('toastMessage');
-        const quickPreviewModal = document.getElementById('quickPreviewModal');
-        const quickPreviewContent = document.getElementById('quickPreviewContent');
-        const busyModeWidget = document.getElementById('busyModeWidget');
-        const busyToggle = document.getElementById('busyToggle');
+        const mobileMessageBadge = document.getElementById('mobileMessageBadge');
         
-        // Teacher Authority Elements
-        const micRequestContainer = document.getElementById('micRequestContainer');
-        const micRequestBadge = document.getElementById('micRequestBadge');
-        const micRequestList = document.getElementById('micRequestList');
-        const struggleSignals = document.getElementById('struggleSignals');
-        const desktopAuthorityPanel = document.getElementById('desktopAuthorityPanel');
+        // Message Center Elements
+        const teacherMessageCenter = document.getElementById('teacherMessageCenter');
+        const desktopMessagesContainer = document.getElementById('desktopMessagesContainer');
+        const allBadge = document.getElementById('allBadge');
+        const requestsBadge = document.getElementById('requestsBadge');
+        const messagesBadge = document.getElementById('messagesBadge');
 
         // ============================================
         // INITIALIZATION
         // ============================================
         document.addEventListener('DOMContentLoaded', async function() {
-            logDebug('Teacher page loaded. Room: ' + roomId);
-            logDebug('Device type: ' + deviceDetector.getDeviceType());
-            logDebug('Is mobile host: ' + isMobileHost);
+            console.log('Teacher page loaded. Room: ' + roomId);
+            console.log('Mobile device: ' + isMobile);
             
-            // Setup mobile-specific UI if needed
-            if (isMobileHost) {
-                setupMobileTeacherUI();
+            if (isMobile) {
+                document.body.classList.add('mobile-device');
                 showNotification('info', 'Mobile Mode', 'Touch-optimized interface enabled');
+                setupMobileUI();
             } else {
-                // Show desktop authority panel
+                // Show desktop message center
+                teacherMessageCenter.style.display = 'block';
                 desktopAuthorityPanel.style.display = 'block';
+                setupDesktopUI();
             }
             
             try {
@@ -2062,7 +1675,7 @@
                 setupEventListeners();
                 startSessionTimer();
                 
-                logDebug('Teacher initialized successfully');
+                console.log('Teacher initialized successfully');
             } catch (error) {
                 console.error('Error initializing teacher:', error);
                 showNotification('error', 'Initialization Error', error.message);
@@ -2070,26 +1683,12 @@
         });
 
         // ============================================
-        // MOBILE TEACHER UI SETUP
+        // MOBILE UI SETUP
         // ============================================
-        function setupMobileTeacherUI() {
-            // Setup FAB long press
-            let pressTimer;
-            mobileFabButton.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                pressTimer = setTimeout(() => {
-                    showQuickPreview();
-                }, 800);
-            });
-
-            mobileFabButton.addEventListener('touchend', function(e) {
-                e.preventDefault();
-                clearTimeout(pressTimer);
-            });
-
+        function setupMobileUI() {
+            // Setup FAB click
             mobileFabButton.addEventListener('click', function(e) {
                 e.preventDefault();
-                clearTimeout(pressTimer);
                 openBottomSheet();
             });
 
@@ -2100,34 +1699,13 @@
             document.querySelectorAll('.mobile-bottom-sheet-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const tabName = this.dataset.tab;
-                    switchTab(tabName);
+                    switchMobileTab(tabName);
                 });
             });
 
-            // Setup busy mode
-            busyToggle.addEventListener('click', function() {
-                if (mobileTeacherState.ui.busyMode.active) {
-                    cancelBusyMode();
-                } else {
-                    this.classList.add('active');
-                }
-            });
-
-            // Setup swipe to close for bottom sheet
+            // Setup swipe to close
             setupSwipeGestures();
             
-            // Setup escape key handler
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    if (mobileBottomSheet.classList.contains('open')) {
-                        closeBottomSheetHandler();
-                    }
-                    if (quickPreviewModal.classList.contains('show')) {
-                        hideQuickPreview();
-                    }
-                }
-            });
-
             // Setup backdrop click
             mobileBottomSheet.addEventListener('click', function(e) {
                 if (e.target === this) {
@@ -2135,7 +1713,23 @@
                 }
             });
 
-            logDebug('Mobile teacher UI setup complete');
+            console.log('Mobile UI setup complete');
+        }
+
+        function setupDesktopUI() {
+            // Setup tab switching
+            document.querySelectorAll('.message-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    switchDesktopTab(tabName);
+                });
+            });
+
+            // Setup clear messages button
+            document.getElementById('clearMessagesBtn').addEventListener('click', clearAllMessages);
+            
+            // Setup mark all read button
+            document.getElementById('markAllReadBtn').addEventListener('click', markAllMessagesAsRead);
         }
 
         function setupSwipeGestures() {
@@ -2179,14 +1773,8 @@
             mobileBottomSheet.style.display = 'block';
             setTimeout(() => {
                 mobileBottomSheet.classList.add('open');
-                scrollLock.lock();
-                mobileTeacherState.ui.bottomSheetOpen = true;
-                
-                // Mark all as read when opening
-                markAllNotificationsAsRead();
-                
-                // Update students list
-                updateMobileStudentsList();
+                updateMobileMessages();
+                markAllMessagesAsRead();
             }, 10);
         }
 
@@ -2194,12 +1782,10 @@
             mobileBottomSheet.classList.remove('open');
             setTimeout(() => {
                 mobileBottomSheet.style.display = 'none';
-                scrollLock.unlock();
-                mobileTeacherState.ui.bottomSheetOpen = false;
             }, 300);
         }
 
-        function switchTab(tabName) {
+        function switchMobileTab(tabName) {
             // Update active tab
             document.querySelectorAll('.mobile-bottom-sheet-tab').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.tab === tabName);
@@ -2210,114 +1796,18 @@
                 content.style.display = content.dataset.tabContent === tabName ? 'block' : 'none';
             });
 
-            mobileTeacherState.ui.activeTab = tabName;
+            activeTab = tabName;
         }
 
-        function showQuickPreview() {
-            const content = quickPreviewContent;
-            content.innerHTML = '';
-            
-            // Add mic requests
-            if (mobileTeacherState.notifications.micRequests.length > 0) {
-                const requestsDiv = document.createElement('div');
-                requestsDiv.innerHTML = '<h5 style="margin-bottom: 10px; color: #1a2980;">🎤 Mic Requests</h5>';
-                
-                mobileTeacherState.notifications.micRequests.slice(0, 3).forEach(req => {
-                    const item = document.createElement('div');
-                    item.className = 'quick-preview-item high';
-                    item.innerHTML = `
-                        <i class="fas fa-user" style="color: #ffa502;"></i>
-                        <span style="flex: 1;">${req.username}</span>
-                        <button onclick="approveMicRequestFromQuickPreview('${req.sid}')" 
-                                style="background: #2ed573; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px;">
-                            Approve
-                        </button>
-                    `;
-                    requestsDiv.appendChild(item);
-                });
-                
-                content.appendChild(requestsDiv);
-            }
+        function switchDesktopTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.message-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
 
-            // Add critical signals
-            const criticalSignals = mobileTeacherState.notifications.studentSignals.filter(
-                signal => signal.priority === 'CRITICAL'
-            );
-            
-            if (criticalSignals.length > 0) {
-                const signalsDiv = document.createElement('div');
-                signalsDiv.innerHTML = '<h5 style="margin-bottom: 10px; color: #ff4757;">🚨 Critical Signals</h5>';
-                
-                criticalSignals.slice(0, 3).forEach(signal => {
-                    const item = document.createElement('div');
-                    item.className = 'quick-preview-item critical';
-                    item.innerHTML = `
-                        <i class="fas fa-exclamation-triangle" style="color: #ff4757;"></i>
-                        <span style="flex: 1;">${signal.username}: ${signal.message.substring(0, 30)}...</span>
-                    `;
-                    signalsDiv.appendChild(item);
-                });
-                
-                content.appendChild(signalsDiv);
-            }
-
-            // Show modal
-            quickPreviewModal.classList.add('show');
-            mobileTeacherState.ui.quickPreviewOpen = true;
-            scrollLock.lock();
-        }
-
-        function hideQuickPreview() {
-            quickPreviewModal.classList.remove('show');
-            mobileTeacherState.ui.quickPreviewOpen = false;
-            scrollLock.unlock();
-        }
-
-        // ============================================
-        // BUSY MODE FUNCTIONS
-        // ============================================
-        function setBusyMode(minutes) {
-            mobileTeacherState.ui.busyMode.active = true;
-            mobileTeacherState.ui.busyMode.until = Date.now() + (minutes * 60000);
-            
-            // Update UI
-            busyToggle.classList.add('active');
-            busyToggle.querySelector('.busy-label').textContent = `Busy (${minutes}m)`;
-            
-            // Start timer
-            if (mobileTeacherState.ui.busyMode.timer) {
-                clearInterval(mobileTeacherState.ui.busyMode.timer);
-            }
-            
-            mobileTeacherState.ui.busyMode.timer = setInterval(() => {
-                const remaining = mobileTeacherState.ui.busyMode.until - Date.now();
-                if (remaining <= 0) {
-                    cancelBusyMode();
-                } else {
-                    const mins = Math.floor(remaining / 60000);
-                    const secs = Math.floor((remaining % 60000) / 1000);
-                    busyToggle.querySelector('.busy-label').textContent = `Busy (${mins}:${secs.toString().padStart(2, '0')})`;
-                }
-            }, 1000);
-            
-            showNotification('info', 'Busy Mode', `Active for ${minutes} minutes. Notifications are silenced.`);
-        }
-
-        function cancelBusyMode() {
-            mobileTeacherState.ui.busyMode.active = false;
-            mobileTeacherState.ui.busyMode.until = null;
-            
-            // Clear timer
-            if (mobileTeacherState.ui.busyMode.timer) {
-                clearInterval(mobileTeacherState.ui.busyMode.timer);
-                mobileTeacherState.ui.busyMode.timer = null;
-            }
-            
-            // Update UI
-            busyToggle.classList.remove('active');
-            busyToggle.querySelector('.busy-label').textContent = 'Busy Mode';
-            
-            showNotification('info', 'Busy Mode', 'Deactivated');
+            // Update messages display
+            updateDesktopMessages();
+            activeTab = tabName;
         }
 
         // ============================================
@@ -2333,12 +1823,6 @@
                 warning: 'fa-exclamation-triangle'
             };
             
-            // Check busy mode
-            if (mobileTeacherState.ui.busyMode.active && type !== 'error' && type !== 'critical') {
-                logDebug(`Notification suppressed by busy mode: ${title}`);
-                return;
-            }
-            
             // Update notification
             notification.className = `notification ${type}`;
             notification.innerHTML = `
@@ -2349,74 +1833,14 @@
                 </div>
             `;
             
-            // Add to history
-            notificationHistory.unshift({
-                type, title, message,
-                timestamp: new Date().toLocaleTimeString()
-            });
-            
-            if (notificationHistory.length > 10) {
-                notificationHistory.pop();
-            }
-            
             // Show notification
             notification.classList.add('show');
             
-            // Log for debugging
-            logDebug(`NOTIFICATION: ${type} - ${title}: ${message}`);
-            
             // Auto-hide
-            const delay = isMobileHost ? 4000 : 3000;
+            const delay = isMobile ? 4000 : 3000;
             setTimeout(() => {
                 notification.classList.remove('show');
             }, delay);
-        }
-
-        function showPriorityToast(priority, title, message) {
-            if (!priorityToast || !toastTitle || !toastMessage) return;
-            
-            // Check if user wants to see this priority
-            if (!mobileTeacherState.settings.priorityFilter.includes(priority)) {
-                return;
-            }
-            
-            // Check busy mode
-            if (mobileTeacherState.ui.busyMode.active && priority !== 'CRITICAL') {
-                return;
-            }
-            
-            // Update toast
-            priorityToast.className = `priority-toast ${priority.toLowerCase()}`;
-            toastTitle.textContent = title;
-            toastMessage.textContent = message;
-            
-            // Set icon based on priority
-            const iconMap = {
-                'CRITICAL': 'fa-exclamation-triangle',
-                'HIGH': 'fa-exclamation-circle',
-                'MEDIUM': 'fa-info-circle',
-                'LOW': 'fa-info-circle',
-                'INFO': 'fa-info-circle'
-            };
-            
-            priorityToast.querySelector('i').className = `fas ${iconMap[priority] || 'fa-info-circle'}`;
-            
-            // Show toast
-            priorityToast.classList.add('show');
-            
-            // Vibrate on mobile for high priority
-            if (isMobileHost && priority === 'CRITICAL' && 'vibrate' in navigator) {
-                navigator.vibrate([200, 100, 200]);
-            }
-            
-            // Auto-hide
-            setTimeout(() => {
-                priorityToast.classList.remove('show');
-            }, mobileTeacherState.settings.autoClearToast);
-        }
-
-        function closeToast() {
-            priorityToast.classList.remove('show');
         }
 
         function updateMobileStatus(type, message) {
@@ -2455,122 +1879,282 @@
             }
         }
 
-        function createMobileAlert(type, title, message) {
-            if (!isMobileHost) return;
-            
-            const alertId = 'mobile-alert-' + Date.now();
-            
-            // Remove existing alerts
-            document.querySelectorAll('.mobile-alert').forEach(alert => {
-                if (!alert.dataset.persistent) alert.remove();
-            });
-            
-            // Create alert
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'mobile-alert';
-            alertDiv.id = alertId;
-            
-            alertDiv.innerHTML = `
-                <div style="flex: 1;">
-                    <i class="fas fa-bell" style="margin-right: 8px;"></i>
-                    <span style="font-size: 13px;"><strong>${title}</strong>: ${message}</span>
-                </div>
-                <button onclick="document.getElementById('${alertId}').remove()" style="background: white; color: #1a2980; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 12px; margin-left: 8px; flex-shrink: 0;">
-                    OK
-                </button>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            // Auto-remove after 8 seconds
-            setTimeout(() => {
-                const alert = document.getElementById(alertId);
-                if (alert) alert.remove();
-            }, 8000);
-        }
-
         // ============================================
-        // NOTIFICATION MANAGEMENT
+        // MESSAGE MANAGEMENT
         // ============================================
-        function addNotification(event) {
-            const priority = eventPrioritizer.getPriority(event);
-            const notification = {
-                ...event,
+        function addMessage(type, data) {
+            const message = {
                 id: Date.now() + Math.random(),
+                type: type,
                 timestamp: Date.now(),
-                priority: priority,
-                read: false
+                read: false,
+                ...data
             };
             
-            // Add to appropriate category
-            if (event.type === 'mic_request') {
-                mobileTeacherState.notifications.micRequests.push(notification);
-                updateMobileRequestBadge();
-            } else if (event.type === 'student_signal') {
-                mobileTeacherState.notifications.studentSignals.push(notification);
-                updateMobileSignalBadge();
-            }
-            
-            // Add to all notifications
-            mobileTeacherState.notifications.all.push(notification);
-            
-            // Update unread count (if not in bottom sheet)
-            if (!mobileTeacherState.ui.bottomSheetOpen) {
-                mobileTeacherState.notifications.unreadCount++;
-                updateFabBadge();
-            }
-            
-            // Show appropriate notification
-            if (priority.toast) {
-                showPriorityToast(priority, event.title || 'New Notification', event.message);
-            }
+            allMessages.unshift(message); // Add to beginning for chronological order
+            unreadCount++;
             
             // Update UI
-            updateNotificationUI(notification);
-        }
-
-        function markAllNotificationsAsRead() {
-            mobileTeacherState.notifications.unreadCount = 0;
-            mobileTeacherState.notifications.all.forEach(n => n.read = true);
-            updateFabBadge();
-        }
-
-        function updateFabBadge() {
-            if (!mobileFabBadge) return;
+            updateMessageBadges();
             
-            const count = mobileTeacherState.notifications.unreadCount;
-            mobileFabBadge.textContent = count > 99 ? '99+' : count;
-            mobileFabBadge.style.display = count > 0 ? 'flex' : 'none';
-        }
-
-        function updateMobileRequestBadge() {
-            if (!mobileRequestBadge) return;
+            // Show notification
+            const notificationTitle = getMessageTypeTitle(type);
+            showNotification('info', notificationTitle, `${data.username}: ${data.message || data.content}`);
             
-            const count = mobileTeacherState.notifications.micRequests.length;
-            mobileRequestBadge.textContent = count;
-            mobileRequestBadge.style.display = count > 0 ? 'inline-block' : 'none';
-        }
-
-        function updateMobileSignalBadge() {
-            if (!mobileSignalBadge) return;
-            
-            const count = mobileTeacherState.notifications.studentSignals.length;
-            mobileSignalBadge.textContent = count;
-            mobileSignalBadge.style.display = count > 0 ? 'inline-block' : 'none';
-        }
-
-        function updateNotificationUI(notification) {
-            // Update desktop UI
-            if (notification.type === 'mic_request' && !isMobileHost) {
-                updateDesktopMicRequestUI(notification);
-            } else if (notification.type === 'student_signal' && !isMobileHost) {
-                updateDesktopSignalUI(notification);
+            // Update message displays
+            if (isMobile) {
+                updateMobileMessages();
+            } else {
+                updateDesktopMessages();
             }
             
-            // Update mobile bottom sheet if open
-            if (mobileTeacherState.ui.bottomSheetOpen) {
-                updateMobileBottomSheetUI(notification);
+            // Auto-remove old messages (keep only last 50)
+            if (allMessages.length > 50) {
+                allMessages = allMessages.slice(0, 50);
             }
+            
+            return message;
+        }
+
+        function getMessageTypeTitle(type) {
+            const titles = {
+                'mic_request': '🎤 Mic Request',
+                'student_signal': '📢 Student Signal',
+                'chat_message': '💬 Chat Message',
+                'feedback': '📝 Feedback'
+            };
+            return titles[type] || 'New Message';
+        }
+
+        function updateMessageBadges() {
+            // Update total message count
+            if (messageCount) {
+                messageCount.textContent = allMessages.length;
+            }
+            
+            // Update unread badge on mobile FAB
+            if (mobileFabBadge) {
+                mobileFabBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                mobileFabBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+            }
+            
+            // Update desktop badges
+            const micRequests = allMessages.filter(m => m.type === 'mic_request').length;
+            const chatMessages = allMessages.filter(m => m.type === 'chat_message' || m.type === 'student_signal').length;
+            
+            if (allBadge) allBadge.textContent = allMessages.length;
+            if (requestsBadge) requestsBadge.textContent = micRequests;
+            if (messagesBadge) messagesBadge.textContent = chatMessages;
+            
+            // Update mobile badges
+            if (mobileAllBadge) mobileAllBadge.textContent = allMessages.length;
+            if (mobileRequestBadge) mobileRequestBadge.textContent = micRequests;
+            if (mobileMessageBadge) mobileMessageBadge.textContent = chatMessages;
+        }
+
+        function markAllMessagesAsRead() {
+            unreadCount = 0;
+            allMessages.forEach(m => m.read = true);
+            updateMessageBadges();
+            
+            if (mobileFabBadge) {
+                mobileFabBadge.style.display = 'none';
+            }
+        }
+
+        function clearAllMessages() {
+            if (confirm('Clear all messages? This cannot be undone.')) {
+                allMessages = [];
+                unreadCount = 0;
+                updateMessageBadges();
+                
+                // Update displays
+                if (isMobile) {
+                    updateMobileMessages();
+                } else {
+                    updateDesktopMessages();
+                }
+                
+                showNotification('info', 'Messages Cleared', 'All messages have been cleared');
+            }
+        }
+
+        function updateDesktopMessages() {
+            if (!desktopMessagesContainer) return;
+            
+            let filteredMessages = allMessages;
+            
+            if (activeTab === 'requests') {
+                filteredMessages = allMessages.filter(m => m.type === 'mic_request');
+            } else if (activeTab === 'messages') {
+                filteredMessages = allMessages.filter(m => m.type === 'chat_message' || m.type === 'student_signal');
+            }
+            
+            if (filteredMessages.length === 0) {
+                desktopMessagesContainer.innerHTML = `
+                    <div class="empty-message-state">
+                        <i class="fas fa-comment-slash"></i>
+                        <p>No ${activeTab === 'all' ? 'messages' : activeTab} yet</p>
+                        <p style="font-size: 12px; margin-top: 5px;">Students' ${activeTab === 'all' ? 'messages' : activeTab} will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            desktopMessagesContainer.innerHTML = filteredMessages.map(message => {
+                const time = new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const priorityClass = getPriorityClass(message);
+                
+                let actions = '';
+                if (message.type === 'mic_request') {
+                    actions = `
+                        <div class="message-actions">
+                            <button class="message-action-btn approve" onclick="approveMicRequest('${message.student_sid}')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="message-action-btn deny" onclick="denyMicRequest('${message.student_sid}')">
+                                <i class="fas fa-times"></i> Deny
+                            </button>
+                        </div>
+                    `;
+                } else if (message.type === 'student_signal') {
+                    actions = `
+                        <div class="message-actions">
+                            <button class="message-action-btn view" onclick="focusStudentVideo('${message.student_sid}')">
+                                <i class="fas fa-eye"></i> View Student
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="message-item ${priorityClass}" data-message-id="${message.id}">
+                        <div class="message-item-header">
+                            <span class="message-sender">
+                                <i class="fas ${getMessageIcon(message.type)}"></i>
+                                ${message.username}
+                            </span>
+                            <span class="message-time">${time}</span>
+                        </div>
+                        <div class="message-content">
+                            ${message.message || message.content}
+                        </div>
+                        ${actions}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateMobileMessages() {
+            // Update all messages tab
+            updateMobileTab('all');
+            
+            // Update requests tab
+            updateMobileTab('requests');
+            
+            // Update messages tab
+            updateMobileTab('messages');
+        }
+
+        function updateMobileTab(tabName) {
+            const containerId = tabName === 'all' ? 'mobileAllMessages' : 
+                               tabName === 'requests' ? 'mobileMicRequestList' : 
+                               'mobileMessageList';
+            
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            let filteredMessages = allMessages;
+            
+            if (tabName === 'requests') {
+                filteredMessages = allMessages.filter(m => m.type === 'mic_request');
+            } else if (tabName === 'messages') {
+                filteredMessages = allMessages.filter(m => m.type === 'chat_message' || m.type === 'student_signal');
+            }
+            
+            if (filteredMessages.length === 0) {
+                container.innerHTML = `<p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">
+                    No ${tabName === 'all' ? 'messages' : tabName} yet
+                </p>`;
+                return;
+            }
+            
+            container.innerHTML = filteredMessages.map(message => {
+                const time = new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                let actions = '';
+                if (message.type === 'mic_request') {
+                    actions = `
+                        <div style="display: flex; gap: 5px; margin-top: 8px;">
+                            <button onclick="approveMicRequest('${message.student_sid}')" 
+                                    style="background: #2ed573; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; flex: 1;">
+                                Approve
+                            </button>
+                            <button onclick="denyMicRequest('${message.student_sid}')" 
+                                    style="background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; flex: 1;">
+                                Deny
+                            </button>
+                        </div>
+                    `;
+                } else if (message.type === 'student_signal') {
+                    actions = `
+                        <div style="margin-top: 8px;">
+                            <button onclick="focusStudentVideo('${message.student_sid}')" 
+                                    style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; width: 100%;">
+                                View Student
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="${tabName === 'requests' ? 'mic-request-item' : 'signal-item'}" 
+                         style="margin-bottom: 10px; padding: 12px; background: #f8f9ff; border-radius: 8px; border-left: 4px solid ${getMessageColor(message.type)};">
+                        <div style="margin-bottom: 6px;">
+                            <div style="font-weight: 600; font-size: 14px; color: #1a2980; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas ${getMessageIcon(message.type)}"></i>
+                                ${message.username}
+                            </div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">
+                                ${time}
+                            </div>
+                        </div>
+                        <div style="font-size: 13px; color: #333; margin-bottom: 8px;">
+                            ${message.message || message.content}
+                        </div>
+                        ${actions}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getMessageIcon(type) {
+            const icons = {
+                'mic_request': 'fa-microphone',
+                'student_signal': 'fa-comment',
+                'chat_message': 'fa-comment-alt',
+                'feedback': 'fa-star'
+            };
+            return icons[type] || 'fa-envelope';
+        }
+
+        function getMessageColor(type) {
+            const colors = {
+                'mic_request': '#ffa502',
+                'student_signal': '#1a2980',
+                'chat_message': '#667eea',
+                'feedback': '#2ed573'
+            };
+            return colors[type] || '#666';
+        }
+
+        function getPriorityClass(message) {
+            if (message.type === 'mic_request') return 'high';
+            if (message.message?.toLowerCase().includes('urgent') || 
+                message.message?.toLowerCase().includes('emergency')) {
+                return 'critical';
+            }
+            return 'medium';
         }
 
         // ============================================
@@ -2578,7 +2162,7 @@
         // ============================================
         async function initializeLocalMedia() {
             try {
-                const constraints = isMobileHost ? {
+                const constraints = isMobile ? {
                     video: {
                         width: { ideal: 640 },
                         height: { ideal: 480 },
@@ -2607,10 +2191,10 @@
                 teacherVideo.srcObject = localStream;
                 await teacherVideo.play();
                 
-                logDebug('Local media obtained:', {
+                console.log('Local media obtained:', {
                     video: localStream.getVideoTracks()[0]?.label,
                     audio: localStream.getAudioTracks()[0]?.label,
-                    mobile: isMobileHost
+                    mobile: isMobile
                 });
                 
                 showNotification('success', 'Media Ready', 'Camera and microphone are active');
@@ -2636,26 +2220,26 @@
         function setupEventListeners() {
             // Connection events
             socket.on('connect', () => {
-                logDebug('✅ Connected to server');
+                console.log('✅ Connected to server');
                 updateConnectionStatus('connected');
                 updateMobileStatus('success', 'Connected');
             });
             
             socket.on('disconnect', () => {
-                logDebug('❌ Disconnected from server');
+                console.log('❌ Disconnected from server');
                 updateConnectionStatus('disconnected');
                 updateMobileStatus('error', 'Disconnected');
             });
             
             socket.on('reconnect', () => {
-                logDebug('🔄 Reconnected to server');
+                console.log('🔄 Reconnected to server');
                 showNotification('info', 'Reconnected', 'Connection restored');
                 updateMobileStatus('success', 'Reconnected');
                 socket.emit('rejoin-room', { room: roomId, role: 'teacher' });
             });
             
             socket.on('reconnect_attempt', () => {
-                logDebug('Attempting to reconnect...');
+                console.log('Attempting to reconnect...');
                 updateMobileStatus('info', 'Reconnecting...');
             });
             
@@ -2672,6 +2256,7 @@
             // Teacher authority events
             socket.on('mic-request-received', handleMicRequestReceived);
             socket.on('student-struggling', handleStudentStruggling);
+            socket.on('student-message', handleStudentMessage);
             socket.on('command-executed', handleCommandExecuted);
             socket.on('room-state', handleRoomState);
             
@@ -2723,17 +2308,16 @@
             socket.emit('join-room', {
                 room: roomId,
                 role: 'teacher',
-                username: 'Teacher',
-                deviceType: deviceDetector.getDeviceType()
+                username: 'Teacher'
             });
-            logDebug('Connecting to room: ' + roomId);
+            console.log('Connecting to room: ' + roomId);
         }
 
         function handleRoomJoined(data) {
             const { sid, username, role, existing_participants } = data;
             
             mySid = sid;
-            logDebug(`✅ Room joined. SID: ${mySid}, Participants: ${existing_participants.length}`);
+            console.log(`✅ Room joined. SID: ${mySid}, Participants: ${existing_participants.length}`);
             
             // Store participants
             existing_participants.forEach(participant => {
@@ -2751,275 +2335,78 @@
         function handleNewParticipant(data) {
             const { sid, username, role } = data;
             
-            logDebug(`👋 New participant: ${username} (${sid})`);
+            console.log(`👋 New participant: ${username} (${sid})`);
             
             participants[sid] = { username, role };
             createPeerConnection(sid, username, role);
             
             updateStudentCount();
-            addNotification({
-                type: 'student_joined',
-                message: `${username} has joined the class`,
+            addMessage('chat_message', {
+                student_sid: sid,
                 username: username,
-                sid: sid
+                content: `${username} has joined the class`,
+                priority: 'info'
             });
         }
 
         function handleParticipantLeft(data) {
             const { sid, username } = data;
             
-            logDebug(`👋 Participant left: ${username} (${sid})`);
+            console.log(`👋 Participant left: ${username} (${sid})`);
             
             cleanupConnection(sid);
             delete participants[sid];
             
             updateStudentCount();
-            addNotification({
-                type: 'student_left',
-                message: `${username} has left the class`,
+            addMessage('chat_message', {
+                student_sid: sid,
                 username: username,
-                sid: sid
+                content: `${username} has left the class`,
+                priority: 'info'
             });
         }
 
         // ============================================
-        // TEACHER AUTHORITY FUNCTIONS
+        // MESSAGE HANDLERS
         // ============================================
         function handleMicRequestReceived(data) {
-            const { student_sid, username, count } = data;
+            const { student_sid, username } = data;
             
-            logDebug(`🎤 MIC REQUEST from ${username} (Total: ${count})`);
+            console.log(`🎤 MIC REQUEST from ${username}`);
             
-            // Add notification
-            addNotification({
-                type: 'mic_request',
-                message: `${username} wants to speak`,
+            addMessage('mic_request', {
+                student_sid: student_sid,
                 username: username,
-                sid: student_sid,
-                title: '🎤 Mic Request'
+                message: `${username} wants to speak`,
+                priority: 'high'
             });
-            
-            // Update desktop UI
-            if (!isMobileHost && micRequestList) {
-                const existingRequest = document.querySelector(`.mic-request-item[data-sid="${student_sid}"]`);
-                
-                if (!existingRequest) {
-                    const requestItem = document.createElement('div');
-                    requestItem.className = 'mic-request-item';
-                    requestItem.dataset.sid = student_sid;
-                    requestItem.innerHTML = `
-                        <span style="font-weight: 500;">${username}</span>
-                        <div>
-                            <button onclick="approveMicRequest('${student_sid}')" 
-                                    style="background: #2ed573; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; margin-right: 5px;">
-                                Approve
-                            </button>
-                            <button onclick="denyMicRequest('${student_sid}')" 
-                                    style="background: #ff4757; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px;">
-                                Deny
-                            </button>
-                        </div>
-                    `;
-                    micRequestList.appendChild(requestItem);
-                }
-            }
         }
 
         function handleStudentStruggling(data) {
             const { student_sid, signal, message, username } = data;
             
-            logDebug(`📢 STUDENT SIGNAL from ${username}: ${signal} - ${message}`);
+            console.log(`📢 STUDENT SIGNAL from ${username}: ${signal} - ${message}`);
             
-            // Add notification
-            addNotification({
-                type: 'student_signal',
-                message: message || getSignalText(signal),
+            addMessage('student_signal', {
+                student_sid: student_sid,
                 username: username,
-                sid: student_sid,
+                message: message || getSignalText(signal),
                 signal: signal,
-                title: '📢 Student Signal'
+                priority: 'medium'
             });
-            
-            // Update desktop UI
-            if (!isMobileHost && struggleSignals) {
-                const emptyState = struggleSignals.querySelector('.empty-state');
-                if (emptyState) emptyState.remove();
-                
-                const studentName = username || participants[student_sid]?.username || 'Student';
-                const signalText = message || getSignalText(signal);
-                
-                const signalItem = document.createElement('div');
-                signalItem.className = 'signal-item';
-                
-                // Style based on signal type
-                if (signal === 'got_it') {
-                    signalItem.style.background = '#e8f5e9';
-                    signalItem.style.borderLeftColor = '#2ed573';
-                } else if (signal === 'too_fast') {
-                    signalItem.style.background = '#fff3e0';
-                    signalItem.style.borderLeftColor = '#ffa502';
-                } else if (signal === 'help' || signal === 'question') {
-                    signalItem.style.background = '#e3f2fd';
-                    signalItem.style.borderLeftColor = '#2196f3';
-                } else {
-                    signalItem.style.background = '#ffebee';
-                    signalItem.style.borderLeftColor = '#ff4757';
-                }
-                
-                signalItem.innerHTML = `
-                    <strong>${studentName}</strong>: ${signalText}
-                    <small style="float: right; color: #666; font-size: 10px;">
-                        ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                    </small>
-                `;
-                
-                // Click to focus student
-                signalItem.onclick = () => {
-                    focusStudentVideo(student_sid);
-                };
-                
-                struggleSignals.prepend(signalItem);
-            }
         }
 
-        function updateDesktopMicRequestUI(notification) {
-            if (!micRequestBadge || !micRequestContainer) return;
+        function handleStudentMessage(data) {
+            const { student_sid, message, username } = data;
             
-            const count = document.querySelectorAll('.mic-request-item').length + 1;
-            micRequestBadge.textContent = count;
-            micRequestContainer.style.display = 'block';
-        }
-
-        function updateDesktopSignalUI(notification) {
-            // Implementation for desktop signal UI
-        }
-
-        function updateMobileBottomSheetUI(notification) {
-            if (notification.type === 'mic_request') {
-                updateMobileMicRequestList(notification);
-            } else if (notification.type === 'student_signal') {
-                updateMobileSignalList(notification);
-            }
-        }
-
-        function updateMobileMicRequestList(notification) {
-            const list = document.getElementById('mobileMicRequestList');
-            if (!list) return;
+            console.log(`💬 CHAT MESSAGE from ${username}: ${message}`);
             
-            // Remove empty state
-            const emptyState = list.querySelector('p');
-            if (emptyState) emptyState.remove();
-            
-            // Check if already exists
-            const existing = list.querySelector(`[data-sid="${notification.sid}"]`);
-            if (existing) return;
-            
-            const item = document.createElement('div');
-            item.className = 'mic-request-item';
-            item.dataset.sid = notification.sid;
-            item.innerHTML = `
-                <div style="flex: 1;">
-                    <strong>${notification.username}</strong>
-                    <div style="font-size: 12px; color: #666;">${notification.message}</div>
-                </div>
-                <div style="display: flex; gap: 5px;">
-                    <button onclick="approveMicRequest('${notification.sid}')" 
-                            style="background: #2ed573; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px;">
-                        Approve
-                    </button>
-                    <button onclick="denyMicRequest('${notification.sid}')" 
-                            style="background: #ff4757; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px;">
-                        Deny
-                    </button>
-                </div>
-            `;
-            
-            list.appendChild(item);
-        }
-
-        function updateMobileSignalList(notification) {
-            const list = document.getElementById('mobileStruggleSignals');
-            if (!list) return;
-            
-            // Remove empty state
-            const emptyState = list.querySelector('p');
-            if (emptyState) emptyState.remove();
-            
-            const item = document.createElement('div');
-            item.className = 'signal-item';
-            item.dataset.sid = notification.sid;
-            
-            // Style based on priority
-            if (notification.priority === 'CRITICAL') {
-                item.style.background = '#ffebee';
-                item.style.borderLeftColor = '#ff4757';
-            } else if (notification.priority === 'HIGH') {
-                item.style.background = '#fff3e0';
-                item.style.borderLeftColor = '#ffa502';
-            } else {
-                item.style.background = '#e3f2fd';
-                item.style.borderLeftColor = '#1a2980';
-            }
-            
-            item.innerHTML = `
-                <div style="flex: 1;">
-                    <strong>${notification.username}</strong>
-                    <div style="font-size: 12px; color: #666; margin-top: 2px;">${notification.message}</div>
-                </div>
-                <small style="color: #666; font-size: 10px; white-space: nowrap;">
-                    ${new Date(notification.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                </small>
-            `;
-            
-            // Click to focus student
-            item.onclick = () => {
-                focusStudentVideo(notification.sid);
-                closeBottomSheetHandler();
-            };
-            
-            list.prepend(item);
-        }
-
-        function updateMobileStudentsList() {
-            const list = document.getElementById('mobileStudentsList');
-            if (!list) return;
-            
-            const studentParticipants = Object.entries(participants)
-                .filter(([_, p]) => p.role === 'student')
-                .map(([sid, participant]) => ({ sid, ...participant }));
-            
-            if (studentParticipants.length === 0) {
-                list.innerHTML = '<p style="color: #666; font-size: 13px; text-align: center; padding: 20px;">No students connected</p>';
-                return;
-            }
-            
-            list.innerHTML = studentParticipants.map(({ sid, username }) => {
-                const connection = peerConnections[sid];
-                let status = 'disconnected';
-                let statusColor = '#ff4757';
-                
-                if (connection) {
-                    status = connection.connectionState;
-                    statusColor = status === 'connected' ? '#2ed573' : 
-                                  status === 'connecting' ? '#ffa502' : '#ff4757';
-                }
-                
-                return `
-                    <div class="student-item" data-sid="${sid}" onclick="focusStudentVideo('${sid}'); closeBottomSheetHandler();" 
-                         style="margin-bottom: 8px; padding: 10px; background: #f8f9ff; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
-                        <div class="student-avatar" style="width: 30px; height: 30px; font-size: 14px;">
-                            ${username.charAt(0).toUpperCase()}
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 500; font-size: 14px;">${username}</div>
-                            <div style="font-size: 11px; color: ${statusColor}; display: flex; align-items: center; gap: 4px;">
-                                <i class="fas fa-circle" style="font-size: 8px;"></i>
-                                ${status.charAt(0).toUpperCase() + status.slice(1)}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            addMessage('chat_message', {
+                student_sid: student_sid,
+                username: username,
+                content: message,
+                priority: 'medium'
+            });
         }
 
         function getSignalText(signal) {
@@ -3036,16 +2423,16 @@
         }
 
         function handleCommandExecuted(data) {
-            logDebug(`Command ${data.command} executed: ${data.status}`);
+            console.log(`Command ${data.command} executed: ${data.status}`);
             showNotification('success', 'Command Executed', `${data.command} completed successfully`);
         }
 
         function handleRoomState(data) {
-            logDebug('Room state updated:', data);
+            console.log('Room state updated:', data);
         }
 
         function handleError(data) {
-            logDebug(`Error received: ${data.message}`);
+            console.log(`Error received: ${data.message}`);
             showNotification('error', 'Error', data.message);
         }
 
@@ -3058,23 +2445,19 @@
                 student_sid: studentSid
             });
             
-            // Remove from all UI
-            removeMicRequestFromUI(studentSid);
+            // Remove mic request from messages
+            allMessages = allMessages.filter(m => !(m.type === 'mic_request' && m.student_sid === studentSid));
             
-            // Update notification state
-            mobileTeacherState.notifications.micRequests = mobileTeacherState.notifications.micRequests.filter(
-                req => req.sid !== studentSid
-            );
+            // Update UI
+            updateMessageBadges();
+            if (isMobile) {
+                updateMobileMessages();
+            } else {
+                updateDesktopMessages();
+            }
             
-            updateMobileRequestBadge();
-            
-            logDebug(`Approved mic for student: ${studentSid}`);
+            console.log(`Approved mic for student: ${studentSid}`);
             showNotification('success', 'Mic Approved', 'Student can now speak');
-        }
-
-        function approveMicRequestFromQuickPreview(studentSid) {
-            approveMicRequest(studentSid);
-            hideQuickPreview();
         }
 
         function denyMicRequest(studentSid) {
@@ -3083,37 +2466,19 @@
                 student_sid: studentSid
             });
             
-            // Remove from all UI
-            removeMicRequestFromUI(studentSid);
+            // Remove mic request from messages
+            allMessages = allMessages.filter(m => !(m.type === 'mic_request' && m.student_sid === studentSid));
             
-            // Update notification state
-            mobileTeacherState.notifications.micRequests = mobileTeacherState.notifications.micRequests.filter(
-                req => req.sid !== studentSid
-            );
-            
-            updateMobileRequestBadge();
-            
-            logDebug(`Denied mic for student: ${studentSid}`);
-            showNotification('info', 'Mic Denied', 'Student cannot speak');
-        }
-
-        function removeMicRequestFromUI(studentSid) {
-            // Remove from desktop UI
-            const desktopItem = document.querySelector(`.mic-request-item[data-sid="${studentSid}"]`);
-            if (desktopItem) desktopItem.remove();
-            
-            // Remove from mobile UI
-            const mobileItem = document.querySelector(`#mobileMicRequestList [data-sid="${studentSid}"]`);
-            if (mobileItem) mobileItem.remove();
-            
-            // Update desktop badge
-            if (micRequestBadge) {
-                const remaining = document.querySelectorAll('.mic-request-item').length;
-                micRequestBadge.textContent = remaining;
-                if (remaining === 0 && micRequestContainer) {
-                    micRequestContainer.style.display = 'none';
-                }
+            // Update UI
+            updateMessageBadges();
+            if (isMobile) {
+                updateMobileMessages();
+            } else {
+                updateDesktopMessages();
             }
+            
+            console.log(`Denied mic for student: ${studentSid}`);
+            showNotification('info', 'Mic Denied', 'Student cannot speak');
         }
 
         // ============================================
@@ -3122,7 +2487,7 @@
         function createPeerConnection(targetSid, targetUsername, targetRole) {
             if (targetSid === mySid || peerConnections[targetSid]) return;
             
-            logDebug(`🔗 Creating connection to ${targetUsername}`);
+            console.log(`🔗 Creating connection to ${targetUsername}`);
             
             try {
                 const peerConnection = new RTCPeerConnection(WEBRTC_CONFIG);
@@ -3137,12 +2502,11 @@
                 
                 // Handle incoming stream
                 peerConnection.ontrack = (event) => {
-                    logDebug(`📥 Received stream from ${targetUsername}`);
+                    console.log(`📥 Received stream from ${targetUsername}`);
                     
                     if (event.streams[0]) {
                         remoteStreams[targetSid] = event.streams[0];
                         displayRemoteVideo(targetSid, targetUsername, targetRole, event.streams[0]);
-                        setupAudioAnalysis(targetSid, event.streams[0]);
                     }
                 };
                 
@@ -3160,7 +2524,7 @@
                 // Connection state
                 peerConnection.onconnectionstatechange = () => {
                     const state = peerConnection.connectionState;
-                    logDebug(`🔌 ${targetUsername} connection: ${state}`);
+                    console.log(`🔌 ${targetUsername} connection: ${state}`);
                     
                     if (state === 'connected') {
                         updateStudentConnectionStatus(targetSid, 'connected');
@@ -3177,7 +2541,6 @@
                 
             } catch (error) {
                 console.error(`❌ Error creating connection:`, error);
-                logDebug(`Error: ${error.message}`);
             }
         }
 
@@ -3196,7 +2559,7 @@
                     offer: peerConnection.localDescription
                 });
                 
-                logDebug(`📤 Offer sent to ${targetSid}`);
+                console.log(`📤 Offer sent to ${targetSid}`);
             } catch (error) {
                 console.error('Error creating offer:', error);
             }
@@ -3208,7 +2571,7 @@
             
             if (!participant) return;
             
-            logDebug(`📥 Received offer from ${participant.username}`);
+            console.log(`📥 Received offer from ${participant.username}`);
             
             if (!peerConnections[from_sid]) {
                 createPeerConnection(from_sid, participant.username, participant.role);
@@ -3235,7 +2598,7 @@
                     answer: peerConnection.localDescription
                 });
                 
-                logDebug(`📤 Answer sent to ${participant.username}`);
+                console.log(`📤 Answer sent to ${participant.username}`);
             } catch (error) {
                 console.error('Error handling offer:', error);
             }
@@ -3248,7 +2611,7 @@
             if (peerConnection) {
                 try {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-                    logDebug(`✅ Remote description set for ${from_sid}`);
+                    console.log(`✅ Remote description set for ${from_sid}`);
                 } catch (error) {
                     console.error('Error setting remote description:', error);
                 }
@@ -3341,24 +2704,16 @@
         // UTILITY FUNCTIONS
         // ============================================
         function cleanupConnection(sid) {
-            logDebug(`🧹 Cleaning up connection to ${sid}`);
+            console.log(`🧹 Cleaning up connection to ${sid}`);
             
             if (peerConnections[sid]) {
                 peerConnections[sid].close();
                 delete peerConnections[sid];
             }
             
-            if (audioAnalysers[sid]) {
-                delete audioAnalysers[sid];
-            }
-            
             delete remoteStreams[sid];
             removeVideoElement(sid);
             updateStudentConnectionStatus(sid, 'disconnected');
-            
-            if (activeSpeaker === sid) {
-                activeSpeaker = null;
-            }
         }
 
         function updateStudentCount() {
@@ -3513,7 +2868,7 @@
                         }
                     });
                     
-                    logDebug(`Video ${videoTrack.enabled ? 'enabled' : 'disabled'}`);
+                    console.log(`Video ${videoTrack.enabled ? 'enabled' : 'disabled'}`);
                 }
             }
         }
@@ -3537,7 +2892,7 @@
                         }
                     });
                     
-                    logDebug(`Audio ${audioTrack.enabled ? 'enabled' : 'disabled'}`);
+                    console.log(`Audio ${audioTrack.enabled ? 'enabled' : 'disabled'}`);
                 }
             }
         }
@@ -3659,179 +3014,10 @@
                 if (localStream) localStream.getTracks().forEach(track => track.stop());
                 if (screenStream) screenStream.getTracks().forEach(track => track.stop());
                 
-                if (speakerDetectionInterval) clearInterval(speakerDetectionInterval);
-                if (sharedAudioContext) sharedAudioContext.close();
                 if (sessionTimer) clearInterval(sessionTimer);
-                
-                // Cancel busy mode
-                if (mobileTeacherState.ui.busyMode.timer) {
-                    clearInterval(mobileTeacherState.ui.busyMode.timer);
-                }
                 
                 socket.disconnect();
                 window.location.href = '/';
-            }
-        }
-
-        // ============================================
-        // AUDIO ANALYSIS FOR SPEAKER DETECTION
-        // ============================================
-        function setupAudioAnalysis(sid, stream) {
-            if (audioAnalysers[sid]) return;
-            
-            const audioTrack = stream.getAudioTracks()[0];
-            if (!audioTrack) return;
-            
-            try {
-                if (!sharedAudioContext) {
-                    sharedAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                
-                const analyser = sharedAudioContext.createAnalyser();
-                analyser.fftSize = 256;
-                
-                const source = sharedAudioContext.createMediaStreamSource(stream);
-                source.connect(analyser);
-                
-                const bufferLength = analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-                
-                audioAnalysers[sid] = { analyser, dataArray };
-                
-                if (!speakerDetectionInterval) {
-                    startSpeakerDetection();
-                }
-                
-            } catch (error) {
-                console.error(`Error setting up audio analysis:`, error);
-            }
-        }
-
-        function startSpeakerDetection() {
-            if (speakerDetectionInterval) return;
-            
-            speakerDetectionInterval = setInterval(() => {
-                detectActiveSpeaker();
-            }, 500);
-        }
-
-        function detectActiveSpeaker() {
-            let maxLevel = 0;
-            let newActiveSpeaker = null;
-            
-            Object.entries(audioAnalysers).forEach(([sid, obj]) => {
-                const { analyser, dataArray } = obj;
-                analyser.getByteFrequencyData(dataArray);
-                
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-                
-                const avg = sum / dataArray.length;
-                const level = avg / 255;
-                
-                if (level > 0.1 && level > maxLevel) {
-                    maxLevel = level;
-                    newActiveSpeaker = sid;
-                }
-            });
-            
-            if (newActiveSpeaker !== activeSpeaker) {
-                if (activeSpeaker) {
-                    const oldVideo = document.getElementById(`video-${activeSpeaker}`);
-                    if (oldVideo) oldVideo.classList.remove('active-speaker');
-                }
-                
-                if (newActiveSpeaker) {
-                    const newVideo = document.getElementById(`video-${newActiveSpeaker}`);
-                    if (newVideo) {
-                        newVideo.classList.add('active-speaker');
-                        const participant = participants[newActiveSpeaker];
-                        if (participant && participant.role === 'student') {
-                            showSpeakerNotification(participant.username);
-                        }
-                    }
-                }
-                
-                activeSpeaker = newActiveSpeaker;
-            }
-        }
-
-        function showSpeakerNotification(username) {
-            if (document.querySelector('.speaker-notification')) return;
-            
-            const notification = document.createElement('div');
-            notification.className = 'speaker-notification';
-            notification.innerHTML = `
-                <i class="fas fa-microphone-alt"></i>
-                <span>${username} is speaking</span>
-            `;
-            notification.style.cssText = `
-                position: fixed;
-                bottom: ${isMobileHost ? '100px' : '80px'};
-                right: 20px;
-                background: rgba(255, 165, 2, 0.9);
-                color: white;
-                padding: 10px 15px;
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                z-index: 9999;
-                animation: slideIn 0.3s ease;
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                }
-            }, 3000);
-        }
-
-        // ============================================
-        // CONNECTION HEALTH CHECK
-        // ============================================
-        function checkAllConnections() {
-            Object.entries(peerConnections).forEach(([sid, pc]) => {
-                if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
-                    logDebug(`Reconnecting to ${sid}`);
-                    cleanupConnection(sid);
-                    const participant = participants[sid];
-                    if (participant) {
-                        createPeerConnection(sid, participant.username, participant.role);
-                    }
-                }
-            });
-            
-            if (!socket.connected) {
-                logDebug('Socket disconnected, reconnecting...');
-                socket.connect();
-            }
-        }
-
-        // ============================================
-        // DEBUG LOGGING
-        // ============================================
-        function logDebug(message, data) {
-            if (!debugLog) return;
-            
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = document.createElement('div');
-            logEntry.textContent = `[${timestamp}] ${message}`;
-            debugLog.prepend(logEntry);
-            
-            if (data) {
-                const dataEntry = document.createElement('div');
-                dataEntry.textContent = JSON.stringify(data, null, 2);
-                dataEntry.style.fontSize = '10px';
-                dataEntry.style.color = '#666';
-                debugLog.prepend(dataEntry);
-            }
-            
-            while (debugLog.children.length > 20) {
-                debugLog.removeChild(debugLog.lastChild);
             }
         }
 
@@ -3844,14 +3030,7 @@
             if (localStream) localStream.getTracks().forEach(track => track.stop());
             if (screenStream) screenStream.getTracks().forEach(track => track.stop());
             
-            if (speakerDetectionInterval) clearInterval(speakerDetectionInterval);
-            if (sharedAudioContext) sharedAudioContext.close();
             if (sessionTimer) clearInterval(sessionTimer);
-            
-            // Cancel busy mode
-            if (mobileTeacherState.ui.busyMode.timer) {
-                clearInterval(mobileTeacherState.ui.busyMode.timer);
-            }
             
             if (socket) socket.disconnect();
         });
@@ -3863,44 +3042,6 @@
         window.pinStudentVideo = pinStudentVideo;
         window.toggleRemoteMute = toggleRemoteMute;
         window.toggleAIPrompter = toggleAIPrompter;
-        window.setBusyMode = setBusyMode;
-        window.cancelBusyMode = cancelBusyMode;
-        window.closeToast = closeToast;
-        window.approveMicRequestFromQuickPreview = approveMicRequestFromQuickPreview;
-
-        // Orientation change handler
-        window.onOrientationChange = function(orientation) {
-            logDebug(`Orientation changed to ${orientation}`);
-            
-            if (isMobileHost) {
-                // Adjust video grid
-                const studentsGrid = document.getElementById('studentsVideoGrid');
-                if (studentsGrid) {
-                    const isPortrait = orientation === 'portrait';
-                    studentsGrid.style.gridTemplateColumns = `repeat(auto-fill, minmax(${isPortrait ? '140px' : '160px'}, 1fr))`;
-                }
-                
-                // Adjust bottom sheet height
-                const bottomSheet = document.getElementById('mobileBottomSheet');
-                if (bottomSheet) {
-                    bottomSheet.style.maxHeight = orientation === 'landscape' ? '90vh' : '85vh';
-                }
-            }
-        };
-
-        // Screen resize handler
-        window.onScreenResize = function(width, height) {
-            logDebug(`Screen resized to ${width}x${height}`);
-            
-            // Update any responsive layouts
-            if (isMobileHost) {
-                // Update FAB position if needed
-                const fab = document.getElementById('mobileTeacherFab');
-                if (fab) {
-                    fab.style.bottom = height < 500 ? '15px' : '30px';
-                }
-            }
-        };
     </script>
 </body>
 </html>
