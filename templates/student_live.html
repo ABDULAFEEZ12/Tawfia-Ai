@@ -432,11 +432,6 @@
             background: #2ed573;
         }
 
-        .action-btn.raised {
-            background: #ff9800;
-            animation: pulse 2s infinite;
-        }
-
         .action-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -444,197 +439,9 @@
             box-shadow: none !important;
         }
 
-        /* Student Controls Panel */
-        .student-controls-panel {
-            background: #f8f9ff;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            border: 2px solid #667eea;
-        }
-
-        .control-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .struggle-signals {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .struggle-btn {
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .struggle-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .struggle-btn.confused {
-            background: #ffebee;
-            color: #d32f2f;
-            border: 1px solid #ffcdd2;
-        }
-
-        .struggle-btn.too-fast {
-            background: #fff3e0;
-            color: #f57c00;
-            border: 1px solid #ffe0b2;
-        }
-
-        .struggle-btn.got-it {
-            background: #e8f5e9;
-            color: #388e3c;
-            border: 1px solid #c8e6c9;
-        }
-
-        /* Quick Feedback System */
-        .quick-feedback-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #eaeaea;
-        }
-
-        .feedback-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .btn-feedback {
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .btn-feedback:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .text-feedback {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        #quickFeedbackText {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .btn-send {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .btn-send:hover {
-            background: #5a6fd8;
-        }
-
-        /* Raise Hand Button Styles */
-        .raise-hand-btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .raise-hand-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .raise-hand-btn.raised {
-            background: #ff9800;
-            animation: handPulse 2s infinite;
-        }
-
-        @keyframes handPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 152, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
-        }
-
-        .mic-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 10px;
-            background: #f0f4ff;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        .mic-status.pending {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .mic-status.approved {
-            background: #e8f5e9;
-            color: #388e3c;
-        }
-
-        .teacher-restriction {
-            background: #ffebee;
-            border-left: 4px solid #ff4757;
-            padding: 10px;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Notification System */
         .notification {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
             background: white;
             padding: 15px 25px;
@@ -665,10 +472,6 @@
             border-left: 4px solid #667eea;
         }
 
-        .notification.hand {
-            border-left: 4px solid #ff9800;
-        }
-
         .notification i {
             font-size: 24px;
         }
@@ -683,10 +486,6 @@
 
         .notification.info i {
             color: #667eea;
-        }
-
-        .notification.hand i {
-            color: #ff9800;
         }
 
         .empty-video {
@@ -758,46 +557,104 @@
             color: #00ff00;
         }
 
-        /* Active speaker notification */
-        .speaker-notification {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: rgba(255, 165, 2, 0.9);
-            color: white;
-            padding: 10px 15px;
+        /* NELAVISTA Student Controls */
+        .student-controls-panel {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px solid #667eea;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .struggle-signals {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .struggle-btn {
+            padding: 10px;
             border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .struggle-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .struggle-btn.confused {
+            background: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+        }
+
+        .struggle-btn.too-fast {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffe0b2;
+        }
+
+        .struggle-btn.got-it {
+            background: #e8f5e9;
+            color: #388e3c;
+            border: 1px solid #c8e6c9;
+        }
+
+        .mic-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .mic-status.pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .mic-status.approved {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .teacher-restriction {
+            background: #ffebee;
+            border-left: 4px solid #ff4757;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
             display: flex;
             align-items: center;
             gap: 10px;
-            z-index: 9999;
-            animation: slideIn 0.3s ease;
         }
 
-        /* Student notification for hand acknowledgment */
-        .student-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 10000;
-            animation: slideInRight 0.3s, fadeOut 0.3s 2.7s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        /* Active speaker notification */
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 165, 2, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 165, 2, 0.8); }
         }
-
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
+        
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
@@ -872,14 +729,6 @@
             .control-row {
                 flex-direction: column;
             }
-            
-            .feedback-buttons {
-                flex-direction: column;
-            }
-            
-            .btn-feedback {
-                min-width: 100%;
-            }
         }
     </style>
 </head>
@@ -943,11 +792,6 @@
                         <i class="fas fa-user-cog"></i> Your Controls
                     </h3>
                     
-                    <!-- Raise Hand Button -->
-                    <button class="raise-hand-btn" id="raiseHandBtn">
-                        <i class="fas fa-hand-paper"></i> ✋ Raise Hand
-                    </button>
-
                     <div class="control-row">
                         <button class="action-btn success" id="requestMicBtn">
                             <i class="fas fa-microphone"></i> Request to Speak
@@ -969,31 +813,10 @@
                         <!-- Will show teacher restrictions -->
                     </div>
 
-                    <!-- Quick Feedback System -->
-                    <div class="quick-feedback-section">
-                        <h4 style="margin-bottom: 15px; color: #666; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-comment-medical"></i> Quick Feedback
-                        </h4>
-                        
-                        <!-- Button Feedback -->
-                        <div class="feedback-buttons">
-                            <button class="btn-feedback" onclick="sendQuickFeedback('confused')">I'm confused 😕</button>
-                            <button class="btn-feedback" onclick="sendQuickFeedback('fast')">Too fast ⏩</button>
-                            <button class="btn-feedback" onclick="sendQuickFeedback('gotit')">I get it ✅</button>
-                        </div>
-                        
-                        <!-- Text Feedback -->
-                        <div class="text-feedback">
-                            <input type="text" 
-                                   id="quickFeedbackText" 
-                                   placeholder="Type quick feedback..."
-                                   maxlength="100">
-                            <button class="btn-send" onclick="sendTextFeedback()">Send</button>
-                        </div>
-                    </div>
-
-                    <!-- Original Struggle Signals (Kept for backward compatibility) -->
-                    <div class="struggle-signals" style="display: none;">
+                    <h4 style="margin-top: 20px; margin-bottom: 10px; color: #666;">
+                        <i class="fas fa-comment-medical"></i> Quick Feedback
+                    </h4>
+                    <div class="struggle-signals">
                         <button class="struggle-btn confused" onclick="sendStruggleSignal('confused')">
                             <i class="fas fa-question-circle"></i>
                             <span>I'm confused</span>
@@ -1021,6 +844,9 @@
                 </div>
 
                 <div class="controls">
+                    <button class="action-btn" id="raiseHand" disabled>
+                        <i class="fas fa-hand-paper"></i> Raise Hand
+                    </button>
                     <button class="action-btn danger" id="leaveClass">
                         <i class="fas fa-sign-out-alt"></i> Leave Class
                     </button>
@@ -1135,23 +961,6 @@
 
     <script>
         // ============================================
-        // Configuration
-        // ============================================
-        const DEBUG = false;
-        
-        function debugLog(...args) {
-            if (DEBUG) console.log(...args);
-        }
-        
-        function debugWarn(...args) {
-            if (DEBUG) console.warn(...args);
-        }
-        
-        function debugError(...args) {
-            if (DEBUG) console.error(...args);
-        }
-
-        // ============================================
         // Student WebRTC Mesh - Full Implementation
         // ============================================
 
@@ -1184,12 +993,6 @@
         };
 
         // ============================================
-        // Raise Hand & Feedback State
-        // ============================================
-        let handRaised = false;
-        let handRaiseTimeout = null;
-
-        // ============================================
         // DOM Elements
         // ============================================
         const teacherVideo = document.getElementById('teacherVideo');
@@ -1198,7 +1001,7 @@
         const videoLabel = document.getElementById('videoLabel');
         const toggleFullscreen = document.getElementById('toggleFullscreen');
         const toggleMute = document.getElementById('toggleMute');
-        const raiseHandBtn = document.getElementById('raiseHandBtn');
+        const raiseHand = document.getElementById('raiseHand');
         const toggleMyAudio = document.getElementById('toggleMyAudio');
         const toggleMyVideo = document.getElementById('toggleMyVideo');
         const requestMicBtn = document.getElementById('requestMicBtn');
@@ -1210,7 +1013,7 @@
         const sessionTimeElement = document.getElementById('sessionTime');
         const teacherNameElement = document.getElementById('teacherName');
         const notification = document.getElementById('notification');
-        const debugLogElement = document.getElementById('debugLog');
+        const debugLog = document.getElementById('debugLog');
         const streamQualityElement = document.getElementById('streamQuality');
         const connectionTypeElement = document.getElementById('connectionType');
         const audioPermissionElement = document.getElementById('audioPermission');
@@ -1220,7 +1023,6 @@
         const teacherStatusElement = document.getElementById('teacherStatus');
         const studentsOnlineElement = document.getElementById('studentsOnline');
         const activeConnectionsElement = document.getElementById('activeConnections');
-        const quickFeedbackText = document.getElementById('quickFeedbackText');
 
         // ============================================
         // WebRTC Configuration
@@ -1381,159 +1183,17 @@
             socket.on('questions-toggled', handleQuestionsToggled);
             socket.on('teacher-disconnected', handleTeacherDisconnected);
             
-            // NEW: Raise Hand & Feedback events
-            socket.on('hand-acknowledged', handleHandAcknowledged);
-            
             // Button events
             toggleFullscreen?.addEventListener('click', toggleFullscreenMode);
             toggleMute?.addEventListener('click', toggleVideoMute);
-            raiseHandBtn?.addEventListener('click', toggleRaiseHand);
+            raiseHand?.addEventListener('click', raiseHandAction);
             toggleMyAudio?.addEventListener('click', toggleStudentAudio);
             toggleMyVideo?.addEventListener('click', toggleStudentVideo);
             requestMicBtn?.addEventListener('click', requestMicrophone);
             leaveClass?.addEventListener('click', leaveClassroom);
             
-            // Text feedback input - allow Enter key
-            quickFeedbackText?.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendTextFeedback();
-                }
-            });
-            
             // Document events
             document.addEventListener('fullscreenchange', handleFullscreenChange);
-        }
-
-        // ============================================
-        // Raise Hand & Feedback System
-        // ============================================
-        function toggleRaiseHand() {
-            if (!roomState.questions_enabled) {
-                showNotification('error', 'Questions Disabled', 'Teacher has disabled questions');
-                return;
-            }
-            
-            if (!roomState.teacher_sid) {
-                showNotification('error', 'No Teacher', 'Teacher is not in the classroom');
-                return;
-            }
-            
-            if (!handRaised) {
-                // Raise hand
-                socket.emit('raise-hand', {
-                    room: roomId,
-                    studentName: studentName
-                });
-                
-                raiseHandBtn.innerHTML = '<i class="fas fa-hand-paper"></i> ✋ Hand Raised';
-                raiseHandBtn.classList.add('raised');
-                handRaised = true;
-                
-                // Auto lower after 60 seconds
-                if (handRaiseTimeout) {
-                    clearTimeout(handRaiseTimeout);
-                }
-                handRaiseTimeout = setTimeout(lowerHand, 60000);
-                
-                showNotification('hand', 'Hand Raised', 'Teacher has been notified');
-                logDebug('✋ Hand raised');
-            } else {
-                // Lower hand
-                lowerHand();
-            }
-        }
-        
-        function lowerHand() {
-            socket.emit('lower-hand', { room: roomId });
-            raiseHandBtn.innerHTML = '<i class="fas fa-hand-paper"></i> ✋ Raise Hand';
-            raiseHandBtn.classList.remove('raised');
-            handRaised = false;
-            
-            if (handRaiseTimeout) {
-                clearTimeout(handRaiseTimeout);
-                handRaiseTimeout = null;
-            }
-            
-            logDebug('✋ Hand lowered');
-        }
-        
-        function handleHandAcknowledged(data) {
-            const { teacher, message } = data;
-            showNotification('success', 'Hand Acknowledged', `${teacher} acknowledged your hand`);
-            
-            // Create visual notification
-            const notification = document.createElement('div');
-            notification.className = 'student-notification';
-            notification.textContent = `✓ ${message}`;
-            document.body.appendChild(notification);
-            
-            // Auto-remove notification
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 3000);
-            
-            // Automatically lower hand
-            lowerHand();
-            
-            logDebug('✅ Hand acknowledged by teacher');
-        }
-        
-        function sendQuickFeedback(type) {
-            if (!roomState.teacher_sid) {
-                showNotification('error', 'No Teacher', 'Teacher is not in the classroom');
-                return;
-            }
-            
-            socket.emit('student-feedback', {
-                room: roomId,
-                type: type,
-                studentName: studentName
-            });
-            
-            const messages = {
-                'confused': 'I\'m confused 😕',
-                'fast': 'Too fast ⏩',
-                'gotit': 'I get it ✅'
-            };
-            
-            showNotification('info', 'Feedback Sent', `Teacher notified: ${messages[type]}`);
-            logDebug(`Sent quick feedback: ${type}`);
-        }
-        
-        function sendTextFeedback() {
-            if (!quickFeedbackText) return;
-            
-            const text = quickFeedbackText.value.trim();
-            if (!text) {
-                showNotification('error', 'Empty Message', 'Please enter some feedback');
-                return;
-            }
-            
-            if (!roomState.teacher_sid) {
-                showNotification('error', 'No Teacher', 'Teacher is not in the classroom');
-                return;
-            }
-            
-            socket.emit('student-feedback', {
-                room: roomId,
-                type: 'text',
-                text: text,
-                studentName: studentName
-            });
-            
-            quickFeedbackText.value = '';
-            
-            // Show confirmation
-            const originalPlaceholder = quickFeedbackText.placeholder;
-            quickFeedbackText.placeholder = 'Feedback sent! ✓';
-            setTimeout(() => {
-                quickFeedbackText.placeholder = originalPlaceholder;
-            }, 2000);
-            
-            showNotification('info', 'Feedback Sent', 'Your feedback has been sent to the teacher');
-            logDebug(`Sent text feedback: ${text.substring(0, 50)}...`);
         }
 
         // ============================================
@@ -1650,11 +1310,6 @@
             teacherStatusElement.textContent = 'Offline';
             teacherStatusElement.style.color = '#ff4757';
             roomState.teacher_sid = null;
-            
-            // Lower hand if raised
-            if (handRaised) {
-                lowerHand();
-            }
         }
 
         // ============================================
@@ -2376,7 +2031,7 @@
                     break;
                 case 'connecting':
                     icon = 'fa-sync-alt fa-spin';
-                    color = '#f57c00;
+                    color = '#f57c00';
                     statusClass = 'connecting';
                     break;
                 case 'disconnected':
@@ -2461,7 +2116,6 @@
             logDebug('Requested microphone permission');
         }
 
-        // Legacy function for backward compatibility
         function sendStruggleSignal(signal) {
             if (!roomState.teacher_sid) {
                 showNotification('error', 'No Teacher', 'Teacher is not in the classroom');
@@ -2670,6 +2324,24 @@
             }
         }
 
+        function raiseHandAction() {
+            if (!roomState.questions_enabled) {
+                showNotification('error', 'Questions Disabled', 'Teacher has disabled questions');
+                return;
+            }
+            
+            showNotification('info', 'Hand Raised', 'Teacher has been notified that you have a question.');
+            logDebug('Raised hand');
+            
+            raiseHand.innerHTML = '<i class="fas fa-hand-paper fa-bounce"></i> Hand Raised';
+            raiseHand.disabled = true;
+            
+            setTimeout(() => {
+                raiseHand.innerHTML = '<i class="fas fa-hand-paper"></i> Raise Hand';
+                raiseHand.disabled = false;
+            }, 5000);
+        }
+
         function leaveClassroom() {
             if (confirm('Are you sure you want to leave the classroom?')) {
                 logDebug('Leaving classroom');
@@ -2699,11 +2371,6 @@
                     clearInterval(sessionTimer);
                 }
                 
-                // Clear raise hand timeout
-                if (handRaiseTimeout) {
-                    clearTimeout(handRaiseTimeout);
-                }
-                
                 // Disconnect socket
                 socket.disconnect();
                 
@@ -2718,8 +2385,7 @@
             const icons = {
                 success: 'fa-check-circle',
                 error: 'fa-exclamation-circle',
-                info: 'fa-info-circle',
-                hand: 'fa-hand-paper'
+                info: 'fa-info-circle'
             };
             
             notification.className = `notification ${type}`;
@@ -2740,7 +2406,7 @@
         }
 
         function logDebug(message, data) {
-            if (!DEBUG || !debugLogElement) return;
+            if (!debugLog) return;
             
             const timestamp = new Date().toLocaleTimeString();
             const logEntry = document.createElement('div');
@@ -2749,21 +2415,21 @@
                 <span class="debug-timestamp">[${timestamp}]</span>
                 <span class="debug-message">${message}</span>
             `;
-            debugLogElement.prepend(logEntry);
+            debugLog.prepend(logEntry);
             
             if (data) {
                 const dataEntry = document.createElement('div');
                 dataEntry.textContent = JSON.stringify(data, null, 2);
                 dataEntry.style.fontSize = '10px';
                 dataEntry.style.color = '#666';
-                debugLogElement.prepend(dataEntry);
+                debugLog.prepend(dataEntry);
             }
             
-            while (debugLogElement.children.length > 20) {
-                debugLogElement.removeChild(debugLogElement.lastChild);
+            while (debugLog.children.length > 20) {
+                debugLog.removeChild(debugLog.lastChild);
             }
             
-            debugLogElement.scrollTop = 0;
+            debugLog.scrollTop = 0;
             
             console.debug(`[${timestamp}] ${message}`);
         }
@@ -2790,11 +2456,6 @@
             // Close audio context
             if (sharedAudioContext) {
                 sharedAudioContext.close();
-            }
-            
-            // Clear raise hand timeout
-            if (handRaiseTimeout) {
-                clearTimeout(handRaiseTimeout);
             }
             
             // Disconnect socket
