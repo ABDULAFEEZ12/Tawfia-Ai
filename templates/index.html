@@ -620,21 +620,21 @@ video {
 <!-- SIDEBAR MENU -->
 <div id="side-menu" class="hidden">
   <ul>
-  <li><a href="/app/profile">👤 Profile</a></li>
-  <li><a href="/app/talk-to-tawfiq">🎙️ Talk to Tawfiq</a></li>
-  <li><a href="/app/live-meeting">🎙️ Live Meeting</a></li>
-  <li><a href="/app/prayer-times">🕌 Prayer Times</a></li>
-  <li><a href="/app/duas">🕌 Dua</a></li>
-  <li><a href="/app/reminder">📅 Daily Reminder</a></li>
-  <li><a href="/app/motivation">✨ Islamic Motivation</a></li>
-  <li><a href="/app/visual-quran">✨ Visual Quran</a></li>
-  <li><a href="/app/story-time">📖 Story Time</a></li> <!-- 🔥 Added here -->
-  <li><a href="/app/reels">📱 Reels</a></li>
-  <li><a href="/app/trivia">🎮 Play Game</a></li>
-  <li><a href="/app/settings">⚙️ Settings</a></li>
-  <li><a href="/app/privacy">🔒 Privacy & Policy</a></li>
-  <li><a href="/app/about">ℹ️ About Tawfiq AI</a></li>
-  <li><a href="/app/feedback">📢 Feedback / Report</a></li>
+  <li><a href="/profile">👤 Profile</a></li>
+  <li><a href="/talk-to-tawfiq">🎙️ Talk to Tawfiq</a></li>
+  <li><a href="/live-meeting">🎙️ Live Meeting</a></li>
+  <li><a href="/prayer-times">🕌 Prayer Times</a></li>
+  <li><a href="/duas">🕌 Dua</a></li>
+  <li><a href="/reminder">📅 Daily Reminder</a></li>
+  <li><a href="/motivation">✨ Islamic Motivation</a></li>
+  <li><a href="/visual-quran">✨ Visual Quran</a></li>
+  <li><a href="/story-time">📖 Story Time</a></li> <!-- 🔥 Added here -->
+  <li><a href="/reels">📱 Reels</a></li>
+  <li><a href="/trivia">🎮 Play Game</a></li>
+  <li><a href="/settings">⚙️ Settings</a></li>
+  <li><a href="/privacy">🔒 Privacy & Policy</a></li>
+  <li><a href="/about">ℹ️ About Tawfiq AI</a></li>
+  <li><a href="/feedback">📢 Feedback / Report</a></li>
 </ul>
 </div>
 
@@ -956,7 +956,7 @@ video {
 
   // Load prayer times
   function loadPrayerTimes() {
-    fetch('/app/get-prayer-times')
+    fetch('/get-prayer-times')
       .then(res => res.json())
       .then(data => {
         const container = document.getElementById('prayerTimesContent');
@@ -979,7 +979,7 @@ video {
 
   // Load Surah list
   function loadSurahList() {
-    fetch('/app/get-surah-list')
+    fetch('/get-surah-list')
       .then(res => res.json())
       .then(data => {
         const select = document.getElementById('surahList');
@@ -1190,7 +1190,7 @@ video {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
     try {
-      const response = await fetch("/app/ask", {
+      const response = await fetch("/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -1378,7 +1378,7 @@ video {
     resultDiv.appendChild(loading);
     quranSearchBtn.disabled = true;
 
-    fetch('/app/quran-surah', {
+    fetch('/quran-surah', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ surah_number: surahNumber })
@@ -1455,7 +1455,7 @@ video {
     resultDiv.appendChild(loading);
     hadithBtn.disabled = true;
 
-    fetch('/app/hadith-search', {
+    fetch('/hadith-search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query })
