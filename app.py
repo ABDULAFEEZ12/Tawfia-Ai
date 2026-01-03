@@ -1,38 +1,31 @@
-import eventlet
-eventlet.monkey_patch()
-print("✅ Eventlet monkey patch applied")
-
-# ============================================
-# Imports
-# ============================================
-import os
-import json
-from datetime import datetime
 from flask import (
     Flask, request, jsonify, render_template,
     redirect, url_for, session, flash,
     send_file, send_from_directory
 )
-from flask_socketio import SocketIO, join_room, emit, leave_room
-from flask_sqlalchemy import SQLAlchemy
-import uuid
+import os
+import json
 from dotenv import load_dotenv
 from hashlib import sha256
 import redis
 from functools import wraps
 from sqlalchemy import func
+from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from difflib import get_close_matches
+from flask_sqlalchemy import SQLAlchemy
 import requests
+from flask_socketio import SocketIO, join_room, emit, disconnect
 import ssl
 
 # Load environment variables
 load_dotenv()
 
-# ============================================
-# Flask App Configuration
-# ============================================
+print("✅ API KEY:", os.getenv("GOOGLE_NEWS_API_KEY"))
+print("✅ CX:", os.getenv("GOOGLE_CX"))
+
+# Initialize Flask app
 app = Flask(__name__)
 
 # Database Configuration with proper SSL for Render
@@ -46,34 +39,43 @@ if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Allow cookies in fetch
 app.config['SESSION_COOKIE_SECURE'] = False    # Only True if HTTPS
 app.config['SECRET_KEY'] = os.getenv('MY_SECRET', 'your-secret-key-here')
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL or 'sqlite:///app.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Debug mode - set to False in production
-DEBUG_MODE = True
-
-def debug_print(*args, **kwargs):
-    if DEBUG_MODE:
-        print(*args, **kwargs)
+# Use SQLite locally, PostgreSQL on Render with proper SSL
+if DATABASE_URL:
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+    # Render requires SSL for PostgreSQL
+    if 'render.com' in DATABASE_URL or os.getenv('RENDER'):
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'connect_args': {
+                'sslmode': 'require',
+                'sslrootcert': 'prod-ca-2021.crt'
+            },
+            'pool_recycle': 300,
+            'pool_pre_ping': True,
+            'pool_size': 10,
+            'max_overflow': 20,
+            'pool_timeout': 30
+        }
+else:
+    # Fallback to SQLite for local development
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
 
 # Initialize SQLAlchemy
 db = SQLAlchemy()
 db.init_app(app)
 
-# Initialize SocketIO with eventlet
+# Initialize SocketIO with proper settings
 socketio = SocketIO(
     app, 
     cors_allowed_origins="*",
-    async_mode='eventlet',
+    async_mode='threading',
     ping_timeout=60,
     ping_interval=25,
     logger=True,
     engineio_logger=True
 )
 
-# ============================================
-# Database Models
-# ============================================
+# --- Models ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -96,593 +98,26 @@ class UserQuestions(db.Model):
     answer = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-class Room(db.Model):
-    id = db.Column(db.String(32), primary_key=True)
-    teacher_id = db.Column(db.String(120))
-    teacher_name = db.Column(db.String(80))
-    is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-# Create tables
+# Create database tables
 with app.app_context():
-    db.create_all()
-    debug_print("✅ Database tables created")
-
-# ============================================
-# In-Memory Storage for Live Meeting
-# ============================================
-rooms = {}           # room_id -> room data
-participants = {}    # socket_id -> participant info
-room_authority = {}  # room_id -> authority state
-
-# ============================================
-# Helper Functions for Live Meeting
-# ============================================
-def get_or_create_room(room_id):
-    """Get existing room or create new one"""
-    if room_id not in rooms:
-        rooms[room_id] = {
-            'participants': {},      # socket_id -> {'username', 'role', 'joined_at'}
-            'teacher_sid': None,
-            'created_at': datetime.utcnow().isoformat()
-        }
-    return rooms[room_id]
-
-def get_room_authority(room_id):
-    """Get or create authority state for a room"""
-    if room_id not in room_authority:
-        room_authority[room_id] = {
-            'muted_all': False,
-            'cameras_disabled': False,
-            'mic_requests': {},
-            'questions_enabled': True,
-            'question_visibility': 'public'
-        }
-    return room_authority[room_id]
-
-def get_participants_list(room_id, exclude_sid=None):
-    """Get list of all participants in room except exclude_sid"""
-    if room_id not in rooms:
-        return []
-    
-    room = rooms[room_id]
-    result = []
-    
-    for sid, info in room['participants'].items():
-        if sid != exclude_sid:
-            result.append({
-                'sid': sid,
-                'username': info['username'],
-                'role': info['role']
-            })
-    
-    return result
-
-def cleanup_room(room_id):
-    """Remove empty rooms"""
-    if room_id in rooms:
-        room = rooms[room_id]
-        if not room['participants']:
-            del rooms[room_id]
-            if room_id in room_authority:
-                del room_authority[room_id]
-            with app.app_context():
-                Room.query.filter_by(id=room_id).delete()
+    try:
+        db.create_all()
+        print("✅ Database tables created successfully")
+        
+        # Create default user if not exists (only for SQLite)
+        if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
+            user = User.query.filter_by(username='zayd').first()
+            if not user:
+                user = User(username='zayd', email='zayd@example.com')
+                user.set_password('secure123')
+                db.session.add(user)
                 db.session.commit()
-
-# ============================================
-# Socket.IO Event Handlers for Live Meeting
-# ============================================
-@socketio.on('connect')
-def handle_connect():
-    sid = request.sid
-    # CRITICAL FIX: Join client to their private SID room for direct messaging
-    join_room(sid)
-    participants[sid] = {'room_id': None, 'username': None, 'role': None}
-    debug_print(f"✅ Client connected: {sid} (joined private room: {sid})")
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    sid = request.sid
-    
-    # Find which room this participant is in
-    participant = participants.get(sid)
-    if not participant:
-        return
-    
-    room_id = participant['room_id']
-    
-    if room_id in rooms:
-        room = rooms[room_id]
-        
-        # Notify all other participants
-        if sid in room['participants']:
-            participant_info = room['participants'][sid]
-            
-            # Remove from room
-            del room['participants'][sid]
-            
-            # Update teacher_sid if teacher left
-            if sid == room['teacher_sid']:
-                room['teacher_sid'] = None
-                # Notify students that teacher left
-                for participant_sid in room['participants']:
-                    if room['participants'][participant_sid]['role'] == 'student':
-                        emit('teacher-disconnected', room=participant_sid)
-            
-            # Notify others
-            emit('participant-left', {
-                'sid': sid,
-                'username': participant_info['username'],
-                'role': participant_info['role']
-            }, room=room_id, skip_sid=sid)
-            
-            debug_print(f"❌ {participant_info['username']} left room {room_id}")
-        
-        # Clean up empty room
-        cleanup_room(room_id)
-    
-    # Remove from participants
-    if sid in participants:
-        del participants[sid]
-
-@socketio.on('join-room')
-def handle_join_room(data):
-    """Join room and get all existing participants"""
-    try:
-        sid = request.sid
-        room_id = data.get('room')
-        role = data.get('role', 'student')
-        username = data.get('username', 'Teacher' if role == 'teacher' else f'Student_{sid[:6]}')
-        
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        debug_print(f"👤 {username} ({role}) joining room: {room_id}")
-        
-        room = get_or_create_room(room_id)
-        authority_state = get_room_authority(room_id)
-        
-        # Check if teacher already exists
-        if role == 'teacher' and room['teacher_sid']:
-            emit('error', {'message': 'Room already has a teacher'})
-            return
-        
-        # Add to room
-        room['participants'][sid] = {
-            'username': username,
-            'role': role,
-            'joined_at': datetime.utcnow().isoformat()
-        }
-        
-        # Update teacher reference
-        if role == 'teacher':
-            room['teacher_sid'] = sid
-            authority_state['teacher_sid'] = sid
-            
-            with app.app_context():
-                existing_room = Room.query.get(room_id)
-                if not existing_room:
-                    room_db = Room(
-                        id=room_id,
-                        teacher_id=sid,
-                        teacher_name=username,
-                        is_active=True
-                    )
-                    db.session.add(room_db)
-                else:
-                    existing_room.teacher_id = sid
-                    existing_room.teacher_name = username
-                db.session.commit()
-            
-            # Notify all students that teacher joined
-            for participant_sid in room['participants']:
-                if room['participants'][participant_sid]['role'] == 'student':
-                    emit('teacher-joined', {
-                        'teacher_sid': sid,
-                        'teacher_name': username
-                    }, room=participant_sid)
-        
-        # Update participant info
-        participants[sid] = {
-            'room_id': room_id,
-            'username': username,
-            'role': role
-        }
-        
-        # Join the socket room
-        join_room(room_id)
-        
-        # Get all existing participants (excluding self)
-        existing_participants = get_participants_list(room_id, exclude_sid=sid)
-        
-        # Send room joined confirmation
-        emit('room-joined', {
-            'room': room_id,
-            'sid': sid,
-            'username': username,
-            'role': role,
-            'existing_participants': existing_participants,
-            'teacher_sid': room['teacher_sid'],
-            'is_waiting': (role == 'student' and not room['teacher_sid'])
-        })
-        
-        # Notify all other participants about new joiner
-        emit('new-participant', {
-            'sid': sid,
-            'username': username,
-            'role': role
-        }, room=room_id, skip_sid=sid)
-        
-        # Send authority state if student and teacher exists
-        if role == 'student' and room['teacher_sid']:
-            emit('room-state', {
-                'muted_all': authority_state['muted_all'],
-                'cameras_disabled': authority_state['cameras_disabled'],
-                'questions_enabled': authority_state['questions_enabled'],
-                'question_visibility': authority_state['question_visibility']
-            })
-        
-        # Log room status
-        debug_print(f"✅ {username} joined room {room_id}. Total participants: {len(room['participants'])}")
-        
+                print("✅ Default user created")
     except Exception as e:
-        debug_print(f"❌ Error in join-room: {e}")
-        emit('error', {'message': str(e)})
+        print(f"⚠️ Database initialization error: {e}")
+        print("⚠️ Continuing without database...")
 
-# ============================================
-# WebRTC Signaling - Full Mesh Support
-# ============================================
-@socketio.on('webrtc-offer')
-def handle_webrtc_offer(data):
-    """Relay WebRTC offer to specific participant"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        offer = data.get('offer')
-        
-        if not all([room_id, target_sid, offer]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        debug_print(f"📨 {request.sid[:8]} → offer → {target_sid[:8]}")
-        
-        emit('webrtc-offer', {
-            'from_sid': request.sid,
-            'offer': offer,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        debug_print(f"❌ Error relaying offer: {e}")
-
-@socketio.on('webrtc-answer')
-def handle_webrtc_answer(data):
-    """Relay WebRTC answer to specific participant"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        answer = data.get('answer')
-        
-        if not all([room_id, target_sid, answer]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        debug_print(f"📨 {request.sid[:8]} → answer → {target_sid[:8]}")
-        
-        emit('webrtc-answer', {
-            'from_sid': request.sid,
-            'answer': answer,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        debug_print(f"❌ Error relaying answer: {e}")
-
-@socketio.on('webrtc-ice-candidate')
-def handle_webrtc_ice_candidate(data):
-    """Relay ICE candidate to specific participant"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        candidate = data.get('candidate')
-        
-        if not all([room_id, target_sid, candidate]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        debug_print(f"📨 {request.sid[:8]} → ICE → {target_sid[:8]}")
-        
-        emit('webrtc-ice-candidate', {
-            'from_sid': request.sid,
-            'candidate': candidate,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        debug_print(f"❌ Error relaying ICE candidate: {e}")
-
-# ============================================
-# Full Mesh Initiation System
-# ============================================
-@socketio.on('request-full-mesh')
-def handle_request_full_mesh(data):
-    """Initiate full mesh connections between all participants"""
-    try:
-        room_id = data.get('room')
-        sid = request.sid
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        
-        # Verify participant is in room
-        if sid not in room['participants']:
-            return
-        
-        # Get all other participants in room
-        other_participants = []
-        for other_sid, info in room['participants'].items():
-            if other_sid != sid:
-                other_participants.append({
-                    'sid': other_sid,
-                    'username': info['username'],
-                    'role': info['role']
-                })
-        
-        # Send list of peers to connect to
-        emit('initiate-mesh-connections', {
-            'peers': other_participants,
-            'room': room_id
-        }, room=sid)
-        
-        debug_print(f"🔗 Initiating full mesh for {sid[:8]} with {len(other_participants)} peers")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in request-full-mesh: {e}")
-
-# ============================================
-# Teacher Authority System
-# ============================================
-@socketio.on('teacher-mute-all')
-def handle_teacher_mute_all(data):
-    """Teacher mutes all students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        # Verify this is the teacher
-        if teacher_sid != room['teacher_sid']:
-            return
-        
-        authority = get_room_authority(room_id)
-        authority['muted_all'] = True
-        
-        # Notify all students
-        for sid in room['participants']:
-            if room['participants'][sid]['role'] == 'student':
-                emit('room-muted', {'muted': True}, room=sid)
-        
-        debug_print(f"🔇 Teacher muted all in room {room_id}")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in teacher-mute-all: {e}")
-
-@socketio.on('teacher-unmute-all')
-def handle_teacher_unmute_all(data):
-    """Teacher unmutes all students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            return
-        
-        authority = get_room_authority(room_id)
-        authority['muted_all'] = False
-        
-        for sid in room['participants']:
-            if room['participants'][sid]['role'] == 'student':
-                emit('room-muted', {'muted': False}, room=sid)
-        
-        debug_print(f"🔊 Teacher unmuted all in room {room_id}")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in teacher-unmute-all: {e}")
-
-# ============================================
-# Control Events
-# ============================================
-@socketio.on('start-broadcast')
-def handle_start_broadcast(data):
-    """Teacher starts broadcasting to all students"""
-    try:
-        room_id = data.get('room')
-        
-        if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can start broadcast'})
-            return
-        
-        debug_print(f"📢 Teacher starting broadcast in room: {room_id}")
-        
-        # Get all student SIDs
-        student_sids = []
-        student_info = []
-        for sid, info in room['participants'].items():
-            if info['role'] == 'student':
-                student_sids.append(sid)
-                student_info.append({
-                    'sid': sid,
-                    'username': info['username']
-                })
-        
-        # Notify teacher
-        emit('broadcast-ready', {
-            'student_sids': student_sids,
-            'student_info': student_info,
-            'student_count': len(student_sids),
-            'room': room_id
-        }, room=teacher_sid)
-        
-        # Initiate WebRTC connections for each student
-        for student_sid in student_sids:
-            # Send list of all peers to connect to (full mesh)
-            peers_to_connect = []
-            for other_sid in room['participants']:
-                if other_sid != student_sid:  # Don't connect to self
-                    peers_to_connect.append({
-                        'sid': other_sid,
-                        'username': room['participants'][other_sid]['username'],
-                        'role': room['participants'][other_sid]['role']
-                    })
-            
-            emit('initiate-full-mesh', {
-                'peers': peers_to_connect,
-                'teacher_sid': teacher_sid,
-                'room': room_id
-            }, room=student_sid)
-        
-    except Exception as e:
-        debug_print(f"❌ Error in start-broadcast: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('ping')
-def handle_ping(data):
-    """Keep-alive ping"""
-    emit('pong', {'timestamp': datetime.utcnow().isoformat()})
-
-# ============================================
-# Redis Cache Setup
-# ============================================
-redis_host = os.getenv("REDIS_HOST", "localhost")
-redis_port = int(os.getenv("REDIS_PORT", 6379))
-redis_db = int(os.getenv("REDIS_DB", 0))
-redis_password = os.getenv("REDIS_PASSWORD", None)
-
-try:
-    r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_password, decode_responses=True)
-    r.ping()
-    print("✅ Redis connected successfully")
-except:
-    print("⚠️ Redis not available, using in-memory cache")
-    r = None
-
-# ============================================
-# File-Based Cache
-# ============================================
-CACHE_FILE = "tawfiq_cache.json"
-
-if os.path.exists(CACHE_FILE):
-    try:
-        with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            question_cache = json.load(f)
-    except json.JSONDecodeError:
-        question_cache = {}
-else:
-    question_cache = {}
-
-def save_cache():
-    with open(CACHE_FILE, "w", encoding="utf-8") as f:
-        json.dump(question_cache, f, indent=2, ensure_ascii=False)
-
-# ============================================
-# Load JSON datasets
-# ============================================
-def load_json_data(file_name, data_variable_name):
-    data = {}
-    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
-    print(f"Attempting to load {data_variable_name} data from: {file_path}")
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        print(f"✅ Successfully loaded {data_variable_name} data")
-    except FileNotFoundError:
-        print(f"❌ ERROR: {data_variable_name} data file not found at {file_path}")
-    except json.JSONDecodeError as e:
-        print(f"❌ JSON Decode Error in {file_path}: {e}")
-        if 'daily_duas' in file_name:
-            data = {"duas": []}
-    except Exception as e:
-        print(f"❌ Unexpected error while loading {file_name}: {e}")
-    return data
-
-# Load datasets
-hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
-basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
-friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
-daily_duas = load_json_data('daily_duas.json', 'Daily Duas')
-islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivation')
-
-# ============================================
-# OpenRouter API Key
-# ============================================
-openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-if not openrouter_api_key:
-    print("⚠️ OPENROUTER_API_KEY environment variable not set.")
-
-# ============================================
-# Flask Routes
-# ============================================
-@app.route('/')
-def index():
-    user = session.get('user')
-    if not user:
-        return redirect(url_for('login'))
-
-    username = user['username']
-    questions = get_questions_for_user(username)
-    
-    if questions is None:
-        questions = []
-
-    return render_template('index.html', user=user, questions=questions)
-
+# --- Get Questions for User with error handling ---
 def get_questions_for_user(username):
     try:
         with app.app_context():
@@ -703,6 +138,7 @@ def get_questions_for_user(username):
         print(f"⚠️ Database error in get_questions_for_user: {e}")
         return []
 
+# --- Save a Question and Answer for a User ---
 def save_question_and_answer(username, question, answer):
     try:
         with app.app_context():
@@ -730,6 +166,83 @@ def save_question_and_answer(username, question, answer):
             db.session.rollback()
         except:
             pass
+
+# --- Redis Cache Setup ---
+redis_host = os.getenv("REDIS_HOST", "localhost")
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+redis_db = int(os.getenv("REDIS_DB", 0))
+redis_password = os.getenv("REDIS_PASSWORD", None)
+
+try:
+    r = redis.Redis(host=redis_host, port=redis_port, db=redis_db, password=redis_password, decode_responses=True)
+    r.ping()
+    print("✅ Redis connected successfully")
+except:
+    print("⚠️ Redis not available, using in-memory cache")
+    r = None
+
+# --- File-Based Cache ---
+CACHE_FILE = "tawfiq_cache.json"
+
+if os.path.exists(CACHE_FILE):
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            question_cache = json.load(f)
+    except json.JSONDecodeError:
+        question_cache = {}
+else:
+    question_cache = {}
+
+def save_cache():
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        json.dump(question_cache, f, indent=2, ensure_ascii=False)
+
+# --- Load JSON datasets ---
+def load_json_data(file_name, data_variable_name):
+    data = {}
+    file_path = os.path.join(os.path.dirname(__file__), 'DATA', file_name)
+    print(f"Attempting to load {data_variable_name} data from: {file_path}")
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        print(f"✅ Successfully loaded {data_variable_name} data")
+    except FileNotFoundError:
+        print(f"❌ ERROR: {data_variable_name} data file not found at {file_path}")
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON Decode Error in {file_path}: {e}")
+        if 'daily_duas' in file_name:
+            data = {"duas": []}
+    except Exception as e:
+        print(f"❌ Unexpected error while loading {file_name}: {e}")
+    return data
+
+# Load datasets
+hadith_data = load_json_data('sahih_bukhari_coded.json', 'Hadith')
+basic_knowledge_data = load_json_data('basic_islamic_knowledge.json', 'Basic Islamic Knowledge')
+friendly_responses_data = load_json_data('friendly_responses.json', 'Friendly Responses')
+daily_duas = load_json_data('daily_duas.json', 'Daily Duas')
+islamic_motivation = load_json_data('islamic_motivation.json', 'Islamic Motivation')
+
+# --- OpenRouter API Key ---
+openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+if not openrouter_api_key:
+    print("⚠️ OPENROUTER_API_KEY environment variable not set.")
+
+# --- Flask Routes and Logic ---
+
+@app.route('/')
+def index():
+    user = session.get('user')
+    if not user:
+        return redirect(url_for('login'))
+
+    username = user['username']
+    questions = get_questions_for_user(username)
+    
+    if questions is None:
+        questions = []
+
+    return render_template('index.html', user=user, questions=questions)
 
 @app.route('/test-db')
 def test_db():
@@ -892,131 +405,7 @@ def logout():
 def forgot_password():
     return render_template('forgot_password.html')
 
-# ============================================
-# Live Meeting Routes
-# ============================================
-@app.route('/teacher')
-def teacher_create():
-    room_id = str(uuid.uuid4())[:8]
-    return redirect(f'/teacher/{room_id}')
-
-@app.route('/teacher/<room_id>')
-def teacher_view(room_id):
-    return render_template('teacher.html', room_id=room_id)
-
-@app.route('/student/<room_id>')
-def student_view(room_id):
-    return render_template('student.html', room_id=room_id)
-
-@app.route('/join', methods=['POST'])
-def join_room_post():
-    room_id = request.form.get('room_id', '').strip()
-    if not room_id:
-        flash('Please enter a room ID')
-        return redirect('/')
-    return redirect(f'/student/{room_id}')
-
-@app.route('/live-meeting')
-@app.route('/live_meeting')
-def live_meeting():
-    return render_template('live_meeting.html')
-
-@app.route('/live-meeting/teacher')
-@app.route('/live_meeting/teacher')
-def live_meeting_teacher_create():
-    room_id = str(uuid.uuid4())[:8]
-    return redirect(url_for('live_meeting_teacher_view', room_id=room_id))
-
-@app.route('/live-meeting/teacher/<room_id>')
-@app.route('/live_meeting/teacher/<room_id>')
-def live_meeting_teacher_view(room_id):
-    return render_template('teacher_live.html', room_id=room_id)
-
-@app.route('/live-meeting/student/<room_id>')
-@app.route('/live_meeting/student/<room_id>')
-def live_meeting_student_view(room_id):
-    return render_template('student_live.html', room_id=room_id)
-
-@app.route('/live-meeting/join', methods=['POST'])
-@app.route('/live_meeting/join', methods=['POST'])
-def live_meeting_join():
-    room_id = request.form.get('room_id', '').strip()
-    username = request.form.get('username', '').strip()
-    
-    if not room_id:
-        flash('Please enter a meeting ID')
-        return redirect('/live_meeting')
-    
-    if not username:
-        username = f"Student_{str(uuid.uuid4())[:4]}"
-    
-    session['live_username'] = username
-    
-    return redirect(url_for('live_meeting_student_view', room_id=room_id))
-
-# ============================================
-# Connection Test Route
-# ============================================
-@app.route('/test-connection')
-def test_connection():
-    """Simple connection test page"""
-    return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Connection Test</title>
-        <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
-    </head>
-    <body>
-        <h1>Socket.IO Connection Test</h1>
-        <div id="status">Connecting...</div>
-        <div id="events"></div>
-        
-        <script>
-            const socket = io();
-            
-            socket.on('connect', () => {
-                document.getElementById('status').innerHTML = '✅ Connected! SID: ' + socket.id;
-                logEvent('Connected to server');
-            });
-            
-            socket.on('disconnect', () => {
-                document.getElementById('status').innerHTML = '❌ Disconnected';
-                logEvent('Disconnected from server');
-            });
-            
-            socket.on('connect_error', (error) => {
-                document.getElementById('status').innerHTML = '❌ Connection Error';
-                logEvent('Error: ' + error.message);
-            });
-            
-            function logEvent(msg) {
-                const eventsDiv = document.getElementById('events');
-                eventsDiv.innerHTML = new Date().toLocaleTimeString() + ': ' + msg + '<br>' + eventsDiv.innerHTML;
-            }
-        </script>
-    </body>
-    </html>
-    """
-
-# ============================================
-# Debug Route
-# ============================================
-@app.route('/debug/rooms')
-def debug_rooms():
-    """Debug endpoint to view current room states"""
-    debug_info = {
-        'rooms': rooms,
-        'participants': participants,
-        'room_authority': room_authority,
-        'total_rooms': len(rooms),
-        'total_participants': len(participants)
-    }
-    return json.dumps(debug_info, indent=2, default=str)
-
-# ============================================
-# Trivia Levels
-# ============================================
+# --- Trivia Levels ---
 levels = {
     1: [
         {
@@ -1045,7 +434,538 @@ levels = {
             "answer": "Khadijah"
         }
     ],
-    # ... (truncated for brevity, include all 20 levels from original)
+
+    2: [
+        {
+            "question": "What is the name of the Islamic month of fasting?",
+            "options": ["Shawwal", "Ramadan", "Muharram", "Dhul-Hijjah"],
+            "answer": "Ramadan"
+        },
+        {
+            "question": "Which prophet is known as the 'Father of Arabs'?",
+            "options": ["Ismail", "Ibrahim", "Ishaq", "Yaqub"],
+            "answer": "Ismail"
+        },
+        {
+            "question": "How many times is the name 'Muhammad' mentioned in the Quran?",
+            "options": ["4", "5", "6", "7"],
+            "answer": "4"
+        },
+        {
+            "question": "What is the term for the Islamic declaration of faith?",
+            "options": ["Takbir", "Shahada", "Tahlil", "Tasbih"],
+            "answer": "Shahada"
+        },
+        {
+            "question": "Which angel will blow the trumpet on Judgment Day?",
+            "options": ["Jibril", "Mikail", "Israfil", "Malik"],
+            "answer": "Israfil"
+        }
+    ],
+
+    3: [
+        {
+            "question": "What is the name of the well in Mecca that appeared for Hajar and Ismail?",
+            "options": ["Zamzam", "Ayn Zubaydah", "Bir Ali", "Qanatir"],
+            "answer": "Zamzam"
+        },
+        {
+            "question": "Which Surah is known as 'The Heart of the Quran'?",
+            "options": ["Yasin", "Al-Fatiha", "Al-Baqarah", "Al-Ikhlas"],
+            "answer": "Yasin"
+        },
+        {
+            "question": "How many Rak'ahs are in Maghrib prayer?",
+            "options": ["2", "3", "4", "5"],
+            "answer": "3"
+        },
+        {
+            "question": "What is the term for the Islamic pilgrimage to Mecca?",
+            "options": ["Umrah", "Hajj", "Tawaf", "Sa'i"],
+            "answer": "Hajj"
+        },
+        {
+            "question": "Which prophet is known for building the Ark?",
+            "options": ["Nuh", "Musa", "Yusuf", "Ibrahim"],
+            "answer": "Nuh"
+        }
+    ],
+
+    4: [
+        {
+            "question": "What is the name of the black stone in the Kaaba?",
+            "options": ["Maqam Ibrahim", "Hajar al-Aswad", "Rukn Yamani", "Hijr Ismail"],
+            "answer": "Hajar al-Aswad"
+        },
+        {
+            "question": "Which Surah begins with 'Alif Lam Meem'?",
+            "options": ["Al-Baqarah", "Al-Imran", "Al-Fatiha", "Yasin"],
+            "answer": "Al-Baqarah"
+        },
+        {
+            "question": "What is the term for the Islamic charity given at Eid?",
+            "options": ["Zakat al-Mal", "Zakat al-Fitr", "Sadaqah", "Kaffarah"],
+            "answer": "Zakat al-Fitr"
+        },
+        {
+            "question": "Which prophet is called 'Kalimullah' (Speaker with Allah)?",
+            "options": ["Musa", "Ibrahim", "Isa", "Dawud"],
+            "answer": "Musa"
+        },
+        {
+            "question": "How many Surahs are in the 30th Juz of the Quran?",
+            "options": ["34", "36", "37", "38"],
+            "answer": "37"
+        }
+    ],
+
+    5: [
+        {
+            "question": "What is the name of the Prophet's night journey from Mecca to Jerusalem?",
+            "options": ["Hijrah", "Isra", "Miraj", "Ghazwa"],
+            "answer": "Isra"
+        },
+        {
+            "question": "Which Surah is called 'The Sovereignty'?",
+            "options": ["Al-Mulk", "Al-Waqi'ah", "Al-Qalam", "Al-Hadid"],
+            "answer": "Al-Mulk"
+        },
+        {
+            "question": "What is the term for the Islamic pre-dawn meal in Ramadan?",
+            "options": ["Iftar", "Suhoor", "Taraweeh", "Qiyam"],
+            "answer": "Suhoor"
+        },
+        {
+            "question": "Which companion was known as 'The Lion of Allah'?",
+            "options": ["Umar", "Ali", "Hamza", "Khalid"],
+            "answer": "Hamza"
+        },
+        {
+            "question": "How many times is 'Bismillah' repeated in the Quran?",
+            "options": ["112", "113", "114", "115"],
+            "answer": "114"
+        }
+    ],
+
+    6: [
+        {
+            "question": "Which prophet is known for his patience in the face of illness?",
+            "options": ["Ayyub", "Yunus", "Yusuf", "Ibrahim"],
+            "answer": "Ayyub"
+        },
+        {
+            "question": "What is the name of the Islamic prayer performed at night in Ramadan?",
+            "options": ["Tahajjud", "Taraweeh", "Witr", "Qiyam"],
+            "answer": "Taraweeh"
+        },
+        {
+            "question": "Which Surah is known as 'The Cow'?",
+            "options": ["Al-Baqarah", "Al-Imran", "An-Nisa", "Al-Ma'idah"],
+            "answer": "Al-Baqarah"
+        },
+        {
+            "question": "What is the term for the Islamic funeral prayer?",
+            "options": ["Janazah", "Taraweeh", "Tahajjud", "Witr"],
+            "answer": "Janazah"
+        },
+        {
+            "question": "Which city was the first capital of Islam?",
+            "options": ["Mecca", "Medina", "Kufa", "Damascus"],
+            "answer": "Medina"
+        }
+    ],
+
+    7: [
+        {
+            "question": "What is the name of the Islamic festival marking the end of Ramadan?",
+            "options": ["Eid al-Adha", "Eid al-Fitr", "Mawlid", "Laylat al-Qadr"],
+            "answer": "Eid al-Fitr"
+        },
+        {
+            "question": "Which prophet is known for his beautiful voice and the Psalms?",
+            "options": ["Dawud", "Sulaiman", "Musa", "Yusuf"],
+            "answer": "Dawud"
+        },
+        {
+            "question": "What is the term for the Islamic ruling on permissible and forbidden?",
+            "options": ["Halal & Haram", "Sunnah & Bid'ah", "Fard & Mustahabb", "Makruh & Mubah"],
+            "answer": "Halal & Haram"
+        },
+        {
+            "question": "Which Surah is known as 'The Purity'?",
+            "options": ["Al-Ikhlas", "Al-Falaq", "An-Nas", "Al-Kafirun"],
+            "answer": "Al-Ikhlas"
+        },
+        {
+            "question": "Who was the first male to accept Islam?",
+            "options": ["Abu Bakr", "Ali", "Zayd", "Umar"],
+            "answer": "Abu Bakr"
+        }
+    ],
+
+    8: [
+        {
+            "question": "What is the name of the Islamic festival of sacrifice?",
+            "options": ["Eid al-Fitr", "Eid al-Adha", "Mawlid", "Laylat al-Qadr"],
+            "answer": "Eid al-Adha"
+        },
+        {
+            "question": "Which prophet is known for his wisdom and the story of the two women?",
+            "options": ["Sulaiman", "Dawud", "Yusuf", "Ibrahim"],
+            "answer": "Sulaiman"
+        },
+        {
+            "question": "What is the term for the Islamic concept of divine decree?",
+            "options": ["Qadr", "Tawakkul", "Tawhid", "Akhirah"],
+            "answer": "Qadr"
+        },
+        {
+            "question": "Which Surah is known as 'The Light'?",
+            "options": ["An-Nur", "Al-Hadid", "Al-Mumtahanah", "Al-Ahzab"],
+            "answer": "An-Nur"
+        },
+        {
+            "question": "Who was the Prophet's foster mother?",
+            "options": ["Halimah", "Amina", "Khadijah", "Sumayyah"],
+            "answer": "Halimah"
+        }
+    ],
+
+    9: [
+        {
+            "question": "What is the name of the Islamic prayer performed at dawn?",
+            "options": ["Fajr", "Dhuhr", "Asr", "Maghrib"],
+            "answer": "Fajr"
+        },
+        {
+            "question": "Which prophet is known for interpreting dreams?",
+            "options": ["Yusuf", "Sulaiman", "Ibrahim", "Dawud"],
+            "answer": "Yusuf"
+        },
+        {
+            "question": "What is the term for the Islamic call to prayer?",
+            "options": ["Iqamah", "Adhan", "Takbir", "Tahlil"],
+            "answer": "Adhan"
+        },
+        {
+            "question": "Which Surah is known as 'The Dawn'?",
+            "options": ["Al-Falaq", "An-Nas", "Al-Ikhlas", "Al-Kafirun"],
+            "answer": "Al-Falaq"
+        },
+        {
+            "question": "Who was the first martyr in Islam?",
+            "options": ["Sumayyah", "Bilal", "Hamza", "Umar"],
+            "answer": "Sumayyah"
+        }
+    ],
+
+    10: [
+        {
+            "question": "What is the name of the Islamic prayer performed at midday?",
+            "options": ["Dhuhr", "Asr", "Fajr", "Isha"],
+            "answer": "Dhuhr"
+        },
+        {
+            "question": "Which prophet is known for his patience and the story of the whale?",
+            "options": ["Yunus", "Musa", "Yusuf", "Ayyub"],
+            "answer": "Yunus"
+        },
+        {
+            "question": "What is the term for the Islamic fast-breaking meal?",
+            "options": ["Suhoor", "Iftar", "Taraweeh", "Qiyam"],
+            "answer": "Iftar"
+        },
+        {
+            "question": "Which Surah is known as 'The People'?",
+            "options": ["An-Nas", "Al-Falaq", "Al-Ikhlas", "Al-Kafirun"],
+            "answer": "An-Nas"
+        },
+        {
+            "question": "Who was the first caliph after Prophet Muhammad?",
+            "options": ["Umar", "Abu Bakr", "Ali", "Uthman"],
+            "answer": "Abu Bakr"
+        }
+    ],
+
+    11: [
+        {
+            "question": "What is the name of the Islamic prayer performed in the late afternoon?",
+            "options": ["Asr", "Dhuhr", "Maghrib", "Isha"],
+            "answer": "Asr"
+        },
+        {
+            "question": "Which prophet is known for his staff and parting the sea?",
+            "options": ["Musa", "Yusuf", "Nuh", "Yunus"],
+            "answer": "Musa"
+        },
+        {
+            "question": "What is the term for the Islamic tax on wealth?",
+            "options": ["Sadaqah", "Zakat", "Kaffarah", "Fitrah"],
+            "answer": "Zakat"
+        },
+        {
+            "question": "Which Surah is known as 'The Iron'?",
+            "options": ["Al-Hadid", "Al-Waqi'ah", "Al-Qalam", "Al-Mulk"],
+            "answer": "Al-Hadid"
+        },
+        {
+            "question": "Who was the first female scholar of Islam?",
+            "options": ["Aisha", "Khadijah", "Fatimah", "Hafsa"],
+            "answer": "Aisha"
+        }
+    ],
+
+    12: [
+        {
+            "question": "What is the name of the Islamic prayer performed after sunset?",
+            "options": ["Maghrib", "Isha", "Fajr", "Dhuhr"],
+            "answer": "Maghrib"
+        },
+        {
+            "question": "Which prophet is known for his kingdom and the hoopoe bird?",
+            "options": ["Sulaiman", "Dawud", "Yusuf", "Ibrahim"],
+            "answer": "Sulaiman"
+        },
+        {
+            "question": "What is the term for the Islamic concept of gratitude?",
+            "options": ["Shukr", "Sabr", "Tawakkul", "Ihsan"],
+            "answer": "Shukr"
+        },
+        {
+            "question": "Which Surah is known as 'The Inevitable'?",
+            "options": ["Al-Waqi'ah", "Al-Qiyamah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Waqi'ah"
+        },
+        {
+            "question": "Who was the first person to compile the Quran into a book?",
+            "options": ["Abu Bakr", "Umar", "Uthman", "Ali"],
+            "answer": "Abu Bakr"
+        }
+    ],
+
+    13: [
+        {
+            "question": "What is the name of the Islamic prayer performed at night?",
+            "options": ["Isha", "Tahajjud", "Taraweeh", "Witr"],
+            "answer": "Isha"
+        },
+        {
+            "question": "Which prophet is known for his cloak and the two gardens?",
+            "options": ["Yusuf", "Sulaiman", "Dawud", "Ibrahim"],
+            "answer": "Yusuf"
+        },
+        {
+            "question": "What is the term for the Islamic concept of reliance on Allah?",
+            "options": ["Tawakkul", "Sabr", "Shukr", "Ihsan"],
+            "answer": "Tawakkul"
+        },
+        {
+            "question": "Which Surah is known as 'The Resurrection'?",
+            "options": ["Al-Qiyamah", "Al-Waqi'ah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Qiyamah"
+        },
+        {
+            "question": "Who was the first person to memorize the entire Quran?",
+            "options": ["Hafsa", "Aisha", "Uthman", "Ali"],
+            "answer": "Hafsa"
+        }
+    ],
+
+    14: [
+        {
+            "question": "What is the name of the Islamic prayer performed during funerals?",
+            "options": ["Janazah", "Taraweeh", "Tahajjud", "Witr"],
+            "answer": "Janazah"
+        },
+        {
+            "question": "Which prophet is known for his ring and control over jinn?",
+            "options": ["Sulaiman", "Dawud", "Yusuf", "Ibrahim"],
+            "answer": "Sulaiman"
+        },
+        {
+            "question": "What is the term for the Islamic concept of excellence in worship?",
+            "options": ["Ihsan", "Iman", "Islam", "Taqwa"],
+            "answer": "Ihsan"
+        },
+        {
+            "question": "Which Surah is known as 'The Event'?",
+            "options": ["Al-Waqi'ah", "Al-Qiyamah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Waqi'ah"
+        },
+        {
+            "question": "Who was the first person to lead prayers in the Prophet's absence?",
+            "options": ["Abu Bakr", "Umar", "Ali", "Bilal"],
+            "answer": "Abu Bakr"
+        }
+    ],
+
+    15: [
+        {
+            "question": "What is the name of the Islamic prayer performed during Eid?",
+            "options": ["Eid Salah", "Taraweeh", "Janazah", "Witr"],
+            "answer": "Eid Salah"
+        },
+        {
+            "question": "Which prophet is known for his patience and the story of the cow?",
+            "options": ["Musa", "Yusuf", "Ibrahim", "Nuh"],
+            "answer": "Musa"
+        },
+        {
+            "question": "What is the term for the Islamic concept of spiritual excellence?",
+            "options": ["Taqwa", "Ihsan", "Iman", "Tawhid"],
+            "answer": "Ihsan"
+        },
+        {
+            "question": "Which Surah is known as 'The Overwhelming'?",
+            "options": ["Al-Ghashiyah", "Al-Waqi'ah", "Al-Qiyamah", "Al-Mulk"],
+            "answer": "Al-Ghashiyah"
+        },
+        {
+            "question": "Who was the first person to compile Hadith into a book?",
+            "options": ["Imam Bukhari", "Imam Muslim", "Imam Malik", "Imam Ahmad"],
+            "answer": "Imam Malik"
+        }
+    ],
+
+    16: [
+        {
+            "question": "What is the name of the Islamic prayer performed during Hajj at Arafat?",
+            "options": ["Wuquf", "Tawaf", "Sa'i", "Ramy"],
+            "answer": "Wuquf"
+        },
+        {
+            "question": "Which prophet is known for his dream of stars and the moon?",
+            "options": ["Yusuf", "Ibrahim", "Yaqub", "Ismail"],
+            "answer": "Yusuf"
+        },
+        {
+            "question": "What is the term for the Islamic concept of divine unity?",
+            "options": ["Tawhid", "Shirk", "Qadr", "Iman"],
+            "answer": "Tawhid"
+        },
+        {
+            "question": "Which Surah is known as 'The Pen'?",
+            "options": ["Al-Qalam", "Al-Waqi'ah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Qalam"
+        },
+        {
+            "question": "Who was the first person to translate the Quran into another language?",
+            "options": ["Salman al-Farsi", "Umar", "Ali", "Abu Bakr"],
+            "answer": "Salman al-Farsi"
+        }
+    ],
+
+    17: [
+        {
+            "question": "What is the name of the Islamic prayer performed during Laylat al-Qadr?",
+            "options": ["Qiyam", "Taraweeh", "Tahajjud", "Witr"],
+            "answer": "Qiyam"
+        },
+        {
+            "question": "Which prophet is known for his golden calf story?",
+            "options": ["Musa", "Harun", "Yusuf", "Ibrahim"],
+            "answer": "Musa"
+        },
+        {
+            "question": "What is the term for the Islamic concept of striving in Allah's path?",
+            "options": ["Jihad", "Hijrah", "Dawah", "Ihsan"],
+            "answer": "Jihad"
+        },
+        {
+            "question": "Which Surah is known as 'The Cloaked One'?",
+            "options": ["Al-Muddathir", "Al-Muzzammil", "Al-Qalam", "Al-Hadid"],
+            "answer": "Al-Muddathir"
+        },
+        {
+            "question": "Who was the first caliph to be assassinated?",
+            "options": ["Umar", "Uthman", "Ali", "Abu Bakr"],
+            "answer": "Umar"
+        }
+    ],
+
+    18: [
+        {
+            "question": "What is the name of the Islamic prayer performed during the eclipse?",
+            "options": ["Salat al-Kusuf", "Salat al-Istisqa", "Salat al-Taraweeh", "Salat al-Janazah"],
+            "answer": "Salat al-Kusuf"
+        },
+        {
+            "question": "Which prophet is known for his miraculous birth without a father?",
+            "options": ["Isa", "Yahya", "Ismail", "Yusuf"],
+            "answer": "Isa"
+        },
+        {
+            "question": "What is the term for the Islamic concept of migration for faith?",
+            "options": ["Hijrah", "Jihad", "Dawah", "Ihsan"],
+            "answer": "Hijrah"
+        },
+        {
+            "question": "Which Surah is known as 'The Criterion'?",
+            "options": ["Al-Furqan", "Al-Waqi'ah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-Furqan"
+        },
+        {
+            "question": "Who was the first female judge in Islamic history?",
+            "options": ["Shifa bint Abdullah", "Aisha", "Fatimah", "Hafsa"],
+            "answer": "Shifa bint Abdullah"
+        }
+    ],
+
+    19: [
+        {
+            "question": "What is the name of the Islamic prayer performed for rain?",
+            "options": ["Salat al-Istisqa", "Salat al-Kusuf", "Salat al-Taraweeh", "Salat al-Janazah"],
+            "answer": "Salat al-Istisqa"
+        },
+        {
+            "question": "Which prophet is known for his miraculous healing abilities?",
+            "options": ["Isa", "Musa", "Yusuf", "Ibrahim"],
+            "answer": "Isa"
+        },
+        {
+            "question": "What is the term for the Islamic concept of sincere devotion?",
+            "options": ["Ikhlas", "Tawakkul", "Sabr", "Shukr"],
+            "answer": "Ikhlas"
+        },
+        {
+            "question": "Which Surah is known as 'The Tidings'?",
+            "options": ["An-Naba", "Al-Waqi'ah", "Al-Mulk", "Al-Hadid"],
+            "answer": "An-Naba"
+        },
+        {
+            "question": "Who was the first person to establish Islamic schools (madrasas)?",
+            "options": ["Imam al-Shafi'i", "Imam Malik", "Imam Abu Hanifa", "Imam Ahmad"],
+            "answer": "Imam Abu Hanifa"
+        }
+    ],
+
+    20: [
+        {
+            "question": "What is the name of the Islamic prayer performed for forgiveness?",
+            "options": ["Salat al-Tawbah", "Salat al-Istisqa", "Salat al-Kusuf", "Salat al-Janazah"],
+            "answer": "Salat al-Tawbah"
+        },
+        {
+            "question": "Which prophet is known for his miraculous staff turning into a serpent?",
+            "options": ["Musa", "Harun", "Yusuf", "Ibrahim"],
+            "answer": "Musa"
+        },
+        {
+            "question": "What is the term for the Islamic concept of remembrance of Allah?",
+            "options": ["Dhikr", "Dua", "Tawbah", "Shukr"],
+            "answer": "Dhikr"
+        },
+        {
+            "question": "Which Surah is known as 'The Most High'?",
+            "options": ["Al-A'la", "Al-Waqi'ah", "Al-Mulk", "Al-Hadid"],
+            "answer": "Al-A'la"
+        },
+        {
+            "question": "Who was the first person to systematize Islamic jurisprudence (Fiqh)?",
+            "options": ["Imam Abu Hanifa", "Imam Malik", "Imam al-Shafi'i", "Imam Ahmad"],
+            "answer": "Imam Abu Hanifa"
+        }
+    ]
 }
 
 def get_questions_for_level(level):
@@ -1191,17 +1111,57 @@ def reels():
             'youtube_id': 'hj8eYLUViQI',
             'description': 'Guide on how to protect yourself using Ruqyah against evil influences.'
         },
-        {
-            'title': 'Story Of Prophet Ibrahim (AS) Part-1  by Mufti Menk',
-            'youtube_id': 'v_KgFBrpx4o',
-            'description': 'An inspiring account of Prophet Ibrahim (AS) and his life story.'
-        },
-        {
-            'title': 'Stories Of The Prophets Ibraheem (AS) by Mufti Menk- (Part 2)',
-            'youtube_id': 'IcKEwfygNS4',
-            'description': 'Continuing the inspiring stories of Prophet Ibraheem (AS).'
-        }
-    ]
+       {
+        'title': 'Story Of Prophet Ibrahim (AS) Part-1  by Mufti Menk',
+        'youtube_id': 'v_KgFBrpx4o',
+        'description': 'An inspiring account of Prophet Ibrahim (AS) and his life story.'
+    },
+    {
+        'title': 'Stories Of The Prophets Ibraheem (AS) by Mufti Menk- (Part 2)',
+        'youtube_id': 'IcKEwfygNS4',
+        'description': 'Continuing the inspiring stories of Prophet Ibraheem (AS).'
+    },
+    {
+        'title': 'The King Chosen by Allah – Prophet Dawud (AS) & His Divine Gift by Mufti Menk',
+        'youtube_id': 'OTDxgNsffOQ',
+        'description': 'Exploring the life of Prophet Dawud (AS), his divine gift, and his significance.'
+    },
+    {
+        'title': 'Two Ways To Invite People To Islam',
+        'youtube_id': '3qlHV-0U87I',
+        'description': 'Guidance on inviting others to Islam effectively.'
+    },
+    {
+        'title': 'Have I Fulfilled Her Rights?',
+        'youtube_id': 'TT0_zjp9vcg',
+        'description': 'Important reflections on fulfilling the rights of others.'
+    },
+    {
+        'title': 'In the End You Will Return to Allah',
+        'youtube_id': 'O2XuvXRFiqc',
+        'description': 'A reminder of our return to Allah.'
+    },
+    {
+        'title': 'Marriage, Mahr, and Finding the One',
+        'youtube_id': 'XLOJ2WlGUNw',
+        'description': 'Discussing the aspects of marriage and finding the right partner.'
+    },
+    {
+        'title': 'How Can We Benefit More From Lectures?',
+        'youtube_id': 'FDmz4nnWQIo',
+        'description': 'Insightful discussion on maximizing the benefits of lectures.'
+    },
+    {
+        'title': 'We All Have This Urge',
+        'youtube_id': '54IRtLoxBsw',
+        'description': 'Addressing common urges and how to manage them.'
+    },
+    {
+        'title': 'Deception & Fake Accounts',
+        'youtube_id': 'a_fSK_PLoBQ',
+        'description': 'Discussing the dangers of deception and fake accounts.'
+    }
+]
     return render_template('pages/reels.html', reels=reels_data)
 
 @app.route('/trivia', methods=['GET', 'POST'])
@@ -1417,9 +1377,25 @@ def get_surah_by_id(surah_id):
         surah_data = json.load(f)
 
     return jsonify(surah_data)
-
+    
 DUA_FILE_PATH = os.path.join("static", "data", "duas.json")
 
+@app.route("/dua")
+def dua():
+    title = request.args.get("title")
+    if not title:
+        abort(404)
+
+    # TEMP: load from daily_duas.json
+    with open("DATA/daily_duas.json", encoding="utf-8") as f:
+        duas = json.load(f)
+
+    for d in duas:
+        if d["title"] == title:
+            return render_template("dua.html", dua=d)
+
+    abort(404)
+    
 @app.route("/duas")
 def all_duas_html():
     if not os.path.exists(DUA_FILE_PATH):
@@ -1460,7 +1436,850 @@ def all_duas_json():
 
     return jsonify(duas_data)
 
-# Additional routes
+@app.route('/daily-dua')
+def daily_dua():
+    try:
+        # Try to load from JSON file
+        json_path = os.path.join('data', 'daily_duas.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            if 'duas' in data and data['duas']:
+                # Get a different Dua each day
+                day_of_year = datetime.now().timetuple().tm_yday
+                dua_index = day_of_year % len(data['duas'])
+                dua = data['duas'][dua_index]
+                
+                return jsonify({
+                    'dua': dua,
+                    'success': True
+                })
+        
+        # Fallback to hardcoded Duas if file doesn't exist
+        hardcoded_duas = [
+            {
+                "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+                "english": "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire.",
+                "reference": "Quran 2:201",
+                "category": "General"
+            },
+            {
+                "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلاً مُتَقَبَّلاً",
+                "english": "O Allah, I ask You for beneficial knowledge, goodly provision, and acceptable deeds.",
+                "reference": "Sunan Ibn Majah",
+                "category": "Knowledge"
+            }
+        ]
+        
+        day_of_year = datetime.now().timetuple().tm_yday
+        dua_index = day_of_year % len(hardcoded_duas)
+        
+        return jsonify({
+            'dua': hardcoded_duas[dua_index],
+            'success': True
+        })
+        
+    except Exception as e:
+        print(f"Error loading daily Dua: {e}")
+        return jsonify({
+            'error': 'Could not load Dua',
+            'success': False
+        }), 500
+# ============================================
+# LIVE MEETING SYSTEM - COMPLETE FIX
+# ============================================
+
+@app.route("/live-meeting")
+def live_meeting_landing():
+    import uuid
+    room_id = str(uuid.uuid4())[:8]
+    return redirect(url_for('live_meeting', room_id=room_id))
+
+@app.route("/live-meeting/<room_id>")
+def live_meeting(room_id):
+    return render_template("live_meeting.html", room_id=room_id)
+
+# NEW: Student join page
+@app.route("/student-live/<room_id>")
+def student_live(room_id):
+    return render_template("student_live.html", room_id=room_id)
+
+# NEW: Join as student route
+@app.route("/join-live/<room_id>")
+def join_live(room_id):
+    return redirect(url_for('student_live', room_id=room_id))
+
+# ============================================
+# SOCKET.IO HANDLERS - COMPLETE FIX
+# ============================================
+
+active_rooms = {}
+waiting_students = {}
+connected_students = {}
+student_details = {}
+
+@socketio.on('connect')
+def handle_connect():
+    print(f"✅ New client connected: {request.sid}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print(f"❌ Client disconnected: {request.sid}")
+    # Clean up disconnected users from all rooms
+    for room_id in list(active_rooms.keys()):
+        if 'teacher_sid' in active_rooms[room_id] and active_rooms[room_id]['teacher_sid'] == request.sid:
+            # Teacher disconnected
+            emit('room-ended', {
+                'room': room_id,
+                'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+                'reason': 'Teacher disconnected'
+            }, room=room_id)
+            
+            # Clean up room
+            if room_id in active_rooms:
+                del active_rooms[room_id]
+            if room_id in waiting_students:
+                del waiting_students[room_id]
+            if room_id in connected_students:
+                del connected_students[room_id]
+            
+        else:
+            # Student disconnected
+            for user_id, details in list(student_details.items()):
+                if details.get('sid') == request.sid:
+                    # Remove from connected students
+                    if room_id in connected_students and user_id in connected_students[room_id]:
+                        connected_students[room_id].remove(user_id)
+                    
+                    # Remove from waiting students
+                    if room_id in waiting_students and user_id in waiting_students[room_id]:
+                        waiting_students[room_id].remove(user_id)
+                    
+                    # Remove details
+                    if user_id in student_details:
+                        del student_details[user_id]
+                    
+                    # Notify room
+                    emit('student-left', {
+                        'userId': user_id,
+                        'username': details.get('username', 'Student')
+                    }, room=room_id)
+                    break
+
+@socketio.on('teacher-join')
+def handle_teacher_join(data):
+    try:
+        room_id = data.get('room', 'default')
+        user_id = data.get('userId', f'teacher_{request.sid}')
+        username = data.get('username', 'Teacher')
+        
+        print(f"👨‍🏫 Teacher {username} ({user_id}) joining room {room_id}")
+        
+        # Initialize room if it doesn't exist
+        if room_id not in active_rooms:
+            active_rooms[room_id] = {
+                'state': 'waiting',
+                'teacher_id': user_id,
+                'teacher_sid': request.sid,
+                'teacher_name': username,
+                'connections': [request.sid],
+                'created_at': datetime.utcnow().isoformat(),
+                'webrtc_started': False
+            }
+            waiting_students[room_id] = []
+            connected_students[room_id] = []
+        else:
+            # Update existing room
+            active_rooms[room_id]['teacher_sid'] = request.sid
+            active_rooms[room_id]['teacher_id'] = user_id
+            active_rooms[room_id]['teacher_name'] = username
+            if request.sid not in active_rooms[room_id]['connections']:
+                active_rooms[room_id]['connections'].append(request.sid)
+        
+        join_room(room_id)
+        
+        emit('room-state', {
+            'state': active_rooms[room_id]['state'],
+            'waitingStudents': len(waiting_students.get(room_id, [])),
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': user_id,
+            'teacherName': username
+        })
+        
+        print(f"✅ Teacher joined room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in teacher-join: {e}")
+        emit('error', {'message': f'Failed to join room: {str(e)}'})
+
+@socketio.on('student-join')
+def handle_student_join(data):
+    try:
+        room_id = data.get('room', 'default')
+        user_id = data.get('userId', f'student_{request.sid}')
+        username = data.get('username', 'Student')
+        
+        print(f"👨‍🎓 Student {username} ({user_id}) joining room {room_id}")
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room does not exist or teacher has not joined yet'})
+            return
+        
+        # Store student details
+        student_details[user_id] = {
+            'sid': request.sid,
+            'username': username,
+            'room': room_id,
+            'joined_at': datetime.utcnow().isoformat()
+        }
+        
+        join_room(room_id)
+        
+        if active_rooms[room_id]['state'] == 'waiting':
+            # Add to waiting students
+            if user_id not in waiting_students[room_id]:
+                waiting_students[room_id].append(user_id)
+            
+            emit('student-waiting', {
+                'userId': user_id,
+                'username': username,
+                'socketId': request.sid
+            }, room=room_id, include_self=False)
+            
+            # Send student-waiting-ack to the student
+            emit('student-waiting-ack', {
+                'status': 'waiting',
+                'room': room_id,
+                'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher')
+            })
+            
+        else:
+            # Add to connected students
+            if user_id not in connected_students[room_id]:
+                connected_students[room_id].append(user_id)
+            
+            emit('student-joined', {
+                'userId': user_id,
+                'username': username,
+                'socketId': request.sid
+            }, room=room_id, include_self=False)
+            
+            # Send student-joined-ack to the student
+            emit('student-joined-ack', {
+                'status': 'joined',
+                'room': room_id,
+                'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher')
+            })
+        
+        # Update room state for teacher
+        emit('room-state', {
+            'state': active_rooms[room_id]['state'],
+            'waitingStudents': len(waiting_students.get(room_id, [])),
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': active_rooms[room_id].get('teacher_id'),
+            'teacherName': active_rooms[room_id].get('teacher_name')
+        }, room=room_id)
+        
+    except Exception as e:
+        print(f"❌ Error in student-join: {e}")
+        emit('error', {'message': f'Failed to join as student: {str(e)}'})
+
+@socketio.on('start-meeting')
+def handle_start_meeting(data):
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        active_rooms[room_id]['state'] = 'live'
+        
+        # Move all waiting students to connected
+        for student_id in waiting_students.get(room_id, []):
+            if student_id not in connected_students[room_id]:
+                connected_students[room_id].append(student_id)
+                
+                # Notify the student
+                student_sid = student_details.get(student_id, {}).get('sid')
+                if student_sid:
+                    emit('meeting-started', {
+                        'room': room_id,
+                        'teacherId': active_rooms[room_id].get('teacher_id'),
+                        'teacherName': active_rooms[room_id].get('teacher_name')
+                    }, room=student_sid)
+        
+        waiting_students[room_id] = []
+        
+        print(f"🚀 Meeting started in room {room_id} with {len(connected_students.get(room_id, []))} students")
+        
+        # Notify all in room
+        emit('room-started', {
+            'room': room_id,
+            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+            'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher'),
+            'students': [
+                {
+                    'userId': sid,
+                    'username': student_details.get(sid, {}).get('username', 'Student'),
+                    'socketId': student_details.get(sid, {}).get('sid')
+                }
+                for sid in connected_students.get(room_id, [])
+            ]
+        }, room=room_id)
+        
+        # Update room state
+        emit('room-state', {
+            'state': 'live',
+            'waitingStudents': 0,
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': active_rooms[room_id].get('teacher_id'),
+            'teacherName': active_rooms[room_id].get('teacher_name')
+        }, room=room_id)
+        
+    except Exception as e:
+        print(f"❌ Error in start-meeting: {e}")
+        emit('error', {'message': f'Failed to start meeting: {str(e)}'})
+
+@socketio.on('end-meeting')
+def handle_end_meeting(data):
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        active_rooms[room_id]['state'] = 'ended'
+        
+        print(f"🛑 Meeting ended in room {room_id}")
+        
+        # Notify all participants
+        emit('room-ended', {
+            'room': room_id,
+            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+            'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher'),
+            'message': 'Meeting has ended'
+        }, room=room_id)
+        
+        # Clean up
+        if room_id in waiting_students:
+            del waiting_students[room_id]
+        if room_id in connected_students:
+            del connected_students[room_id]
+        if room_id in active_rooms:
+            del active_rooms[room_id]
+        
+        # Clean up student details for this room
+        for user_id in list(student_details.keys()):
+            if student_details[user_id].get('room') == room_id:
+                del student_details[user_id]
+        
+    except Exception as e:
+        print(f"❌ Error in end-meeting: {e}")
+        emit('error', {'message': f'Failed to end meeting: {str(e)}'})
+
+@socketio.on('webrtc-signal')
+def handle_webrtc_signal(data):
+    try:
+        room_id = data.get('room', 'default')
+        from_user = data.get('from')
+        to_user = data.get('to')
+        signal = data.get('signal')
+        type = data.get('type', 'signal')  # 'offer', 'answer', 'candidate'
+        
+        print(f"📡 WebRTC {type} from {from_user} to {to_user} in room {room_id}")
+        
+        # Find target socket ID
+        target_sid = None
+        if to_user.startswith('teacher_'):
+            # Send to teacher
+            if room_id in active_rooms:
+                target_sid = active_rooms[room_id].get('teacher_sid')
+        else:
+            # Send to student
+            if to_user in student_details:
+                target_sid = student_details[to_user].get('sid')
+        
+        if target_sid:
+            emit('webrtc-signal', {
+                'from': from_user,
+                'to': to_user,
+                'signal': signal,
+                'type': type
+            }, room=target_sid)
+        else:
+            print(f"⚠️ Target user {to_user} not found")
+            
+    except Exception as e:
+        print(f"❌ Error in webrtc-signal: {e}")
+
+@socketio.on('start-webrtc')
+def handle_start_webrtc(data):
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in connected_students or not connected_students[room_id]:
+            emit('error', {'message': 'No students connected'})
+            return
+        
+        active_rooms[room_id]['webrtc_started'] = True
+        
+        print(f"🎥 Starting WebRTC in room {room_id} with {len(connected_students.get(room_id, []))} students")
+        
+        # Get teacher info
+        teacher_id = active_rooms[room_id].get('teacher_id')
+        teacher_name = active_rooms[room_id].get('teacher_name', 'Teacher')
+        
+        # Notify teacher
+        emit('webrtc-start-teacher', {
+            'students': [
+                {
+                    'userId': student_id,
+                    'username': student_details.get(student_id, {}).get('username', 'Student'),
+                    'socketId': student_details.get(student_id, {}).get('sid')
+                }
+                for student_id in connected_students.get(room_id, [])
+            ]
+        })
+        
+        # Notify each student
+        for student_id in connected_students.get(room_id, []):
+            student_sid = student_details.get(student_id, {}).get('sid')
+            if student_sid:
+                emit('webrtc-start-student', {
+                    'teacherId': teacher_id,
+                    'teacherName': teacher_name,
+                    'room': room_id
+                }, room=student_sid)
+        
+    except Exception as e:
+        print(f"❌ Error in start-webrtc: {e}")
+        emit('error', {'message': f'Failed to start WebRTC: {str(e)}'})
+
+@socketio.on('mute-student')
+def handle_mute_student(data):
+    room_id = data.get('room')
+    student_id = data.get('userId')
+    
+    # Find student socket ID
+    if student_id in student_details:
+        student_sid = student_details[student_id].get('sid')
+        if student_sid:
+            emit('student-muted', {
+                'userId': student_id,
+                'muted': True
+            }, room=student_sid)
+            
+            # Notify teacher
+            emit('student-muted-confirm', {
+                'userId': student_id,
+                'muted': True
+            })
+
+@socketio.on('unmute-student')
+def handle_unmute_student(data):
+    room_id = data.get('room')
+    student_id = data.get('userId')
+    
+    # Find student socket ID
+    if student_id in student_details:
+        student_sid = student_details[student_id].get('sid')
+        if student_sid:
+            emit('student-muted', {
+                'userId': student_id,
+                'muted': False
+            }, room=student_sid)
+            
+            # Notify teacher
+            emit('student-muted-confirm', {
+                'userId': student_id,
+                'muted': False
+            })
+
+@socketio.on('mic-request')
+def handle_mic_request(data):
+    room_id = data.get('room')
+    user_id = data.get('userId', 'unknown')
+    username = data.get('username', 'Student')
+    
+    # Send to teacher
+    if room_id in active_rooms:
+        teacher_sid = active_rooms[room_id].get('teacher_sid')
+        if teacher_sid:
+            emit('mic-request', {
+                'userId': user_id,
+                'username': username,
+                'socketId': request.sid
+            }, room=teacher_sid)
+
+@socketio.on('student-question')
+def handle_student_question(data):
+    room_id = data.get('room')
+    user_id = data.get('userId', 'unknown')
+    username = data.get('username', 'Student')
+    question = data.get('question', '')
+    question_id = f"q_{user_id}_{int(datetime.utcnow().timestamp())}"
+    
+    # Send to teacher
+    if room_id in active_rooms:
+        teacher_sid = active_rooms[room_id].get('teacher_sid')
+        if teacher_sid:
+            emit('student-question', {
+                'userId': user_id,
+                'username': username,
+                'question': question,
+                'questionId': question_id
+            }, room=teacher_sid)
+
+@socketio.on('teacher-leave')
+def handle_teacher_leave(data):
+    room_id = data.get('room')
+    user_id = data.get('userId')
+    
+    if room_id in active_rooms:
+        # Notify all students
+        emit('room-ended', {
+            'room': room_id,
+            'teacherId': user_id,
+            'reason': 'Teacher left the meeting'
+        }, room=room_id)
+        
+        # Clean up
+        if room_id in active_rooms:
+            del active_rooms[room_id]
+        if room_id in waiting_students:
+            del waiting_students[room_id]
+        if room_id in connected_students:
+            del connected_students[room_id]
+
+@app.route('/socket-test')
+def socket_test():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    </head>
+    <body>
+        <h1>Socket.IO Test</h1>
+        <div id="status">Disconnected</div>
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+        <script>
+            let socket;
+            function connect() {
+                socket = io();
+                socket.on('connect', () => {
+                    document.getElementById('status').textContent = 'Connected: ' + socket.id;
+                });
+                socket.on('disconnect', () => {
+                    document.getElementById('status').textContent = 'Disconnected';
+                });
+            }
+            function disconnect() {
+                if (socket) socket.disconnect();
+            }
+        </script>
+    </body>
+    </html>
+    """
+
+@app.route('/static/live_meeting.css')
+def serve_live_meeting_css():
+    return """
+    /* Complete live meeting CSS */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        padding: 40px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 20px;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .header h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .header p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .room-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .room-id {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+    
+    .share-link {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .share-link input {
+        flex: 1;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+    
+    .share-link button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    .share-link button:hover {
+        background: #5a67d8;
+    }
+    
+    .controls {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin: 30px 0;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+    }
+    
+    .btn-success {
+        background: #48bb78;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #38a169;
+        transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+        background: #f56565;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #e53e3e;
+        transform: translateY(-2px);
+    }
+    
+    .video-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+    
+    .video-box {
+        background: #1a202c;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        aspect-ratio: 16/9;
+    }
+    
+    .video-box video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .video-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .status {
+        text-align: center;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+        background: #f0f4ff;
+    }
+    
+    .status.waiting {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status.live {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+    
+    .status.error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .students-list {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 30px;
+    }
+    
+    .students-list h3 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .student-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background: white;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .student-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .action-btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    
+    .action-btn.mute {
+        background: #f56565;
+        color: white;
+    }
+    
+    .action-btn.unmute {
+        background: #48bb78;
+        color: white;
+    }
+    
+    .questions-panel {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 30px;
+    }
+    
+    .question-item {
+        background: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 4px solid #48bb78;
+    }
+    
+    .question-meta {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+        }
+        
+        .controls {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .video-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    """, 200, {'Content-Type': 'text/css'}
+
+# Additional routes (kept from original but with error handling)
 @app.route('/reminder')
 def reminder():
     json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "reminders.json")
@@ -1779,7 +2598,7 @@ def quran_surah():
     except requests.RequestException as e:
         print(f"Surah Fetch Error: {e}")
         return jsonify({'ayahs': []})
-
+        
 # --- Additional API: Islamic Motivation ---
 @app.route('/islamic-motivation')
 def get_islamic_motivation():
@@ -1854,25 +2673,24 @@ def temp_login():
     <p><a href="/login">Back to real login</a></p>
     '''
 
-# ============================================
-# Run Server
-# ============================================
-if __name__ == '__main__':
-    print(f"\n{'='*60}")
-    print("🚀 NELAVISTA LIVE - Full Mesh WebRTC (FIXED)")
-    print("🌟 Teacher Authority + Full Mesh Networking")
-    print("✋ Raise Hand System + Quick Feedback")
-    print(f"{'='*60}")
-    print("✅ FIXED: SID private rooms for signaling")
-    print("✅ FIXED: Students can join without teacher")
-    print("✅ FIXED: Full mesh initiation system")
-    print("✅ WebRTC signaling with STUN/TURN")
-    print("✅ Production ready for Render deployment")
-    print(f"{'='*60}")
-    print("\n📡 Connection test: http://localhost:5000/test-connection")
-    print("👨‍🏫 Teacher test: http://localhost:5000/live_meeting/teacher")
-    print("👨‍🎓 Student test: http://localhost:5000/live_meeting")
-    print(f"{'='*60}\n")
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_ENV") == "development"
     
-    port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port, debug=DEBUG_MODE)
+    print(f"🚀 Starting server on port {port} (debug={debug})")
+    print(f"🌐 Server URL: http://localhost:{port}")
+    print(f"📡 Socket.IO enabled: True")
+    print(f"💾 Database URL: {DATABASE_URL[:50]}..." if DATABASE_URL else "💾 Using SQLite database")
+    print(f"🎥 Live Meeting System: READY")
+    
+    socketio.run(
+        app,
+        host="0.0.0.0",
+        port=port,
+        debug=debug,
+        allow_unsafe_werkzeug=True,
+        log_output=True
+    )
+    print("=== REGISTERED ROUTES ===")
+for rule in app.url_map.iter_rules():
+    print(rule)
