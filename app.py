@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 from flask import (
     Flask, render_template, session, redirect, url_for, 
-    request, flash, jsonify, send_from_directory
+    request, flash, jsonify, send_from_directory, abort
 )
 from flask_socketio import SocketIO, join_room, emit, leave_room
 from flask_sqlalchemy import SQLAlchemy
@@ -24,6 +24,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import random
 import requests
 import ssl
+from werkzeug.utils import secure_filename
 
 # Load environment variables
 load_dotenv()
@@ -40,7 +41,12 @@ if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
 
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-123')
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# Create upload folder if it doesn't exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 if DATABASE_URL:
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
@@ -81,8 +87,11 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     level = db.Column(db.Integer, default=1)
+    points = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
+    profile_picture = db.Column(db.String(200), default='default.png')
+    bio = db.Column(db.Text, default='')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -104,6 +113,22 @@ class Room(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class GameScore(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    game_type = db.Column(db.String(50), nullable=False)  # 'trivia', 'memory', 'quiz'
+    score = db.Column(db.Integer, default=0)
+    level = db.Column(db.Integer, default=1)
+    played_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Feedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80))
+    email = db.Column(db.String(120))
+    type = db.Column(db.String(50))  # 'feedback', 'bug', 'suggestion'
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 # Create tables
 with app.app_context():
     try:
@@ -115,10 +140,10 @@ with app.app_context():
 # ============================================
 # In-Memory Storage for Live Meetings
 # ============================================
-rooms = {}           # room_id -> room data
-participants = {}    # socket_id -> participant info
-room_authority = {}  # room_id -> authority state
-active_rooms = {}    # For live meeting system
+rooms = {}
+participants = {}
+room_authority = {}
+active_rooms = {}
 waiting_students = {}
 connected_students = {}
 student_details = {}
@@ -130,7 +155,7 @@ def get_or_create_room(room_id):
     """Get existing room or create new one"""
     if room_id not in rooms:
         rooms[room_id] = {
-            'participants': {},      # socket_id -> {'username', 'role', 'joined_at'}
+            'participants': {},
             'teacher_sid': None,
             'created_at': datetime.utcnow().isoformat()
         }
@@ -226,20 +251,58 @@ def save_question_and_answer(username, question, answer):
         except:
             pass
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            flash('Please login to access this page')
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def load_json_data(file_name):
+    """Load JSON data from DATA directory"""
+    try:
+        file_path = os.path.join('DATA', file_name)
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        else:
+            # Try static/DATA directory
+            file_path = os.path.join('static', 'DATA', file_name)
+            if os.path.exists(file_path):
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            else:
+                debug_print(f"⚠️ File not found: {file_name}")
+                return {}
+    except Exception as e:
+        debug_print(f"❌ Error loading {file_name}: {e}")
+        return {}
+
+# Load JSON data
+hadith_data = load_json_data('sahih_bukhari_coded.json')
+basic_knowledge_data = load_json_data('basic_islamic_knowledge.json')
+friendly_responses_data = load_json_data('friendly_responses.json')
+daily_duas = load_json_data('daily_duas.json')
+islamic_motivation = load_json_data('islamic_motivation.json')
+stories_data = load_json_data('stories.json')
+reminders_data = load_json_data('reminders.json')
+
+# OpenRouter API Key
+openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+
 # ============================================
-# Socket.IO Event Handlers - Combined
+# Socket.IO Event Handlers
 # ============================================
 
-# Main connection handler
 @socketio.on('connect')
 def handle_connect():
     sid = request.sid
-    # For WebRTC meetings
     join_room(sid)
     participants[sid] = {'room_id': None, 'username': None, 'role': None}
     debug_print(f"✅ Client connected: {sid}")
 
-# Main disconnect handler
 @socketio.on('disconnect')
 def handle_disconnect():
     sid = request.sid
@@ -254,7 +317,6 @@ def handle_disconnect():
             
             if sid in room['participants']:
                 participant_info = room['participants'][sid]
-                
                 del room['participants'][sid]
                 
                 if sid == room['teacher_sid']:
@@ -268,8 +330,6 @@ def handle_disconnect():
                     'username': participant_info['username'],
                     'role': participant_info['role']
                 }, room=room_id, skip_sid=sid)
-                
-                debug_print(f"❌ {participant_info['username']} left room {room_id}")
             
             cleanup_room(room_id)
     
@@ -426,8 +486,6 @@ def handle_webrtc_offer(data):
         if sender['room_id'] != room_id or target['room_id'] != room_id:
             return
         
-        debug_print(f"📨 {request.sid[:8]} → offer → {target_sid[:8]}")
-        
         emit('webrtc-offer', {
             'from_sid': request.sid,
             'offer': offer,
@@ -456,8 +514,6 @@ def handle_webrtc_answer(data):
         
         if sender['room_id'] != room_id or target['room_id'] != room_id:
             return
-        
-        debug_print(f"📨 {request.sid[:8]} → answer → {target_sid[:8]}")
         
         emit('webrtc-answer', {
             'from_sid': request.sid,
@@ -488,8 +544,6 @@ def handle_webrtc_ice_candidate(data):
         if sender['room_id'] != room_id or target['room_id'] != room_id:
             return
         
-        debug_print(f"📨 {request.sid[:8]} → ICE → {target_sid[:8]}")
-        
         emit('webrtc-ice-candidate', {
             'from_sid': request.sid,
             'candidate': candidate,
@@ -498,158 +552,6 @@ def handle_webrtc_ice_candidate(data):
         
     except Exception as e:
         debug_print(f"❌ Error relaying ICE candidate: {e}")
-
-# Full Mesh Initiation
-@socketio.on('request-full-mesh')
-def handle_request_full_mesh(data):
-    """Initiate full mesh connections between all participants"""
-    try:
-        room_id = data.get('room')
-        sid = request.sid
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        
-        if sid not in room['participants']:
-            return
-        
-        other_participants = []
-        for other_sid, info in room['participants'].items():
-            if other_sid != sid:
-                other_participants.append({
-                    'sid': other_sid,
-                    'username': info['username'],
-                    'role': info['role']
-                })
-        
-        emit('initiate-mesh-connections', {
-            'peers': other_participants,
-            'room': room_id
-        }, room=sid)
-        
-        debug_print(f"🔗 Initiating full mesh for {sid[:8]} with {len(other_participants)} peers")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in request-full-mesh: {e}")
-
-# Teacher Authority System
-@socketio.on('teacher-mute-all')
-def handle_teacher_mute_all(data):
-    """Teacher mutes all students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            return
-        
-        authority = get_room_authority(room_id)
-        authority['muted_all'] = True
-        
-        for sid in room['participants']:
-            if room['participants'][sid]['role'] == 'student':
-                emit('room-muted', {'muted': True}, room=sid)
-        
-        debug_print(f"🔇 Teacher muted all in room {room_id}")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in teacher-mute-all: {e}")
-
-@socketio.on('teacher-unmute-all')
-def handle_teacher_unmute_all(data):
-    """Teacher unmutes all students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            return
-        
-        authority = get_room_authority(room_id)
-        authority['muted_all'] = False
-        
-        for sid in room['participants']:
-            if room['participants'][sid]['role'] == 'student':
-                emit('room-muted', {'muted': False}, room=sid)
-        
-        debug_print(f"🔊 Teacher unmuted all in room {room_id}")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in teacher-unmute-all: {e}")
-
-# Control Events
-@socketio.on('start-broadcast')
-def handle_start_broadcast(data):
-    """Teacher starts broadcasting to all students"""
-    try:
-        room_id = data.get('room')
-        
-        if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can start broadcast'})
-            return
-        
-        debug_print(f"📢 Teacher starting broadcast in room: {room_id}")
-        
-        student_sids = []
-        student_info = []
-        for sid, info in room['participants'].items():
-            if info['role'] == 'student':
-                student_sids.append(sid)
-                student_info.append({
-                    'sid': sid,
-                    'username': info['username']
-                })
-        
-        emit('broadcast-ready', {
-            'student_sids': student_sids,
-            'student_info': student_info,
-            'student_count': len(student_sids),
-            'room': room_id
-        }, room=teacher_sid)
-        
-        for student_sid in student_sids:
-            peers_to_connect = []
-            for other_sid in room['participants']:
-                if other_sid != student_sid:
-                    peers_to_connect.append({
-                        'sid': other_sid,
-                        'username': room['participants'][other_sid]['username'],
-                        'role': room['participants'][other_sid]['role']
-                    })
-            
-            emit('initiate-full-mesh', {
-                'peers': peers_to_connect,
-                'teacher_sid': teacher_sid,
-                'room': room_id
-            }, room=student_sid)
-        
-    except Exception as e:
-        debug_print(f"❌ Error in start-broadcast: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('ping')
-def handle_ping(data):
-    """Keep-alive ping"""
-    emit('pong', {'timestamp': datetime.utcnow().isoformat()})
 
 # Live Meeting System Handlers
 @socketio.on('teacher-join')
@@ -818,32 +720,146 @@ def handle_start_meeting(data):
         debug_print(f"❌ Error in start-meeting: {e}")
         emit('error', {'message': f'Failed to start meeting: {str(e)}'})
 
+@socketio.on('end-meeting')
+def handle_end_meeting(data):
+    """End the live meeting"""
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        active_rooms[room_id]['state'] = 'ended'
+        
+        debug_print(f"🛑 Meeting ended in room {room_id}")
+        
+        emit('room-ended', {
+            'room': room_id,
+            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+            'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher'),
+            'message': 'Meeting has ended'
+        }, room=room_id)
+        
+        if room_id in waiting_students:
+            del waiting_students[room_id]
+        if room_id in connected_students:
+            del connected_students[room_id]
+        if room_id in active_rooms:
+            del active_rooms[room_id]
+        
+        for user_id in list(student_details.keys()):
+            if student_details[user_id].get('room') == room_id:
+                del student_details[user_id]
+        
+    except Exception as e:
+        debug_print(f"❌ Error in end-meeting: {e}")
+        emit('error', {'message': f'Failed to end meeting: {str(e)}'})
+
+@socketio.on('webrtc-signal')
+def handle_webrtc_signal(data):
+    """Handle WebRTC signaling for live meetings"""
+    try:
+        room_id = data.get('room', 'default')
+        from_user = data.get('from')
+        to_user = data.get('to')
+        signal = data.get('signal')
+        type = data.get('type', 'signal')
+        
+        debug_print(f"📡 WebRTC {type} from {from_user} to {to_user} in room {room_id}")
+        
+        target_sid = None
+        if to_user.startswith('teacher_'):
+            if room_id in active_rooms:
+                target_sid = active_rooms[room_id].get('teacher_sid')
+        else:
+            if to_user in student_details:
+                target_sid = student_details[to_user].get('sid')
+        
+        if target_sid:
+            emit('webrtc-signal', {
+                'from': from_user,
+                'to': to_user,
+                'signal': signal,
+                'type': type
+            }, room=target_sid)
+        else:
+            debug_print(f"⚠️ Target user {to_user} not found")
+            
+    except Exception as e:
+        debug_print(f"❌ Error in webrtc-signal: {e}")
+
+@socketio.on('mic-request')
+def handle_mic_request(data):
+    """Student requests microphone permission"""
+    room_id = data.get('room')
+    user_id = data.get('userId', 'unknown')
+    username = data.get('username', 'Student')
+    
+    if room_id in active_rooms:
+        teacher_sid = active_rooms[room_id].get('teacher_sid')
+        if teacher_sid:
+            emit('mic-request', {
+                'userId': user_id,
+                'username': username,
+                'socketId': request.sid
+            }, room=teacher_sid)
+
+@socketio.on('student-question')
+def handle_student_question(data):
+    """Student submits a question"""
+    room_id = data.get('room')
+    user_id = data.get('userId', 'unknown')
+    username = data.get('username', 'Student')
+    question = data.get('question', '')
+    question_id = f"q_{user_id}_{int(datetime.utcnow().timestamp())}"
+    
+    if room_id in active_rooms:
+        teacher_sid = active_rooms[room_id].get('teacher_sid')
+        if teacher_sid:
+            emit('student-question', {
+                'userId': user_id,
+                'username': username,
+                'question': question,
+                'questionId': question_id
+            }, room=teacher_sid)
+
 # ============================================
-# Flask Routes - Combined
+# Flask Routes - Complete Navigation System
 # ============================================
 
-# Authentication Routes
+# Home & Authentication
 @app.route('/')
 def index():
+    """Home page dashboard"""
     user = session.get('user')
     if not user:
         return redirect(url_for('login'))
+    
     username = user['username']
     questions = get_questions_for_user(username)
     if questions is None:
         questions = []
-    return render_template('index.html', user=user, questions=questions)
+    
+    # Get user stats
+    with app.app_context():
+        user_stats = {
+            'total_questions': UserQuestions.query.filter_by(username=username).count(),
+            'level': user.get('level', 1),
+            'points': user.get('points', 0)
+        }
+    
+    return render_template('index.html', 
+                         user=user, 
+                         questions=questions,
+                         stats=user_stats)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Login page"""
     if request.method == 'POST':
-        if request.is_json:
-            data = request.get_json()
-            username = data.get('username', '').strip()
-            password = data.get('password', '').strip()
-        else:
-            username = request.form.get('username', '').strip()
-            password = request.form.get('password', '').strip()
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
 
         try:
             with app.app_context():
@@ -851,86 +867,74 @@ def login():
                 
                 if not user:
                     if username and password:
+                        # Create temporary user
+                        new_user = User(
+                            username=username,
+                            email=f'{username}@example.com',
+                            joined_on=datetime.utcnow()
+                        )
+                        new_user.set_password(password)
+                        db.session.add(new_user)
+                        db.session.commit()
+                        
                         session['user'] = {
                             'username': username,
                             'email': f'{username}@example.com',
                             'joined_on': datetime.now().strftime('%Y-%m-%d'),
                             'preferred_language': 'English',
-                            'last_login': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                            'last_login': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                            'level': 1,
+                            'points': 0
                         }
                         
-                        if request.is_json:
-                            return jsonify({'success': True, 'message': 'Login successful (temporary mode)', 'user': session['user']})
-                        else:
-                            flash('Logged in successfully (temporary mode)!')
-                            return redirect(url_for('index'))
+                        flash('Logged in successfully!')
+                        return redirect(url_for('index'))
                     else:
-                        if request.is_json:
-                            return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
-                        else:
-                            flash('Please enter username and password.')
-                            return redirect(url_for('login'))
+                        flash('Please enter username and password.')
+                        return redirect(url_for('login'))
                 
                 if user.check_password(password):
                     user.last_login = datetime.utcnow()
                     db.session.commit()
 
-                    session.permanent = True
                     session['user'] = {
                         'username': user.username,
                         'email': user.email,
                         'joined_on': user.joined_on.strftime('%Y-%m-%d'),
                         'preferred_language': 'English',
-                        'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S')
+                        'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else '',
+                        'level': user.level,
+                        'points': user.points
                     }
 
-                    if request.is_json:
-                        return jsonify({'success': True, 'message': 'Login successful', 'user': session['user']})
-                    else:
-                        flash('Logged in successfully!')
-                        return redirect(url_for('index'))
+                    flash('Logged in successfully!')
+                    return redirect(url_for('index'))
 
                 else:
-                    if request.is_json:
-                        return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
-                    else:
-                        flash('Invalid username or password.')
-                        return redirect(url_for('login'))
+                    flash('Invalid username or password.')
+                    return redirect(url_for('login'))
 
         except Exception as e:
-            print(f"Database error: {e}")
-            if username and password:
-                session['user'] = {
-                    'username': username,
-                    'email': f'{username}@example.com',
-                    'joined_on': datetime.now().strftime('%Y-%m-%d'),
-                    'preferred_language': 'English',
-                    'last_login': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }
-                
-                if request.is_json:
-                    return jsonify({'success': True, 'message': 'Login successful (fallback mode)', 'user': session['user']})
-                else:
-                    flash('Logged in successfully (database temporarily unavailable)!')
-                    return redirect(url_for('index'))
-            else:
-                if request.is_json:
-                    return jsonify({'success': False, 'error': f'Database error: {str(e)}'}), 500
-                else:
-                    flash(f'Database error: {str(e)}')
-                    return redirect(url_for('login'))
+            flash(f'Error: {str(e)}')
+            return redirect(url_for('login'))
 
     return render_template('login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    """Signup page"""
     if request.method == 'POST':
         username = request.form.get('username').strip()
         email = request.form.get('email').strip()
         password = request.form.get('password').strip()
+        confirm_password = request.form.get('confirm_password').strip()
 
         if not username or not password or not email:
             flash('Please fill out all fields.')
+            return redirect(url_for('signup'))
+        
+        if password != confirm_password:
+            flash('Passwords do not match.')
             return redirect(url_for('signup'))
 
         try:
@@ -958,7 +962,9 @@ def signup():
                     'email': email,
                     'joined_on': new_user.joined_on.strftime('%Y-%m-%d'),
                     'preferred_language': 'English',
-                    'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+                    'last_login': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                    'level': 1,
+                    'points': 0
                 }
 
                 flash('Account created successfully!')
@@ -968,219 +974,679 @@ def signup():
             flash(f'Error creating account: {str(e)}')
             return redirect(url_for('signup'))
 
-    return render_template('signup.html', user=session.get('user'))
+    return render_template('signup.html')
 
 @app.route('/logout')
 def logout():
+    """Logout user"""
     session.clear()
-    return """
-    <h2>You have been logged out</h2>
-    <a href="/login">Login Again</a> | <a href="/signup">Create Account</a>
-    """
+    flash('You have been logged out.')
+    return redirect(url_for('login'))
 
-# WebRTC Meeting Routes
-@app.route('/teacher')
-def teacher_create():
-    room_id = str(uuid.uuid4())[:8]
-    return redirect(f'/teacher/{room_id}')
+# 👤 Profile Routes
+@app.route('/profile')
+@login_required
+def profile():
+    """User profile page"""
+    user_data = session.get('user', {})
+    username = user_data.get('username')
+    
+    with app.app_context():
+        user = User.query.filter_by(username=username).first()
+        if user:
+            user_data['level'] = user.level
+            user_data['points'] = user.points
+            user_data['bio'] = user.bio
+            user_data['profile_picture'] = user.profile_picture
+    
+    return render_template('profile.html', user=user_data)
 
-@app.route('/teacher/<room_id>')
-def teacher_view(room_id):
-    return render_template('teacher.html', room_id=room_id)
+@app.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    """Edit profile page"""
+    if request.method == 'POST':
+        username = session['user']['username']
+        bio = request.form.get('bio', '')
+        
+        with app.app_context():
+            user = User.query.filter_by(username=username).first()
+            if user:
+                user.bio = bio
+                
+                # Handle profile picture upload
+                if 'profile_picture' in request.files:
+                    file = request.files['profile_picture']
+                    if file and file.filename:
+                        filename = secure_filename(f"{username}_{file.filename}")
+                        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                        file.save(file_path)
+                        user.profile_picture = filename
+                
+                db.session.commit()
+                session['user']['bio'] = bio
+                
+                flash('Profile updated successfully!')
+                return redirect(url_for('profile'))
+    
+    return render_template('edit_profile.html', user=session.get('user'))
 
-@app.route('/student/<room_id>')
-def student_view(room_id):
-    return render_template('student.html', room_id=room_id)
+# 🎙️ Talk to Tawfiq AI
+@app.route('/talk-to-tawfiq')
+@login_required
+def talk_to_tawfiq():
+    """Tawfiq AI chat interface"""
+    username = session['user']['username']
+    questions = get_questions_for_user(username)
+    return render_template('talk_to_tawfiq.html', user=session.get('user'), questions=questions)
 
-@app.route('/join', methods=['POST'])
-def join_room_post():
-    room_id = request.form.get('room_id', '').strip()
-    if not room_id:
-        flash('Please enter a room ID')
-        return redirect('/')
-    return redirect(f'/student/{room_id}')
+@app.route('/api/ask', methods=['POST'])
+@login_required
+def ask_ai():
+    """Tawfiq AI API endpoint"""
+    data = request.get_json()
+    username = session['user']['username']
+    question = data.get('question', '')
+    history = data.get('history', [])
+    
+    if not question:
+        return jsonify({'error': 'Question is required'}), 400
+    
+    try:
+        # Check if we have API key for OpenRouter
+        if openrouter_api_key:
+            headers = {
+                "Authorization": f"Bearer {openrouter_api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are Tawfiq AI, an Islamic assistant created by Tella Abdul Afeez Adewale. You provide accurate Islamic knowledge, answer questions about Quran, Hadith, fiqh, history, and daily life issues from an Islamic perspective. Be kind, helpful, and authentic."
+                }
+            ]
+            
+            # Add history
+            for msg in history[-5:]:  # Last 5 messages for context
+                messages.append(msg)
+            
+            # Add current question
+            messages.append({"role": "user", "content": question})
+            
+            payload = {
+                "model": "openai/gpt-3.5-turbo",
+                "messages": messages,
+                "temperature": 0.7,
+                "max_tokens": 500
+            }
+            
+            response = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                answer = result['choices'][0]['message']['content']
+                
+                # Save to database
+                save_question_and_answer(username, question, answer)
+                
+                return jsonify({
+                    'answer': answer,
+                    'question': question
+                })
+            else:
+                # Fallback response
+                answer = "I apologize, but I'm having trouble accessing advanced features right now. Here's what I can tell you based on my knowledge..."
+        else:
+            # Local response without API
+            answer = "As Tawfiq AI, I'm here to help you with Islamic knowledge. For advanced features, please configure the API key. For now, I recommend consulting authentic Islamic sources like Quran and Hadith for accurate information."
+        
+        # Save to database even with fallback
+        save_question_and_answer(username, question, answer)
+        
+        return jsonify({
+            'answer': answer,
+            'question': question
+        })
+        
+    except Exception as e:
+        debug_print(f"❌ AI Error: {e}")
+        return jsonify({
+            'answer': f"I encountered an error: {str(e)}. Please try again later.",
+            'question': question
+        })
 
-# Live Meeting Routes
+# 🎙️ Live Meeting System
 @app.route('/live-meeting')
-@app.route('/live_meeting')
-def live_meeting():
-    return render_template('live_meeting.html')
+@login_required
+def live_meeting_home():
+    """Live meeting landing page"""
+    return render_template('live_meeting.html', user=session.get('user'))
 
-@app.route('/live-meeting/teacher')
-@app.route('/live_meeting/teacher')
-def live_meeting_teacher_create():
+@app.route('/live-meeting/create')
+@login_required
+def create_live_meeting():
+    """Create a new live meeting room"""
     room_id = str(uuid.uuid4())[:8]
-    return redirect(url_for('live_meeting_teacher_view', room_id=room_id))
+    return redirect(url_for('live_meeting_teacher', room_id=room_id))
 
 @app.route('/live-meeting/teacher/<room_id>')
-@app.route('/live_meeting/teacher/<room_id>')
-def live_meeting_teacher_view(room_id):
-    return render_template('teacher_live.html', room_id=room_id)
+@login_required
+def live_meeting_teacher(room_id):
+    """Teacher interface for live meeting"""
+    return render_template('teacher_live.html', room_id=room_id, user=session.get('user'))
 
 @app.route('/live-meeting/student/<room_id>')
-@app.route('/live_meeting/student/<room_id>')
-def live_meeting_student_view(room_id):
-    return render_template('student_live.html', room_id=room_id)
+@login_required
+def live_meeting_student(room_id):
+    """Student interface for live meeting"""
+    return render_template('student_live.html', room_id=room_id, user=session.get('user'))
 
 @app.route('/live-meeting/join', methods=['POST'])
-@app.route('/live_meeting/join', methods=['POST'])
-def live_meeting_join():
+@login_required
+def join_live_meeting():
+    """Join an existing live meeting"""
     room_id = request.form.get('room_id', '').strip()
-    username = request.form.get('username', '').strip()
-    
     if not room_id:
         flash('Please enter a meeting ID')
-        return redirect('/live_meeting')
+        return redirect(url_for('live_meeting_home'))
     
-    if not username:
-        username = f"Student_{str(uuid.uuid4())[:4]}"
-    
-    session['live_username'] = username
-    
-    return redirect(url_for('live_meeting_student_view', room_id=room_id))
+    return redirect(url_for('live_meeting_student', room_id=room_id))
 
-# Tawfiq AI Routes
-@app.route('/talk-to-tawfiq')
-def talk_to_tawfiq():
-    return render_template('talk_to_tawfiq.html')
+# 🕌 Prayer Times
+@app.route('/prayer-times')
+@login_required
+def prayer_times():
+    """Prayer times page"""
+    # You can integrate with an external API like Aladhan API
+    return render_template('prayer_times.html', user=session.get('user'))
 
-@app.route('/ask', methods=['POST'])
-def ask():
-    # Implement Tawfiq AI logic here
-    data = request.get_json()
-    username = session.get('user', {}).get('username')
-    history = data.get('history')
-
-    if not username:
-        return jsonify({'error': 'You must be logged in to chat with Tawfiq AI.'}), 401
-    if not history:
-        return jsonify({'error': 'Chat history is required.'}), 400
-
-    # Simplified response for now
-    response = {
-        "choices": [{
-            "message": {
-                "role": "assistant",
-                "content": "Assalamu alaikum! I'm Tawfiq AI, your Islamic learning assistant. How can I help you today?"
-            }
-        }]
-    }
-    
-    return jsonify(response)
-
-# Additional Routes from Tawfiq AI
-@app.route('/profile')
-def profile():
-    user = session.get('user', {})
-    return render_template('profile.html',
-                           username=user.get('username', 'Guest'),
-                           email=user.get('email', 'not_set@example.com'),
-                           joined_on=user.get('joined_on', 'Unknown'),
-                           preferred_language=user.get('preferred_language', 'English'),
-                           last_login=user.get('last_login', 'N/A'))
-
-@app.route('/my-questions')
-def my_questions():
+@app.route('/api/prayer-times')
+def get_prayer_times():
+    """API to get prayer times (example using Aladhan API)"""
     try:
-        username = session['user']['username']
-        with app.app_context():
-            questions = UserQuestions.query.filter_by(username=username).order_by(UserQuestions.timestamp.desc()).all()
-        return render_template('my_questions.html', questions=questions)
+        # Get location from request or use default
+        city = request.args.get('city', 'Mecca')
+        country = request.args.get('country', 'Saudi Arabia')
+        
+        # Using Aladhan API
+        url = f"http://api.aladhan.com/v1/timingsByCity"
+        params = {
+            'city': city,
+            'country': country,
+            'method': 2  # Islamic Society of North America
+        }
+        
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify(data['data'])
+        else:
+            # Return mock data if API fails
+            return jsonify({
+                'timings': {
+                    'Fajr': '5:30',
+                    'Dhuhr': '12:30',
+                    'Asr': '15:45',
+                    'Maghrib': '18:20',
+                    'Isha': '19:45'
+                },
+                'date': {
+                    'readable': datetime.now().strftime('%d %B %Y')
+                }
+            })
     except Exception as e:
-        flash(f'Error loading questions: {str(e)}')
-        return render_template('my_questions.html', questions=[])
+        return jsonify({'error': str(e)}), 500
 
-@app.route('/trivia')
-def trivia():
-    # Implement trivia logic here
-    return render_template('trivia.html')
+# ✨ Islamic Motivation
+@app.route('/motivation')
+@login_required
+def motivation():
+    """Islamic motivation and quotes"""
+    # Get random motivation from loaded data
+    motiv_list = islamic_motivation.get('quotes', []) if isinstance(islamic_motivation, dict) else islamic_mototion
+    
+    if not motiv_list:
+        motiv_list = [
+            "Verily, with hardship comes ease. (Quran 94:6)",
+            "Allah does not burden a soul beyond that it can bear. (Quran 2:286)",
+            "The best among you are those who have the best manners and character. (Hadith)",
+            "When you forget that you need Allah, He puts you in a situation that causes you to call upon Him. And that's for your own good.",
+            "Allah knows what is best for you, so when He says no, trust Him."
+        ]
+    
+    # Get a different quote each day
+    day_of_year = datetime.now().timetuple().tm_yday
+    quote_index = day_of_year % len(motiv_list)
+    daily_quote = motiv_list[quote_index] if isinstance(motiv_list[quote_index], str) else motiv_list[quote_index].get('quote', '')
+    
+    return render_template('motivation.html', 
+                         user=session.get('user'),
+                         quote=daily_quote,
+                         quotes=motiv_list[:10])
 
+# 📖 Story Time
+@app.route('/story-time')
+@login_required
+def story_time():
+    """Islamic stories for kids and adults"""
+    stories = stories_data if stories_data else []
+    return render_template('story_time.html', 
+                         user=session.get('user'),
+                         stories=stories[:10])  # Show first 10 stories
+
+@app.route('/story/<int:story_id>')
+@login_required
+def story_detail(story_id):
+    """Individual story page"""
+    stories = stories_data if stories_data else []
+    if 0 <= story_id < len(stories):
+        story = stories[story_id]
+    else:
+        story = {
+            'title': 'Story Not Found',
+            'content': 'The requested story could not be found.',
+            'moral': '',
+            'category': 'General'
+        }
+    
+    return render_template('story_detail.html', 
+                         user=session.get('user'),
+                         story=story,
+                         story_id=story_id)
+
+# 📱 Reels (Islamic Videos)
 @app.route('/reels')
+@login_required
 def reels():
+    """Islamic educational videos"""
+    # Hardcoded reel data - you can replace with database or API
     reels_data = [
         {
-            'title': 'The Story of Prophet Muhammad (ﷺ)  by Mufti Menk',
+            'title': 'The Story of Prophet Muhammad (ﷺ) by Mufti Menk',
             'youtube_id': 'DdWxCVYAOCk',
-            'description': 'A brief overview of the life and teachings of Prophet Muhammad (S.A.W).'
+            'description': 'A brief overview of the life and teachings of Prophet Muhammad (S.A.W).',
+            'duration': '15:30',
+            'category': 'Seerah'
         },
-        # Add more reels as needed
+        {
+            'title': 'How to Perform Wudu Correctly',
+            'youtube_id': 'R06y6XF7mLk',
+            'description': 'Step-by-step guide on performing ablution (wudu).',
+            'duration': '8:45',
+            'category': 'Fiqh'
+        },
+        {
+            'title': '10 Duas Every Muslim Should Know',
+            'youtube_id': 'CBhCc_Fxa4g',
+            'description': 'Important daily duas from Quran and Sunnah.',
+            'duration': '12:20',
+            'category': 'Dua'
+        },
+        {
+            'title': 'The Miracle of Quran',
+            'youtube_id': 'W7iR5B1MSWc',
+            'description': 'Scientific miracles in the Holy Quran.',
+            'duration': '20:15',
+            'category': 'Quran'
+        },
+        {
+            'title': 'Patience in Islam - Story of Prophet Ayyub',
+            'youtube_id': 'hj8eYLUViQI',
+            'description': 'Lessons in patience from the life of Prophet Ayyub (AS).',
+            'duration': '18:30',
+            'category': 'Stories'
+        }
     ]
-    return render_template('reels.html', reels=reels_data)
+    
+    return render_template('reels.html', 
+                         user=session.get('user'),
+                         reels=reels_data)
 
-# Debug Routes
+# 🎮 Play Game (Islamic Trivia)
+@app.route('/play-game')
+@login_required
+def play_game():
+    """Game selection page"""
+    # Get user's game stats
+    username = session['user']['username']
+    with app.app_context():
+        trivia_scores = GameScore.query.filter_by(
+            username=username, 
+            game_type='trivia'
+        ).order_by(GameScore.score.desc()).limit(5).all()
+        
+        high_score = max([score.score for score in trivia_scores]) if trivia_scores else 0
+    
+    return render_template('play_game.html', 
+                         user=session.get('user'),
+                         high_score=high_score,
+                         trivia_scores=trivia_scores)
+
+@app.route('/game/trivia')
+@login_required
+def trivia_game():
+    """Islamic trivia game"""
+    # Questions database
+    questions = basic_knowledge_data.get('questions', []) if isinstance(basic_knowledge_data, dict) else basic_knowledge_data
+    
+    if not questions:
+        # Fallback questions
+        questions = [
+            {
+                'question': 'What is the first month of the Islamic calendar?',
+                'options': ['Ramadan', 'Muharram', 'Shawwal', 'Dhul-Hijjah'],
+                'answer': 'Muharram',
+                'category': 'Calendar'
+            },
+            {
+                'question': 'How many pillars of Islam are there?',
+                'options': ['3', '4', '5', '6'],
+                'answer': '5',
+                'category': 'Aqeedah'
+            },
+            {
+                'question': 'Which Surah is called the "Heart of the Quran"?',
+                'options': ['Al-Fatiha', 'Yasin', 'Al-Baqarah', 'Al-Ikhlas'],
+                'answer': 'Yasin',
+                'category': 'Quran'
+            }
+        ]
+    
+    return render_template('trivia_game.html', 
+                         user=session.get('user'),
+                         questions=questions[:10])  # First 10 questions
+
+@app.route('/api/game/submit-score', methods=['POST'])
+@login_required
+def submit_game_score():
+    """Submit game score"""
+    data = request.get_json()
+    username = session['user']['username']
+    game_type = data.get('game_type', 'trivia')
+    score = data.get('score', 0)
+    level = data.get('level', 1)
+    
+    try:
+        with app.app_context():
+            game_score = GameScore(
+                username=username,
+                game_type=game_type,
+                score=score,
+                level=level
+            )
+            db.session.add(game_score)
+            
+            # Update user points
+            user = User.query.filter_by(username=username).first()
+            if user:
+                user.points += score // 10  # Convert score to points
+                if score > 50 and user.level < 2:
+                    user.level = 2
+                elif score > 100 and user.level < 3:
+                    user.level = 3
+            
+            db.session.commit()
+            
+            # Update session
+            session['user']['points'] = user.points if user else 0
+            session['user']['level'] = user.level if user else 1
+            
+            return jsonify({
+                'success': True,
+                'message': 'Score saved successfully',
+                'new_points': user.points if user else 0,
+                'new_level': user.level if user else 1
+            })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ⚙️ Settings
+@app.route('/settings')
+@login_required
+def settings():
+    """User settings page"""
+    user_data = session.get('user', {})
+    return render_template('settings.html', user=user_data)
+
+@app.route('/settings/update', methods=['POST'])
+@login_required
+def update_settings():
+    """Update user settings"""
+    username = session['user']['username']
+    language = request.form.get('language', 'English')
+    theme = request.form.get('theme', 'light')
+    notifications = request.form.get('notifications', 'off') == 'on'
+    
+    # Update session
+    session['user']['preferred_language'] = language
+    session['user']['theme'] = theme
+    session['user']['notifications'] = notifications
+    
+    flash('Settings updated successfully!')
+    return redirect(url_for('settings'))
+
+# 🔒 Privacy & Policy
+@app.route('/privacy')
+def privacy():
+    """Privacy policy page"""
+    return render_template('privacy.html', user=session.get('user'))
+
+# ℹ️ About Tawfiq AI
+@app.route('/about')
+def about():
+    """About page"""
+    return render_template('about.html', user=session.get('user'))
+
+# 📢 Feedback / Report
+@app.route('/feedback', methods=['GET', 'POST'])
+@login_required
+def feedback():
+    """Feedback submission page"""
+    if request.method == 'POST':
+        username = session['user']['username']
+        email = session['user'].get('email', '')
+        feedback_type = request.form.get('type', 'feedback')
+        message = request.form.get('message', '')
+        
+        if not message:
+            flash('Please enter your feedback message')
+            return redirect(url_for('feedback'))
+        
+        try:
+            with app.app_context():
+                feedback_entry = Feedback(
+                    username=username,
+                    email=email,
+                    type=feedback_type,
+                    message=message
+                )
+                db.session.add(feedback_entry)
+                db.session.commit()
+            
+            flash('Thank you for your feedback! We appreciate your input.')
+            return redirect(url_for('feedback'))
+        except Exception as e:
+            flash(f'Error submitting feedback: {str(e)}')
+            return redirect(url_for('feedback'))
+    
+    return render_template('feedback.html', user=session.get('user'))
+
+# ============================================
+# Additional Features & API Endpoints
+# ============================================
+
+# Daily Dua
+@app.route('/daily-dua')
+@login_required
+def daily_dua():
+    """Get daily Dua"""
+    duas = daily_duas.get('duas', []) if isinstance(daily_duas, dict) else daily_duas
+    
+    if not duas:
+        duas = [
+            {
+                'arabic': 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ',
+                'english': 'Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire.',
+                'reference': 'Quran 2:201',
+                'category': 'General'
+            }
+        ]
+    
+    # Get different Dua each day
+    day_of_year = datetime.now().timetuple().tm_yday
+    dua_index = day_of_year % len(duas)
+    daily = duas[dua_index]
+    
+    return render_template('daily_dua.html', 
+                         user=session.get('user'),
+                         dua=daily)
+
+# Hadith Search
+@app.route('/hadith-search')
+@login_required
+def hadith_search_page():
+    """Hadith search page"""
+    return render_template('hadith_search.html', user=session.get('user'))
+
+@app.route('/api/hadith/search', methods=['POST'])
+def search_hadith():
+    """Search hadith API"""
+    data = request.get_json()
+    query = data.get('query', '').lower().strip()
+    
+    if not query:
+        return jsonify({'error': 'Search query required'}), 400
+    
+    results = []
+    
+    # Search in loaded hadith data
+    if hadith_data and isinstance(hadith_data, dict):
+        volumes = hadith_data.get('volumes', [])
+        for volume in volumes:
+            books = volume.get('books', [])
+            for book in books:
+                hadiths = book.get('hadiths', [])
+                for hadith in hadiths:
+                    text = hadith.get('text', '').lower()
+                    if query in text:
+                        results.append({
+                            'volume': volume.get('volume_number', ''),
+                            'book': book.get('book_name', ''),
+                            'text': hadith.get('text', ''),
+                            'narrator': hadith.get('by', ''),
+                            'reference': f"Volume {volume.get('volume_number', '')}, Book {book.get('book_number', '')}"
+                        })
+                    
+                    if len(results) >= 10:  # Limit results
+                        break
+                if len(results) >= 10:
+                    break
+            if len(results) >= 10:
+                break
+    
+    return jsonify({'results': results})
+
+# Quran Surah
+@app.route('/quran')
+@login_required
+def quran():
+    """Quran reading page"""
+    return render_template('quran.html', user=session.get('user'))
+
+# Reminders
+@app.route('/reminders')
+@login_required
+def reminders():
+    """Islamic reminders page"""
+    reminders_list = reminders_data if reminders_data else []
+    return render_template('reminders.html', 
+                         user=session.get('user'),
+                         reminders=reminders_list)
+
+# Memorize Quran
+@app.route('/memorize-quran')
+@login_required
+def memorize_quran():
+    """Quran memorization helper"""
+    return render_template('memorize_quran.html', user=session.get('user'))
+
+# ============================================
+# Static Files & Debug Routes
+# ============================================
+
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    """Serve static files"""
+    return send_from_directory('static', filename)
+
 @app.route('/test-connection')
 def test_connection():
-    """Simple connection test page"""
-    return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Connection Test</title>
-        <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
-    </head>
-    <body>
-        <h1>Socket.IO Connection Test</h1>
-        <div id="status">Connecting...</div>
-        <div id="events"></div>
-        
-        <script>
-            const socket = io();
-            
-            socket.on('connect', () => {
-                document.getElementById('status').innerHTML = '✅ Connected! SID: ' + socket.id;
-                logEvent('Connected to server');
-            });
-            
-            socket.on('disconnect', () => {
-                document.getElementById('status').innerHTML = '❌ Disconnected';
-                logEvent('Disconnected from server');
-            });
-            
-            socket.on('connect_error', (error) => {
-                document.getElementById('status').innerHTML = '❌ Connection Error';
-                logEvent('Error: ' + error.message);
-            });
-            
-            function logEvent(msg) {
-                const eventsDiv = document.getElementById('events');
-                eventsDiv.innerHTML = new Date().toLocaleTimeString() + ': ' + msg + '<br>' + eventsDiv.innerHTML;
-            }
-        </script>
-    </body>
-    </html>
-    """
+    """Test WebSocket connection"""
+    return render_template('test_connection.html')
 
 @app.route('/debug/rooms')
 def debug_rooms():
-    """Debug endpoint to view current room states"""
+    """Debug room information"""
+    if not DEBUG_MODE:
+        return "Debug mode is disabled"
+    
     debug_info = {
         'rooms': rooms,
         'participants': participants,
-        'room_authority': room_authority,
+        'active_rooms': active_rooms,
         'total_rooms': len(rooms),
-        'total_participants': len(participants)
+        'total_participants': len(participants),
+        'total_active_rooms': len(active_rooms)
     }
     return json.dumps(debug_info, indent=2, default=str)
+
+# ============================================
+# Error Handlers
+# ============================================
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """404 error handler"""
+    return render_template('404.html', user=session.get('user')), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    """500 error handler"""
+    return render_template('500.html', user=session.get('user')), 500
 
 # ============================================
 # Run Server
 # ============================================
 if __name__ == '__main__':
     print(f"\n{'='*60}")
-    print("🚀 TAWFIQ AI + LIVE MEETING SYSTEM - MERGED")
-    print("🌟 Islamic Learning Platform with Live WebRTC Meetings")
-    print("👨‍🏫 Teacher-Student Interactive System")
+    print("🚀 TAWFIQ AI - COMPLETE ISLAMIC PLATFORM")
     print(f"{'='*60}")
-    print("✅ WebRTC Live Meetings")
-    print("✅ Tawfiq AI Assistant")
-    print("✅ User Authentication")
-    print("✅ Database Integration")
-    print(f"{'='=60}")
-    print("\n📡 Connection test: http://localhost:5000/test-connection")
-    print("👨‍🏫 Teacher test: http://localhost:5000/teacher")
-    print("👨‍🎓 Student test: http://localhost:5000/live_meeting")
-    print("🤖 Tawfiq AI: http://localhost:5000/talk-to-tawfiq")
-    print(f"{'='=60}\n")
+    print("👤 Profile Management")
+    print("🎙️ Talk to Tawfiq AI")
+    print("🎙️ Live Meeting System (WebRTC)")
+    print("🕌 Prayer Times")
+    print("✨ Islamic Motivation")
+    print("📖 Story Time")
+    print("📱 Islamic Reels/Videos")
+    print("🎮 Islamic Trivia Games")
+    print("⚙️ User Settings")
+    print("🔒 Privacy & Policy")
+    print("ℹ️ About Tawfiq AI")
+    print("📢 Feedback System")
+    print(f"{'='*60}")
+    print("\n📡 Server starting...")
+    print("🌐 Access at: http://localhost:5000")
+    print("🔌 Test WebSocket: http://localhost:5000/test-connection")
+    print(f"{'='*60}\n")
     
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port, debug=DEBUG_MODE, allow_unsafe_werkzeug=True)
+    socketio.run(app, 
+                host='0.0.0.0', 
+                port=port, 
+                debug=DEBUG_MODE, 
+                allow_unsafe_werkzeug=True)
