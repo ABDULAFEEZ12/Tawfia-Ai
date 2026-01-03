@@ -7,7 +7,7 @@
 <meta name="keywords" content="Tawfiq AI, Islamic AI, Muslim AI, Quran AI, Hadith Chatbot, Muslim Chatbot, AI for Muslims, Halal AI, Islamic ChatGPT">
 
 <!-- Viewport (mobile-first) -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
 <!-- Open Graph -->
 <meta property="og:title" content="Tawfiq AI – Islamic AI Chatbot & Quran Helper" />
@@ -32,12 +32,14 @@
 <!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<!-- Enhanced CSS with Magical UI/UX -->
+<!-- Mobile-Optimized CSS -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
 
+/* ===== MOBILE-FIRST VARIABLES ===== */
 :root {
+  /* Colors */
   --primary-color: #00695c;
   --secondary-color: #4CAF50;
   --accent-gold: #FFD700;
@@ -46,677 +48,243 @@
   --dark-bg: #121212;
   --text-light: #333;
   --text-dark: #e0e0e0;
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
-  --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.15);
+  
+  /* Mobile-optimized shadows */
+  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.12);
+  
+  /* Smooth transitions */
+  --transition-fast: all 0.2s ease;
   --transition-smooth: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+}
+
+/* ===== MOBILE RESET & BASE STYLES ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* ===== WELCOME EXPERIENCE ===== */
-.welcome-overlay{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at center, rgba(212,175,55,.12), transparent 60%),
-    linear-gradient(135deg,#08131f,#0f2436,#08131f);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  overflow:hidden;
-  transition:opacity 1.2s ease;
-}
-
-/* ===== BACKGROUND ===== */
-.depth-canvas {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.light-rays{
-  position:absolute;
-  inset:-60%;
-  background:conic-gradient(
-    transparent 0deg,
-    rgba(212,175,55,.04) 45deg,
-    transparent 90deg
-  );
-  animation:rotate 80s linear infinite;
-}
-
-@keyframes rotate{
-  to{transform:rotate(360deg)}
-}
-
-.distant-stars {
-  position: absolute;
-  inset: 0;
-}
-
-.star{
-  position:absolute;
-  width:2px;height:2px;
-  background:#fff;
-  opacity:.15;
-  border-radius:50%;
-  animation:twinkle 8s infinite;
-}
-
-.distant-stars .star:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-.distant-stars .star:nth-child(2) { top: 60%; left: 85%; animation-delay: 1s; }
-.distant-stars .star:nth-child(3) { top: 80%; left: 15%; animation-delay: 2s; }
-.distant-stars .star:nth-child(4) { top: 30%; left: 70%; animation-delay: 3s; }
-.distant-stars .star:nth-child(5) { top: 50%; left: 40%; animation-delay: 4s; }
-
-@keyframes twinkle{
-  50%{opacity:.6}
-}
-
-/* ===== CENTER ===== */
-.welcome-center{
-  text-align:center;
-  z-index:2;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:2.2rem;
-}
-
-/* ===== T ===== */
-.elegant-t-container{
-  width:140px;
-  height:140px;
-}
-
-.elegant-t svg{
-  width:100%;
-  height:100%;
-  filter:drop-shadow(0 6px 14px rgba(0,0,0,.35));
-}
-
-@keyframes breathe{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-5px)}
-}
-
-.t-breathe{
-  animation:breathe 7s ease-in-out infinite;
-}
-
-/* ===== TEXT ===== */
-.tawfiq-text h1{
-  font-size:2.6rem;
-  font-weight:300;
-  color:#fff;
-  margin:0;
-  font-family: 'Poppins', sans-serif;
-}
-
-.tawfiq-text p{
-  font-size:.9rem;
-  letter-spacing:2px;
-  opacity:.7;
-  margin-top:.4rem;
-  font-family: 'Poppins', sans-serif;
-  color: rgba(255,255,255,0.8);
-}
-
-/* ===== TYPING BLESSING ===== */
-.blessings-area{
-  max-width:560px;
-  padding:0 1rem;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-}
-
-.blessing{
-  font-family:'Amiri',serif;
-  font-size:1.4rem;
-  line-height:1.8;
-  color:rgba(255,255,255,.92);
-  white-space:normal;
-  word-break:break-word;
-  min-height: 60px;
-}
-
-/* Cursor */
-.cursor{
-  font-size:1.4rem;
-  color:rgba(255,255,255,.6);
-  animation:blink 1s infinite;
-}
-
-@keyframes blink{
-  50%{opacity:0}
-}
-
-/* ===== EXIT ===== */
-.welcome-overlay.exit{
-  opacity:0;
-  pointer-events:none;
-}
-
-/* ===== MOBILE ===== */
-@media(max-width:480px){
-  .tawfiq-text h1{font-size:2rem}
-  .blessing{font-size:1.2rem}
-  .elegant-t-container { width: 100px; height: 100px; }
-}
-
-/* ===== SMILE BOOSTER ===== */
-.smile-booster-container {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 100;
-}
-
-.smile-button {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 32px;
-  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
-  transition: var(--transition-bounce);
-  position: relative;
-  z-index: 101;
-}
-
-.smile-button:hover {
-  transform: scale(1.1) rotate(10deg);
-  box-shadow: 0 12px 30px rgba(255, 215, 0, 0.6);
-}
-
-.smile-button:active {
-  transform: scale(0.95);
-}
-
-.compliment-bubble {
-  position: absolute;
-  bottom: 80px;
-  right: 0;
-  background: white;
-  padding: 12px 18px;
-  border-radius: 20px;
-  box-shadow: var(--shadow-soft);
-  max-width: 250px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: var(--transition-smooth);
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  color: #333;
-  text-align: center;
-  z-index: 100;
-}
-
-.compliment-bubble.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.compliment-bubble:after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  right: 20px;
-  border-width: 8px;
-  border-style: solid;
-  border-color: white transparent transparent transparent;
-}
-
-/* Auto-messages */
-.auto-message {
-  position: fixed;
-  bottom: 120px;
-  right: 30px;
-  background: rgba(76, 175, 80, 0.9);
-  color: white;
-  padding: 10px 16px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-soft);
-  max-width: 250px;
-  opacity: 0;
-  transform: translateX(100px);
-  transition: var(--transition-bounce);
-  z-index: 99;
-}
-
-.auto-message.show {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* ===== DELIGHTFUL INTERACTIONS ===== */
-.ripple-button {
-  position: relative;
-  overflow: hidden;
-}
-
-.ripple-button:after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.6);
-  opacity: 0;
-  border-radius: 100%;
-  transform: scale(1, 1) translate(-50%);
-  transform-origin: 50% 50%;
-}
-
-.ripple-button:focus:not(:active)::after {
-  animation: ripple 1s ease-out;
-}
-
-@keyframes ripple {
-  0% {
-    transform: scale(0, 0);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(20, 20);
-    opacity: 0;
-  }
-}
-
-/* Hover transformations */
-.hover-lift {
-  transition: var(--transition-smooth);
-}
-
-.hover-lift:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-medium);
-}
-
-.hover-rotate:hover {
-  transform: rotate(5deg);
-}
-
-.hover-glow:hover {
-  box-shadow: 0 0 15px rgba(0, 105, 92, 0.3);
-}
-
-/* Bounce animations */
-@keyframes bounce {
-  0%, 20%, 60%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-10px); }
-  80% { transform: translateY(-5px); }
-}
-
-.bounce-on-click:active {
-  animation: bounce 0.5s;
-}
-
-/* ===== LIVING INTERFACE ===== */
-.cursor-follower {
-  position: fixed;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(0, 105, 92, 0.2);
-  pointer-events: none;
-  z-index: 9998;
-  mix-blend-mode: screen;
-  transition: transform 0.1s ease;
-}
-
-.logo-living {
-  animation: gentle-pulse 4s infinite ease-in-out;
-}
-
-@keyframes gentle-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-.shimmering-progress {
-  position: relative;
-  overflow: hidden;
-}
-
-.shimmering-progress:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  100% { left: 100%; }
-}
-
-/* ===== VISUAL FEEDBACK ===== */
-.glow-border {
-  position: relative;
-}
-
-.glow-border:before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, #00695c, #4CAF50, #2196F3, #FFD700);
-  border-radius: inherit;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.glow-border:hover:before {
-  opacity: 1;
-  animation: border-glow 2s linear infinite;
-}
-
-@keyframes border-glow {
-  0% { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
-}
-
-.shimmering-header {
-  position: relative;
-  overflow: hidden;
-}
-
-.shimmering-header:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  animation: header-shimmer 3s infinite;
-}
-
-@keyframes header-shimmer {
-  100% { left: 100%; }
-}
-
-.celebration-animation {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9997;
-  opacity: 0;
-}
-
-.celebration-particle {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--accent-gold);
-  animation: celebration 1.5s ease-out forwards;
-}
-
-@keyframes celebration {
-  0% {
-    transform: translateY(100vh) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100px) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* ===== ENGAGING CONTENT DISPLAY ===== */
-.typing-text {
-  overflow: hidden;
-  border-right: 2px solid var(--primary-color);
-  white-space: pre-wrap;
-  animation: typing-cursor 0.7s step-end infinite;
-}
-
-@keyframes typing-cursor {
-  0%, 100% { border-color: transparent; }
-  50% { border-color: var(--primary-color); }
-}
-
-.floating-dua {
-  animation: float-dua 8s ease-in-out infinite;
-  position: relative;
-}
-
-@keyframes float-dua {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-10px) rotate(1deg); }
-  66% { transform: translateY(5px) rotate(-1deg); }
-}
-
-.rotating-bracket {
-  display: inline-block;
-  animation: rotate-bracket 20s linear infinite;
-}
-
-@keyframes rotate-bracket {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ===== MICRO-DELIGHTS ===== */
-.hover-rotate-small:hover {
-  transform: rotate(15deg);
-  transition: transform 0.3s ease;
-}
-
-.sliding-message {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: var(--primary-color);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 10px;
-  box-shadow: var(--shadow-soft);
-  transform: translateX(-120%);
-  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  z-index: 100;
-}
-
-.sliding-message.show {
-  transform: translateX(0);
-}
-
-.shimmering-audio {
-  position: relative;
-  overflow: hidden;
-}
-
-.shimmering-audio:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 30%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  animation: audio-shimmer 3s infinite;
-}
-
-@keyframes audio-shimmer {
-  100% { left: 100%; }
-}
-
-/* ===== MAIN STYLES (Updated with new features) ===== */
 body {
   font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
   margin: 0;
   padding: 0;
   background-color: var(--light-bg);
   color: var(--text-light);
-  line-height: 1.6;
-  scroll-behavior: smooth;
   overflow-x: hidden;
-  transition: background-color 0.5s ease, color 0.5s ease;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
 }
 
-body.light-mode {
-  background-color: var(--light-bg);
-  color: var(--text-light);
-}
-
-body.dark-mode {
-  background-color: var(--dark-bg);
-  color: var(--text-dark);
-}
-
-/* Header with living effects */
-header {
-  text-align: center;
-  padding: 30px 20px;
-  position: relative;
-  overflow: hidden;
-}
-
-.header-shimmer {
-  position: absolute;
+/* ===== WELCOME EXPERIENCE (MOBILE OPTIMIZED) ===== */
+.welcome-overlay {
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-  animation: header-shimmer 8s infinite;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #08131f, #0f2436);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  overflow: hidden;
+  padding: 20px;
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin: 10px 0;
+.welcome-center {
+  text-align: center;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 100%;
+}
+
+.elegant-t-container {
+  width: 100px;
+  height: 100px;
+}
+
+.elegant-t svg {
+  width: 100%;
+  height: 100%;
+}
+
+.tawfiq-text h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.tawfiq-text p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 4px;
+}
+
+.blessings-area {
+  max-width: 100%;
+  padding: 0 16px;
+}
+
+.blessing {
+  font-family: 'Amiri', serif;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+  min-height: 40px;
+}
+
+.cursor {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.6);
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.welcome-overlay.exit {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+/* ===== MAIN CONTENT STRUCTURE ===== */
+/* Header */
+header {
+  padding: 70px 20px 20px;
+  text-align: center;
+  position: relative;
+}
+
+h1.logo-living {
+  font-size: 1.6rem;
+  margin: 0 0 8px 0;
   background: linear-gradient(45deg, var(--primary-color), var(--accent-blue));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gentle-pulse 4s infinite;
 }
 
-/* ===== ENHANCED MENU STYLES ===== */
-/* Menu toggle button style */
+h3.shimmering-header {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ===== MOBILE CONTROLS ===== */
+/* Menu Toggle */
 #menu-toggle {
-  font-size: 28px;
-  cursor: pointer;
   position: fixed;
-  top: 20px;
-  left: 15px;
-  z-index: 1001;
-  background: #fff;
-  padding: 10px 14px;
-  border-radius: 12px;
+  top: 16px;
+  left: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+  border: none;
   box-shadow: var(--shadow-soft);
-  transition: var(--transition-bounce);
-}
-#menu-toggle:hover {
-  background: #eee;
-  transform: scale(1.1) rotate(90deg);
+  font-size: 1.5rem;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
 }
 
-/* Theme toggle button style */
+#menu-toggle:hover {
+  transform: scale(1.05);
+}
+
+/* Theme Toggle */
 #theme-toggle {
   position: fixed;
-  top: 20px;
-  right: 15px;
-  z-index: 1001;
-  padding: 10px 16px;
-  border-radius: 12px;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   border: none;
-  cursor: pointer;
-  font-size: 20px;
   background: linear-gradient(135deg, #FFD700, #FFA500);
   color: #333;
-  box-shadow: var(--shadow-soft);
-  transition: var(--transition-bounce);
+  font-size: 1.2rem;
+  z-index: 1001;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
 }
+
 #theme-toggle:hover {
-  transform: scale(1.1) rotate(15deg);
+  transform: scale(1.05);
 }
+
 body.dark-mode #theme-toggle {
   background: linear-gradient(135deg, #333, #555);
   color: #fff;
 }
 
-/* Sidebar menu styles - ENHANCED */
+/* Sidebar Menu (Mobile Optimized) */
 #side-menu {
   position: fixed;
   top: 0;
   left: 0;
-  width: 280px;
-  height: 100%;
+  width: 85%;
+  max-width: 300px;
+  height: 100vh;
   background: linear-gradient(180deg, #121212 0%, #1a1a2e 100%);
   color: #fff;
-  padding-top: 80px;
-  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
   overflow-y: auto;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+  -webkit-overflow-scrolling: touch;
+  padding-top: 80px;
+}
+
+#side-menu.active {
+  transform: translateX(0);
 }
 
 #side-menu.hidden {
-  transform: translateX(-280px);
+  transform: translateX(-100%);
 }
 
 #side-menu ul {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
 #side-menu li {
-  padding: 16px 25px;
+  padding: 14px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: var(--transition-fast);
   cursor: pointer;
-  font-size: 1.05em;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-#side-menu li:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.5s;
-}
-
-#side-menu li:hover:before {
-  left: 100%;
-}
-
-#side-menu li:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(10px);
-  border-left: 4px solid var(--accent-gold);
 }
 
 #side-menu li:active {
-  transform: translateX(5px) scale(0.98);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
 }
 
 #side-menu a {
@@ -725,12 +293,12 @@ body.dark-mode #theme-toggle {
   display: flex;
   align-items: center;
   gap: 12px;
+  font-size: 0.95rem;
 }
 
 #side-menu i {
-  font-size: 1.2em;
   width: 24px;
-  text-align: center;
+  font-size: 1.1rem;
 }
 
 /* Menu item specific colors */
@@ -750,219 +318,372 @@ body.dark-mode #theme-toggle {
 #side-menu li:nth-child(14) i { color: #9E9E9E; } /* About Tawfiq AI */
 #side-menu li:nth-child(15) i { color: #FF5252; } /* Feedback / Report */
 
-/* Scrollbar for menu */
-#side-menu::-webkit-scrollbar {
-  width: 6px;
-}
-#side-menu::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-}
-#side-menu::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* Tabs styles */
-.tabs {
-  margin-top: 100px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.tab {
-  padding: 12px 24px;
-  border-radius: 25px;
-  background-color: white;
-  box-shadow: var(--shadow-soft);
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1em;
-  transition: var(--transition-bounce);
-  position: relative;
-  overflow: hidden;
-}
-.tab:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s;
-}
-.tab:hover:before {
-  left: 100%;
-}
-.tab.active, .tab:hover {
-  background-color: var(--primary-color);
-  color: white;
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-medium);
-}
-
-/* Sections styling */
-.section {
-  display: none;
-  padding: 25px;
-  max-width: 800px;
-  margin: 25px auto;
-  background-color: white;
-  border-radius: 20px;
-  box-shadow: var(--shadow-soft);
-  position: relative;
-  overflow: hidden;
-}
-body.dark-mode .section {
-  background-color: #2c2c2c;
-}
-.section:before {
-  content: '';
-  position: absolute;
+/* Menu Overlay */
+.menu-overlay {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-blue), var(--secondary-color));
-}
-.section.active {
-  display: block;
-  animation: section-appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes section-appear {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-fast);
 }
 
-/* Input styles */
-input[type="text"], select {
-  width: 100%;
-  padding: 15px;
-  margin-top: 12px;
-  border-radius: 12px;
-  border: 2px solid #e0e0e0;
-  font-size: 1em;
-  font-family: 'Poppins', sans-serif;
-  transition: var(--transition-smooth);
+.menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
-input[type="text"]:focus, select:focus {
-  border-color: var(--primary-color);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.2);
+
+/* ===== TABS (MOBILE OPTIMIZED) ===== */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  margin-top: 80px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: white;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
+}
+
+.tab.active, .tab:hover {
+  background: var(--primary-color);
+  color: white;
   transform: translateY(-2px);
 }
 
-/* Buttons styling */
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button) {
-  margin-top: 15px;
-  padding: 14px 24px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-blue));
-  color: #fff;
-  font-size: 1em;
-  font-weight: 600;
-  cursor: pointer;
+/* ===== SECTIONS (MOBILE OPTIMIZED) ===== */
+.section {
+  padding: 20px;
+  margin: 16px;
+  background: white;
+  border-radius: 16px;
   box-shadow: var(--shadow-soft);
-  transition: var(--transition-bounce);
+  display: none;
   position: relative;
   overflow: hidden;
 }
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):hover:before {
-  left: 100%;
-}
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-medium);
-}
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):active {
-  transform: translateY(-2px);
+
+.section.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
 }
 
-/* Messages container styles */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== INPUTS & BUTTONS ===== */
+input[type="text"], select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  margin: 8px 0;
+  transition: var(--transition-fast);
+  background: white;
+}
+
+input[type="text"]:focus, select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.1);
+}
+
+button:not(#menu-toggle):not(#theme-toggle):not(.smile-button) {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-blue));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  margin: 8px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):active {
+  transform: scale(0.98);
+}
+
+/* ===== CHAT MESSAGES ===== */
 .messages {
-  margin-top: 20px;
-  background-color: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: var(--shadow-soft);
-  max-height: 400px;
+  height: 300px;
   overflow-y: auto;
-  font-family: inherit;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  margin: 16px 0;
+  background: #f8f9fa;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
-}
-body.dark-mode .messages {
-  background-color: #333;
+  gap: 12px;
 }
 
-/* User message style */
 .user-message {
   align-self: flex-end;
   background: linear-gradient(135deg, #dcf8c6, #c5e8b7);
   color: #000;
-  padding: 12px 18px;
-  margin-bottom: 12px;
-  border-radius: 20px 20px 5px 20px;
+  padding: 12px 16px;
+  border-radius: 18px 18px 4px 18px;
   max-width: 85%;
   word-wrap: break-word;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: var(--transition-smooth);
-}
-body.dark-mode .user-message {
-  background: linear-gradient(135deg, #2d5a27, #3a6b31);
-  color: white;
+  animation: slideInRight 0.3s ease;
 }
 
-/* AI message style */
 .ai-message {
   align-self: flex-start;
-  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+  background: white;
   color: #000;
-  padding: 12px 18px;
-  margin-bottom: 12px;
-  border-radius: 20px 20px 20px 5px;
+  padding: 12px 16px;
+  border-radius: 18px 18px 18px 4px;
   max-width: 85%;
   word-wrap: break-word;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: 1px solid #e0e0e0;
+  animation: slideInLeft 0.3s ease;
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== QURAN & HADITH SECTIONS ===== */
+.results {
+  margin-top: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.verse-block, .hadith-entry {
+  padding: 12px;
+  margin: 8px 0;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+/* ===== DAILY DUA SECTION ===== */
+#dailyDuaSection {
+  background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+  padding: 20px;
+  border-radius: 16px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+#dailyDuaContent {
+  font-family: 'Amiri', serif;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #00695c;
+  direction: rtl;
+  margin: 16px 0;
+}
+
+.quran-bracket {
+  font-size: 1.5em;
+  color: var(--primary-color);
+  display: inline-block;
+  margin: 0 5px;
+}
+
+.rotating-bracket {
+  animation: rotate-bracket 20s linear infinite;
+}
+
+@keyframes rotate-bracket {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== SMILE BOOSTER (MOBILE OPTIMIZED) ===== */
+.smile-booster-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.smile-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
   transition: var(--transition-smooth);
 }
-body.dark-mode .ai-message {
-  background: linear-gradient(135deg, #424242, #333);
+
+.smile-button:active {
+  transform: scale(0.95);
+}
+
+.compliment-bubble {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft);
+  max-width: 200px;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: var(--transition-smooth);
+  z-index: 100;
+}
+
+.compliment-bubble.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.compliment-bubble:after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
+
+/* ===== AUTO MESSAGES ===== */
+.auto-message {
+  position: fixed;
+  bottom: 100px;
+  left: 20px;
+  right: 20px;
+  background: rgba(76, 175, 80, 0.95);
   color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: var(--transition-smooth);
+  z-index: 99;
 }
 
-.user-message:hover, .ai-message:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.auto-message.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* Video styles */
-video {
-  width: 300px;
-  height: 225px;
-  margin: 8px;
-  border-radius: 10px;
-  background: black;
-  object-fit: cover;
+/* ===== AUDIO PLAYER ===== */
+.audio-player {
+  margin: 16px 0;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  display: none;
 }
 
-#remoteVideos {
+.audio-controls {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 15px;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.play-button {
+  background: var(--secondary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.play-button:active {
+  transform: scale(0.95);
+}
+
+.audio-progress {
+  flex: 1;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.audio-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-blue));
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+.audio-time {
+  font-size: 12px;
+  color: #666;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* ===== LIVE MEETING (MOBILE OPTIMIZED) ===== */
+.video-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+video {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  background: #000;
+  object-fit: cover;
 }
 
 #localVideo {
@@ -973,28 +694,223 @@ video {
   border: 3px solid #2196F3;
 }
 
-/* Daily Dua Section Specific */
-#dailyDuaSection {
-  background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
-  border-radius: 20px;
-  padding: 25px;
-  margin-top: 20px;
-  box-shadow: var(--shadow-soft);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+.meeting-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
 }
+
+.control-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.control-btn:active {
+  transform: scale(0.95);
+}
+
+#toggleVideo {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#toggleAudio {
+  background-color: #2196F3;
+  color: white;
+}
+
+#endCall {
+  background-color: #f44336;
+  color: white;
+}
+
+/* ===== TYPING INDICATOR ===== */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: #666;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.hidden {
+  display: none !important;
+}
+
+/* ===== DARK MODE ===== */
+body.dark-mode {
+  background-color: var(--dark-bg);
+  color: var(--text-dark);
+}
+
+body.dark-mode .section,
+body.dark-mode .messages,
+body.dark-mode .results {
+  background: #2c2c2c;
+  color: var(--text-dark);
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode select {
+  background: #333;
+  border-color: #444;
+  color: var(--text-dark);
+}
+
+body.dark-mode .user-message {
+  background: linear-gradient(135deg, #2d5a27, #3a6b31);
+  color: white;
+}
+
+body.dark-mode .ai-message {
+  background: #333;
+  color: white;
+  border-color: #444;
+}
+
 body.dark-mode #dailyDuaSection {
   background: linear-gradient(135deg, #263238, #37474f);
 }
-#dailyDuaContent {
-  font-size: 1.3em;
-  font-family: 'Amiri', serif;
-  color: #00695c;
-  line-height: 1.8;
-}
+
 body.dark-mode #dailyDuaContent {
   color: #80cbc4;
+}
+
+body.dark-mode .audio-player {
+  background: #333;
+}
+
+body.dark-mode .audio-time {
+  color: #ccc;
+}
+
+body.dark-mode .meeting-controls {
+  background: #333;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+/* Tablets and larger phones */
+@media (min-width: 480px) {
+  .tabs {
+    gap: 12px;
+  }
+  
+  .tab {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+  
+  .smile-button {
+    width: 70px;
+    height: 70px;
+    font-size: 32px;
+  }
+  
+  .messages {
+    height: 350px;
+  }
+}
+
+/* Small tablets */
+@media (min-width: 768px) {
+  body {
+    font-size: 18px;
+  }
+  
+  .section {
+    margin: 20px auto;
+    max-width: 600px;
+  }
+  
+  .messages {
+    height: 400px;
+  }
+  
+  video {
+    height: 250px;
+  }
+  
+  #side-menu {
+    width: 280px;
+  }
+}
+
+/* Large tablets and laptops */
+@media (min-width: 1024px) {
+  .tabs {
+    margin-top: 100px;
+  }
+  
+  .smile-booster-container {
+    bottom: 30px;
+    right: 30px;
+  }
+  
+  .section {
+    max-width: 800px;
+  }
+}
+
+/* ===== SAFARI/IOS SPECIFIC ===== */
+@supports (-webkit-touch-callout: none) {
+  .messages,
+  .results {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  input[type="text"],
+  select,
+  button {
+    -webkit-appearance: none;
+  }
+  
+  body {
+    overscroll-behavior: none;
+  }
+}
+
+/* Auth Status */
+.auth-status {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 100;
+  font-size: 0.9rem;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-soft);
+}
+
+body.dark-mode .auth-status {
+  background: #333;
+  color: white;
 }
 
 /* Quran brackets rotation */
@@ -1005,164 +921,12 @@ body.dark-mode #dailyDuaContent {
   margin: 0 10px;
 }
 
-/* Audio player with shimmer */
-.audio-player {
-  margin-top: 20px;
-  width: 100%;
-  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-  border-radius: 15px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-}
-body.dark-mode .audio-player {
-  background: linear-gradient(135deg, #333, #424242);
-}
-.audio-controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 15px;
-}
-.play-button {
-  background: linear-gradient(135deg, var(--secondary-color), #45a049);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: var(--transition-smooth);
-}
-.play-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-}
-.audio-progress {
-  flex-grow: 1;
-  height: 8px;
-  background-color: #ddd;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.audio-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-blue));
-  width: 0%;
-  transition: width 0.1s linear;
-  position: relative;
-  overflow: hidden;
-}
-.audio-progress-bar:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: shimmer 2s infinite;
-}
-
-/* Live Meeting Section */
-#liveMeetingSection {
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-top: 20px;
-}
-#liveMeetingSection h2 {
+/* Loading indicator */
+.loading-indicator {
+  padding: 10px;
   text-align: center;
-  color: #00695c;
-  margin-bottom: 20px;
-  font-size: 1.8em;
-}
-.video-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
-}
-.video-wrapper {
-  position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-.video-wrapper h3 {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(0,0,0,0.7);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 0.9em;
-  margin: 0;
-}
-.meeting-controls {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 20px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 10px;
-}
-body.dark-mode .meeting-controls {
-  background: #333;
-}
-.control-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-}
-.control-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-#toggleVideo {
-  background-color: #4CAF50;
-  color: white;
-}
-#toggleAudio {
-  background-color: #2196F3;
-  color: white;
-}
-#endCall {
-  background-color: #f44336;
-  color: white;
-}
-
-/* Responsive design */
-@media(max-width: 768px) {
-  h1 { font-size: 2rem; }
-  .tab { padding: 10px 18px; font-size: 0.9em; }
-  .section { padding: 20px; margin: 15px; }
-  .smile-button { width: 60px; height: 60px; font-size: 28px; }
-  .smile-booster-container { bottom: 20px; right: 20px; }
-  .auto-message { bottom: 100px; right: 20px; max-width: 200px; }
-  #side-menu { width: 250px; }
-  #menu-toggle { top: 15px; left: 10px; padding: 8px 12px; font-size: 24px; }
-  #theme-toggle { top: 15px; right: 10px; padding: 8px 14px; font-size: 18px; }
-}
-
-@media(max-width: 480px) {
-  h1 { font-size: 1.8rem; }
-  .tabs { gap: 8px; }
-  .tab { padding: 8px 14px; font-size: 0.85em; }
-  button:not(#menu-toggle):not(#theme-toggle):not(.smile-button) { padding: 12px 18px; }
-  #dailyDuaContent { font-size: 1.1em; }
-  #side-menu { width: 220px; }
-  #side-menu li { padding: 14px 20px; font-size: 1em; }
+  color: #666;
+  font-style: italic;
 }
 </style>
 </head>
@@ -1170,23 +934,9 @@ body.dark-mode .meeting-controls {
 
 <!-- ===== WELCOME EXPERIENCE ===== -->
 <div id="welcome-overlay" class="welcome-overlay">
-
-  <!-- Background -->
-  <div class="depth-canvas">
-    <div class="light-rays"></div>
-
-    <div class="distant-stars">
-      <span class="star"></span><span class="star"></span><span class="star"></span>
-      <span class="star"></span><span class="star"></span>
-    </div>
-  </div>
-
-  <!-- Center -->
   <div class="welcome-center">
-
-    <!-- Elegant T -->
     <div class="elegant-t-container">
-      <div class="elegant-t t-breathe">
+      <div class="elegant-t">
         <svg viewBox="0 0 100 100">
           <defs>
             <linearGradient id="tGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1199,28 +949,20 @@ body.dark-mode .meeting-controls {
         </svg>
       </div>
     </div>
-
-    <!-- Text -->
     <div class="tawfiq-text">
       <h1>Tawfiq AI</h1>
       <p>Your Smart Islamic Companion</p>
     </div>
-
-    <!-- Blessing -->
     <div class="blessings-area">
       <div id="blessing" class="blessing"></div>
       <span class="cursor">|</span>
     </div>
-
   </div>
 </div>
 
-<!-- ===== CURSOR FOLLOWER ===== -->
-<div class="cursor-follower"></div>
-
 <!-- ===== SMILE BOOSTER ===== -->
 <div class="smile-booster-container">
-  <button class="smile-button bounce-on-click" id="smileBtn">
+  <button class="smile-button" id="smileBtn">
     <i class="fas fa-smile"></i>
   </button>
   <div class="compliment-bubble" id="complimentBubble">
@@ -1228,23 +970,17 @@ body.dark-mode .meeting-controls {
   </div>
 </div>
 
-<!-- ===== AUTO MESSAGES CONTAINER ===== -->
+<!-- ===== AUTO MESSAGES ===== -->
 <div class="auto-message" id="autoMessage">
   <i class="fas fa-heart" style="margin-right: 8px;"></i>
   <span id="autoMessageText">Remember Allah in every moment</span>
 </div>
 
-<!-- ===== CELEBRATION ANIMATION CONTAINER ===== -->
-<div class="celebration-animation" id="celebrationContainer"></div>
-
-<!-- ===== SLIDING MESSAGE ===== -->
-<div class="sliding-message" id="slidingMessage">
-  <i class="fas fa-star" style="margin-right: 8px;"></i>
-  <span>Welcome to Tawfiq AI!</span>
-</div>
+<!-- ===== MENU OVERLAY ===== -->
+<div class="menu-overlay" id="menuOverlay"></div>
 
 <!-- Theme Toggle Button -->
-<button id="theme-toggle" class="hover-rotate-small">☀️</button>
+<button id="theme-toggle">☀️</button>
 
 <!-- Auth Status -->
 <div class="auth-status">
@@ -1256,16 +992,19 @@ body.dark-mode .meeting-controls {
 </div>
 
 <!-- MENU TOGGLE BUTTON -->
-<div id="menu-toggle" class="hover-rotate-small">☰</div>
+<button id="menu-toggle">☰</button>
 
-<!-- SIDEBAR MENU - KEPT EXACTLY AS REQUESTED -->
-<div id="side-menu" class="hidden">
+<!-- SIDEBAR MENU -->
+<nav id="side-menu" class="hidden">
   <ul>
     <li><a href="/profile"><i class="fas fa-user"></i> 👤 Profile</a></li>
     <li><a href="/talk-to-tawfiq"><i class="fas fa-microphone"></i> 🎙️ Talk to Tawfiq</a></li>
     <li><a href="/live-meeting"><i class="fas fa-video"></i> 🎙️ Live Meeting</a></li>
     <li><a href="/prayer-times"><i class="fas fa-mosque"></i> 🕌 Prayer Times</a></li>
+    <li><a href="/duas"><i class="fas fa-hands-praying"></i> 🕌 Dua</a></li>
+    <li><a href="/reminder"><i class="fas fa-bell"></i> 📅 Daily Reminder</a></li>
     <li><a href="/motivation"><i class="fas fa-sparkles"></i> ✨ Islamic Motivation</a></li>
+    <li><a href="/visual-quran"><i class="fas fa-book-quran"></i> ✨ Visual Quran</a></li>
     <li><a href="/story-time"><i class="fas fa-book-open"></i> 📖 Story Time</a></li>
     <li><a href="/reels"><i class="fas fa-mobile-alt"></i> 📱 Reels</a></li>
     <li><a href="/trivia"><i class="fas fa-gamepad"></i> 🎮 Play Game</a></li>
@@ -1274,28 +1013,27 @@ body.dark-mode .meeting-controls {
     <li><a href="/about"><i class="fas fa-info-circle"></i> ℹ️ About Tawfiq AI</a></li>
     <li><a href="/feedback"><i class="fas fa-comment-dots"></i> 📢 Feedback / Report</a></li>
   </ul>
-</div>
+</nav>
 
 <!-- Main Header -->
 <header>
-  <div class="header-shimmer"></div>
   <h1 class="logo-living">🌙 Tawfiq AI - Smart Islamic Companion 🌙</h1>
   <h3 class="shimmering-header">✨ Ask me anything about Islam ✨</h3>
 </header>
 
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab active hover-lift" onclick="switchTab('aiSection', event)">🤖 AI Chat</div>
-  <div class="tab hover-lift" onclick="switchTab('quranSection', event)">📖 Quran</div>
-  <div class="tab hover-lift" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
-  <div class="tab hover-lift" onclick="switchTab('duaSection', event)">🕌 Daily Dua</div>
+  <div class="tab active" onclick="switchTab('aiSection', event)">🤖 AI Chat</div>
+  <div class="tab" onclick="switchTab('quranSection', event)">📖 Quran</div>
+  <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
+  <div class="tab" onclick="switchTab('duaSection', event)">🕌 Dua</div>
 </div>
 
 <!-- AI Section -->
 <div class="section active" id="aiSection">
   <div class="messages" id="messages"></div>
   <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
-  <button id="askButton" class="ripple-button hover-lift">Ask Tawfiq AI</button>
+  <button id="askButton">Ask Tawfiq AI</button>
 </div>
 
 <!-- Quran Section -->
@@ -1304,14 +1042,14 @@ body.dark-mode .meeting-controls {
   <select id="surahList">
     <option value="">-- Or Select Surah --</option>
   </select>
-  <div style="display: flex; gap: 10px; margin-top: 10px;">
-    <button id="quranSearchButton" class="ripple-button hover-lift">Search Surah</button>
-    <button id="playSurahButton" class="ripple-button hover-lift" style="background: linear-gradient(135deg, #4CAF50, #45a049);">🎵 Play Surah</button>
+  <div style="display: flex; gap: 10px; margin-top: 12px;">
+    <button id="quranSearchButton">Search Surah</button>
+    <button id="playSurahButton" style="background: linear-gradient(135deg, #4CAF50, #45a049);">🎵 Play Surah</button>
   </div>
-  <div class="audio-player shimmering-audio" id="audioPlayer" style="display: none;">
+  <div class="audio-player shimmering-audio" id="audioPlayer">
     <audio id="surahAudio" controls style="width: 100%;"></audio>
     <div class="audio-controls">
-      <button class="play-button bounce-on-click" id="playPauseBtn">Play</button>
+      <button class="play-button" id="playPauseBtn">Play</button>
       <div class="audio-progress">
         <div class="audio-progress-bar" id="progressBar"></div>
       </div>
@@ -1327,7 +1065,7 @@ body.dark-mode .meeting-controls {
   <select id="hadithDropdown">
     <option value="">-- Or Select Hadith Topic --</option>
   </select>
-  <button id="hadithSearchButton" class="ripple-button hover-lift">Search Hadith</button>
+  <button id="hadithSearchButton">Search Hadith</button>
   <div class="results" id="hadithResult"></div>
 </div>
 
@@ -1359,546 +1097,330 @@ body.dark-mode .meeting-controls {
 <script src="https://unpkg.com/simple-peer@9.11.1/simplepeer.min.js"></script>
 
 <script>
-  // ===== INITIALIZATION =====
-  document.addEventListener("DOMContentLoaded", function() {
-    // Initialize new welcome experience
-    initializeNewWelcomeExperience();
-    
-    // Initialize cursor follower
-    initializeCursorFollower();
-    
-    // Initialize smile booster
-    initializeSmileBooster();
-    
-    // Initialize auto messages
-    initializeAutoMessages();
-    
-    // Initialize sliding message
-    showSlidingMessage();
-    
-    // Load content
-    loadDailyDua();
-    loadHadithTopics();
-    loadSurahList();
-    initializeAudioPlayer();
-    
-    // Apply hover effects to existing elements
-    applyHoverEffects();
-    
-    // Add celebration on first interaction
-    document.addEventListener('click', function firstInteraction() {
-      triggerCelebration();
-      document.removeEventListener('click', firstInteraction);
-    });
-    
-    // Initialize event listeners
-    document.getElementById('askButton').addEventListener('click', sendQuestion);
-    document.getElementById('quranSearchButton').addEventListener('click', searchQuran);
-    document.getElementById('playSurahButton').addEventListener('click', playSurah);
-    document.getElementById('hadithSearchButton').addEventListener('click', searchHadith);
-    document.getElementById('theme-toggle').addEventListener('click', toggleMode);
-    document.getElementById('menu-toggle').addEventListener('click', toggleMenu);
-    document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
-    
-    // Enter key for AI chat
-    document.getElementById('userInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') sendQuestion();
+// ===== MOBILE-OPTIMIZED JAVASCRIPT =====
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize welcome experience
+  initializeWelcome();
+  
+  // Initialize mobile interactions
+  initializeMobileInteractions();
+  
+  // Load initial content
+  loadInitialContent();
+  
+  // Set up event listeners
+  setupEventListeners();
+  
+  // Handle keyboard for better mobile UX
+  setupKeyboardHandling();
+  
+  // Load saved theme
+  loadTheme();
+});
+
+function initializeWelcome() {
+  const text = "In the name of Allah, the Most Gracious, the Most Merciful";
+  const blessingEl = document.getElementById("blessing");
+  const overlay = document.getElementById("welcome-overlay");
+  const cursor = document.querySelector(".cursor");
+  
+  let i = 0;
+  
+  function typeBlessing() {
+    if (i < text.length) {
+      blessingEl.textContent += text.charAt(i);
+      i++;
+      setTimeout(typeBlessing, 60);
+    } else {
+      cursor.style.display = "none";
+      
+      // Pause before fading out
+      setTimeout(() => {
+        overlay.classList.add("exit");
+        // Wait for transition to complete before hiding completely
+        setTimeout(() => {
+          overlay.style.display = "none";
+        }, 1200);
+      }, 2000);
+    }
+  }
+  
+  // Start typing after slight delay
+  setTimeout(typeBlessing, 800);
+}
+
+function initializeMobileInteractions() {
+  // Menu toggle
+  const menuToggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('side-menu');
+  const menuOverlay = document.getElementById('menuOverlay');
+  
+  menuToggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    menu.classList.toggle('hidden');
+    menuOverlay.classList.toggle('active');
+  });
+  
+  menuOverlay.addEventListener('click', function() {
+    menu.classList.add('hidden');
+    menuOverlay.classList.remove('active');
+  });
+  
+  // Close menu when clicking outside on mobile
+  document.addEventListener('click', function(e) {
+    if (!menu.contains(e.target) && !menuToggle.contains(e.target)) {
+      menu.classList.add('hidden');
+      menuOverlay.classList.remove('active');
+    }
+  });
+  
+  // Prevent body scroll when menu is open
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'class') {
+        if (!menu.classList.contains('hidden')) {
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.body.style.overflow = '';
+        }
+      }
     });
   });
-
-  // ===== NEW WELCOME EXPERIENCE =====
-  function initializeNewWelcomeExperience() {
-    const text = "In the name of Allah, the Most Gracious, the Most Merciful";
-    const blessingEl = document.getElementById("blessing");
-    const overlay = document.getElementById("welcome-overlay");
-    const cursor = document.querySelector(".cursor");
-
-    let i = 0;
-
-    function typeBlessing() {
-      if (i < text.length) {
-        blessingEl.textContent += text.charAt(i);
-        i++;
-        setTimeout(typeBlessing, 60); // typing speed
-      } else {
-        cursor.style.display = "none";
-
-        // Pause before fading out
-        setTimeout(() => {
-          overlay.classList.add("exit");
-          // Wait for transition to complete before hiding completely
-          setTimeout(() => {
-            overlay.style.display = "none";
-          }, 1200);
-        }, 2000);
-      }
-    }
-
-    // Start typing after slight delay
-    setTimeout(typeBlessing, 800);
-  }
-
-  // ===== CURSOR FOLLOWER =====
-  function initializeCursorFollower() {
-    const follower = document.querySelector('.cursor-follower');
-    let mouseX = 0, mouseY = 0;
-    let followerX = 0, followerY = 0;
+  
+  observer.observe(menu, { attributes: true });
+  
+  // Smile booster for mobile
+  const smileBtn = document.getElementById('smileBtn');
+  const complimentBubble = document.getElementById('complimentBubble');
+  
+  const compliments = [
+    "Masha'Allah! Your smile is sadaqah!",
+    "Allah loves those who are cheerful!",
+    "A smile is charity - Prophet Muhammad (PBUH)",
+    "Your positivity brightens the day!",
+    "May Allah accept your good deeds!",
+    "Keep smiling, it's sunnah!",
+    "Your faith shines through your smile!",
+    "Allah rewards every good intention!",
+    "Patience and gratitude bring smiles!",
+    "Your smile makes angels smile too!"
+  ];
+  
+  smileBtn.addEventListener('click', function() {
+    const randomCompliment = compliments[Math.floor(Math.random() * compliments.length)];
+    complimentBubble.textContent = randomCompliment;
+    complimentBubble.classList.add('show');
     
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-    
-    function animate() {
-      // Calculate distance between cursor and follower
-      let distX = mouseX - followerX;
-      let distY = mouseY - followerY;
-      
-      // Move follower toward cursor with easing
-      followerX += distX * 0.1;
-      followerY += distY * 0.1;
-      
-      // Apply position
-      follower.style.transform = `translate(${followerX - 10}px, ${followerY - 10}px)`;
-      
-      // Change size based on speed
-      const speed = Math.sqrt(distX * distX + distY * distY);
-      const size = Math.min(20 + speed * 0.05, 40);
-      follower.style.width = `${size}px`;
-      follower.style.height = `${size}px`;
-      
-      requestAnimationFrame(animate);
-    }
-    
-    animate();
-  }
-
-  // ===== SMILE BOOSTER =====
-  function initializeSmileBooster() {
-    const smileBtn = document.getElementById('smileBtn');
-    const complimentBubble = document.getElementById('complimentBubble');
-    
-    const compliments = [
-      "Masha'Allah! Your smile is sadaqah!",
-      "Allah loves those who are cheerful!",
-      "A smile is charity - Prophet Muhammad (PBUH)",
-      "Your positivity brightens the day!",
-      "May Allah accept your good deeds!",
-      "Keep smiling, it's sunnah!",
-      "Your faith shines through your smile!",
-      "Allah rewards every good intention!",
-      "Patience and gratitude bring smiles!",
-      "Your smile makes angels smile too!"
-    ];
-    
-    smileBtn.addEventListener('click', function() {
-      // Select random compliment
-      const randomCompliment = compliments[Math.floor(Math.random() * compliments.length)];
-      complimentBubble.textContent = randomCompliment;
-      
-      // Show bubble
-      complimentBubble.classList.add('show');
-      
-      // Add bounce effect to button
-      this.classList.add('bounce-on-click');
-      setTimeout(() => {
-        this.classList.remove('bounce-on-click');
-      }, 500);
-      
-      // Hide bubble after 4 seconds
-      setTimeout(() => {
-        complimentBubble.classList.remove('show');
-      }, 4000);
-      
-      // Trigger celebration
-      triggerMiniCelebration();
-    });
-  }
-
-  // ===== AUTO MESSAGES =====
-  function initializeAutoMessages() {
-    const autoMessage = document.getElementById('autoMessage');
-    const autoMessageText = document.getElementById('autoMessageText');
-    
-    const autoMessages = [
-      "Remember Allah in every moment",
-      "Patience is a pillar of faith",
-      "Gratitude increases blessings",
-      "Prayer is the key to Paradise",
-      "Charity erases sins",
-      "Kindness is a mark of faith",
-      "Seek knowledge from cradle to grave",
-      "Trust in Allah's timing",
-      "Forgive others as you seek forgiveness",
-      "The best among you are those with the best character"
-    ];
-    
-    let messageIndex = 0;
-    
-    // Show first message after 30 seconds
-    setTimeout(showAutoMessage, 30000);
-    
-    // Show new message every 45 seconds
-    setInterval(showAutoMessage, 45000);
-    
-    function showAutoMessage() {
-      autoMessageText.textContent = autoMessages[messageIndex];
-      autoMessage.classList.add('show');
-      
-      messageIndex = (messageIndex + 1) % autoMessages.length;
-      
-      // Hide after 6 seconds
-      setTimeout(() => {
-        autoMessage.classList.remove('show');
-      }, 6000);
-    }
-  }
-
-  // ===== SLIDING MESSAGE =====
-  function showSlidingMessage() {
-    const slidingMessage = document.getElementById('slidingMessage');
-    
-    // Show message after welcome overlay disappears
     setTimeout(() => {
-      slidingMessage.classList.add('show');
-      
-      // Hide after 5 seconds
-      setTimeout(() => {
-        slidingMessage.classList.remove('show');
-      }, 5000);
+      complimentBubble.classList.remove('show');
+    }, 3000);
+  });
+  
+  // Auto messages
+  const autoMessage = document.getElementById('autoMessage');
+  const autoMessages = [
+    "Remember Allah in every moment",
+    "Patience is a pillar of faith",
+    "Gratitude increases blessings",
+    "Prayer is the key to Paradise",
+    "Charity erases sins",
+    "Kindness is a mark of faith",
+    "Seek knowledge from cradle to grave",
+    "Trust in Allah's timing",
+    "Forgive others as you seek forgiveness",
+    "The best among you are those with the best character"
+  ];
+  
+  let messageIndex = 0;
+  
+  function showAutoMessage() {
+    autoMessage.children[1].textContent = autoMessages[messageIndex];
+    autoMessage.classList.add('show');
+    
+    messageIndex = (messageIndex + 1) % autoMessages.length;
+    
+    setTimeout(() => {
+      autoMessage.classList.remove('show');
     }, 5000);
   }
-
-  // ===== CELEBRATION ANIMATIONS =====
-  function triggerCelebration() {
-    const container = document.getElementById('celebrationContainer');
-    const colors = ['#FFD700', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800'];
-    
-    // Create 30 particles
-    for (let i = 0; i < 30; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'celebration-particle';
-      
-      // Random properties
-      const size = Math.random() * 15 + 5;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const left = Math.random() * 100;
-      const delay = Math.random() * 0.5;
-      
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.backgroundColor = color;
-      particle.style.left = `${left}%`;
-      particle.style.animationDelay = `${delay}s`;
-      
-      container.appendChild(particle);
-      
-      // Remove after animation completes
-      setTimeout(() => {
-        particle.remove();
-      }, 1500);
-    }
-    
-    // Show container
-    container.style.opacity = '1';
-    
-    // Hide after animation
-    setTimeout(() => {
-      container.style.opacity = '0';
-    }, 1500);
-  }
-
-  function triggerMiniCelebration() {
-    const container = document.getElementById('celebrationContainer');
-    const colors = ['#FFD700', '#4CAF50'];
-    
-    // Create 10 smaller particles
-    for (let i = 0; i < 10; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'celebration-particle';
-      
-      // Random properties
-      const size = Math.random() * 8 + 3;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const left = 70 + Math.random() * 20;
-      const delay = Math.random() * 0.3;
-      
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.backgroundColor = color;
-      particle.style.left = `${left}%`;
-      particle.style.animationDelay = `${delay}s`;
-      
-      container.appendChild(particle);
-      
-      // Remove after animation completes
-      setTimeout(() => {
-        particle.remove();
-      }, 1500);
-    }
-    
-    // Show container
-    container.style.opacity = '1';
-    
-    // Hide after animation
-    setTimeout(() => {
-      container.style.opacity = '0';
-    }, 1500);
-  }
-
-  // ===== APPLY HOVER EFFECTS =====
-  function applyHoverEffects() {
-    // Add ripple effect to all buttons
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-      button.addEventListener('click', function(e) {
-        // Create ripple element
-        const ripple = document.createElement('span');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        
-        ripple.style.cssText = `
-          position: absolute;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.7);
-          transform: scale(0);
-          animation: ripple-animation 0.6s linear;
-          width: ${size}px;
-          height: ${size}px;
-          top: ${y}px;
-          left: ${x}px;
-          pointer-events: none;
-        `;
-        
-        this.appendChild(ripple);
-        
-        setTimeout(() => {
-          ripple.remove();
-        }, 600);
-      });
-    });
-    
-    // Add CSS for ripple animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes ripple-animation {
-        to {
-          transform: scale(4);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  // ===== TYPING EFFECT FOR AI RESPONSES =====
-  function typeText(element, text, speed = 20) {
-    return new Promise(resolve => {
-      let i = 0;
-      element.innerHTML = '';
-      
-      function typeChar() {
-        if (i < text.length) {
-          const char = text.charAt(i);
-          element.innerHTML += char === "\n" ? "<br>" : char;
-          i++;
-          setTimeout(typeChar, speed);
-        } else {
-          resolve();
-        }
-      }
-      
-      typeChar();
-    });
-  }
-
-  // ===== ENHANCED SEND QUESTION =====
-  async function sendQuestion() {
-    const inputEl = document.getElementById("userInput");
-    const question = inputEl.value.trim();
-    if (!question) return;
-
-    const messagesDiv = document.getElementById("messages");
-
-    // Add user message with animation
-    const userMsg = document.createElement("div");
-    userMsg.className = "user-message";
-    userMsg.innerHTML = `You: ${question}`;
-    userMsg.style.opacity = '0';
-    userMsg.style.transform = 'translateY(20px)';
-    messagesDiv.appendChild(userMsg);
-    
-    // Animate user message in
-    setTimeout(() => {
-      userMsg.style.opacity = '1';
-      userMsg.style.transform = 'translateY(0)';
-      userMsg.style.transition = 'opacity 0.3s, transform 0.3s';
-    }, 10);
-    
-    inputEl.value = "";
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    // Add thinking animation
-    const thinkingMsg = document.createElement("div");
-    thinkingMsg.className = "ai-message";
-    thinkingMsg.innerHTML = `<div class="typing-indicator">
-      <span></span><span></span><span></span>
-    </div>`;
-    messagesDiv.appendChild(thinkingMsg);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    try {
-      const response = await fetch("/ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ history: [{ role: "user", content: question }] })
-      });
-      const data = await response.json();
-
-      // Remove thinking message
-      thinkingMsg.remove();
-
-      const messageContent = data.choices?.[0]?.message?.content;
-      const answerText = messageContent || "I apologize, but I couldn't generate a response at this moment. Please try again.";
-
-      // Add AI message with typing effect
-      const aiMsg = document.createElement("div");
-      aiMsg.className = "ai-message typing-text";
-      messagesDiv.appendChild(aiMsg);
-      
-      // Type out response
-      await typeText(aiMsg, `Tawfiq AI: ${answerText}`, 15);
-      
-      // Remove typing cursor after completion
-      aiMsg.classList.remove('typing-text');
-      
-      // Trigger mini celebration
-      triggerMiniCelebration();
-
-    } catch (error) {
-      console.error("Error:", error);
-      
-      // Remove thinking message
-      if (thinkingMsg.parentNode) {
-        thinkingMsg.remove();
-      }
-
-      // Show error message
-      const errorMsg = document.createElement("div");
-      errorMsg.className = "ai-message";
-      errorMsg.textContent = "Tawfiq AI: I apologize for the error. Please try again or check your connection.";
-      messagesDiv.appendChild(errorMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-  }
-
-  // ===== THEME TOGGLE =====
-  function toggleMode() {
-    const body = document.body;
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    
-    body.classList.toggle('light-mode');
-    body.classList.toggle('dark-mode');
-
-    if (body.classList.contains('dark-mode')) {
-      localStorage.setItem('theme', 'dark');
-      themeToggleBtn.innerHTML = '🌙';
-      themeToggleBtn.style.background = 'linear-gradient(135deg, #333, #555)';
-    } else {
-      localStorage.setItem('theme', 'light');
-      themeToggleBtn.innerHTML = '☀️';
-      themeToggleBtn.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
-    }
-    
-    // Add rotation effect
-    themeToggleBtn.classList.add('hover-rotate');
-    setTimeout(() => {
-      themeToggleBtn.classList.remove('hover-rotate');
-    }, 300);
-  }
-
-  // ===== LOAD SAVED THEME =====
-  function loadTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    
-    if (savedTheme === 'dark') {
-      document.body.classList.remove('light-mode');
-      document.body.classList.add('dark-mode');
-      themeToggleBtn.innerHTML = '🌙';
-      themeToggleBtn.style.background = 'linear-gradient(135deg, #333, #555)';
-    } else {
-      document.body.classList.remove('dark-mode');
-      document.body.classList.add('light-mode');
-      themeToggleBtn.innerHTML = '☀️';
-      themeToggleBtn.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
-    }
-  }
-
-  // Call loadTheme on page load
-  window.addEventListener('load', loadTheme);
-
-  // ===== ENHANCED TAB SWITCHING =====
-  function switchTab(sectionId, event) {
-    // Remove active class from all tabs and sections
-    document.querySelectorAll('.section').forEach(s => {
-      s.classList.remove('active');
-      s.style.opacity = '0';
-      s.style.transform = 'translateY(20px)';
-    });
-    
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    
-    // Add active class to clicked tab
-    event.target.classList.add('active');
-    
-    // Show selected section with animation
-    const activeSection = document.getElementById(sectionId);
-    activeSection.classList.add('active');
-    
-    setTimeout(() => {
-      activeSection.style.opacity = '1';
-      activeSection.style.transform = 'translateY(0)';
-      activeSection.style.transition = 'opacity 0.5s, transform 0.5s';
-    }, 10);
-    
-    // Load specific content for tab
-    if (sectionId === 'prayerTimes') loadPrayerTimes();
-    if (sectionId === 'duaSection') loadDailyDua();
-    
-    // Trigger mini celebration on tab switch
-    triggerMiniCelebration();
-  }
-
-  // ===== TOGGLE MENU =====
-  function toggleMenu() {
-    const sideMenu = document.getElementById('side-menu');
-    sideMenu.classList.toggle('hidden');
-    
-    // Add bounce effect to menu button
-    const menuToggle = document.getElementById('menu-toggle');
-    menuToggle.classList.add('hover-rotate');
-    setTimeout(() => {
-      menuToggle.classList.remove('hover-rotate');
-    }, 300);
-  }
-
-  // ===== ORIGINAL FUNCTIONS (with enhancements) =====
-  let chatHistory = [];
-  let audioPlayer = null;
   
-  // WebRTC Variables
-  let socket;
-  let localStream;
-  let peers = {};
-  let isVideoEnabled = true;
-  let isAudioEnabled = true;
-  let ROOM_ID = null;
+  // Show first message after 10 seconds
+  setTimeout(showAutoMessage, 10000);
+  setInterval(showAutoMessage, 30000);
+}
 
-  function loadDailyDua() {
+function loadInitialContent() {
+  loadDailyDua();
+  loadHadithTopics();
+  loadSurahList();
+  initializeAudioPlayer();
+}
+
+function setupEventListeners() {
+  // Theme toggle
+  document.getElementById('theme-toggle').addEventListener('click', toggleMode);
+  
+  // Chat functionality
+  document.getElementById('askButton').addEventListener('click', sendQuestion);
+  document.getElementById('userInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendQuestion();
+  });
+  
+  // Quran functionality
+  document.getElementById('quranSearchButton').addEventListener('click', searchQuran);
+  document.getElementById('playSurahButton').addEventListener('click', playSurah);
+  
+  // Hadith functionality
+  document.getElementById('hadithSearchButton').addEventListener('click', searchHadith);
+  
+  // Audio player
+  document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
+}
+
+function setupKeyboardHandling() {
+  // Handle virtual keyboard on mobile
+  const inputs = document.querySelectorAll('input[type="text"]');
+  inputs.forEach(input => {
+    input.addEventListener('focus', function() {
+      setTimeout(() => {
+        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    });
+  });
+}
+
+function loadTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  
+  if (savedTheme === 'dark') {
+    document.body.classList.remove('light-mode');
+    document.body.classList.add('dark-mode');
+    themeToggleBtn.innerHTML = '🌙';
+  } else {
+    document.body.classList.remove('dark-mode');
+    document.body.classList.add('light-mode');
+    themeToggleBtn.innerHTML = '☀️';
+  }
+}
+
+// ===== CORE FUNCTIONS (Optimized for Mobile) =====
+let chatHistory = [];
+let audioPlayer = null;
+
+async function sendQuestion() {
+  const inputEl = document.getElementById("userInput");
+  const question = inputEl.value.trim();
+  if (!question) return;
+
+  const messagesDiv = document.getElementById("messages");
+  
+  // Add user message
+  const userMsg = document.createElement("div");
+  userMsg.className = "user-message";
+  userMsg.textContent = `You: ${question}`;
+  messagesDiv.appendChild(userMsg);
+  
+  inputEl.value = "";
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  
+  // Show typing indicator
+  const typingMsg = document.createElement("div");
+  typingMsg.className = "ai-message";
+  typingMsg.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+  messagesDiv.appendChild(typingMsg);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  try {
+    const response = await fetch("/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ history: [{ role: "user", content: question }] })
+    });
+    
+    const data = await response.json();
+    typingMsg.remove();
+
+    const answerText = data.choices?.[0]?.message?.content || 
+                      "I apologize, but I couldn't generate a response at this moment. Please try again.";
+
+    // Add AI message with typing effect
+    const aiMsg = document.createElement("div");
+    aiMsg.className = "ai-message";
+    messagesDiv.appendChild(aiMsg);
+    
+    // Type out response
+    await typeText(aiMsg, `Tawfiq AI: ${answerText}`, 15);
+    
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  } catch (error) {
+    console.error("Error:", error);
+    typingMsg.remove();
+    
+    const errorMsg = document.createElement("div");
+    errorMsg.className = "ai-message";
+    errorMsg.textContent = "Tawfiq AI: I apologize for the error. Please try again.";
+    messagesDiv.appendChild(errorMsg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+}
+
+function typeText(element, text, speed = 20) {
+  return new Promise(resolve => {
+    let i = 0;
+    element.innerHTML = '';
+    
+    function typeChar() {
+      if (i < text.length) {
+        element.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typeChar, speed);
+      } else {
+        resolve();
+      }
+    }
+    
+    typeChar();
+  });
+}
+
+function switchTab(sectionId, event) {
+  // Update tabs
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  // Update sections
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  
+  // Scroll to top on mobile
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  // Load specific content for tab
+  if (sectionId === 'prayerTimes') loadPrayerTimes();
+  if (sectionId === 'duaSection') loadDailyDua();
+}
+
+function toggleMode() {
+  const body = document.body;
+  const themeBtn = document.getElementById('theme-toggle');
+  
+  body.classList.toggle('light-mode');
+  body.classList.toggle('dark-mode');
+
+  if (body.classList.contains('dark-mode')) {
+    localStorage.setItem('theme', 'dark');
+    themeBtn.textContent = '🌙';
+  } else {
+    localStorage.setItem('theme', 'light');
+    themeBtn.textContent = '☀️';
+  }
+}
+
+// ===== ORIGINAL FUNCTIONS =====
+function loadDailyDua() {
   // Try to fetch from the server first
   fetch('/daily-dua')
     .then(res => {
@@ -1974,378 +1496,550 @@ function loadHardcodedDua() {
   document.getElementById('dailyDuaContent').innerHTML = duaHTML;
 }
 
-  function loadPrayerTimes() {
-    fetch('/get-prayer-times')
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('prayerTimesContent');
-        if (data && data.prayer_times) {
-          container.innerHTML = '';
-          for (const [name, time] of Object.entries(data.prayer_times)) {
-            const p = document.createElement('p');
-            p.innerHTML = `<strong>${name}:</strong> ${time}`;
-            container.appendChild(p);
-          }
-        } else {
-          container.innerHTML = '<p>Prayer times data unavailable.</p>';
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching prayer times:', error);
-        document.getElementById('prayerTimesContent').innerHTML = '<p>Error loading prayer times.</p>';
-      });
-  }
-
-  function loadSurahList() {
-    fetch('/get-surah-list')
-      .then(res => res.json())
-      .then(data => {
-        const select = document.getElementById('surahList');
-        select.innerHTML = '<option value="">-- Or Select Surah --</option>';
-        
-        if (data && data.surah_list && Array.isArray(data.surah_list)) {
-          data.surah_list.forEach((surahName, index) => {
-            const option = document.createElement('option');
-            option.value = index + 1;
-            option.textContent = `${index + 1}. ${surahName}`;
-            select.appendChild(option);
-          });
-        } else {
-          loadHardcodedSurahList();
-        }
-      })
-      .catch(error => {
-        console.error('Error loading Surah list:', error);
-        loadHardcodedSurahList();
-      });
-  }
-
-  function loadHardcodedSurahList() {
-    const surahs = [
-      "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf",
-      "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr",
-      "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun",
-      "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
-      "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad",
-      "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya",
-      "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur",
-      "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr",
-      "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
-      "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
-      "Al-Muzzammil", "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba",
-      "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq",
-      "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams",
-      "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina",
-      "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humazah",
-      "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad",
-      "Al-Ikhlas", "Al-Falaq", "An-Nas"
-    ];
-    const select = document.getElementById('surahList');
-    surahs.forEach(surah => {
-      const option = document.createElement('option');
-      option.value = surah;
-      option.textContent = surah;
-      select.appendChild(option);
-    });
-  }
-
-  function loadHadithTopics() {
-    const topics = [
-      "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
-      "Hadith on Gratitude", "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj",
-      "Hadith on Honesty", "Hadith on Forgiveness", "Hadith on Parents", "Hadith on Children",
-      "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood", "Hadith on Modesty",
-      "Hadith on Repenance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
-      "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran",
-      "Hadith on Sunnah", "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting",
-      "Hadith on Lying", "Hadith on Trust", "Hadith on Trade", "Hadith on Wealth",
-      "Hadith on Poverty", "Hadith on Oppression", "Hadith on Manners", "Hadith on Sincerity",
-      "Hadith on Innovation", "Hadith on Angels", "Hadith on Jinn", "Hadith on Death",
-      "Hadith on Resurrection", "Hadith on Signs of Day of Judgment", "Hadith on Health",
-      "Hadith on Cleanliness", "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip",
-      "Hadith on Leadership", "Hadith on Love", "Hadith on Peace", "Hadith on Prayer at Night",
-      "Hadith on Ablution", "Hadith on Sadaqah", "Hadith on Zakat", "Hadith on Seeking Knowledge",
-      "Hadith on Good Deeds", "Hadith on Evil Deeds", "Hadith on Hypocrisy", "Hadith on Arrogance",
-      "Hadith on Tawheed", "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth",
-      "Hadith on Orphans", "Hadith on Widows", "Hadith on Modesty in Dressing",
-      "Hadith on Halal and Haram", "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling",
-      "Hadith on Good Speech", "Hadith on Contentment", "Hadith on Worldly Life",
-      "Hadith on Akhirah", "Hadith on Thankfulness", "Hadith on Seeking Forgiveness",
-      "Hadith on Trials", "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves",
-      "Hadith on Trust in Allah", "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage",
-      "Hadith on Sin", "Hadith on Purification", "Hadith on Eid", "Hadith on Sacrifice",
-      "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam", "Hadith on Reciting Quran",
-      "Hadith on Betrayal", "Hadith on Contentment", "Hadith on Piety", "Hadith on Remembrance of Allah",
-      "Hadith on Friday Prayer", "Hadith on Allah's Mercy", "Hadith on Night of Qadr",
-      "Hadith on Family Ties"
-    ];
-    const dropdown = document.getElementById('hadithDropdown');
-    topics.forEach(topic => {
-      const option = document.createElement('option');
-      option.value = topic;
-      option.textContent = topic;
-      dropdown.appendChild(option);
-    });
-  }
-
-  function initializeAudioPlayer() {
-    audioPlayer = document.getElementById('surahAudio');
-    if (!audioPlayer) return;
-    
-    audioPlayer.addEventListener('timeupdate', updateProgress);
-    audioPlayer.addEventListener('loadedmetadata', function() {
-      updateTimeDisplay();
-    });
-    audioPlayer.addEventListener('ended', function() {
-      document.getElementById('playPauseBtn').classList.remove('playing');
-      document.getElementById('playPauseBtn').textContent = 'Play';
-    });
-  }
-
-  function togglePlayPause() {
-    const btn = document.getElementById('playPauseBtn');
-    if (audioPlayer.paused) {
-      audioPlayer.play();
-      btn.classList.add('playing');
-      btn.textContent = 'Pause';
-    } else {
-      audioPlayer.pause();
-      btn.classList.remove('playing');
-      btn.textContent = 'Play';
-    }
-  }
-
-  function updateProgress() {
-    const progressBar = document.getElementById('progressBar');
-    const value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-    progressBar.style.width = value + '%';
-    updateTimeDisplay();
-  }
-
-  function updateTimeDisplay() {
-    const timeDisplay = document.getElementById('timeDisplay');
-    const currentTime = formatTime(audioPlayer.currentTime);
-    const duration = formatTime(audioPlayer.duration);
-    timeDisplay.textContent = `${currentTime} / ${duration}`;
-  }
-
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  }
-
-  const surahNameToNumber = {
-    "Al-Fatihah": 1, "Al-Baqarah": 2, "Aali Imran": 3, "An-Nisa": 4, "Al-Ma'idah": 5,
-    "Al-An'am": 6, "Al-A'raf": 7, "Al-Anfal": 8, "At-Tawbah": 9, "Yunus": 10,
-    "Hud": 11, "Yusuf": 12, "Ar-Ra'd": 13, "Ibrahim": 14, "Al-Hijr": 15,
-    "An-Nahl": 16, "Al-Isra": 17, "Al-Kahf": 18, "Maryam": 19, "Ta-Ha": 20,
-    "Al-Anbiya": 21, "Al-Hajj": 22, "Al-Mu'minun": 23, "An-Nur": 24, "Al-Furqan": 25,
-    "Ash-Shu'ara": 26, "An-Naml": 27, "Al-Qasas": 28, "Al-Ankabut": 29, "Ar-Rum": 30,
-    "Luqman": 31, "As-Sajda": 32, "Al-Ahzab": 33, "Saba": 34, "Fatir": 35,
-    "Ya-Sin": 36, "As-Saffat": 37, "Sad": 38, "Az-Zumar": 39, "Ghafir": 40,
-    "Fussilat": 41, "Ash-Shura": 42, "Az-Zukhruf": 43, "Ad-Dukhan": 44, "Al-Jathiya": 45,
-    "Al-Ahqaf": 46, "Muhammad": 47, "Al-Fath": 48, "Al-Hujurat": 49, "Qaf": 50,
-    "Adh-Dhariyat": 51, "At-Tur": 52, "An-Najm": 53, "Al-Qamar": 54, "Ar-Rahman": 55,
-    "Al-Waqi'a": 56, "Al-Hadid": 57, "Al-Mujadila": 58, "Al-Hashr": 59, "Al-Mumtahina": 60,
-    "As-Saff": 61, "Al-Jumu'a": 62, "Al-Munafiqun": 63, "At-Taghabun": 64, "At-Talaq": 65,
-    "At-Tahrim": 66, "Al-Mulk": 67, "Al-Qalam": 68, "Al-Haqqa": 69, "Al-Ma'arij": 70,
-    "Nuh": 71, "Al-Jinn": 72, "Al-Muzzammil": 73, "Al-Muddathir": 74, "Al-Qiyama": 75,
-    "Al-Insan": 76, "Al-Mursalat": 77, "An-Naba": 78, "An-Nazi'at": 79, "Abasa": 80,
-    "At-Takwir": 81, "Al-Infitar": 82, "Al-Mutaffifin": 83, "Al-Inshiqaq": 84, "Al-Buruj": 85,
-    "At-Tariq": 86, "Al-A'la": 87, "Al-Ghashiya": 88, "Al-Fajr": 89, "Al-Balad": 90,
-    "Ash-Shams": 91, "Al-Lail": 92, "Ad-Duha": 93, "Ash-Sharh": 94, "At-Tin": 95,
-    "Al-'Alaq": 96, "Al-Qadr": 97, "Al-Bayyina": 98, "Az-Zalzala": 99, "Al-Adiyat": 100,
-    "Al-Qari'a": 101, "At-Takathur": 102, "Al-Asr": 103, "Al-Humaza": 104, "Al-Fil": 105,
-    "Quraysh": 106, "Al-Ma'un": 107, "Al-Kawthar": 108, "Al-Kafirun": 109, "An-Nasr": 110,
-    "Al-Masad": 111, "Al-Ikhlas": 112, "Al-Falaq": 113, "An-Nas": 114
-  };
-
-  function playSurah() {
-    const query = document.getElementById("quranInput").value.trim();
-    const selectedSurah = document.getElementById("surahList").value;
-    const surahName = query || selectedSurah;
-    
-    if (!surahName || !surahNameToNumber[surahName]) {
-      alert("Please select a valid Surah from the list.");
-      return;
-    }
-
-    const surahNumber = surahNameToNumber[surahName];
-    const audioPlayerContainer = document.getElementById('audioPlayer');
-    const audioElement = document.getElementById('surahAudio');
-    
-    audioPlayerContainer.style.display = 'block';
-    
-    audioElement.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`;
-    
-    document.getElementById('playPauseBtn').textContent = 'Loading...';
-    document.getElementById('playPauseBtn').disabled = true;
-    
-    audioElement.oncanplay = function() {
-      document.getElementById('playPauseBtn').textContent = 'Play';
-      document.getElementById('playPauseBtn').disabled = false;
-      document.getElementById('timeDisplay').textContent = '0:00 / ' + formatTime(audioElement.duration);
-    };
-    
-    audioElement.onerror = function() {
-      alert("Could not load audio for this Surah. Please try another one.");
-      document.getElementById('playPauseBtn').textContent = 'Play';
-      document.getElementById('playPauseBtn').disabled = false;
-    };
-  }
-
-  function searchQuran() {
-    const query = document.getElementById("quranInput").value.trim();
-    const selectedSurah = document.getElementById("surahList").value;
-    const surahName = query || selectedSurah;
-    const resultDiv = document.getElementById("quranResult");
-    const quranSearchBtn = document.getElementById("quranSearchButton");
-
-    if (!surahName || !surahNameToNumber[surahName]) {
-      resultDiv.innerHTML = `<div class="user-message">Please select a valid Surah from the list.</div>`;
-      return;
-    }
-
-    const surahNumber = surahNameToNumber[surahName];
-
-    resultDiv.innerHTML = `<div class="user-message">Searching Surah: ${surahName}</div>`;
-    
-    const loading = document.createElement("div");
-    loading.className = "loading-indicator";
-    loading.textContent = "Searching Quran...";
-    resultDiv.appendChild(loading);
-    quranSearchBtn.disabled = true;
-
-    fetch('/quran-surah', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ surah_number: surahNumber })
-    })
+function loadPrayerTimes() {
+  fetch('/get-prayer-times')
     .then(res => res.json())
     .then(data => {
-      resultDiv.innerHTML = '';
-
-      if (data.surah_name) {
-        const titleEl = document.createElement("div");
-        titleEl.innerHTML = `<strong>Surah ${surahNumber}: ${data.surah_name}</strong>`;
-        titleEl.style.fontSize = '18px';
-        titleEl.style.marginBottom = '10px';
-        resultDiv.appendChild(titleEl);
-      }
-
-      if (data.ayahs && Array.isArray(data.ayahs) && data.ayahs.length > 0) {
-        data.ayahs.forEach(verse => {
-          const verseEl = document.createElement("div");
-          verseEl.className = "verse-block";
-          verseEl.style.marginBottom = '20px';
-
-          const info = document.createElement("p");
-          info.innerHTML = `<strong>Ayah ${verse.ayah_number}</strong>`;
-          verseEl.appendChild(info);
-
-          const arabic = document.createElement("p");
-          arabic.textContent = verse.arabic;
-          arabic.style.textAlign = 'right';
-          arabic.style.fontWeight = 'bold';
-          arabic.style.direction = 'rtl';
-          verseEl.appendChild(arabic);
-
-          const trans = document.createElement("p");
-          trans.textContent = verse.english;
-          verseEl.appendChild(trans);
-
-          if (verse.transliteration) {
-            const translitPara = document.createElement("p");
-            translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
-            translitPara.style.fontSize = '0.9em';
-            verseEl.appendChild(translitPara);
-          }
-
-          resultDiv.appendChild(verseEl);
-        });
+      const container = document.getElementById('prayerTimesContent');
+      if (data && data.prayer_times) {
+        container.innerHTML = '';
+        for (const [name, time] of Object.entries(data.prayer_times)) {
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>${name}:</strong> ${time}`;
+          container.appendChild(p);
+        }
       } else {
-        resultDiv.innerHTML = `<div>No verses found for Surah ${surahName}.</div>`;
+        container.innerHTML = '<p>Prayer times data unavailable.</p>';
       }
     })
     .catch(error => {
-      console.error('Error:', error);
-      resultDiv.innerHTML = `<div>Error searching Quran. Please try again.</div>`;
-    })
-    .finally(() => {
-      const loadingEl = resultDiv.querySelector('.loading-indicator');
-      if (loadingEl) loadingEl.remove();
-      quranSearchBtn.disabled = false;
+      console.error('Error fetching prayer times:', error);
+      document.getElementById('prayerTimesContent').innerHTML = '<p>Error loading prayer times.</p>';
     });
-  }
+}
 
-  function searchHadith() {
-    const inputQuery = document.getElementById("hadithInput").value.trim();
-    const dropdownQuery = document.getElementById("hadithDropdown").value;
-    const query = inputQuery || dropdownQuery;
-    if (!query) return;
-    const resultDiv = document.getElementById("hadithResult");
-    const hadithBtn = document.getElementById("hadithSearchButton");
-    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-    const loading = document.createElement("div");
-    loading.className = "loading-indicator";
-    loading.textContent = "Searching Hadith...";
-    resultDiv.appendChild(loading);
-    hadithBtn.disabled = true;
-
-    fetch('/hadith-search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query })
-    }).then(res => res.json()).then(data => {
-      resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
-      if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-        data.results.forEach(hadith => {
-          const hadithEl = document.createElement("div");
-          hadithEl.className = "hadith-entry";
-
-          let infoText = '';
-          if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
-            infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
-          } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
-            infoText += `<strong>Book:</strong> ${hadith.book_name}`;
-          } else if (hadith.book_number && hadith.book_number !== 'N/A') {
-            infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
-          }
-          if (hadith.volume_number && hadith.volume_number !== 'N/A') {
-            infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
-          }
-          if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
-            if (!infoText.includes(hadith.hadith_info))
-              infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
-          }
-          if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
-            infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
-          }
-
-          const infoPara = document.createElement("p");
-          infoPara.innerHTML = infoText;
-          hadithEl.appendChild(infoPara);
-
-          const textPara = document.createElement("p");
-          textPara.textContent = hadith.text;
-          textPara.style.marginTop = '8px';
-          hadithEl.appendChild(textPara);
-
-          resultDiv.appendChild(hadithEl);
+function loadSurahList() {
+  fetch('/get-surah-list')
+    .then(res => res.json())
+    .then(data => {
+      const select = document.getElementById('surahList');
+      select.innerHTML = '<option value="">-- Or Select Surah --</option>';
+      
+      if (data && data.surah_list && Array.isArray(data.surah_list)) {
+        data.surah_list.forEach((surahName, index) => {
+          const option = document.createElement('option');
+          option.value = index + 1;
+          option.textContent = `${index + 1}. ${surahName}`;
+          select.appendChild(option);
         });
-      } else if (data.result) {
-        resultDiv.innerHTML += `<div>${data.result}</div>`;
       } else {
-        resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
+        loadHardcodedSurahList();
       }
-    }).catch(error => {
-      console.error('Error:', error);
-      resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
-    }).finally(() => {
-      document.getElementById("hadithSearchButton").disabled = false;
+    })
+    .catch(error => {
+      console.error('Error loading Surah list:', error);
+      loadHardcodedSurahList();
     });
+}
+
+function loadHardcodedSurahList() {
+  const surahs = [
+    "Al-Fatihah", "Al-Baqarah", "Aali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf",
+    "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr",
+    "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbiya", "Al-Hajj", "Al-Muminun",
+    "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
+    "Luqman", "As-Sajda", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad",
+    "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiya",
+    "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur",
+    "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'a", "Al-Hadid", "Al-Mujadila", "Al-Hashr",
+    "Al-Mumtahanah", "As-Saff", "Al-Jumu'a", "Al-Munafiqun", "At-Taghabun", "At-Talaq",
+    "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij", "Nuh", "Al-Jinn",
+    "Al-Muzzammil", "Al-Muddathir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba",
+    "An-Nazi'at", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq",
+    "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams",
+    "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyina",
+    "Az-Zalzalah", "Al-Adiyat", "Al-Qari'a", "At-Takathur", "Al-Asr", "Al-Humazah",
+    "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad",
+    "Al-Ikhlas", "Al-Falaq", "An-Nas"
+  ];
+  const select = document.getElementById('surahList');
+  surahs.forEach(surah => {
+    const option = document.createElement('option');
+    option.value = surah;
+    option.textContent = surah;
+    select.appendChild(option);
+  });
+}
+
+function loadHadithTopics() {
+  const topics = [
+    "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
+    "Hadith on Gratitude", "Hadith on Kindness", "Hadith on Fasting", "Hadith on Hajj",
+    "Hadith on Honesty", "Hadith on Forgiveness", "Hadith on Parents", "Hadith on Children",
+    "Hadith on Marriage", "Hadith on Neighbors", "Hadith on Brotherhood", "Hadith on Modesty",
+    "Hadith on Repenance", "Hadith on Mercy", "Hadith on Humility", "Hadith on Envy",
+    "Hadith on Justice", "Hadith on Knowledge", "Hadith on Dua", "Hadith on Quran",
+    "Hadith on Sunnah", "Hadith on Hellfire", "Hadith on Paradise", "Hadith on Backbiting",
+    "Hadith on Lying", "Hadith on Trust", "Hadith on Trade", "Hadith on Wealth",
+    "Hadith on Poverty", "Hadith on Oppression", "Hadith on Manners", "Hadith on Sincerity",
+    "Hadith on Innovation", "Hadith on Angels", "Hadith on Jinn", "Hadith on Death",
+    "Hadith on Resurrection", "Hadith on Signs of Day of Judgment", "Hadith on Health",
+    "Hadith on Cleanliness", "Hadith on Generosity", "Hadith on Bribery", "Hadith on Gossip",
+    "Hadith on Leadership", "Hadith on Love", "Hadith on Peace", "Hadith on Prayer at Night",
+    "Hadith on Ablution", "Hadith on Sadaqah", "Hadith on Zakat", "Hadith on Seeking Knowledge",
+    "Hadith on Good Deeds", "Hadith on Evil Deeds", "Hadith on Hypocrisy", "Hadith on Arrogance",
+    "Hadith on Tawheed", "Hadith on Shirk", "Hadith on Respecting Elders", "Hadith on Youth",
+    "Hadith on Orphans", "Hadith on Widows", "Hadith on Modesty in Dressing",
+    "Hadith on Halal and Haram", "Hadith on Gossip", "Hadith on Anger", "Hadith on Smiling",
+    "Hadith on Good Speech", "Hadith on Contentment", "Hadith on Worldly Life",
+    "Hadith on Akhirah", "Hadith on Thankfulness", "Hadith on Seeking Forgiveness",
+    "Hadith on Trials", "Hadith on Signs of Hypocrites", "Hadith on Visiting Graves",
+    "Hadith on Trust in Allah", "Hadith on Destiny", "Hadith on Martyrdom", "Hadith on Courage",
+    "Hadith on Sin", "Hadith on Purification", "Hadith on Eid", "Hadith on Sacrifice",
+    "Hadith on Brotherhood in Islam", "Hadith on Leadership in Islam", "Hadith on Reciting Quran",
+    "Hadith on Betrayal", "Hadith on Contentment", "Hadith on Piety", "Hadith on Remembrance of Allah",
+    "Hadith on Friday Prayer", "Hadith on Allah's Mercy", "Hadith on Night of Qadr",
+    "Hadith on Family Ties"
+  ];
+  const dropdown = document.getElementById('hadithDropdown');
+  topics.forEach(topic => {
+    const option = document.createElement('option');
+    option.value = topic;
+    option.textContent = topic;
+    dropdown.appendChild(option);
+  });
+}
+
+function initializeAudioPlayer() {
+  audioPlayer = document.getElementById('surahAudio');
+  if (!audioPlayer) return;
+  
+  audioPlayer.addEventListener('timeupdate', updateProgress);
+  audioPlayer.addEventListener('loadedmetadata', function() {
+    updateTimeDisplay();
+  });
+  audioPlayer.addEventListener('ended', function() {
+    document.getElementById('playPauseBtn').classList.remove('playing');
+    document.getElementById('playPauseBtn').textContent = 'Play';
+  });
+}
+
+function togglePlayPause() {
+  const btn = document.getElementById('playPauseBtn');
+  if (audioPlayer.paused) {
+    audioPlayer.play();
+    btn.classList.add('playing');
+    btn.textContent = 'Pause';
+  } else {
+    audioPlayer.pause();
+    btn.classList.remove('playing');
+    btn.textContent = 'Play';
   }
+}
+
+function updateProgress() {
+  const progressBar = document.getElementById('progressBar');
+  const value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+  progressBar.style.width = value + '%';
+  updateTimeDisplay();
+}
+
+function updateTimeDisplay() {
+  const timeDisplay = document.getElementById('timeDisplay');
+  const currentTime = formatTime(audioPlayer.currentTime);
+  const duration = formatTime(audioPlayer.duration);
+  timeDisplay.textContent = `${currentTime} / ${duration}`;
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+const surahNameToNumber = {
+  "Al-Fatihah": 1, "Al-Baqarah": 2, "Aali Imran": 3, "An-Nisa": 4, "Al-Ma'idah": 5,
+  "Al-An'am": 6, "Al-A'raf": 7, "Al-Anfal": 8, "At-Tawbah": 9, "Yunus": 10,
+  "Hud": 11, "Yusuf": 12, "Ar-Ra'd": 13, "Ibrahim": 14, "Al-Hijr": 15,
+  "An-Nahl": 16, "Al-Isra": 17, "Al-Kahf": 18, "Maryam": 19, "Ta-Ha": 20,
+  "Al-Anbiya": 21, "Al-Hajj": 22, "Al-Mu'minun": 23, "An-Nur": 24, "Al-Furqan": 25,
+  "Ash-Shu'ara": 26, "An-Naml": 27, "Al-Qasas": 28, "Al-Ankabut": 29, "Ar-Rum": 30,
+  "Luqman": 31, "As-Sajda": 32, "Al-Ahzab": 33, "Saba": 34, "Fatir": 35,
+  "Ya-Sin": 36, "As-Saffat": 37, "Sad": 38, "Az-Zumar": 39, "Ghafir": 40,
+  "Fussilat": 41, "Ash-Shura": 42, "Az-Zukhruf": 43, "Ad-Dukhan": 44, "Al-Jathiya": 45,
+  "Al-Ahqaf": 46, "Muhammad": 47, "Al-Fath": 48, "Al-Hujurat": 49, "Qaf": 50,
+  "Adh-Dhariyat": 51, "At-Tur": 52, "An-Najm": 53, "Al-Qamar": 54, "Ar-Rahman": 55,
+  "Al-Waqi'a": 56, "Al-Hadid": 57, "Al-Mujadila": 58, "Al-Hashr": 59, "Al-Mumtahina": 60,
+  "As-Saff": 61, "Al-Jumu'a": 62, "Al-Munafiqun": 63, "At-Taghabun": 64, "At-Talaq": 65,
+  "At-Tahrim": 66, "Al-Mulk": 67, "Al-Qalam": 68, "Al-Haqqa": 69, "Al-Ma'arij": 70,
+  "Nuh": 71, "Al-Jinn": 72, "Al-Muzzammil": 73, "Al-Muddathir": 74, "Al-Qiyama": 75,
+  "Al-Insan": 76, "Al-Mursalat": 77, "An-Naba": 78, "An-Nazi'at": 79, "Abasa": 80,
+  "At-Takwir": 81, "Al-Infitar": 82, "Al-Mutaffifin": 83, "Al-Inshiqaq": 84, "Al-Buruj": 85,
+  "At-Tariq": 86, "Al-A'la": 87, "Al-Ghashiya": 88, "Al-Fajr": 89, "Al-Balad": 90,
+  "Ash-Shams": 91, "Al-Lail": 92, "Ad-Duha": 93, "Ash-Sharh": 94, "At-Tin": 95,
+  "Al-'Alaq": 96, "Al-Qadr": 97, "Al-Bayyina": 98, "Az-Zalzala": 99, "Al-Adiyat": 100,
+  "Al-Qari'a": 101, "At-Takathur": 102, "Al-Asr": 103, "Al-Humaza": 104, "Al-Fil": 105,
+  "Quraysh": 106, "Al-Ma'un": 107, "Al-Kawthar": 108, "Al-Kafirun": 109, "An-Nasr": 110,
+  "Al-Masad": 111, "Al-Ikhlas": 112, "Al-Falaq": 113, "An-Nas": 114
+};
+
+function playSurah() {
+  const query = document.getElementById("quranInput").value.trim();
+  const selectedSurah = document.getElementById("surahList").value;
+  const surahName = query || selectedSurah;
+  
+  if (!surahName || !surahNameToNumber[surahName]) {
+    alert("Please select a valid Surah from the list.");
+    return;
+  }
+
+  const surahNumber = surahNameToNumber[surahName];
+  const audioPlayerContainer = document.getElementById('audioPlayer');
+  const audioElement = document.getElementById('surahAudio');
+  
+  audioPlayerContainer.style.display = 'block';
+  
+  audioElement.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNumber}.mp3`;
+  
+  document.getElementById('playPauseBtn').textContent = 'Loading...';
+  document.getElementById('playPauseBtn').disabled = true;
+  
+  audioElement.oncanplay = function() {
+    document.getElementById('playPauseBtn').textContent = 'Play';
+    document.getElementById('playPauseBtn').disabled = false;
+    document.getElementById('timeDisplay').textContent = '0:00 / ' + formatTime(audioElement.duration);
+  };
+  
+  audioElement.onerror = function() {
+    alert("Could not load audio for this Surah. Please try another one.");
+    document.getElementById('playPauseBtn').textContent = 'Play';
+    document.getElementById('playPauseBtn').disabled = false;
+  };
+}
+
+function searchQuran() {
+  const query = document.getElementById("quranInput").value.trim();
+  const selectedSurah = document.getElementById("surahList").value;
+  const surahName = query || selectedSurah;
+  const resultDiv = document.getElementById("quranResult");
+  const quranSearchBtn = document.getElementById("quranSearchButton");
+
+  if (!surahName || !surahNameToNumber[surahName]) {
+    resultDiv.innerHTML = `<div class="user-message">Please select a valid Surah from the list.</div>`;
+    return;
+  }
+
+  const surahNumber = surahNameToNumber[surahName];
+
+  resultDiv.innerHTML = `<div class="user-message">Searching Surah: ${surahName}</div>`;
+  
+  const loading = document.createElement("div");
+  loading.className = "loading-indicator";
+  loading.textContent = "Searching Quran...";
+  resultDiv.appendChild(loading);
+  quranSearchBtn.disabled = true;
+
+  fetch('/quran-surah', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ surah_number: surahNumber })
+  })
+  .then(res => res.json())
+  .then(data => {
+    resultDiv.innerHTML = '';
+
+    if (data.surah_name) {
+      const titleEl = document.createElement("div");
+      titleEl.innerHTML = `<strong>Surah ${surahNumber}: ${data.surah_name}</strong>`;
+      titleEl.style.fontSize = '18px';
+      titleEl.style.marginBottom = '10px';
+      resultDiv.appendChild(titleEl);
+    }
+
+    if (data.ayahs && Array.isArray(data.ayahs) && data.ayahs.length > 0) {
+      data.ayahs.forEach(verse => {
+        const verseEl = document.createElement("div");
+        verseEl.className = "verse-block";
+        verseEl.style.marginBottom = '20px';
+
+        const info = document.createElement("p");
+        info.innerHTML = `<strong>Ayah ${verse.ayah_number}</strong>`;
+        verseEl.appendChild(info);
+
+        const arabic = document.createElement("p");
+        arabic.textContent = verse.arabic;
+        arabic.style.textAlign = 'right';
+        arabic.style.fontWeight = 'bold';
+        arabic.style.direction = 'rtl';
+        verseEl.appendChild(arabic);
+
+        const trans = document.createElement("p");
+        trans.textContent = verse.english;
+        verseEl.appendChild(trans);
+
+        if (verse.transliteration) {
+          const translitPara = document.createElement("p");
+          translitPara.innerHTML = `<em>Transliteration:</em> ${verse.transliteration}`;
+          translitPara.style.fontSize = '0.9em';
+          verseEl.appendChild(translitPara);
+        }
+
+        resultDiv.appendChild(verseEl);
+      });
+    } else {
+      resultDiv.innerHTML = `<div>No verses found for Surah ${surahName}.</div>`;
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    resultDiv.innerHTML = `<div>Error searching Quran. Please try again.</div>`;
+  })
+  .finally(() => {
+    const loadingEl = resultDiv.querySelector('.loading-indicator');
+    if (loadingEl) loadingEl.remove();
+    quranSearchBtn.disabled = false;
+  });
+}
+
+function searchHadith() {
+  const inputQuery = document.getElementById("hadithInput").value.trim();
+  const dropdownQuery = document.getElementById("hadithDropdown").value;
+  const query = inputQuery || dropdownQuery;
+  if (!query) return;
+  const resultDiv = document.getElementById("hadithResult");
+  const hadithBtn = document.getElementById("hadithSearchButton");
+  resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+  const loading = document.createElement("div");
+  loading.className = "loading-indicator";
+  loading.textContent = "Searching Hadith...";
+  resultDiv.appendChild(loading);
+  hadithBtn.disabled = true;
+
+  fetch('/hadith-search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query })
+  }).then(res => res.json()).then(data => {
+    resultDiv.innerHTML = `<div class="user-message">Searching: ${query}</div>`;
+    if (data.results && Array.isArray(data.results) && data.results.length > 0) {
+      data.results.forEach(hadith => {
+        const hadithEl = document.createElement("div");
+        hadithEl.className = "hadith-entry";
+
+        let infoText = '';
+        if (hadith.book_name && hadith.book_number && hadith.book_name !== 'Unknown Book' && hadith.book_number !== 'N/A') {
+          infoText += `<strong>Book:</strong> ${hadith.book_name} (${hadith.book_number})`;
+        } else if (hadith.book_name && hadith.book_name !== 'Unknown Book') {
+          infoText += `<strong>Book:</strong> ${hadith.book_name}`;
+        } else if (hadith.book_number && hadith.book_number !== 'N/A') {
+          infoText += `<strong>Book Number:</strong> ${hadith.book_number}`;
+        }
+        if (hadith.volume_number && hadith.volume_number !== 'N/A') {
+          infoText += (infoText ? '<br>' : '') + `<strong>Volume:</strong> ${hadith.volume_number}`;
+        }
+        if (hadith.hadith_info && hadith.hadith_info !== 'Volume N/A, Book N/A') {
+          if (!infoText.includes(hadith.hadith_info))
+            infoText += (infoText ? '<br>' : '') + `<strong>Info:</strong> ${hadith.hadith_info}`;
+        }
+        if (hadith.narrator && hadith.narrator !== 'Unknown narrator') {
+          infoText += (infoText ? '<br>' : '') + `<strong>Narrated by:</strong> ${hadith.narrator}`;
+        }
+
+        const infoPara = document.createElement("p");
+        infoPara.innerHTML = infoText;
+        hadithEl.appendChild(infoPara);
+
+        const textPara = document.createElement("p");
+        textPara.textContent = hadith.text;
+        textPara.style.marginTop = '8px';
+        hadithEl.appendChild(textPara);
+
+        resultDiv.appendChild(hadithEl);
+      });
+    } else if (data.result) {
+      resultDiv.innerHTML += `<div>${data.result}</div>`;
+    } else {
+      resultDiv.innerHTML += `<div>No result found for "${query}".</div>`;
+    }
+  }).catch(error => {
+    console.error('Error:', error);
+    resultDiv.innerHTML += `<div>Error searching Hadith.</div>`;
+  }).finally(() => {
+    document.getElementById("hadithSearchButton").disabled = false;
+  });
+}
+
+// WebRTC Variables
+let socket;
+let localStream;
+let peers = {};
+let isVideoEnabled = true;
+let isAudioEnabled = true;
+let ROOM_ID = null;
+
+// Initialize WebRTC when Live Meeting section is active
+function initializeWebRTC() {
+  const localVideo = document.getElementById("localVideo");
+  const remoteVideos = document.getElementById("remoteVideos");
+  
+  // Generate or get room ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  ROOM_ID = urlParams.get('room') || "default-islamic-room";
+  
+  // Initialize Socket.IO
+  socket = io();
+  
+  // Request media access
+  navigator.mediaDevices.getUserMedia({ 
+    video: true, 
+    audio: true 
+  }).then(stream => {
+    localStream = stream;
+    localVideo.srcObject = stream;
+    
+    // Join the room
+    socket.emit("join", { 
+      room: ROOM_ID, 
+      id: socket.id,
+      username: "{{ user.username if user else 'Guest' }}"
+    });
+    
+    console.log("Joined room:", ROOM_ID);
+  }).catch(error => {
+    console.error("Error accessing media devices:", error);
+    alert("Unable to access camera/microphone. Please check permissions.");
+  });
+  
+  // Socket event handlers
+  socket.on("user-joined", data => {
+    console.log("User joined:", data.id);
+    createPeer(data.id, true);
+  });
+  
+  socket.on("signal", data => {
+    if (!peers[data.from]) {
+      createPeer(data.from, false);
+    }
+    if (peers[data.from]) {
+      peers[data.from].signal(data.signal);
+    }
+  });
+  
+  socket.on("user-left", userId => {
+    console.log("User left:", userId);
+    if (peers[userId]) {
+      peers[userId].destroy();
+      delete peers[userId];
+      
+      // Remove video element
+      const videoElement = document.getElementById(`video-${userId}`);
+      if (videoElement) {
+        videoElement.remove();
+      }
+    }
+  });
+}
+
+function createPeer(id, initiator) {
+  const peer = new SimplePeer({
+    initiator: initiator,
+    trickle: false,
+    stream: localStream
+  });
+  
+  peer.on("signal", signal => {
+    socket.emit("signal", {
+      room: ROOM_ID,
+      signal: signal,
+      from: socket.id,
+      to: id
+    });
+  });
+  
+  peer.on("stream", stream => {
+    // Check if video already exists
+    if (document.getElementById(`video-${id}`)) return;
+    
+    const video = document.createElement("video");
+    video.id = `video-${id}`;
+    video.srcObject = stream;
+    video.autoplay = true;
+    video.playsInline = true;
+    
+    const wrapper = document.createElement("div");
+    wrapper.className = "video-wrapper";
+    wrapper.appendChild(video);
+    
+    const name = document.createElement("h3");
+    name.textContent = `User ${id.substring(0, 5)}`;
+    wrapper.appendChild(name);
+    
+    document.getElementById("remoteVideos").appendChild(wrapper);
+  });
+  
+  peer.on("close", () => {
+    peer.destroy();
+    delete peers[id];
+    
+    const videoElement = document.getElementById(`video-${id}`);
+    if (videoElement) {
+      videoElement.parentElement.remove();
+    }
+  });
+  
+  peers[id] = peer;
+}
+
+function toggleVideo() {
+  if (!localStream) return;
+  
+  const videoTrack = localStream.getVideoTracks()[0];
+  if (videoTrack) {
+    videoTrack.enabled = !videoTrack.enabled;
+    isVideoEnabled = videoTrack.enabled;
+    document.getElementById("toggleVideo").innerHTML = 
+      isVideoEnabled ? '<span>📹</span> Video ON' : '<span>📴</span> Video OFF';
+  }
+}
+
+function toggleAudio() {
+  if (!localStream) return;
+  
+  const audioTrack = localStream.getAudioTracks()[0];
+  if (audioTrack) {
+    audioTrack.enabled = !audioTrack.enabled;
+    isAudioEnabled = audioTrack.enabled;
+    document.getElementById("toggleAudio").innerHTML = 
+      isAudioEnabled ? '<span>🎤</span> Audio ON' : '<span>🔇</span> Audio OFF';
+  }
+}
+
+function endCall() {
+  // Stop all tracks
+  if (localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+  }
+  
+  // Destroy all peers
+  Object.values(peers).forEach(peer => peer.destroy());
+  peers = {};
+  
+  // Clear videos
+  document.getElementById("remoteVideos").innerHTML = "";
+  const localVideo = document.getElementById("localVideo");
+  localVideo.srcObject = null;
+  
+  // Leave room
+  if (socket) {
+    socket.emit("leave", { room: ROOM_ID, id: socket.id });
+  }
+  
+  // Reset buttons
+  document.getElementById("toggleVideo").innerHTML = '<span>📹</span> Toggle Video';
+  document.getElementById("toggleAudio").innerHTML = '<span>🎤</span> Toggle Audio';
+  
+  alert("Call ended. You can start a new call by refreshing the page.");
+}
 </script>
 </body>
 </html>
