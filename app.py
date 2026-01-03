@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import (
     Flask, request, jsonify, render_template,
     redirect, url_for, session, flash,
