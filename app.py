@@ -1940,11 +1940,11 @@ def teacher_create():
 
 @app.route('/teacher/<room_id>')
 def teacher_view(room_id):
-    return render_template('teacher.html', room_id=room_id)
+    return render_template('teacher_live.html', room_id=room_id)
 
 @app.route('/student/<room_id>')
 def student_view(room_id):
-    return render_template('student.html', room_id=room_id)
+    return render_template('student_live.html', room_id=room_id)
 
 @app.route('/join', methods=['POST'])
 def join_room_post():
