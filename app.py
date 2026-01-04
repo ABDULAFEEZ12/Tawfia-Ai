@@ -22,6 +22,10 @@ from flask_sqlalchemy import SQLAlchemy
 import requests
 from flask_socketio import SocketIO, join_room, emit, disconnect
 import ssl
+from uuid import uuid4
+
+room_id = str(uuid4())[:8]
+
 
 # Load environment variables
 load_dotenv()
