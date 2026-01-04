@@ -1932,9 +1932,6 @@ def handle_ping(data):
 # ============================================
 # Flask Routes
 # ============================================
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 @app.route('/teacher')
 def teacher_create():
