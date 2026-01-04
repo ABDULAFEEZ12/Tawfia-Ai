@@ -24,8 +24,6 @@ from flask_socketio import SocketIO, join_room, emit, disconnect
 import ssl
 from uuid import uuid4
 
-room_id = str(uuid4())[:8]
-
 
 # Load environment variables
 load_dotenv()
@@ -1967,10 +1965,10 @@ def live_meeting():
     return render_template('live_meeting.html')
 
 @app.route('/live-meeting/teacher')
-@app.route('/live_meeting/teacher')
+@app.route('/live-meeting/teacher')
 def live_meeting_teacher_create():
-    room_id = str(uuid.uuid4())[:8]
-    return redirect(url_for('live_meeting_teacher_view', room_id=room_id))
+    room_id = str(uuid4())[:8]
+    return redirect(f'/live-meeting/teacher/{room_id}')
 
 @app.route('/live-meeting/teacher/<room_id>')
 @app.route('/live_meeting/teacher/<room_id>')
