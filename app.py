@@ -1935,67 +1935,47 @@ def handle_ping(data):
 # Flask Routes
 # ============================================
 
-@app.route('/teacher')
-def teacher_create():
-    room_id = str(uuid.uuid4())[:8]
-    return redirect(f'/teacher/{room_id}')
-
-@app.route('/teacher/<room_id>')
-def teacher_view(room_id):
-    return render_template('teacher_live.html', room_id=room_id)
-
-@app.route('/student/<room_id>')
-def student_view(room_id):
-    return render_template('student_live.html', room_id=room_id)
-
-@app.route('/join', methods=['POST'])
-def join_room_post():
-    room_id = request.form.get('room_id', '').strip()
-    if not room_id:
-        flash('Please enter a room ID')
-        return redirect('/')
-    return redirect(f'/student/{room_id}')
-
 # ============================================
-# Live Meeting Routes
+# Live Meeting Routes (SINGLE SOURCE OF TRUTH)
 # ============================================
+
 @app.route('/live-meeting')
-@app.route('/live_meeting')
 def live_meeting():
     return render_template('live_meeting.html')
 
-@app.route('/live-meeting/teacher')
+
 @app.route('/live-meeting/teacher')
 def live_meeting_teacher_create():
     room_id = str(uuid4())[:8]
-    return redirect(f'/live-meeting/teacher/{room_id}')
+    return redirect(url_for('live_meeting_teacher_view', room_id=room_id))
+
 
 @app.route('/live-meeting/teacher/<room_id>')
-@app.route('/live_meeting/teacher/<room_id>')
 def live_meeting_teacher_view(room_id):
     return render_template('teacher_live.html', room_id=room_id)
 
+
 @app.route('/live-meeting/student/<room_id>')
-@app.route('/live_meeting/student/<room_id>')
 def live_meeting_student_view(room_id):
     return render_template('student_live.html', room_id=room_id)
 
+
 @app.route('/live-meeting/join', methods=['POST'])
-@app.route('/live_meeting/join', methods=['POST'])
 def live_meeting_join():
     room_id = request.form.get('room_id', '').strip()
     username = request.form.get('username', '').strip()
-    
+
     if not room_id:
         flash('Please enter a meeting ID')
-        return redirect('/live_meeting')
-    
+        return redirect(url_for('live_meeting'))
+
     if not username:
-        username = f"Student_{str(uuid.uuid4())[:4]}"
-    
+        username = f"Student_{str(uuid4())[:4]}"
+
     session['live_username'] = username
-    
+
     return redirect(url_for('live_meeting_student_view', room_id=room_id))
+
 
 # ============================================
 # NEW: Connection Test Route
