@@ -2,6 +2,9 @@ import eventlet
 eventlet.monkey_patch()
 print("✅ Eventlet monkey patch applied")
 
+# ============================================
+# Imports
+# ============================================
 from flask import (
     Flask, request, jsonify, render_template,
     redirect, url_for, session, flash,
@@ -20,10 +23,10 @@ import random
 from difflib import get_close_matches
 from flask_sqlalchemy import SQLAlchemy
 import requests
-from flask_socketio import SocketIO, join_room, emit, disconnect
+from flask_socketio import SocketIO, join_room, emit, leave_room
 import ssl
 from uuid import uuid4
-
+import uuid
 
 # Load environment variables
 load_dotenv()
@@ -74,7 +77,7 @@ db.init_app(app)
 socketio = SocketIO(
     app, 
     cors_allowed_origins="*",
-    async_mode='threading',
+    async_mode='eventlet',
     ping_timeout=60,
     ping_interval=25,
     logger=True,
@@ -103,6 +106,13 @@ class UserQuestions(db.Model):
     question = db.Column(db.Text, nullable=False)
     answer = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Room(db.Model):
+    id = db.Column(db.String(32), primary_key=True)
+    teacher_id = db.Column(db.String(120))
+    teacher_name = db.Column(db.String(80))
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Create database tables
 with app.app_context():
@@ -234,8 +244,501 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openrouter_api_key:
     print("⚠️ OPENROUTER_API_KEY environment variable not set.")
 
-# --- Flask Routes and Logic ---
+# ============================================
+# Live Meeting In-Memory Storage
+# ============================================
+rooms = {}           # room_id -> room data
+participants = {}    # socket_id -> participant info
+room_authority = {}  # room_id -> authority state
 
+# ============================================
+# Helper Functions for Live Meeting
+# ============================================
+def get_or_create_room(room_id):
+    """Get existing room or create new one"""
+    if room_id not in rooms:
+        rooms[room_id] = {
+            'participants': {},      # socket_id -> {'username', 'role', 'joined_at'}
+            'teacher_sid': None,
+            'created_at': datetime.utcnow().isoformat()
+        }
+    return rooms[room_id]
+
+def get_room_authority(room_id):
+    """Get or create authority state for a room"""
+    if room_id not in room_authority:
+        room_authority[room_id] = {
+            'muted_all': False,
+            'cameras_disabled': False,
+            'mic_requests': {},
+            'questions_enabled': True,
+            'question_visibility': 'public'
+        }
+    return room_authority[room_id]
+
+def get_participants_list(room_id, exclude_sid=None):
+    """Get list of all participants in room except exclude_sid"""
+    if room_id not in rooms:
+        return []
+    
+    room = rooms[room_id]
+    result = []
+    
+    for sid, info in room['participants'].items():
+        if sid != exclude_sid:
+            result.append({
+                'sid': sid,
+                'username': info['username'],
+                'role': info['role']
+            })
+    
+    return result
+
+def cleanup_room(room_id):
+    """Remove empty rooms"""
+    if room_id in rooms:
+        room = rooms[room_id]
+        if not room['participants']:
+            del rooms[room_id]
+            if room_id in room_authority:
+                del room_authority[room_id]
+            with app.app_context():
+                Room.query.filter_by(id=room_id).delete()
+                db.session.commit()
+
+# ============================================
+# Socket.IO Event Handlers - LIVE MEETING
+# ============================================
+@socketio.on('connect')
+def handle_connect():
+    sid = request.sid
+    # CRITICAL FIX: Join client to their private SID room for direct messaging
+    join_room(sid)
+    participants[sid] = {'room_id': None, 'username': None, 'role': None}
+    print(f"✅ Client connected: {sid} (joined private room: {sid})")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    sid = request.sid
+    
+    # Find which room this participant is in
+    participant = participants.get(sid)
+    if not participant:
+        return
+    
+    room_id = participant['room_id']
+    
+    if room_id in rooms:
+        room = rooms[room_id]
+        
+        # Notify all other participants
+        if sid in room['participants']:
+            participant_info = room['participants'][sid]
+            
+            # Remove from room
+            del room['participants'][sid]
+            
+            # Update teacher_sid if teacher left
+            if sid == room['teacher_sid']:
+                room['teacher_sid'] = None
+                # Notify students that teacher left
+                for participant_sid in room['participants']:
+                    if room['participants'][participant_sid]['role'] == 'student':
+                        emit('teacher-disconnected', room=participant_sid)
+            
+            # Notify others
+            emit('participant-left', {
+                'sid': sid,
+                'username': participant_info['username'],
+                'role': participant_info['role']
+            }, room=room_id, skip_sid=sid)
+            
+            print(f"❌ {participant_info['username']} left room {room_id}")
+        
+        # Clean up empty room
+        cleanup_room(room_id)
+    
+    # Remove from participants
+    if sid in participants:
+        del participants[sid]
+
+@socketio.on('join-room')
+def handle_join_room(data):
+    """Join room and get all existing participants - FIXED"""
+    try:
+        sid = request.sid
+        room_id = data.get('room')
+        role = data.get('role', 'student')
+        username = data.get('username', 'Teacher' if role == 'teacher' else f'Student_{sid[:6]}')
+        
+        if not room_id:
+            emit('error', {'message': 'Room ID required'})
+            return
+        
+        print(f"👤 {username} ({role}) joining room: {room_id}")
+        
+        room = get_or_create_room(room_id)
+        authority_state = get_room_authority(room_id)
+        
+        # Check if teacher already exists
+        if role == 'teacher' and room['teacher_sid']:
+            emit('error', {'message': 'Room already has a teacher'})
+            return
+        
+        # Add to room
+        room['participants'][sid] = {
+            'username': username,
+            'role': role,
+            'joined_at': datetime.utcnow().isoformat()
+        }
+        
+        # Update teacher reference
+        if role == 'teacher':
+            room['teacher_sid'] = sid
+            authority_state['teacher_sid'] = sid
+            
+            with app.app_context():
+                existing_room = Room.query.get(room_id)
+                if not existing_room:
+                    room_db = Room(
+                        id=room_id,
+                        teacher_id=sid,
+                        teacher_name=username,
+                        is_active=True
+                    )
+                    db.session.add(room_db)
+                else:
+                    existing_room.teacher_id = sid
+                    existing_room.teacher_name = username
+                db.session.commit()
+            
+            # Notify all students that teacher joined
+            for participant_sid in room['participants']:
+                if room['participants'][participant_sid]['role'] == 'student':
+                    emit('teacher-joined', {
+                        'teacher_sid': sid,
+                        'teacher_name': username
+                    }, room=participant_sid)
+        
+        # Update participant info
+        participants[sid] = {
+            'room_id': room_id,
+            'username': username,
+            'role': role
+        }
+        
+        # Join the socket room
+        join_room(room_id)
+        
+        # Get all existing participants (excluding self)
+        existing_participants = get_participants_list(room_id, exclude_sid=sid)
+        
+        # Send room joined confirmation
+        emit('room-joined', {
+            'room': room_id,
+            'sid': sid,
+            'username': username,
+            'role': role,
+            'existing_participants': existing_participants,
+            'teacher_sid': room['teacher_sid'],
+            'is_waiting': (role == 'student' and not room['teacher_sid'])  # Inform student they're waiting
+        })
+        
+        # Notify all other participants about new joiner
+        emit('new-participant', {
+            'sid': sid,
+            'username': username,
+            'role': role
+        }, room=room_id, skip_sid=sid)
+        
+        # Send authority state if student and teacher exists
+        if role == 'student' and room['teacher_sid']:
+            emit('room-state', {
+                'muted_all': authority_state['muted_all'],
+                'cameras_disabled': authority_state['cameras_disabled'],
+                'questions_enabled': authority_state['questions_enabled'],
+                'question_visibility': authority_state['question_visibility']
+            })
+        
+        # Log room status
+        print(f"✅ {username} joined room {room_id}. Total participants: {len(room['participants'])}")
+        
+    except Exception as e:
+        print(f"❌ Error in join-room: {e}")
+        emit('error', {'message': str(e)})
+
+# ============================================
+# WebRTC Signaling - Full Mesh Support - FIXED
+# ============================================
+@socketio.on('webrtc-offer')
+def handle_webrtc_offer(data):
+    """Relay WebRTC offer to specific participant - FIXED"""
+    try:
+        room_id = data.get('room')
+        target_sid = data.get('target_sid')
+        offer = data.get('offer')
+        
+        if not all([room_id, target_sid, offer]):
+            return
+        
+        # Verify both are in the same room
+        sender = participants.get(request.sid)
+        target = participants.get(target_sid)
+        
+        if not sender or not target:
+            return
+        
+        if sender['room_id'] != room_id or target['room_id'] != room_id:
+            return
+        
+        print(f"📨 {request.sid[:8]} → offer → {target_sid[:8]}")
+        
+        # FIX: Use target_sid as room (requires client to join their SID room on connect)
+        emit('webrtc-offer', {
+            'from_sid': request.sid,
+            'offer': offer,
+            'room': room_id
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error relaying offer: {e}")
+
+@socketio.on('webrtc-answer')
+def handle_webrtc_answer(data):
+    """Relay WebRTC answer to specific participant - FIXED"""
+    try:
+        room_id = data.get('room')
+        target_sid = data.get('target_sid')
+        answer = data.get('answer')
+        
+        if not all([room_id, target_sid, answer]):
+            return
+        
+        # Verify both are in the same room
+        sender = participants.get(request.sid)
+        target = participants.get(target_sid)
+        
+        if not sender or not target:
+            return
+        
+        if sender['room_id'] != room_id or target['room_id'] != room_id:
+            return
+        
+        print(f"📨 {request.sid[:8]} → answer → {target_sid[:8]}")
+        
+        # FIX: Use target_sid as room
+        emit('webrtc-answer', {
+            'from_sid': request.sid,
+            'answer': answer,
+            'room': room_id
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error relaying answer: {e}")
+
+@socketio.on('webrtc-ice-candidate')
+def handle_webrtc_ice_candidate(data):
+    """Relay ICE candidate to specific participant - FIXED"""
+    try:
+        room_id = data.get('room')
+        target_sid = data.get('target_sid')
+        candidate = data.get('candidate')
+        
+        if not all([room_id, target_sid, candidate]):
+            return
+        
+        # Verify both are in the same room
+        sender = participants.get(request.sid)
+        target = participants.get(target_sid)
+        
+        if not sender or not target:
+            return
+        
+        if sender['room_id'] != room_id or target['room_id'] != room_id:
+            return
+        
+        print(f"📨 {request.sid[:8]} → ICE → {target_sid[:8]}")
+        
+        # FIX: Use target_sid as room
+        emit('webrtc-ice-candidate', {
+            'from_sid': request.sid,
+            'candidate': candidate,
+            'room': room_id
+        }, room=target_sid)
+        
+    except Exception as e:
+        print(f"❌ Error relaying ICE candidate: {e}")
+
+# ============================================
+# NEW: Full Mesh Initiation System
+# ============================================
+@socketio.on('request-full-mesh')
+def handle_request_full_mesh(data):
+    """Initiate full mesh connections between all participants"""
+    try:
+        room_id = data.get('room')
+        sid = request.sid
+        
+        if not room_id or room_id not in rooms:
+            return
+        
+        room = rooms[room_id]
+        
+        # Verify participant is in room
+        if sid not in room['participants']:
+            return
+        
+        # Get all other participants in room
+        other_participants = []
+        for other_sid, info in room['participants'].items():
+            if other_sid != sid:
+                other_participants.append({
+                    'sid': other_sid,
+                    'username': info['username'],
+                    'role': info['role']
+                })
+        
+        # Send list of peers to connect to
+        emit('initiate-mesh-connections', {
+            'peers': other_participants,
+            'room': room_id
+        }, room=sid)
+        
+        print(f"🔗 Initiating full mesh for {sid[:8]} with {len(other_participants)} peers")
+        
+    except Exception as e:
+        print(f"❌ Error in request-full-mesh: {e}")
+
+# ============================================
+# Teacher Authority System
+# ============================================
+@socketio.on('teacher-mute-all')
+def handle_teacher_mute_all(data):
+    """Teacher mutes all students"""
+    try:
+        room_id = data.get('room')
+        
+        if not room_id or room_id not in rooms:
+            return
+        
+        room = rooms[room_id]
+        teacher_sid = request.sid
+        
+        # Verify this is the teacher
+        if teacher_sid != room['teacher_sid']:
+            return
+        
+        authority = get_room_authority(room_id)
+        authority['muted_all'] = True
+        
+        # Notify all students
+        for sid in room['participants']:
+            if room['participants'][sid]['role'] == 'student':
+                emit('room-muted', {'muted': True}, room=sid)
+        
+        print(f"🔇 Teacher muted all in room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in teacher-mute-all: {e}")
+
+@socketio.on('teacher-unmute-all')
+def handle_teacher_unmute_all(data):
+    """Teacher unmutes all students"""
+    try:
+        room_id = data.get('room')
+        
+        if not room_id or room_id not in rooms:
+            return
+        
+        room = rooms[room_id]
+        teacher_sid = request.sid
+        
+        if teacher_sid != room['teacher_sid']:
+            return
+        
+        authority = get_room_authority(room_id)
+        authority['muted_all'] = False
+        
+        for sid in room['participants']:
+            if room['participants'][sid]['role'] == 'student':
+                emit('room-muted', {'muted': False}, room=sid)
+        
+        print(f"🔊 Teacher unmuted all in room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in teacher-unmute-all: {e}")
+
+# ============================================
+# Control Events - FIXED
+# ============================================
+@socketio.on('start-broadcast')
+def handle_start_broadcast(data):
+    """Teacher starts broadcasting to all students - FIXED"""
+    try:
+        room_id = data.get('room')
+        
+        if room_id not in rooms:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        room = rooms[room_id]
+        teacher_sid = request.sid
+        
+        if teacher_sid != room['teacher_sid']:
+            emit('error', {'message': 'Only teacher can start broadcast'})
+            return
+        
+        print(f"📢 Teacher starting broadcast in room: {room_id}")
+        
+        # Get all student SIDs
+        student_sids = []
+        student_info = []
+        for sid, info in room['participants'].items():
+            if info['role'] == 'student':
+                student_sids.append(sid)
+                student_info.append({
+                    'sid': sid,
+                    'username': info['username']
+                })
+        
+        # Notify teacher
+        emit('broadcast-ready', {
+            'student_sids': student_sids,
+            'student_info': student_info,
+            'student_count': len(student_sids),
+            'room': room_id
+        }, room=teacher_sid)
+        
+        # FIX: Initiate WebRTC connections for each student
+        for student_sid in student_sids:
+            # Send list of all peers to connect to (full mesh)
+            peers_to_connect = []
+            for other_sid in room['participants']:
+                if other_sid != student_sid:  # Don't connect to self
+                    peers_to_connect.append({
+                        'sid': other_sid,
+                        'username': room['participants'][other_sid]['username'],
+                        'role': room['participants'][other_sid]['role']
+                    })
+            
+            emit('initiate-full-mesh', {
+                'peers': peers_to_connect,
+                'teacher_sid': teacher_sid,
+                'room': room_id
+            }, room=student_sid)
+        
+    except Exception as e:
+        print(f"❌ Error in start-broadcast: {e}")
+        emit('error', {'message': str(e)})
+
+@socketio.on('ping')
+def handle_ping(data):
+    """Keep-alive ping"""
+    emit('pong', {'timestamp': datetime.utcnow().isoformat()})
+
+# ============================================
+# Flask Routes
+# ============================================
 @app.route('/')
 def index():
     user = session.get('user')
@@ -1492,553 +1995,369 @@ def daily_dua():
             'error': 'Could not load Dua',
             'success': False
         }), 500
-# ============================================
-# LIVE MEETING SYSTEM - COMPLETE FIX
-# ============================================
-@socketio.on('connect')
-def handle_connect():
-    sid = request.sid
-    # CRITICAL FIX: Join client to their private SID room for direct messaging
-    join_room(sid)
-    participants[sid] = {'room_id': None, 'username': None, 'role': None}
-    debug_print(f"✅ Client connected: {sid} (joined private room: {sid})")
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    sid = request.sid
-    
-    # Find which room this participant is in
-    participant = participants.get(sid)
-    if not participant:
-        return
-    
-    room_id = participant['room_id']
-    
-    if room_id in rooms:
-        room = rooms[room_id]
-        
-        # Notify all other participants
-        if sid in room['participants']:
-            participant_info = room['participants'][sid]
-            
-            # Remove from room
-            del room['participants'][sid]
-            
-            # Update teacher_sid if teacher left
-            if sid == room['teacher_sid']:
-                room['teacher_sid'] = None
-                # Notify students that teacher left
-                for participant_sid in room['participants']:
-                    if room['participants'][participant_sid]['role'] == 'student':
-                        emit('teacher-disconnected', room=participant_sid)
-            
-            # Notify others
-            emit('participant-left', {
-                'sid': sid,
-                'username': participant_info['username'],
-                'role': participant_info['role']
-            }, room=room_id, skip_sid=sid)
-            
-            debug_print(f"❌ {participant_info['username']} left room {room_id}")
-        
-        # Clean up empty room
-        cleanup_room(room_id)
-    
-    # Remove from participants
-    if sid in participants:
-        del participants[sid]
-
-@socketio.on('join-room')
-def handle_join_room(data):
-    """Join room and get all existing participants - FIXED"""
-    try:
-        sid = request.sid
-        room_id = data.get('room')
-        role = data.get('role', 'student')
-        username = data.get('username', 'Teacher' if role == 'teacher' else f'Student_{sid[:6]}')
-        
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        debug_print(f"👤 {username} ({role}) joining room: {room_id}")
-        
-        room = get_or_create_room(room_id)
-        authority_state = get_room_authority(room_id)
-        
-        # Check if teacher already exists
-        if role == 'teacher' and room['teacher_sid']:
-            emit('error', {'message': 'Room already has a teacher'})
-            return
-        
-        # FIX: Allow students to join even without teacher (live meeting requirement)
-        # Remove this check:
-        # if role == 'student' and not room['teacher_sid']:
-        #     emit('error', {'message': 'Teacher not in room. Please wait.'})
-        #     return
-        
-        # Add to room
-        room['participants'][sid] = {
-            'username': username,
-            'role': role,
-            'joined_at': datetime.utcnow().isoformat()
-        }
-        
-        # Update teacher reference
-        if role == 'teacher':
-            room['teacher_sid'] = sid
-            authority_state['teacher_sid'] = sid
-            
-            with app.app_context():
-                existing_room = Room.query.get(room_id)
-                if not existing_room:
-                    room_db = Room(
-                        id=room_id,
-                        teacher_id=sid,
-                        teacher_name=username,
-                        is_active=True
-                    )
-                    db.session.add(room_db)
-                else:
-                    existing_room.teacher_id = sid
-                    existing_room.teacher_name = username
-                db.session.commit()
-            
-            # Notify all students that teacher joined
-            for participant_sid in room['participants']:
-                if room['participants'][participant_sid]['role'] == 'student':
-                    emit('teacher-joined', {
-                        'teacher_sid': sid,
-                        'teacher_name': username
-                    }, room=participant_sid)
-        
-        # Update participant info
-        participants[sid] = {
-            'room_id': room_id,
-            'username': username,
-            'role': role
-        }
-        
-        # Join the socket room
-        join_room(room_id)
-        
-        # Get all existing participants (excluding self)
-        existing_participants = get_participants_list(room_id, exclude_sid=sid)
-        
-        # Send room joined confirmation
-        emit('room-joined', {
-            'room': room_id,
-            'sid': sid,
-            'username': username,
-            'role': role,
-            'existing_participants': existing_participants,
-            'teacher_sid': room['teacher_sid'],
-            'is_waiting': (role == 'student' and not room['teacher_sid'])  # Inform student they're waiting
-        })
-        
-        # Notify all other participants about new joiner
-        emit('new-participant', {
-            'sid': sid,
-            'username': username,
-            'role': role
-        }, room=room_id, skip_sid=sid)
-        
-        # Send authority state if student and teacher exists
-        if role == 'student' and room['teacher_sid']:
-            emit('room-state', {
-                'muted_all': authority_state['muted_all'],
-                'cameras_disabled': authority_state['cameras_disabled'],
-                'questions_enabled': authority_state['questions_enabled'],
-                'question_visibility': authority_state['question_visibility']
-            })
-        
-        # Log room status
-        debug_print(f"✅ {username} joined room {room_id}. Total participants: {len(room['participants'])}")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in join-room: {e}")
-        emit('error', {'message': str(e)})
 
 # ============================================
-# WebRTC Signaling - Full Mesh Support - FIXED
+# Live Meeting Routes (WORKING VERSION)
 # ============================================
-@socketio.on('webrtc-offer')
-def handle_webrtc_offer(data):
-    """Relay WebRTC offer to specific participant - FIXED"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        offer = data.get('offer')
-        
-        if not all([room_id, target_sid, offer]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        debug_print(f"📨 {request.sid[:8]} → offer → {target_sid[:8]}")
-        
-        # FIX: Use target_sid as room (requires client to join their SID room on connect)
-        emit('webrtc-offer', {
-            'from_sid': request.sid,
-            'offer': offer,
-            'room': room_id
-        }, room=target_sid)  # This now works because we joined SID room in connect
-        
-    except Exception as e:
-        debug_print(f"❌ Error relaying offer: {e}")
-
-@socketio.on('webrtc-answer')
-def handle_webrtc_answer(data):
-    """Relay WebRTC answer to specific participant - FIXED"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        answer = data.get('answer')
-        
-        if not all([room_id, target_sid, answer]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        debug_print(f"📨 {request.sid[:8]} → answer → {target_sid[:8]}")
-        
-        # FIX: Use target_sid as room
-        emit('webrtc-answer', {
-            'from_sid': request.sid,
-            'answer': answer,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        debug_print(f"❌ Error relaying answer: {e}")
-
-@socketio.on('webrtc-ice-candidate')
-def handle_webrtc_ice_candidate(data):
-    """Relay ICE candidate to specific participant - FIXED"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        candidate = data.get('candidate')
-        
-        if not all([room_id, target_sid, candidate]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        debug_print(f"📨 {request.sid[:8]} → ICE → {target_sid[:8]}")
-        
-        # FIX: Use target_sid as room
-        emit('webrtc-ice-candidate', {
-            'from_sid': request.sid,
-            'candidate': candidate,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        debug_print(f"❌ Error relaying ICE candidate: {e}")
-
-# ============================================
-# NEW: Full Mesh Initiation System
-# ============================================
-@socketio.on('request-full-mesh')
-def handle_request_full_mesh(data):
-    """Initiate full mesh connections between all participants"""
-    try:
-        room_id = data.get('room')
-        sid = request.sid
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        
-        # Verify participant is in room
-        if sid not in room['participants']:
-            return
-        
-        # Get all other participants in room
-        other_participants = []
-        for other_sid, info in room['participants'].items():
-            if other_sid != sid:
-                other_participants.append({
-                    'sid': other_sid,
-                    'username': info['username'],
-                    'role': info['role']
-                })
-        
-        # Send list of peers to connect to
-        emit('initiate-mesh-connections', {
-            'peers': other_participants,
-            'room': room_id
-        }, room=sid)
-        
-        debug_print(f"🔗 Initiating full mesh for {sid[:8]} with {len(other_participants)} peers")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in request-full-mesh: {e}")
-
-# ============================================
-# Teacher Authority System
-# ============================================
-# ... [rest of the teacher authority handlers remain the same] ...
-@socketio.on('teacher-mute-all')
-def handle_teacher_mute_all(data):
-    """Teacher mutes all students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        # Verify this is the teacher
-        if teacher_sid != room['teacher_sid']:
-            return
-        
-        authority = get_room_authority(room_id)
-        authority['muted_all'] = True
-        
-        # Notify all students
-        for sid in room['participants']:
-            if room['participants'][sid]['role'] == 'student':
-                emit('room-muted', {'muted': True}, room=sid)
-        
-        debug_print(f"🔇 Teacher muted all in room {room_id}")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in teacher-mute-all: {e}")
-
-@socketio.on('teacher-unmute-all')
-def handle_teacher_unmute_all(data):
-    """Teacher unmutes all students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            return
-        
-        authority = get_room_authority(room_id)
-        authority['muted_all'] = False
-        
-        for sid in room['participants']:
-            if room['participants'][sid]['role'] == 'student':
-                emit('room-muted', {'muted': False}, room=sid)
-        
-        debug_print(f"🔊 Teacher unmuted all in room {room_id}")
-        
-    except Exception as e:
-        debug_print(f"❌ Error in teacher-unmute-all: {e}")
-
-# ... [rest of the authority handlers] ...
-
-# ============================================
-# Control Events - FIXED
-# ============================================
-@socketio.on('start-broadcast')
-def handle_start_broadcast(data):
-    """Teacher starts broadcasting to all students - FIXED"""
-    try:
-        room_id = data.get('room')
-        
-        if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can start broadcast'})
-            return
-        
-        debug_print(f"📢 Teacher starting broadcast in room: {room_id}")
-        
-        # Get all student SIDs
-        student_sids = []
-        student_info = []
-        for sid, info in room['participants'].items():
-            if info['role'] == 'student':
-                student_sids.append(sid)
-                student_info.append({
-                    'sid': sid,
-                    'username': info['username']
-                })
-        
-        # Notify teacher
-        emit('broadcast-ready', {
-            'student_sids': student_sids,
-            'student_info': student_info,
-            'student_count': len(student_sids),
-            'room': room_id
-        }, room=teacher_sid)
-        
-        # FIX: Initiate WebRTC connections for each student
-        for student_sid in student_sids:
-            # Send list of all peers to connect to (full mesh)
-            peers_to_connect = []
-            for other_sid in room['participants']:
-                if other_sid != student_sid:  # Don't connect to self
-                    peers_to_connect.append({
-                        'sid': other_sid,
-                        'username': room['participants'][other_sid]['username'],
-                        'role': room['participants'][other_sid]['role']
-                    })
-            
-            emit('initiate-full-mesh', {
-                'peers': peers_to_connect,
-                'teacher_sid': teacher_sid,
-                'room': room_id
-            }, room=student_sid)
-        
-    except Exception as e:
-        debug_print(f"❌ Error in start-broadcast: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('ping')
-def handle_ping(data):
-    """Keep-alive ping"""
-    emit('pong', {'timestamp': datetime.utcnow().isoformat()})
-
-# ============================================
-# Flask Routes
-# ============================================
-
-# ============================================
-# Live Meeting Routes (SINGLE SOURCE OF TRUTH)
-# ============================================
-
 @app.route('/live-meeting')
-def live_meeting():
+def live_meeting_landing():
     return render_template('live_meeting.html')
-
 
 @app.route('/live-meeting/teacher')
 def live_meeting_teacher_create():
     room_id = str(uuid4())[:8]
-    return redirect(url_for('live_meeting_teacher_view', room_id=room_id))
-
+    return redirect(f'/live-meeting/teacher/{room_id}')
 
 @app.route('/live-meeting/teacher/<room_id>')
 def live_meeting_teacher_view(room_id):
     return render_template('teacher_live.html', room_id=room_id)
 
-
 @app.route('/live-meeting/student/<room_id>')
 def live_meeting_student_view(room_id):
     return render_template('student_live.html', room_id=room_id)
-
 
 @app.route('/live-meeting/join', methods=['POST'])
 def live_meeting_join():
     room_id = request.form.get('room_id', '').strip()
     username = request.form.get('username', '').strip()
-
+    
     if not room_id:
         flash('Please enter a meeting ID')
-        return redirect(url_for('live_meeting'))
-
+        return redirect('/live-meeting')
+    
     if not username:
         username = f"Student_{str(uuid4())[:4]}"
-
+    
     session['live_username'] = username
+    
+    return redirect(f'/live-meeting/student/{room_id}')
 
-    return redirect(url_for('live_meeting_student_view', room_id=room_id))
-
-
-# ============================================
-# NEW: Connection Test Route
-# ============================================
-@app.route('/test-connection')
-def test_connection():
-    """Simple connection test page"""
+@app.route('/socket-test')
+def socket_test():
     return """
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Connection Test</title>
-        <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     </head>
     <body>
-        <h1>Socket.IO Connection Test</h1>
-        <div id="status">Connecting...</div>
-        <div id="events"></div>
-        
+        <h1>Socket.IO Test</h1>
+        <div id="status">Disconnected</div>
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
         <script>
-            const socket = io();
-            
-            socket.on('connect', () => {
-                document.getElementById('status').innerHTML = '✅ Connected! SID: ' + socket.id;
-                logEvent('Connected to server');
-            });
-            
-            socket.on('disconnect', () => {
-                document.getElementById('status').innerHTML = '❌ Disconnected';
-                logEvent('Disconnected from server');
-            });
-            
-            socket.on('connect_error', (error) => {
-                document.getElementById('status').innerHTML = '❌ Connection Error';
-                logEvent('Error: ' + error.message);
-            });
-            
-            function logEvent(msg) {
-                const eventsDiv = document.getElementById('events');
-                eventsDiv.innerHTML = new Date().toLocaleTimeString() + ': ' + msg + '<br>' + eventsDiv.innerHTML;
+            let socket;
+            function connect() {
+                socket = io();
+                socket.on('connect', () => {
+                    document.getElementById('status').textContent = 'Connected: ' + socket.id;
+                });
+                socket.on('disconnect', () => {
+                    document.getElementById('status').textContent = 'Disconnected';
+                });
+            }
+            function disconnect() {
+                if (socket) socket.disconnect();
             }
         </script>
     </body>
     </html>
     """
 
-# ============================================
-# Debug Route
-# ============================================
-@app.route('/debug/rooms')
-def debug_rooms():
-    """Debug endpoint to view current room states"""
-    debug_info = {
-        'rooms': rooms,
-        'participants': participants,
-        'room_authority': room_authority,
-        'total_rooms': len(rooms),
-        'total_participants': len(participants)
+@app.route('/static/live_meeting.css')
+def serve_live_meeting_css():
+    return """
+    /* Complete live meeting CSS */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-    return json.dumps(debug_info, indent=2, default=str)
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    
+    .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        padding: 40px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 20px;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .header h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .header p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .room-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .room-id {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+    
+    .share-link {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .share-link input {
+        flex: 1;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+    
+    .share-link button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    .share-link button:hover {
+        background: #5a67d8;
+    }
+    
+    .controls {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin: 30px 0;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+    }
+    
+    .btn-success {
+        background: #48bb78;
+        color: white;
+    }
+    
+    .btn-success:hover {
+        background: #38a169;
+        transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+        background: #f56565;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #e53e3e;
+        transform: translateY(-2px);
+    }
+    
+    .video-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+    
+    .video-box {
+        background: #1a202c;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        aspect-ratio: 16/9;
+    }
+    
+    .video-box video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .video-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .status {
+        text-align: center;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 10px;
+        background: #f0f4ff;
+    }
+    
+    .status.waiting {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status.live {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+    
+    .status.error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .students-list {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 30px;
+    }
+    
+    .students-list h3 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .student-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background: white;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .student-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .action-btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    
+    .action-btn.mute {
+        background: #f56565;
+        color: white;
+    }
+    
+    .action-btn.unmute {
+        background: #48bb78;
+        color: white;
+    }
+    
+    .questions-panel {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 30px;
+    }
+    
+    .question-item {
+        background: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border-left: 4px solid #48bb78;
+    }
+    
+    .question-meta {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+        }
+        
+        .controls {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .video-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    """, 200, {'Content-Type': 'text/css'}
 
-
-# Additional routes (kept from original but with error handling)
+# Additional routes
 @app.route('/reminder')
 def reminder():
     json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "reminders.json")
@@ -2441,6 +2760,7 @@ if __name__ == "__main__":
     print(f"📡 Socket.IO enabled: True")
     print(f"💾 Database URL: {DATABASE_URL[:50]}..." if DATABASE_URL else "💾 Using SQLite database")
     print(f"🎥 Live Meeting System: READY")
+    print(f"✅ Working live meeting integrated")
     
     socketio.run(
         app,
@@ -2450,6 +2770,3 @@ if __name__ == "__main__":
         allow_unsafe_werkzeug=True,
         log_output=True
     )
-    print("=== REGISTERED ROUTES ===")
-for rule in app.url_map.iter_rules():
-    print(rule)
