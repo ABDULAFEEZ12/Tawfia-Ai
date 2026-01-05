@@ -6,15 +6,8 @@
 <meta name="description" content="Tawfiq AI is the smartest Muslim AI that helps with Quran, Hadith, Islamic questions, games, and more – built for Muslims, by Muslims.">
 <meta name="keywords" content="Tawfiq AI, Islamic AI, Muslim AI, Quran AI, Hadith Chatbot, Muslim Chatbot, AI for Muslims, Halal AI, Islamic ChatGPT">
 
-<!-- Mobile-First Viewport -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#00695c">
-
-<!-- Touch Icons -->
-<link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
-<link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+<!-- Viewport (mobile-first) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <!-- Open Graph -->
 <meta property="og:title" content="Tawfiq AI – Islamic AI Chatbot & Quran Helper" />
@@ -30,708 +23,352 @@
 <meta name="twitter:image" content="https://www.tawfiqai.com/static/logo.png" />
 
 <!-- Force update -->
-<meta name="version" content="2.0.0">
+<meta name="version" content="1.0.1">
 
 <!-- External CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='live_meeting.css') }}">
 
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- Enhanced CSS with Mobile-First Responsive Design -->
+<!-- Updated and Enhanced CSS for Mobile & Aesthetics, including Light/Dark Mode -->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-:root {
-  --primary-color: #00695c;
-  --secondary-color: #4CAF50;
-  --accent-gold: #FFD700;
-  --accent-blue: #2196F3;
-  --light-bg: #f8f9fa;
-  --dark-bg: #121212;
-  --text-light: #333;
-  --text-dark: #e0e0e0;
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
-  --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.15);
-  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --safe-area-top: env(safe-area-inset-top, 0px);
-  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* ===== BASE MOBILE STYLES ===== */
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  height: -webkit-fill-available;
-}
-
+<link rel="icon" href="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" type="image/jpeg">
+  
 body {
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  <header style="text-align: center; padding: 30px;">
+  <img src="{{ url_for('static', filename='images/tawfiq-logo.jpg') }}" alt="Tawfiq AI Logo" style="height: 120px; max-width: 100%;">
+  <h1 style="font-family: sans-serif; font-size: 2rem; margin-top: 10px;">Tawfiq AI</h1>
+  <p style="font-style: italic; color: #555;">Smart Islamic Companion</p>
+</header>
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   margin: 0;
   padding: 0;
-  background-color: var(--light-bg);
-  color: var(--text-light);
+  background-color: #f4f4f4;
+  color: #333;
   line-height: 1.6;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  scroll-behavior: smooth;
   overflow-x: hidden;
-  padding-top: var(--safe-area-top);
-  padding-bottom: var(--safe-area-bottom);
-  position: relative;
-  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-body.light-mode {
-  background-color: var(--light-bg);
-  color: var(--text-light);
-}
-
-body.dark-mode {
-  background-color: var(--dark-bg);
-  color: var(--text-dark);
-}
-
-/* Prevent text size adjustment on orientation change */
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-/* ===== WELCOME EXPERIENCE ===== */
-.welcome-overlay{
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at center, rgba(212,175,55,.12), transparent 60%),
-    linear-gradient(135deg,#08131f,#0f2436,#08131f);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  overflow: hidden;
-  transition: opacity 1.2s ease;
+/* Live Meeting Section Specific Styles */
+#liveMeetingSection {
   padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 20px;
 }
 
-/* ===== BACKGROUND ===== */
-.depth-canvas {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.light-rays{
-  position:absolute;
-  inset:-60%;
-  background:conic-gradient(
-    transparent 0deg,
-    rgba(212,175,55,.04) 45deg,
-    transparent 90deg
-  );
-  animation:rotate 80s linear infinite;
-}
-
-@keyframes rotate{
-  to{transform:rotate(360deg)}
-}
-
-.distant-stars {
-  position: absolute;
-  inset: 0;
-}
-
-.star{
-  position:absolute;
-  width:2px;height:2px;
-  background:#fff;
-  opacity:.15;
-  border-radius:50%;
-  animation:twinkle 8s infinite;
-}
-
-.distant-stars .star:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-.distant-stars .star:nth-child(2) { top: 60%; left: 85%; animation-delay: 1s; }
-.distant-stars .star:nth-child(3) { top: 80%; left: 15%; animation-delay: 2s; }
-.distant-stars .star:nth-child(4) { top: 30%; left: 70%; animation-delay: 3s; }
-.distant-stars .star:nth-child(5) { top: 50%; left: 40%; animation-delay: 4s; }
-
-@keyframes twinkle{
-  50%{opacity:.6}
-}
-
-/* ===== CENTER ===== */
-.welcome-center{
-  text-align:center;
-  z-index:2;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:2.2rem;
-}
-
-/* ===== T ===== */
-.elegant-t-container{
-  width:120px;
-  height:120px;
-}
-
-.elegant-t svg{
-  width:100%;
-  height:100%;
-  filter:drop-shadow(0 6px 14px rgba(0,0,0,.35));
-}
-
-@keyframes breathe{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-5px)}
-}
-
-.t-breathe{
-  animation:breathe 7s ease-in-out infinite;
-}
-
-/* ===== TEXT ===== */
-.tawfiq-text h1{
-  font-size:2rem;
-  font-weight:300;
-  color:#fff;
-  margin:0;
-  font-family: 'Poppins', sans-serif;
+#liveMeetingSection h2 {
   text-align: center;
+  color: #00695c;
+  margin-bottom: 20px;
+  font-size: 1.8em;
 }
 
-.tawfiq-text p{
-  font-size:.85rem;
-  letter-spacing:1px;
-  opacity:.7;
-  margin-top:.4rem;
-  font-family: 'Poppins', sans-serif;
-  color: rgba(255,255,255,0.8);
-  text-align: center;
-}
-
-/* ===== TYPING BLESSING ===== */
-.blessings-area{
-  max-width:100%;
-  padding:0 20px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-}
-
-.blessing{
-  font-family:'Amiri',serif;
-  font-size:1.2rem;
-  line-height:1.6;
-  color:rgba(255,255,255,.92);
-  white-space:normal;
-  word-break:break-word;
-  text-align:center;
-  min-height:60px;
-  display:flex;
-  align-items:center;
-}
-
-/* Cursor */
-.cursor{
-  font-size:1.4rem;
-  color:rgba(255,255,255,.6);
-  animation:blink 1s infinite;
-}
-
-@keyframes blink{
-  50%{opacity:0}
-}
-
-/* ===== EXIT ===== */
-.welcome-overlay.exit{
-  opacity:0;
-  pointer-events:none;
-}
-
-/* ===== MOBILE-FRIENDLY LAYOUT ===== */
-
-/* Top Bar for Mobile */
-.top-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-blue));
+.video-container {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 15px;
-  z-index: 1000;
-  box-shadow: var(--shadow-soft);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
 }
 
-.top-bar h2 {
+.video-wrapper {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.video-wrapper h3 {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.7);
   color: white;
-  font-size: 1.2rem;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
   margin: 0;
-  flex: 1;
-  text-align: center;
-  white-space: nowrap;
+}
+
+.meeting-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.control-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#toggleVideo {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#toggleAudio {
+  background-color: #2196F3;
+  color: white;
+}
+
+#endCall {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Light Mode Styles (default) */
+body.light-mode {
+  background-color: #f4f4f4;
+  color: #333;
+}
+body.light-mode header h1 { color: #222; }
+body.light-mode header h3 { color: #555; }
+body.light-mode .tab { background-color: #fff; color: #000; }
+body.light-mode .tab.active, body.light-mode .tab:hover { background-color: #ddd; }
+body.light-mode .section { background-color: #fff; color: #000; }
+body.light-mode .messages { background-color: #fff; }
+body.light-mode .user-message { background-color: #dcf8c6; color: #000; }
+body.light-mode .ai-message { background-color: #ececec; color: #000; }
+body.light-mode #menu-toggle { background: #fff; color: #000; }
+body.light-mode #menu-toggle:hover { background: #eee; }
+body.light-mode #liveMeetingSection { background-color: #fff; }
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+body.dark-mode header h1 { color: #ffffff; }
+body.dark-mode header h3 { color: #cccccc; }
+body.dark-mode .tab {
+  background-color: #333;
+  color: #fff;
+}
+body.dark-mode .tab.active,
+body.dark-mode .tab:hover {
+  background-color: #555;
+}
+body.dark-mode .section {
+  background-color: #2c2c2c;
+  color: #e0e0e0;
+}
+body.dark-mode .messages {
+  background-color: #2c2c2c;
+}
+body.dark-mode .user-message {
+  background-color: #4caf50;
+  color: #fff;
+}
+body.dark-mode .ai-message {
+  background-color: #424242;
+  color: #fff;
+}
+body.dark-mode #menu-toggle {
+  background: #333;
+  color: #fff;
+}
+body.dark-mode #menu-toggle:hover {
+  background: #444;
+}
+body.dark-mode #liveMeetingSection {
+  background-color: #2c2c2c;
+  color: #e0e0e0;
+}
+body.dark-mode .meeting-controls {
+  background: #333;
+}
+body.dark-mode video {
+  border: 2px solid #555;
+}
+/* Daily Dua Section Dark Mode */
+body.dark-mode #dailyDuaSection {
+  background-color: #263238;
+  color: #b2dfdb;
+}
+body.dark-mode #dailyDuaSection h2 {
+  color: #4dd0e1;
+}
+body.dark-mode #dailyDuaContent {
+  color: #80cbc4;
+}
+
+/* Audio player styling */
+.audio-player {
+  margin-top: 15px;
+  width: 100%;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 10px;
+}
+body.dark-mode .audio-player {
+  background-color: #333;
+}
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.play-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.play-button:hover {
+  background-color: #45a049;
+}
+.play-button.playing {
+  background-color: #f44336;
+}
+.play-button.playing:hover {
+  background-color: #d32f2f;
+}
+.audio-progress {
+  flex-grow: 1;
+  height: 5px;
+  background-color: #ddd;
+  border-radius: 5px;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+.audio-progress-bar {
+  height: 100%;
+  background-color: #4CAF50;
+  width: 0%;
+}
+.audio-time {
+  font-size: 12px;
+  color: #666;
+  min-width: 80px;
+  text-align: right;
+}
+body.dark-mode .audio-time {
+  color: #ccc;
 }
 
-/* Menu toggle button - mobile optimized */
+/* Additional styles as per your original stylesheet... */
+
+h1, h3 {
+  text-align: center;
+  margin: 20px 10px;
+  font-weight: 600;
+}
+header h1 {
+  font-size: 1.8em;
+  color: #222;
+}
+header h3 {
+  font-size: 1.2em;
+  color: #555;
+}
+
+/* Menu toggle button style */
 #menu-toggle {
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 8px 12px;
-  border-radius: 50%;
-  border: none;
-  color: white;
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-smooth);
-  z-index: 1001;
-}
-
-#menu-toggle:active {
-  transform: scale(0.95);
-}
-
-/* Theme toggle button - mobile optimized */
-#theme-toggle {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 50%;
-  color: white;
-  padding: 8px 12px;
-  font-size: 20px;
-  cursor: pointer;
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-smooth);
-  z-index: 1001;
-}
-
-#theme-toggle:active {
-  transform: scale(0.95);
-}
-
-body.dark-mode #theme-toggle {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Menu overlay for mobile */
-.menu-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease;
+  top: 20px;
+  left: 15px;
+  z-index: 1001;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+#menu-toggle:hover {
+  background: #eee;
+  transform: scale(1.05);
 }
 
-.menu-overlay.active {
-  opacity: 1;
-  visibility: visible;
+/* Theme toggle button style */
+#theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 15px;
+  z-index: 1001;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  background-color: #fff;
+  color: #000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+#theme-toggle:hover {
+  transform: scale(1.1);
+}
+body.dark-mode #theme-toggle {
+  background-color: #333;
+  color: #fff;
 }
 
-/* ===== ENHANCED MENU STYLES ===== */
-/* Sidebar menu styles - ENHANCED */
+/* Sidebar menu styles */
 #side-menu {
   position: fixed;
   top: 0;
   left: 0;
   width: 280px;
   height: 100%;
-  background: linear-gradient(180deg, #121212 0%, #1a1a2e 100%);
+  background-color: #121212;
   color: #fff;
-  padding-top: 80px;
-  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  padding-top: 70px;
+  transition: all 0.3s ease;
   z-index: 1000;
   overflow-y: auto;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
-  -webkit-overflow-scrolling: touch;
-  transform: translateX(-280px);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
-
-#side-menu.open {
-  transform: translateX(0);
+#side-menu.hidden {
+  left: -280px;
 }
-
 #side-menu ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
 #side-menu li {
-  padding: 16px 25px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 20px;
+  border-bottom: 1px solid #333;
   cursor: pointer;
-  font-size: 1.05em;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  min-height: 50px;
-  display: flex;
-  align-items: center;
+  font-size: 1em;
+  transition: background 0.2s, transform 0.1s;
 }
-
-#side-menu li:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.5s;
-}
-
-#side-menu li:hover:before {
-  left: 100%;
-}
-
 #side-menu li:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(10px);
-  border-left: 4px solid var(--accent-gold);
+  background-color: #333;
+  transform: translateX(2px);
 }
-
-#side-menu li:active {
-  transform: translateX(5px) scale(0.98);
-}
-
 #side-menu a {
   color: inherit;
   text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 4px 0;
+  display: block;
 }
 
-#side-menu i {
-  font-size: 1.2em;
-  width: 24px;
-  text-align: center;
-}
-
-/* Menu item specific colors */
-#side-menu li:nth-child(1) i { color: #4CAF50; } /* Profile */
-#side-menu li:nth-child(2) i { color: #2196F3; } /* Talk to Tawfiq */
-#side-menu li:nth-child(3) i { color: #9C27B0; } /* Live Meeting */
-#side-menu li:nth-child(4) i { color: #FF9800; } /* Prayer Times */
-#side-menu li:nth-child(5) i { color: #00BCD4; } /* Dua */
-#side-menu li:nth-child(6) i { color: #FF5722; } /* Daily Reminder */
-#side-menu li:nth-child(7) i { color: #E91E63; } /* Islamic Motivation */
-#side-menu li:nth-child(8) i { color: #3F51B5; } /* Visual Quran */
-#side-menu li:nth-child(9) i { color: #009688; } /* Story Time */
-#side-menu li:nth-child(10) i { color: #FFC107; } /* Reels */
-#side-menu li:nth-child(11) i { color: #8BC34A; } /* Play Game */
-#side-menu li:nth-child(12) i { color: #607D8B; } /* Settings */
-#side-menu li:nth-child(13) i { color: #795548; } /* Privacy & Policy */
-#side-menu li:nth-child(14) i { color: #9E9E9E; } /* About Tawfiq AI */
-#side-menu li:nth-child(15) i { color: #FF5252; } /* Feedback / Report */
-
-/* Scrollbar for menu */
-#side-menu::-webkit-scrollbar {
-  width: 6px;
-}
-#side-menu::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-}
-#side-menu::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* Header adjustments for mobile */
-header {
-  text-align: center;
-  padding: 70px 15px 20px;
-  position: relative;
-  overflow: hidden;
-  margin-top: var(--safe-area-top);
-}
-
-h1 {
-  font-size: 1.8rem;
-  margin: 10px 0;
-  background: linear-gradient(45deg, var(--primary-color), var(--accent-blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gentle-pulse 4s infinite;
-  line-height: 1.3;
-  padding: 0 10px;
-}
-
-@keyframes gentle-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-/* ===== SMILE BOOSTER - MOBILE OPTIMIZED ===== */
-.smile-booster-container {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  z-index: 100;
-}
-
-.smile-button {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 28px;
-  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-  transition: var(--transition-bounce);
-  position: relative;
-  z-index: 101;
-  touch-action: manipulation;
-  min-width: 60px;
-  min-height: 60px;
-}
-
-.smile-button:active {
-  transform: scale(0.9);
-}
-
-.compliment-bubble {
-  position: absolute;
-  bottom: 70px;
-  right: 0;
-  background: white;
-  padding: 12px 16px;
-  border-radius: 18px;
-  box-shadow: var(--shadow-soft);
-  max-width: 200px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: var(--transition-smooth);
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  color: #333;
-  text-align: center;
-  z-index: 100;
-  font-size: 0.9rem;
-}
-
-.compliment-bubble.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.compliment-bubble:after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  right: 20px;
-  border-width: 8px;
-  border-style: solid;
-  border-color: white transparent transparent transparent;
-}
-
-/* Auto-messages - mobile optimized */
-.auto-message {
-  position: fixed;
-  bottom: 150px;
-  right: 20px;
-  background: rgba(76, 175, 80, 0.95);
-  color: white;
-  padding: 10px 14px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-soft);
-  max-width: 200px;
-  opacity: 0;
-  transform: translateX(100px);
-  transition: var(--transition-bounce);
-  z-index: 99;
-  font-size: 0.9rem;
-  backdrop-filter: blur(10px);
-}
-
-.auto-message.show {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* ===== DELIGHTFUL INTERACTIONS ===== */
-.ripple-button {
-  position: relative;
-  overflow: hidden;
-}
-
-.ripple-button:after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.6);
-  opacity: 0;
-  border-radius: 100%;
-  transform: scale(1, 1) translate(-50%);
-  transform-origin: 50% 50%;
-}
-
-.ripple-button:focus:not(:active)::after {
-  animation: ripple 1s ease-out;
-}
-
-@keyframes ripple {
-  0% {
-    transform: scale(0, 0);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(20, 20);
-    opacity: 0;
-  }
-}
-
-/* Bounce animations */
-@keyframes bounce {
-  0%, 20%, 60%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-10px); }
-  80% { transform: translateY(-5px); }
-}
-
-.bounce-on-click:active {
-  animation: bounce 0.5s;
-}
-
-/* ===== LIVING INTERFACE ===== */
-.cursor-follower {
-  position: fixed;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(0, 105, 92, 0.2);
-  pointer-events: none;
-  z-index: 9998;
-  mix-blend-mode: screen;
-  transition: transform 0.1s ease;
-}
-
-/* ===== VISUAL FEEDBACK ===== */
-.celebration-animation {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9997;
-  opacity: 0;
-}
-
-.celebration-particle {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--accent-gold);
-  animation: celebration 1.5s ease-out forwards;
-}
-
-@keyframes celebration {
-  0% {
-    transform: translateY(100vh) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100px) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* ===== ENGAGING CONTENT DISPLAY ===== */
-.typing-text {
-  overflow: hidden;
-  border-right: 2px solid var(--primary-color);
-  white-space: pre-wrap;
-  animation: typing-cursor 0.7s step-end infinite;
-}
-
-@keyframes typing-cursor {
-  0%, 100% { border-color: transparent; }
-  50% { border-color: var(--primary-color); }
-}
-
-.floating-dua {
-  animation: float-dua 8s ease-in-out infinite;
-  position: relative;
-}
-
-@keyframes float-dua {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-10px) rotate(1deg); }
-  66% { transform: translateY(5px) rotate(-1deg); }
-}
-
-.rotating-bracket {
-  display: inline-block;
-  animation: rotate-bracket 20s linear infinite;
-}
-
-@keyframes rotate-bracket {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ===== MICRO-DELIGHTS ===== */
-.sliding-message {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: var(--primary-color);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 10px;
-  box-shadow: var(--shadow-soft);
-  transform: translateX(-120%);
-  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  z-index: 100;
-}
-
-.sliding-message.show {
-  transform: translateX(0);
-}
-
-/* ===== TABS STYLES ===== */
+/* Tabs styles */
 .tabs {
   margin-top: 100px;
   display: flex;
@@ -740,198 +377,134 @@ h1 {
   gap: 12px;
 }
 .tab {
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 25px;
-  background-color: white;
-  box-shadow: var(--shadow-soft);
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   cursor: pointer;
   font-weight: 600;
   font-size: 1em;
-  transition: var(--transition-bounce);
-  position: relative;
-  overflow: hidden;
-}
-.tab:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s;
-}
-.tab:hover:before {
-  left: 100%;
+  transition: background 0.3s, transform 0.2s;
 }
 .tab.active, .tab:hover {
-  background-color: var(--primary-color);
-  color: white;
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-medium);
+  background-color: #ddd;
+  transform: scale(1.02);
 }
 
 /* Sections styling */
 .section {
   display: none;
-  padding: 25px;
-  max-width: 800px;
-  margin: 25px auto;
-  background-color: white;
-  border-radius: 20px;
-  box-shadow: var(--shadow-soft);
-  position: relative;
-  overflow: hidden;
-}
-body.dark-mode .section {
-  background-color: #2c2c2c;
-}
-.section:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-blue), var(--secondary-color));
+  padding: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 20px;
+  width: 100%;
 }
 .section.active {
   display: block;
-  animation: section-appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes section-appear {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Input fields - mobile optimized */
+/* Input styles */
 input[type="text"], select {
   width: 100%;
-  padding: 16px;
-  margin-top: 12px;
-  border-radius: 12px;
-  border: 2px solid #e0e0e0;
-  font-size: 1rem;
+  padding: 12px 15px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1em;
   font-family: 'Poppins', sans-serif;
-  transition: var(--transition-smooth);
-  -webkit-appearance: none;
-  appearance: none;
-  min-height: 52px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  transition: border-color 0.2s;
 }
-
 input[type="text"]:focus, select:focus {
-  border-color: var(--primary-color);
+  border-color: #007bff;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.2);
-}
-
-body.dark-mode input[type="text"],
-body.dark-mode select {
-  background-color: #333;
-  border-color: #555;
-  color: var(--text-dark);
 }
 
 /* Buttons styling */
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button) {
-  margin-top: 15px;
-  padding: 14px 24px;
+button {
+  margin-top: 12px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-blue));
+  border-radius: 8px;
+  background-color: #007bff;
   color: #fff;
   font-size: 1em;
-  font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  transition: var(--transition-bounce);
-  position: relative;
-  overflow: hidden;
-  min-height: 52px;
-  touch-action: manipulation;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.2s;
 }
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):hover:before {
-  left: 100%;
-}
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-medium);
-}
-button:not(#menu-toggle):not(#theme-toggle):not(.smile-button):active {
-  transform: translateY(-2px);
+button:hover {
+  background-color: #0056b3;
+  transform: scale(1.02);
 }
 
-/* Messages container - mobile optimized */
+/* Messages container styles (for chat bubbles) */
 .messages {
   margin-top: 20px;
-  background-color: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: var(--shadow-soft);
-  max-height: 400px;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-height: 300px;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   font-family: inherit;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-height: 200px;
-}
-body.dark-mode .messages {
-  background-color: #333;
 }
 
-/* Message bubbles - mobile optimized */
+/* User message style */
 .user-message {
   align-self: flex-end;
-  background: linear-gradient(135deg, #dcf8c6, #c5e8b7);
+  background-color: #dcf8c6; /* WhatsApp greenish */
   color: #000;
-  padding: 12px 18px;
-  border-radius: 20px 20px 5px 20px;
-  max-width: 85%;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  max-width: 80%;
+  font-weight: normal;
   word-wrap: break-word;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: var(--transition-smooth);
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-body.dark-mode .user-message {
-  background: linear-gradient(135deg, #2d5a27, #3a6b31);
-  color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* AI message style */
 .ai-message {
   align-self: flex-start;
-  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+  background-color: #ececec; /* Light gray/white bubble */
   color: #000;
-  padding: 12px 18px;
-  border-radius: 20px 20px 20px 5px;
-  max-width: 85%;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  max-width: 80%;
+  font-weight: 400;
   word-wrap: break-word;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: var(--transition-smooth);
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-body.dark-mode .ai-message {
-  background: linear-gradient(135deg, #424242, #333);
-  color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+/* Optional hover effect on chat bubbles */
 .user-message:hover, .ai-message:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Scrollbar styles for WebKit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0,0,0,0.4);
+}
+
+/* Firefox scrollbar */
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.2) transparent;
 }
 
 /* Video styles */
@@ -951,597 +524,88 @@ video {
   gap: 15px;
 }
 
-/* Daily Dua Section Specific */
-#dailyDuaSection {
-  background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
-  border-radius: 20px;
-  padding: 25px;
-  margin-top: 20px;
-  box-shadow: var(--shadow-soft);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-body.dark-mode #dailyDuaSection {
-  background: linear-gradient(135deg, #263238, #37474f);
-}
-#dailyDuaContent {
-  font-size: 1.3em;
-  font-family: 'Amiri', serif;
-  color: #00695c;
-  line-height: 1.8;
-}
-body.dark-mode #dailyDuaContent {
-  color: #80cbc4;
+#localVideo {
+  border: 3px solid #4CAF50;
 }
 
-/* Quran brackets rotation */
-.quran-bracket {
-  font-size: 1.5em;
-  color: var(--primary-color);
-  display: inline-block;
-  margin: 0 10px;
+#remoteVideos video {
+  border: 3px solid #2196F3;
 }
 
-/* Audio player with shimmer */
-.audio-player {
-  margin-top: 20px;
-  width: 100%;
-  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-  border-radius: 15px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-}
-body.dark-mode .audio-player {
-  background: linear-gradient(135deg, #333, #424242);
-}
-.audio-controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 15px;
-}
-.play-button {
-  background: linear-gradient(135deg, var(--secondary-color), #45a049);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: var(--transition-smooth);
-}
-.play-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-}
-.audio-progress {
-  flex-grow: 1;
-  height: 8px;
-  background-color: #ddd;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.audio-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--accent-blue));
-  width: 0%;
-  transition: width 0.1s linear;
-  position: relative;
-  overflow: hidden;
-}
-.audio-progress-bar:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  100% { left: 100%; }
-}
-
-/* ===== BOTTOM NAVIGATION FOR MOBILE ===== */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: white;
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0 var(--safe-area-bottom);
-  box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
-  z-index: 999;
-}
-
-.bottom-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 12px;
-  border: none;
-  background: none;
-  color: #666;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: var(--transition-smooth);
-  min-height: 60px;
-  flex: 1;
-}
-
-.bottom-nav-item:active {
-  color: var(--primary-color);
-  transform: scale(0.95);
-}
-
-.bottom-nav-item i {
-  font-size: 1.2rem;
-  margin-bottom: 4px;
-}
-
-.bottom-nav-item.active {
-  color: var(--primary-color);
-}
-
-body.dark-mode .bottom-nav {
-  background: #2c2c2c;
-}
-
-body.dark-mode .bottom-nav-item {
-  color: #aaa;
-}
-
-body.dark-mode .bottom-nav-item.active {
-  color: var(--accent-gold);
-}
-
-/* Auth Status */
-.auth-status {
-  text-align: center;
-  padding: 10px;
-  background: rgba(0,0,0,0.05);
-  margin: 10px;
-  border-radius: 10px;
-}
-
-.auth-status a {
-  color: var(--primary-color);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-/* ===== RESPONSIVE ADJUSTMENTS ===== */
-
-/* Small phones */
-@media (max-width: 768px) {
-  .top-bar {
-    display: flex;
+/* Responsive font sizes and layout adjustments for small screens */
+@media(max-width: 600px) {
+  body {
+    font-size: 0.95em;
   }
-  
-  header {
-    padding: 70px 15px 20px;
+  header h1 {
+    font-size: 1.4em;
   }
-  
-  h1 {
-    font-size: 1.8rem;
-  }
-  
-  .tabs {
-    margin-top: 60px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding: 15px 10px;
-    gap: 8px;
-  }
-  
-  .tab {
-    padding: 12px 20px;
-    font-size: 0.9rem;
-    white-space: nowrap;
-  }
-  
-  .section {
-    padding: 20px;
-    margin: 0 10px 20px;
-  }
-  
-  .smile-button {
-    width: 60px;
-    height: 60px;
-    font-size: 28px;
-    bottom: 80px;
-    right: 20px;
-  }
-  
-  .smile-booster-container {
-    bottom: 80px;
-    right: 20px;
-  }
-  
-  .auto-message {
-    bottom: 150px;
-    right: 20px;
-    max-width: 200px;
-  }
-  
-  #side-menu {
-    width: 280px;
-  }
-  
-  video {
-    width: 100%;
-    height: auto;
-    max-height: 300px;
-  }
-  
-  #remoteVideos {
-    flex-direction: column;
-  }
-  
-  .bottom-nav {
-    display: flex;
-  }
-}
-
-@media (max-width: 480px) {
-  .tawfiq-text h1 {
-    font-size: 1.7rem;
-  }
-  
-  .blessing {
-    font-size: 1.1rem;
-  }
-  
-  .elegant-t-container {
-    width: 100px;
-    height: 100px;
-  }
-  
-  h1 {
-    font-size: 1.5rem;
-  }
-  
-  .tabs {
-    gap: 8px;
-  }
-  
-  .tab {
-    padding: 10px 16px;
-    font-size: 0.85rem;
-  }
-  
-  button:not(#menu-toggle):not(#theme-toggle):not(.smile-button) {
-    padding: 12px 18px;
-  }
-  
-  #dailyDuaContent {
-    font-size: 1.1em;
-  }
-  
-  #side-menu {
-    width: 250px;
-  }
-  
-  #side-menu li {
-    padding: 14px 20px;
+  header h3 {
     font-size: 1em;
   }
-  
-  .smile-button {
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
-  }
-  
-  .auto-message {
-    max-width: 180px;
-    right: 15px;
-    bottom: 130px;
-  }
-}
-
-/* Tablets and larger phones */
-@media (min-width: 769px) {
-  .top-bar {
-    display: none;
-  }
-  
-  header {
-    padding: 30px 20px;
-    margin-top: 0;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-  }
-  
-  .tawfiq-text h1 {
-    font-size: 2.6rem;
-  }
-  
-  .blessing {
-    font-size: 1.4rem;
-  }
-  
-  .elegant-t-container {
-    width: 140px;
-    height: 140px;
-  }
-  
-  .tabs {
-    margin-top: 100px;
-  }
-  
-  .bottom-nav {
-    display: none;
-  }
-  
-  /* Desktop menu toggle button */
   #menu-toggle {
-    display: block;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1001;
-    background: #fff;
-    padding: 10px 14px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-soft);
-    transition: var(--transition-bounce);
-    font-size: 28px;
-    cursor: pointer;
-    color: #333;
-    min-width: auto;
-    min-height: auto;
+    font-size: 24px;
+    padding: 6px 10px;
   }
-  
-  #menu-toggle:hover {
-    background: #eee;
-    transform: scale(1.1) rotate(90deg);
+  .tab {
+    padding: 8px 16px;
+    font-size: 0.95em;
   }
-  
-  #theme-toggle {
-    display: block;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1001;
+  button {
     padding: 10px 16px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    color: #333;
-    box-shadow: var(--shadow-soft);
-    transition: var(--transition-bounce);
-    min-width: auto;
-    min-height: auto;
+    font-size: 0.95em;
   }
-  
-  #theme-toggle:hover {
-    transform: scale(1.1) rotate(15deg);
+  .audio-controls {
+    flex-direction: column;
+    align-items: stretch;
   }
-  
-  body.dark-mode #menu-toggle {
-    background: #333;
-    color: white;
+  .audio-time {
+    text-align: center;
   }
-  
-  body.dark-mode #theme-toggle {
-    background: linear-gradient(135deg, #333, #555);
-    color: #fff;
+  video {
+    width: 250px;
+    height: 188px;
   }
-  
-  #side-menu {
-    transform: translateX(-280px);
+  .meeting-controls {
+    flex-direction: column;
+    align-items: center;
   }
-  
-  #side-menu.open {
-    transform: translateX(0);
-  }
-  
-  .menu-overlay {
-    display: none;
+  .control-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
-/* Landscape orientation */
-@media (max-height: 600px) and (orientation: landscape) {
-  header {
-    padding-top: 50px;
-    padding-bottom: 10px;
-  }
-  
-  .tabs {
-    margin-top: 40px;
-    padding: 10px;
-  }
-  
-  .section {
-    min-height: 150px;
-  }
-  
-  .messages {
-    max-height: 200px;
-  }
-  
-  .bottom-nav {
-    padding: 5px 0 var(--safe-area-bottom);
-  }
-  
-  .bottom-nav-item {
-    min-height: 50px;
-    font-size: 0.7rem;
-  }
-  
-  .bottom-nav-item i {
-    font-size: 1rem;
-  }
+/* Specific styles for the Dua section */
+#duaSection {
+  margin-top: 20px;
+  padding: 20px;
 }
-
-/* High-resolution displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .section {
-    border: 0.5px solid rgba(0,0,0,0.1);
-  }
-  
-  body.dark-mode .section {
-    border-color: rgba(255,255,255,0.1);
-  }
+#dailyDuaSection {
+  background-color: #e0f7fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
 }
-
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+#dailyDuaSection h2 {
+  margin-bottom: 15px;
+  font-size: 1.4em;
+  color: #00695c;
 }
-
-/* Dark mode preference */
-@media (prefers-color-scheme: dark) {
-  body:not(.light-mode) {
-    background-color: var(--dark-bg);
-    color: var(--text-dark);
-  }
-}
-
-/* Hide cursor follower on touch devices */
-@media (hover: none) and (pointer: coarse) {
-  .cursor-follower {
-    display: none;
-  }
-}
-
-/* Hover effects only for non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  .hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-medium);
-  }
-  
-  .hover-rotate:hover {
-    transform: rotate(5deg);
-  }
-  
-  .hover-glow:hover {
-    box-shadow: 0 0 15px rgba(0, 105, 92, 0.3);
-  }
-  
-  .smile-button:hover {
-    transform: scale(1.1) rotate(10deg);
-    box-shadow: 0 12px 30px rgba(255, 215, 0, 0.6);
-  }
+#dailyDuaContent {
+  font-size: 1.2em;
+  font-family: 'Poppins', sans-serif;
+  color: #004d40;
 }
 </style>
 </head>
 <body class="light-mode">
 
-<!-- ===== MENU OVERLAY ===== -->
-<div class="menu-overlay" id="menuOverlay"></div>
+<!-- Theme Toggle Button -->
+<button id="theme-toggle" onclick="toggleMode()">☀️</button>
 
-<!-- ===== TOP BAR FOR MOBILE ===== -->
-<div class="top-bar">
-  <button id="menu-toggle" aria-label="Open menu">
-    <i class="fas fa-bars"></i>
-  </button>
-  <h2>Tawfiq AI</h2>
-  <button id="theme-toggle" aria-label="Toggle theme">
-    <i class="fas fa-sun"></i>
-  </button>
-</div>
-
-<!-- ===== WELCOME EXPERIENCE ===== -->
-<div id="welcome-overlay" class="welcome-overlay">
-  <!-- Background -->
-  <div class="depth-canvas">
-    <div class="light-rays"></div>
-
-    <div class="distant-stars">
-      <span class="star"></span><span class="star"></span><span class="star"></span>
-      <span class="star"></span><span class="star"></span>
-    </div>
-  </div>
-
-  <!-- Center -->
-  <div class="welcome-center">
-    <!-- Elegant T -->
-    <div class="elegant-t-container">
-      <div class="elegant-t t-breathe">
-        <svg viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id="tGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#e6c76e"/>
-              <stop offset="100%" stop-color="#b68d40"/>
-            </linearGradient>
-          </defs>
-          <rect x="28" y="22" width="44" height="10" rx="3" fill="url(#tGrad)"/>
-          <rect x="46" y="32" width="8" height="46" rx="3" fill="url(#tGrad)"/>
-        </svg>
-      </div>
-    </div>
-
-    <!-- Text -->
-    <div class="tawfiq-text">
-      <h1>Tawfiq AI</h1>
-      <p>Your Smart Islamic Companion</p>
-    </div>
-
-    <!-- Blessing -->
-    <div class="blessings-area">
-      <div id="blessing" class="blessing"></div>
-      <span class="cursor">|</span>
-    </div>
-  </div>
-</div>
-
-<!-- ===== CURSOR FOLLOWER (Desktop only) ===== -->
-<div class="cursor-follower"></div>
-
-<!-- ===== SMILE BOOSTER ===== -->
-<div class="smile-booster-container">
-  <button class="smile-button bounce-on-click ripple-button" id="smileBtn" aria-label="Get Islamic compliment">
-    <i class="fas fa-smile"></i>
-  </button>
-  <div class="compliment-bubble" id="complimentBubble">
-    May Allah fill your heart with peace and joy!
-  </div>
-</div>
-
-<!-- ===== AUTO MESSAGES ===== -->
-<div class="auto-message" id="autoMessage">
-  <i class="fas fa-heart" style="margin-right: 8px;"></i>
-  <span id="autoMessageText">Remember Allah in every moment</span>
-</div>
-
-<!-- ===== CELEBRATION ANIMATION CONTAINER ===== -->
-<div class="celebration-animation" id="celebrationContainer"></div>
-
-<!-- ===== SLIDING MESSAGE ===== -->
-<div class="sliding-message" id="slidingMessage">
-  <i class="fas fa-star" style="margin-right: 8px;"></i>
-  <span>Welcome to Tawfiq AI!</span>
-</div>
-
-<!-- Desktop Theme Toggle Button -->
-<button id="theme-toggle-desktop" class="hover-rotate-small" style="display: none;">☀️</button>
-
-<!-- Desktop Menu Toggle Button -->
-<div id="menu-toggle-desktop" class="hover-rotate-small" style="display: none;">☰</div>
-
-<!-- Auth Status -->
 <div class="auth-status">
   {% if user %}
     <p>Welcome, {{ user.username }}! <a href="/logout">Logout</a></p>
@@ -1550,92 +614,99 @@ body.dark-mode .bottom-nav-item.active {
   {% endif %}
 </div>
 
-<!-- ===== SIDEBAR MENU ===== -->
-<div id="side-menu">
+<!-- MENU TOGGLE BUTTON -->
+<div id="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<!-- SIDEBAR MENU -->
+<div id="side-menu" class="hidden">
   <ul>
-    <li><a href="/profile"><i class="fas fa-user"></i> 👤 Profile</a></li>
-    <li><a href="/talk-to-tawfiq"><i class="fas fa-microphone"></i> 🎙️ Talk to Tawfiq</a></li>
-    <li><a href="/live-meeting"><i class="fas fa-video"></i> 🎙️ Live Meeting</a></li>
-    <li><a href="/prayer-times"><i class="fas fa-mosque"></i> 🕌 Prayer Times</a></li>
-    <li><a href="/duas"><i class="fas fa-hands-praying"></i> 🕌 Dua</a></li>
-    <li><a href="/reminder"><i class="fas fa-bell"></i> 📅 Daily Reminder</a></li>
-    <li><a href="/motivation"><i class="fas fa-sparkles"></i> ✨ Islamic Motivation</a></li>
-    <li><a href="/visual-quran"><i class="fas fa-book-quran"></i> ✨ Visual Quran</a></li>
-    <li><a href="/story-time"><i class="fas fa-book-open"></i> 📖 Story Time</a></li>
-    <li><a href="/reels"><i class="fas fa-mobile-alt"></i> 📱 Reels</a></li>
-    <li><a href="/trivia"><i class="fas fa-gamepad"></i> 🎮 Play Game</a></li>
-    <li><a href="/settings"><i class="fas fa-cog"></i> ⚙️ Settings</a></li>
-    <li><a href="/privacy"><i class="fas fa-lock"></i> 🔒 Privacy & Policy</a></li>
-    <li><a href="/about"><i class="fas fa-info-circle"></i> ℹ️ About Tawfiq AI</a></li>
-    <li><a href="/feedback"><i class="fas fa-comment-dots"></i> 📢 Feedback / Report</a></li>
-  </ul>
+  <li><a href="/profile">👤 Profile</a></li>
+  <li><a href="/talk-to-tawfiq">🎙️ Talk to Tawfiq</a></li>
+  <li><a href="/live-meeting">🎙️ Live Meeting</a></li>
+  <li><a href="/prayer-times">🕌 Prayer Times</a></li>
+  <li><a href="/duas">🕌 Dua</a></li>
+  <li><a href="/reminder">📅 Daily Reminder</a></li>
+  <li><a href="/motivation">✨ Islamic Motivation</a></li>
+  <li><a href="/visual-quran">✨ Visual Quran</a></li>
+  <li><a href="/story-time">📖 Story Time</a></li> <!-- 🔥 Added here -->
+  <li><a href="/reels">📱 Reels</a></li>
+  <li><a href="/trivia">🎮 Play Game</a></li>
+  <li><a href="/settings">⚙️ Settings</a></li>
+  <li><a href="/privacy">🔒 Privacy & Policy</a></li>
+  <li><a href="/about">ℹ️ About Tawfiq AI</a></li>
+  <li><a href="/feedback">📢 Feedback / Report</a></li>
+</ul>
 </div>
 
 <!-- Main Header -->
 <header>
-  <h1 class="logo-living">🌙 Tawfiq AI - Smart Islamic Companion 🌙</h1>
-  <h3 class="shimmering-header">✨ Ask me anything about Islam ✨</h3>
+<h1>🌙 Tawfiq AI - Smart Islamic Companion 🌙</h1>
+<h3>✨ Ask me anything about Islam ✨</h3>
 </header>
 
 <!-- TABS -->
 <div class="tabs">
-  <div class="tab active hover-lift" onclick="switchTab('aiSection', event)">🤖 AI Chat</div>
-  <div class="tab hover-lift" onclick="switchTab('quranSection', event)">📖 Quran</div>
-  <div class="tab hover-lift" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
-  <div class="tab hover-lift" onclick="switchTab('duaSection', event)">🕌 Daily Dua</div>
+  <div class="tab active" onclick="switchTab('aiSection', event)">🤖 AI</div>
+  <div class="tab" onclick="switchTab('quranSection', event)">📖 Quran</div>
+  <div class="tab" onclick="switchTab('hadithSection', event)">📜 Hadith</div>
 </div>
 
 <!-- AI Section -->
 <div class="section active" id="aiSection">
   <div class="messages" id="messages"></div>
-  <input type="text" id="userInput" placeholder="Ask a question about Islam..." 
-         enterkeyhint="send" inputmode="text" autocomplete="off" />
-  <button id="askButton" class="ripple-button hover-lift">Ask Tawfiq AI</button>
+  <input type="text" id="userInput" placeholder="Ask a question about Islam..." />
+  <button id="askButton" onclick="sendQuestion()">Ask</button>
 </div>
 
 <!-- Quran Section -->
 <div class="section" id="quranSection">
-  <input type="text" id="quranInput" placeholder="Enter Surah name or keyword..." 
-         inputmode="text" autocomplete="off" />
+  <input type="text" id="quranInput" placeholder="Enter Surah name or keyword..."/>
   <select id="surahList">
     <option value="">-- Or Select Surah --</option>
   </select>
-  <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-    <button id="quranSearchButton" class="ripple-button hover-lift">Search Surah</button>
-    <button id="playSurahButton" class="ripple-button hover-lift" style="background: linear-gradient(135deg, #4CAF50, #45a049);">🎵 Play Surah</button>
+  <div style="display: flex; gap: 10px; margin-top: 10px;">
+    <button id="quranSearchButton" onclick="searchQuran()">Search Surah</button>
+    <button id="playSurahButton" onclick="playSurah()" style="background-color: #4CAF50;">🎵 Play Surah</button>
   </div>
   <div class="audio-player" id="audioPlayer" style="display: none;">
-    <audio id="surahAudio" controls style="width: 100%;" preload="metadata"></audio>
+    <audio id="surahAudio" controls style="width: 100%;"></audio>
     <div class="audio-controls">
-      <button class="play-button bounce-on-click" id="playPauseBtn">Play</button>
+      <button class="play-button" id="playPauseBtn" onclick="togglePlayPause()">Play</button>
       <div class="audio-progress">
         <div class="audio-progress-bar" id="progressBar"></div>
       </div>
       <div class="audio-time" id="timeDisplay">0:00 / 0:00</div>
     </div>
   </div>
-  <div class="results" id="quranResult" style="margin-top: 20px;"></div>
+  <div class="results" id="quranResult"></div>
 </div>
 
 <!-- Hadith Section -->
 <div class="section" id="hadithSection">
-  <input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number..." 
-         inputmode="text" autocomplete="off" />
+  <input type="text" id="hadithInput" placeholder="Enter Hadith keyword or number..."/>
   <select id="hadithDropdown">
     <option value="">-- Or Select Hadith Topic --</option>
   </select>
-  <button id="hadithSearchButton" class="ripple-button hover-lift">Search Hadith</button>
-  <div class="results" id="hadithResult" style="margin-top: 20px;"></div>
+  <button id="hadithSearchButton" onclick="searchHadith()">Search Hadith</button>
+  <div class="results" id="hadithResult"></div>
 </div>
+
 
 <!-- Dua Section (Main) -->
 <div class="section" id="duaSection">
-  <h3><span class="quran-bracket rotating-bracket">﴾</span> Today's Dua <span class="quran-bracket rotating-bracket">﴿</span></h3>
+  <h3>Today's Dua</h3>
+  <div id="duaText">Loading Dua...</div>
   <!-- The prominent Daily Dua box -->
-  <div id="dailyDuaSection" class="floating-dua">
+  <div id="dailyDuaSection">
     <h2>🕌 Daily Dua 📿</h2>
     <div id="dailyDuaContent">Loading the Dua of the Day...</div>
   </div>
+</div>
+
+<!-- Motivation Section -->
+<div class="section" id="motivationSection">
+  <h3>Daily Motivation</h3>
+  <div id="motivationText">Loading Motivation...</div>
 </div>
 
 <!-- Prayer Times Section -->
@@ -1646,25 +717,11 @@ body.dark-mode .bottom-nav-item.active {
   </div>
 </div>
 
-<!-- ===== BOTTOM NAVIGATION (Mobile only) ===== -->
-<nav class="bottom-nav">
-  <button class="bottom-nav-item active" onclick="switchTab('aiSection', event)">
-    <i class="fas fa-robot"></i>
-    <span>AI Chat</span>
-  </button>
-  <button class="bottom-nav-item" onclick="switchTab('quranSection', event)">
-    <i class="fas fa-book-quran"></i>
-    <span>Quran</span>
-  </button>
-  <button class="bottom-nav-item" onclick="switchTab('hadithSection', event)">
-    <i class="fas fa-book"></i>
-    <span>Hadith</span>
-  </button>
-  <button class="bottom-nav-item" onclick="switchTab('duaSection', event)">
-    <i class="fas fa-mosque"></i>
-    <span>Dua</span>
-  </button>
-</nav>
+<!-- Daily Dua Menu Section (for menu navigation) -->
+<div class="section" id="dailyDuaMenu" style="display:none;">
+  <h3>🕌 Daily Dua 📿</h3>
+  <div id="dailyDuaContentMenu" style="font-size: 1.2em; padding: 10px; text-align: center;">Loading the Dua of the Day...</div>
+</div>
 
 <!-- Hidden SEO text -->
 <div style="display:none;">
@@ -1676,726 +733,36 @@ body.dark-mode .bottom-nav-item.active {
 <script src="https://unpkg.com/simple-peer@9.11.1/simplepeer.min.js"></script>
 
 <script>
-  // ===== MOBILE-SPECIFIC ENHANCEMENTS =====
+  // Theme toggle button logic
+  const themeToggleBtn = document.getElementById('theme-toggle');
 
-  // Detect touch device
-  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-  // Prevent zoom on double tap
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function(event) {
-    const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-      event.preventDefault();
-    }
-    lastTouchEnd = now;
-  }, false);
-
-  // Prevent pull-to-refresh on mobile
-  document.addEventListener('touchmove', function(event) {
-    if (event.scale !== 1) {
-      event.preventDefault();
-    }
-  }, { passive: false });
-
-  // Initialize mobile-specific features
-  document.addEventListener('DOMContentLoaded', function() {
-    // Add touch feedback classes
-    if (isTouchDevice) {
-      document.body.classList.add('touch-device');
-    }
-
-    // Show/hide desktop elements based on screen size
-    function checkScreenSize() {
-      const isMobile = window.innerWidth <= 768;
-      const desktopMenuToggle = document.getElementById('menu-toggle-desktop');
-      const desktopThemeToggle = document.getElementById('theme-toggle-desktop');
-      
-      if (isMobile) {
-        if (desktopMenuToggle) desktopMenuToggle.style.display = 'none';
-        if (desktopThemeToggle) desktopThemeToggle.style.display = 'none';
-      } else {
-        if (desktopMenuToggle) desktopMenuToggle.style.display = 'block';
-        if (desktopThemeToggle) desktopThemeToggle.style.display = 'block';
-      }
-    }
-    
-    // Check on load and resize
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-
-    // Initialize new welcome experience
-    initializeNewWelcomeExperience();
-    
-    // Initialize cursor follower for desktop only
-    if (!isTouchDevice) {
-      initializeCursorFollower();
-    }
-    
-    // Initialize smile booster
-    initializeSmileBooster();
-    
-    // Initialize auto messages
-    initializeAutoMessages();
-    
-    // Initialize sliding message
-    showSlidingMessage();
-    
-    // Load content
-    loadDailyDua();
-    loadHadithTopics();
-    loadSurahList();
-    initializeAudioPlayer();
-    
-    // Apply hover effects to existing elements
-    applyHoverEffects();
-    
-    // Add celebration on first interaction
-    document.addEventListener('click', function firstInteraction() {
-      triggerCelebration();
-      document.removeEventListener('click', firstInteraction);
-    });
-    
-    // Mobile menu functionality
-    const menuToggle = document.getElementById('menu-toggle');
-    const sideMenu = document.getElementById('side-menu');
-    const menuOverlay = document.getElementById('menuOverlay');
-    
-    // Desktop menu toggle
-    const desktopMenuToggle = document.getElementById('menu-toggle-desktop');
-    
-    function toggleSideMenu() {
-      sideMenu.classList.toggle('open');
-      menuOverlay.classList.toggle('active');
-      document.body.style.overflow = sideMenu.classList.contains('open') ? 'hidden' : '';
-    }
-    
-    if (menuToggle) {
-      menuToggle.addEventListener('click', function(e) {
-        e.stopPropagation();
-        toggleSideMenu();
-      });
-    }
-    
-    if (desktopMenuToggle) {
-      desktopMenuToggle.addEventListener('click', function(e) {
-        e.stopPropagation();
-        toggleSideMenu();
-      });
-    }
-    
-    menuOverlay.addEventListener('click', function() {
-      sideMenu.classList.remove('open');
-      menuOverlay.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-    
-    // Close menu when clicking outside on mobile
-    document.addEventListener('touchstart', function(e) {
-      if (sideMenu.classList.contains('open') && 
-          !sideMenu.contains(e.target) && 
-          !menuToggle.contains(e.target) && 
-          !desktopMenuToggle.contains(e.target)) {
-        sideMenu.classList.remove('open');
-        menuOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-    });
-    
-    // Theme toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    const desktopThemeToggle = document.getElementById('theme-toggle-desktop');
-    
-    function handleThemeToggle() {
-      toggleMode();
-    }
-    
-    if (themeToggle) {
-      themeToggle.addEventListener('click', handleThemeToggle);
-    }
-    
-    if (desktopThemeToggle) {
-      desktopThemeToggle.addEventListener('click', handleThemeToggle);
-    }
-    
-    // Bottom nav synchronization
-    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
-    bottomNavItems.forEach(item => {
-      item.addEventListener('click', function() {
-        bottomNavItems.forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
-    
-    // Initialize event listeners with touch support
-    document.getElementById('askButton').addEventListener(isTouchDevice ? 'touchstart' : 'click', sendQuestion);
-    document.getElementById('quranSearchButton').addEventListener(isTouchDevice ? 'touchstart' : 'click', searchQuran);
-    document.getElementById('playSurahButton').addEventListener(isTouchDevice ? 'touchstart' : 'click', playSurah);
-    document.getElementById('hadithSearchButton').addEventListener(isTouchDevice ? 'touchstart' : 'click', searchHadith);
-    document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
-    
-    // Enter key for AI chat
-    document.getElementById('userInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') sendQuestion();
-    });
-    
-    // Load saved theme
-    loadTheme();
-    
-    // Handle orientation change
-    window.addEventListener('orientationchange', function() {
-      // Refresh layout after orientation change
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 100);
-    });
-    
-    // Handle keyboard visibility changes
-    window.addEventListener('resize', function() {
-      // Scroll to active input when keyboard appears
-      const activeElement = document.activeElement;
-      if (['INPUT', 'TEXTAREA'].includes(activeElement.tagName)) {
-        setTimeout(() => {
-          activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-      }
-      
-      // Re-check screen size
-      checkScreenSize();
-    });
-  });
-
-  // ===== NEW WELCOME EXPERIENCE =====
-  function initializeNewWelcomeExperience() {
-    const text = "In the name of Allah, the Most Gracious, the Most Merciful";
-    const blessingEl = document.getElementById("blessing");
-    const overlay = document.getElementById("welcome-overlay");
-    const cursor = document.querySelector(".cursor");
-
-    let i = 0;
-
-    function typeBlessing() {
-      if (i < text.length) {
-        blessingEl.textContent += text.charAt(i);
-        i++;
-        setTimeout(typeBlessing, 60); // typing speed
-      } else {
-        cursor.style.display = "none";
-
-        // Pause before fading out
-        setTimeout(() => {
-          overlay.classList.add("exit");
-          // Wait for transition to complete before hiding completely
-          setTimeout(() => {
-            overlay.style.display = "none";
-          }, 1200);
-        }, 2000);
-      }
-    }
-
-    // Start typing after slight delay
-    setTimeout(typeBlessing, 800);
+  // Load saved theme preference - default to light mode
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.remove('light-mode');
+    document.body.classList.add('dark-mode');
+    themeToggleBtn.innerText = '🌙'; // Show moon when in dark mode
+  } else {
+    // Default is light mode
+    document.body.classList.remove('dark-mode');
+    document.body.classList.add('light-mode');
+    themeToggleBtn.innerText = '☀️'; // Show sun when in light mode
   }
 
-  // ===== CURSOR FOLLOWER =====
-  function initializeCursorFollower() {
-    const follower = document.querySelector('.cursor-follower');
-    let mouseX = 0, mouseY = 0;
-    let followerX = 0, followerY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-    
-    function animate() {
-      // Calculate distance between cursor and follower
-      let distX = mouseX - followerX;
-      let distY = mouseY - followerY;
-      
-      // Move follower toward cursor with easing
-      followerX += distX * 0.1;
-      followerY += distY * 0.1;
-      
-      // Apply position
-      follower.style.transform = `translate(${followerX - 10}px, ${followerY - 10}px)`;
-      
-      // Change size based on speed
-      const speed = Math.sqrt(distX * distX + distY * distY);
-      const size = Math.min(20 + speed * 0.05, 40);
-      follower.style.width = `${size}px`;
-      follower.style.height = `${size}px`;
-      
-      requestAnimationFrame(animate);
-    }
-    
-    animate();
-  }
-
-  // ===== SMILE BOOSTER =====
-  function initializeSmileBooster() {
-    const smileBtn = document.getElementById('smileBtn');
-    const complimentBubble = document.getElementById('complimentBubble');
-    
-    const compliments = [
-      "Masha'Allah! Your smile is sadaqah!",
-      "Allah loves those who are cheerful!",
-      "A smile is charity - Prophet Muhammad (PBUH)",
-      "Your positivity brightens the day!",
-      "May Allah accept your good deeds!",
-      "Keep smiling, it's sunnah!",
-      "Your faith shines through your smile!",
-      "Allah rewards every good intention!",
-      "Patience and gratitude bring smiles!",
-      "Your smile makes angels smile too!"
-    ];
-    
-    smileBtn.addEventListener('click', function() {
-      // Select random compliment
-      const randomCompliment = compliments[Math.floor(Math.random() * compliments.length)];
-      complimentBubble.textContent = randomCompliment;
-      
-      // Show bubble
-      complimentBubble.classList.add('show');
-      
-      // Add bounce effect to button
-      this.classList.add('bounce-on-click');
-      setTimeout(() => {
-        this.classList.remove('bounce-on-click');
-      }, 500);
-      
-      // Hide bubble after 4 seconds
-      setTimeout(() => {
-        complimentBubble.classList.remove('show');
-      }, 4000);
-      
-      // Trigger celebration
-      triggerMiniCelebration();
-    });
-  }
-
-  // ===== AUTO MESSAGES =====
-  function initializeAutoMessages() {
-    const autoMessage = document.getElementById('autoMessage');
-    const autoMessageText = document.getElementById('autoMessageText');
-    
-    const autoMessages = [
-      "Remember Allah in every moment",
-      "Patience is a pillar of faith",
-      "Gratitude increases blessings",
-      "Prayer is the key to Paradise",
-      "Charity erases sins",
-      "Kindness is a mark of faith",
-      "Seek knowledge from cradle to grave",
-      "Trust in Allah's timing",
-      "Forgive others as you seek forgiveness",
-      "The best among you are those with the best character"
-    ];
-    
-    let messageIndex = 0;
-    
-    // Show first message after 30 seconds
-    setTimeout(showAutoMessage, 30000);
-    
-    // Show new message every 45 seconds
-    setInterval(showAutoMessage, 45000);
-    
-    function showAutoMessage() {
-      autoMessageText.textContent = autoMessages[messageIndex];
-      autoMessage.classList.add('show');
-      
-      messageIndex = (messageIndex + 1) % autoMessages.length;
-      
-      // Hide after 6 seconds
-      setTimeout(() => {
-        autoMessage.classList.remove('show');
-      }, 6000);
-    }
-  }
-
-  // ===== SLIDING MESSAGE =====
-  function showSlidingMessage() {
-    const slidingMessage = document.getElementById('slidingMessage');
-    
-    // Show message after welcome overlay disappears
-    setTimeout(() => {
-      slidingMessage.classList.add('show');
-      
-      // Hide after 5 seconds
-      setTimeout(() => {
-        slidingMessage.classList.remove('show');
-      }, 5000);
-    }, 5000);
-  }
-
-  // ===== CELEBRATION ANIMATIONS =====
-  function triggerCelebration() {
-    const container = document.getElementById('celebrationContainer');
-    const colors = ['#FFD700', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800'];
-    
-    // Create 30 particles
-    for (let i = 0; i < 30; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'celebration-particle';
-      
-      // Random properties
-      const size = Math.random() * 15 + 5;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const left = Math.random() * 100;
-      const delay = Math.random() * 0.5;
-      
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.backgroundColor = color;
-      particle.style.left = `${left}%`;
-      particle.style.animationDelay = `${delay}s`;
-      
-      container.appendChild(particle);
-      
-      // Remove after animation completes
-      setTimeout(() => {
-        particle.remove();
-      }, 1500);
-    }
-    
-    // Show container
-    container.style.opacity = '1';
-    
-    // Hide after animation
-    setTimeout(() => {
-      container.style.opacity = '0';
-    }, 1500);
-  }
-
-  function triggerMiniCelebration() {
-    const container = document.getElementById('celebrationContainer');
-    const colors = ['#FFD700', '#4CAF50'];
-    
-    // Create 10 smaller particles
-    for (let i = 0; i < 10; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'celebration-particle';
-      
-      // Random properties
-      const size = Math.random() * 8 + 3;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const left = 70 + Math.random() * 20;
-      const delay = Math.random() * 0.3;
-      
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.backgroundColor = color;
-      particle.style.left = `${left}%`;
-      particle.style.animationDelay = `${delay}s`;
-      
-      container.appendChild(particle);
-      
-      // Remove after animation completes
-      setTimeout(() => {
-        particle.remove();
-      }, 1500);
-    }
-    
-    // Show container
-    container.style.opacity = '1';
-    
-    // Hide after animation
-    setTimeout(() => {
-      container.style.opacity = '0';
-    }, 1500);
-  }
-
-  // ===== APPLY HOVER EFFECTS =====
-  function applyHoverEffects() {
-    // Add ripple effect to all buttons
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-      button.addEventListener('click', function(e) {
-        // Create ripple element
-        const ripple = document.createElement('span');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        
-        ripple.style.cssText = `
-          position: absolute;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.7);
-          transform: scale(0);
-          animation: ripple-animation 0.6s linear;
-          width: ${size}px;
-          height: ${size}px;
-          top: ${y}px;
-          left: ${x}px;
-          pointer-events: none;
-        `;
-        
-        this.appendChild(ripple);
-        
-        setTimeout(() => {
-          ripple.remove();
-        }, 600);
-      });
-    });
-    
-    // Add CSS for ripple animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes ripple-animation {
-        to {
-          transform: scale(4);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  // ===== TYPING EFFECT FOR AI RESPONSES =====
-  function typeText(element, text, speed = 20) {
-    return new Promise(resolve => {
-      let i = 0;
-      element.innerHTML = '';
-      
-      function typeChar() {
-        if (i < text.length) {
-          const char = text.charAt(i);
-          element.innerHTML += char === "\n" ? "<br>" : char;
-          i++;
-          setTimeout(typeChar, speed);
-        } else {
-          resolve();
-        }
-      }
-      
-      typeChar();
-    });
-  }
-
-  // ===== ENHANCED SEND QUESTION =====
-  async function sendQuestion(event) {
-    // Prevent double-tap on mobile
-    if (event && event.type === 'touchstart') {
-      event.preventDefault();
-    }
-    
-    const inputEl = document.getElementById("userInput");
-    const question = inputEl.value.trim();
-    if (!question) return;
-
-    // Hide keyboard on mobile after sending
-    if (isTouchDevice) {
-      inputEl.blur();
-    }
-
-    const messagesDiv = document.getElementById("messages");
-
-    // Add user message with animation
-    const userMsg = document.createElement("div");
-    userMsg.className = "user-message";
-    userMsg.innerHTML = `You: ${question}`;
-    userMsg.style.opacity = '0';
-    userMsg.style.transform = 'translateY(20px)';
-    messagesDiv.appendChild(userMsg);
-    
-    // Animate user message in
-    setTimeout(() => {
-      userMsg.style.opacity = '1';
-      userMsg.style.transform = 'translateY(0)';
-      userMsg.style.transition = 'opacity 0.3s, transform 0.3s';
-    }, 10);
-    
-    inputEl.value = "";
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    // Add thinking animation
-    const thinkingMsg = document.createElement("div");
-    thinkingMsg.className = "ai-message";
-    thinkingMsg.innerHTML = `<div class="typing-indicator">
-      <span></span><span></span><span></span>
-    </div>`;
-    messagesDiv.appendChild(thinkingMsg);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-    try {
-      const response = await fetch("/ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ history: [{ role: "user", content: question }] })
-      });
-      const data = await response.json();
-
-      // Remove thinking message
-      thinkingMsg.remove();
-
-      const messageContent = data.choices?.[0]?.message?.content;
-      const answerText = messageContent || "I apologize, but I couldn't generate a response at this moment. Please try again.";
-
-      // Add AI message with typing effect
-      const aiMsg = document.createElement("div");
-      aiMsg.className = "ai-message typing-text";
-      messagesDiv.appendChild(aiMsg);
-      
-      // Type out response
-      await typeText(aiMsg, `Tawfiq AI: ${answerText}`, 15);
-      
-      // Remove typing cursor after completion
-      aiMsg.classList.remove('typing-text');
-      
-      // Trigger mini celebration
-      triggerMiniCelebration();
-
-    } catch (error) {
-      console.error("Error:", error);
-      
-      // Remove thinking message
-      if (thinkingMsg.parentNode) {
-        thinkingMsg.remove();
-      }
-
-      // Show error message
-      const errorMsg = document.createElement("div");
-      errorMsg.className = "ai-message";
-      errorMsg.textContent = "Tawfiq AI: I apologize for the error. Please try again or check your connection.";
-      messagesDiv.appendChild(errorMsg);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-  }
-
-  // ===== THEME TOGGLE =====
   function toggleMode() {
-    const body = document.body;
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const desktopThemeToggle = document.getElementById('theme-toggle-desktop');
-    
-    body.classList.toggle('light-mode');
-    body.classList.toggle('dark-mode');
+    document.body.classList.toggle('light-mode');
+    document.body.classList.toggle('dark-mode');
 
-    if (body.classList.contains('dark-mode')) {
+    const toggleBtn = document.getElementById('theme-toggle');
+
+    if (document.body.classList.contains('dark-mode')) {
       localStorage.setItem('theme', 'dark');
-      if (themeToggleBtn) {
-        themeToggleBtn.innerHTML = '🌙';
-        if (isTouchDevice) {
-          themeToggleBtn.style.background = 'rgba(255, 255, 255, 0.1)';
-        }
-      }
-      if (desktopThemeToggle) {
-        desktopThemeToggle.innerHTML = '🌙';
-        desktopThemeToggle.style.background = 'linear-gradient(135deg, #333, #555)';
-      }
+      toggleBtn.innerText = '🌙'; // Moon icon for dark mode
     } else {
       localStorage.setItem('theme', 'light');
-      if (themeToggleBtn) {
-        themeToggleBtn.innerHTML = '☀️';
-        if (isTouchDevice) {
-          themeToggleBtn.style.background = 'rgba(255, 255, 255, 0.2)';
-        }
-      }
-      if (desktopThemeToggle) {
-        desktopThemeToggle.innerHTML = '☀️';
-        desktopThemeToggle.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
-      }
-    }
-    
-    // Add rotation effect
-    if (!isTouchDevice) {
-      if (desktopThemeToggle) {
-        desktopThemeToggle.classList.add('hover-rotate');
-        setTimeout(() => {
-          desktopThemeToggle.classList.remove('hover-rotate');
-        }, 300);
-      }
+      toggleBtn.innerText = '☀️'; // Sun icon for light mode
     }
   }
 
-  // ===== LOAD SAVED THEME =====
-  function loadTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const desktopThemeToggle = document.getElementById('theme-toggle-desktop');
-    
-    if (savedTheme === 'dark') {
-      document.body.classList.remove('light-mode');
-      document.body.classList.add('dark-mode');
-      if (themeToggleBtn) {
-        themeToggleBtn.innerHTML = '🌙';
-        if (isTouchDevice) {
-          themeToggleBtn.style.background = 'rgba(255, 255, 255, 0.1)';
-        }
-      }
-      if (desktopThemeToggle) {
-        desktopThemeToggle.innerHTML = '🌙';
-        desktopThemeToggle.style.background = 'linear-gradient(135deg, #333, #555)';
-      }
-    } else {
-      document.body.classList.remove('dark-mode');
-      document.body.classList.add('light-mode');
-      if (themeToggleBtn) {
-        themeToggleBtn.innerHTML = '☀️';
-        if (isTouchDevice) {
-          themeToggleBtn.style.background = 'rgba(255, 255, 255, 0.2)';
-        }
-      }
-      if (desktopThemeToggle) {
-        desktopThemeToggle.innerHTML = '☀️';
-        desktopThemeToggle.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
-      }
-    }
-  }
-
-  // ===== ENHANCED TAB SWITCHING =====
-  function switchTab(sectionId, event) {
-    // Prevent default for touch events
-    if (event && event.preventDefault) event.preventDefault();
-    
-    // Remove active class from all tabs and sections
-    document.querySelectorAll('.section').forEach(s => {
-      s.classList.remove('active');
-      s.style.opacity = '0';
-      s.style.transform = 'translateY(20px)';
-    });
-    
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
-    
-    // Add active class to clicked tab
-    if (event && event.target.classList.contains('tab')) {
-      event.target.classList.add('active');
-    }
-    
-    // Update bottom nav
-    const tabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => 
-      tab.onclick && tab.onclick.toString().includes(sectionId)
-    );
-    if (tabIndex > -1) {
-      document.querySelectorAll('.bottom-nav-item')[tabIndex].classList.add('active');
-    }
-    
-    // Show selected section with animation
-    const activeSection = document.getElementById(sectionId);
-    activeSection.classList.add('active');
-    
-    setTimeout(() => {
-      activeSection.style.opacity = '1';
-      activeSection.style.transform = 'translateY(0)';
-      activeSection.style.transition = 'opacity 0.5s, transform 0.5s';
-      // Scroll to top of section on mobile
-      if (isTouchDevice) {
-        activeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 10);
-    
-    // Load specific content for tab
-    if (sectionId === 'prayerTimes') loadPrayerTimes();
-    if (sectionId === 'duaSection') loadDailyDua();
-    
-    // Trigger mini celebration on tab switch
-    triggerMiniCelebration();
-  }
-
-  // ===== ORIGINAL FUNCTIONS (with enhancements) =====
   let chatHistory = [];
   let audioPlayer = null;
   
@@ -2407,82 +774,187 @@ body.dark-mode .bottom-nav-item.active {
   let isAudioEnabled = true;
   let ROOM_ID = null;
 
-  function loadDailyDua() {
-  // Try to fetch from the server first
-  fetch('/daily-dua')
-    .then(res => {
-      if (!res.ok) throw new Error('Network response was not ok');
-      return res.json();
-    })
-    .then(data => {
-      if (data.dua) {
-        const dua = data.dua;
-        const duaHTML = `
-          <div class="dua-arabic" style="font-family: 'Amiri', serif; font-size: 1.5em; text-align: right; margin-bottom: 15px; color: #00695c;">
-            ${dua.arabic}
-          </div>
-          <div class="dua-english" style="font-size: 1.1em; margin-bottom: 10px; line-height: 1.6;">
-            ${dua.english}
-          </div>
-          <div class="dua-reference" style="font-size: 0.9em; color: #666; font-style: italic;">
-            Reference: ${dua.reference} | Category: ${dua.category}
-          </div>
-        `;
-        document.getElementById('dailyDuaContent').innerHTML = duaHTML;
-      } else {
-        // Fallback to local hardcoded Duas
-        loadHardcodedDua();
-      }
-    })
-    .catch(error => {
-      console.log('Fetching from server failed, using hardcoded Duas');
-      loadHardcodedDua();
+  // Initialize WebRTC when Live Meeting section is active
+  function initializeWebRTC() {
+    const localVideo = document.getElementById("localVideo");
+    const remoteVideos = document.getElementById("remoteVideos");
+    
+    // Generate or get room ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    ROOM_ID = urlParams.get('room') || "default-islamic-room";
+    
+    // Initialize Socket.IO
+    socket = io();
+    
+    // Request media access
+    navigator.mediaDevices.getUserMedia({ 
+      video: true, 
+      audio: true 
+    }).then(stream => {
+      localStream = stream;
+      localVideo.srcObject = stream;
+      
+      // Join the room
+      socket.emit("join", { 
+        room: ROOM_ID, 
+        id: socket.id,
+        username: "{{ user.username if user else 'Guest' }}"
+      });
+      
+      console.log("Joined room:", ROOM_ID);
+    }).catch(error => {
+      console.error("Error accessing media devices:", error);
+      alert("Unable to access camera/microphone. Please check permissions.");
     });
-}
-
-function loadHardcodedDua() {
-  const hardcodedDuas = [
-    {
-      arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
-      english: "Our Lord, give us in this world [that which is] good and in the Hereafter [that which is] good and protect us from the punishment of the Fire.",
-      reference: "Quran 2:201",
-      category: "General"
-    },
-    {
-      arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلاً مُتَقَبَّلاً",
-      english: "O Allah, I ask You for beneficial knowledge, goodly provision, and acceptable deeds.",
-      reference: "Sunan Ibn Majah",
-      category: "Knowledge"
-    },
-    {
-      arabic: "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي",
-      english: "My Lord, expand for me my breast [with assurance] and ease for me my task.",
-      reference: "Quran 20:25-26",
-      category: "Ease"
+    
+    // Socket event handlers
+    socket.on("user-joined", data => {
+      console.log("User joined:", data.id);
+      createPeer(data.id, true);
+    });
+    
+    socket.on("signal", data => {
+      if (!peers[data.from]) {
+        createPeer(data.from, false);
+      }
+      if (peers[data.from]) {
+        peers[data.from].signal(data.signal);
+      }
+    });
+    
+    socket.on("user-left", userId => {
+      console.log("User left:", userId);
+      if (peers[userId]) {
+        peers[userId].destroy();
+        delete peers[userId];
+        
+        // Remove video element
+        const videoElement = document.getElementById(`video-${userId}`);
+        if (videoElement) {
+          videoElement.remove();
+        }
+      }
+    });
+  }
+  
+  function createPeer(id, initiator) {
+    const peer = new SimplePeer({
+      initiator: initiator,
+      trickle: false,
+      stream: localStream
+    });
+    
+    peer.on("signal", signal => {
+      socket.emit("signal", {
+        room: ROOM_ID,
+        signal: signal,
+        from: socket.id,
+        to: id
+      });
+    });
+    
+    peer.on("stream", stream => {
+      // Check if video already exists
+      if (document.getElementById(`video-${id}`)) return;
+      
+      const video = document.createElement("video");
+      video.id = `video-${id}`;
+      video.srcObject = stream;
+      video.autoplay = true;
+      video.playsInline = true;
+      
+      const wrapper = document.createElement("div");
+      wrapper.className = "video-wrapper";
+      wrapper.appendChild(video);
+      
+      const name = document.createElement("h3");
+      name.textContent = `User ${id.substring(0, 5)}`;
+      wrapper.appendChild(name);
+      
+      document.getElementById("remoteVideos").appendChild(wrapper);
+    });
+    
+    peer.on("close", () => {
+      peer.destroy();
+      delete peers[id];
+      
+      const videoElement = document.getElementById(`video-${id}`);
+      if (videoElement) {
+        videoElement.parentElement.remove();
+      }
+    });
+    
+    peers[id] = peer;
+  }
+  
+  function toggleVideo() {
+    if (!localStream) return;
+    
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      isVideoEnabled = videoTrack.enabled;
+      document.getElementById("toggleVideo").innerHTML = 
+        isVideoEnabled ? '<span>📹</span> Video ON' : '<span>📴</span> Video OFF';
     }
-  ];
+  }
   
-  // Get a different Dua each day
-  const today = new Date();
-  const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-  const duaIndex = dayOfYear % hardcodedDuas.length;
-  const dua = hardcodedDuas[duaIndex];
+  function toggleAudio() {
+    if (!localStream) return;
+    
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      isAudioEnabled = audioTrack.enabled;
+      document.getElementById("toggleAudio").innerHTML = 
+        isAudioEnabled ? '<span>🎤</span> Audio ON' : '<span>🔇</span> Audio OFF';
+    }
+  }
   
-  const duaHTML = `
-    <div class="dua-arabic" style="font-family: 'Amiri', serif; font-size: 1.5em; text-align: right; margin-bottom: 15px; color: #00695c;">
-      ${dua.arabic}
-    </div>
-    <div class="dua-english" style="font-size: 1.1em; margin-bottom: 10px; line-height: 1.6;">
-      ${dua.english}
-    </div>
-    <div class="dua-reference" style="font-size: 0.9em; color: #666; font-style: italic;">
-      Reference: ${dua.reference} | Category: ${dua.category}
-    </div>
-  `;
-  
-  document.getElementById('dailyDuaContent').innerHTML = duaHTML;
-}
+  function endCall() {
+    // Stop all tracks
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+    }
+    
+    // Destroy all peers
+    Object.values(peers).forEach(peer => peer.destroy());
+    peers = {};
+    
+    // Clear videos
+    document.getElementById("remoteVideos").innerHTML = "";
+    const localVideo = document.getElementById("localVideo");
+    localVideo.srcObject = null;
+    
+    // Leave room
+    if (socket) {
+      socket.emit("leave", { room: ROOM_ID, id: socket.id });
+    }
+    
+    // Reset buttons
+    document.getElementById("toggleVideo").innerHTML = '<span>📹</span> Toggle Video';
+    document.getElementById("toggleAudio").innerHTML = '<span>🎤</span> Toggle Audio';
+    
+    alert("Call ended. You can start a new call by refreshing the page.");
+  }
 
+  // Load Daily Dua
+  function loadDailyDua() {
+    fetch('data/daily_duas.json')
+      .then(res => res.json())
+      .then(data => {
+        const duaText = data.dua || "No Dua available.";
+        document.getElementById('dailyDuaContent').innerHTML = `<p>${duaText}</p>`;
+        document.getElementById('dailyDuaContentMenu').innerHTML = `<p>${duaText}</p>`;
+      })
+      .catch(error => {
+        document.getElementById('dailyDuaContent').innerHTML = '<p>Unable to load Dua for today.</p>';
+        document.getElementById('dailyDuaContentMenu').innerHTML = '<p>Unable to load Dua for today.</p>';
+        console.error('Error loading daily_duas.json:', error);
+      });
+  }
+
+  // Load prayer times
   function loadPrayerTimes() {
     fetch('/get-prayer-times')
       .then(res => res.json())
@@ -2505,6 +977,7 @@ function loadHardcodedDua() {
       });
   }
 
+  // Load Surah list
   function loadSurahList() {
     fetch('/get-surah-list')
       .then(res => res.json())
@@ -2558,6 +1031,7 @@ function loadHardcodedDua() {
     });
   }
 
+  // Load Hadith topics
   function loadHadithTopics() {
     const topics = [
       "Hadith on Prayer", "Hadith on Faith", "Hadith on Charity", "Hadith on Patience",
@@ -2597,6 +1071,15 @@ function loadHardcodedDua() {
     });
   }
 
+  // Call loadDailyDua on DOMContentLoaded
+  document.addEventListener("DOMContentLoaded", () => {
+    loadDailyDua();
+    loadHadithTopics();
+    loadSurahList();
+    initializeAudioPlayer();
+  });
+
+  // Initialize audio player
   function initializeAudioPlayer() {
     audioPlayer = document.getElementById('surahAudio');
     if (!audioPlayer) return;
@@ -2611,6 +1094,7 @@ function loadHardcodedDua() {
     });
   }
 
+  // Toggle play/pause for audio
   function togglePlayPause() {
     const btn = document.getElementById('playPauseBtn');
     if (audioPlayer.paused) {
@@ -2624,6 +1108,7 @@ function loadHardcodedDua() {
     }
   }
 
+  // Update progress bar
   function updateProgress() {
     const progressBar = document.getElementById('progressBar');
     const value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
@@ -2631,6 +1116,7 @@ function loadHardcodedDua() {
     updateTimeDisplay();
   }
 
+  // Update time display
   function updateTimeDisplay() {
     const timeDisplay = document.getElementById('timeDisplay');
     const currentTime = formatTime(audioPlayer.currentTime);
@@ -2638,38 +1124,14 @@ function loadHardcodedDua() {
     timeDisplay.textContent = `${currentTime} / ${duration}`;
   }
 
+  // Format time in minutes:seconds
   function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   }
 
-  const surahNameToNumber = {
-    "Al-Fatihah": 1, "Al-Baqarah": 2, "Aali Imran": 3, "An-Nisa": 4, "Al-Ma'idah": 5,
-    "Al-An'am": 6, "Al-A'raf": 7, "Al-Anfal": 8, "At-Tawbah": 9, "Yunus": 10,
-    "Hud": 11, "Yusuf": 12, "Ar-Ra'd": 13, "Ibrahim": 14, "Al-Hijr": 15,
-    "An-Nahl": 16, "Al-Isra": 17, "Al-Kahf": 18, "Maryam": 19, "Ta-Ha": 20,
-    "Al-Anbiya": 21, "Al-Hajj": 22, "Al-Mu'minun": 23, "An-Nur": 24, "Al-Furqan": 25,
-    "Ash-Shu'ara": 26, "An-Naml": 27, "Al-Qasas": 28, "Al-Ankabut": 29, "Ar-Rum": 30,
-    "Luqman": 31, "As-Sajda": 32, "Al-Ahzab": 33, "Saba": 34, "Fatir": 35,
-    "Ya-Sin": 36, "As-Saffat": 37, "Sad": 38, "Az-Zumar": 39, "Ghafir": 40,
-    "Fussilat": 41, "Ash-Shura": 42, "Az-Zukhruf": 43, "Ad-Dukhan": 44, "Al-Jathiya": 45,
-    "Al-Ahqaf": 46, "Muhammad": 47, "Al-Fath": 48, "Al-Hujurat": 49, "Qaf": 50,
-    "Adh-Dhariyat": 51, "At-Tur": 52, "An-Najm": 53, "Al-Qamar": 54, "Ar-Rahman": 55,
-    "Al-Waqi'a": 56, "Al-Hadid": 57, "Al-Mujadila": 58, "Al-Hashr": 59, "Al-Mumtahina": 60,
-    "As-Saff": 61, "Al-Jumu'a": 62, "Al-Munafiqun": 63, "At-Taghabun": 64, "At-Talaq": 65,
-    "At-Tahrim": 66, "Al-Mulk": 67, "Al-Qalam": 68, "Al-Haqqa": 69, "Al-Ma'arij": 70,
-    "Nuh": 71, "Al-Jinn": 72, "Al-Muzzammil": 73, "Al-Muddathir": 74, "Al-Qiyama": 75,
-    "Al-Insan": 76, "Al-Mursalat": 77, "An-Naba": 78, "An-Nazi'at": 79, "Abasa": 80,
-    "At-Takwir": 81, "Al-Infitar": 82, "Al-Mutaffifin": 83, "Al-Inshiqaq": 84, "Al-Buruj": 85,
-    "At-Tariq": 86, "Al-A'la": 87, "Al-Ghashiya": 88, "Al-Fajr": 89, "Al-Balad": 90,
-    "Ash-Shams": 91, "Al-Lail": 92, "Ad-Duha": 93, "Ash-Sharh": 94, "At-Tin": 95,
-    "Al-'Alaq": 96, "Al-Qadr": 97, "Al-Bayyina": 98, "Az-Zalzala": 99, "Al-Adiyat": 100,
-    "Al-Qari'a": 101, "At-Takathur": 102, "Al-Asr": 103, "Al-Humaza": 104, "Al-Fil": 105,
-    "Quraysh": 106, "Al-Ma'un": 107, "Al-Kawthar": 108, "Al-Kafirun": 109, "An-Nasr": 110,
-    "Al-Masad": 111, "Al-Ikhlas": 112, "Al-Falaq": 113, "An-Nas": 114
-  };
-
+  // Play Surah function
   function playSurah() {
     const query = document.getElementById("quranInput").value.trim();
     const selectedSurah = document.getElementById("surahList").value;
@@ -2703,6 +1165,196 @@ function loadHardcodedDua() {
       document.getElementById('playPauseBtn').disabled = false;
     };
   }
+
+  // Main function to send question
+  async function sendQuestion() {
+    const inputEl = document.getElementById("userInput");
+    const question = inputEl.value.trim();
+    if (!question) return;
+
+    const messagesDiv = document.getElementById("messages");
+
+    const userMsg = document.createElement("p");
+    userMsg.className = "user-message";
+    userMsg.innerHTML = `You: ${question}`;
+    messagesDiv.appendChild(userMsg);
+    inputEl.value = "";
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    chatHistory.push({ role: "user", content: question });
+
+    const loadingMsg = document.createElement("p");
+    loadingMsg.className = "loading-indicator";
+    loadingMsg.textContent = "Tawfiq AI is thinking...";
+    messagesDiv.appendChild(loadingMsg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+      const response = await fetch("/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ history: chatHistory })
+      });
+      const data = await response.json();
+
+      loadingMsg.remove?.();
+
+      const messageContent = data.choices?.[0]?.message?.content;
+      const answerText = messageContent || "Sorry, couldn't answer.";
+
+      chatHistory.push({ role: "assistant", content: answerText });
+
+      const aiMsg = document.createElement("p");
+      aiMsg.className = "ai-message";
+      messagesDiv.appendChild(aiMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      function typeText(element, text, speed = 20) {
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i < text.length) {
+            const char = text.charAt(i);
+            element.innerHTML += char === "\n" ? "<br>" : char;
+            i++;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          } else {
+            clearInterval(interval);
+          }
+        }, speed);
+      }
+
+      typeText(aiMsg, `Tawfiq AI: ${answerText}`, 20);
+
+    } catch (error) {
+      console.error("Error:", error);
+      loadingMsg.remove?.();
+
+      const errorMsg = document.createElement("p");
+      errorMsg.className = "ai-message";
+      errorMsg.textContent = "Tawfiq AI: ❌ Error getting response.";
+      messagesDiv.appendChild(errorMsg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+  }
+
+  // Surah name → number map
+  const surahNameToNumber = {
+    "Al-Fatihah": 1,
+    "Al-Baqarah": 2,
+    "Aali Imran": 3,
+    "An-Nisa": 4,
+    "Al-Ma'idah": 5,
+    "Al-An'am": 6,
+    "Al-A'raf": 7,
+    "Al-Anfal": 8,
+    "At-Tawbah": 9,
+    "Yunus": 10,
+    "Hud": 11,
+    "Yusuf": 12,
+    "Ar-Ra'd": 13,
+    "Ibrahim": 14,
+    "Al-Hijr": 15,
+    "An-Nahl": 16,
+    "Al-Isra": 17,
+    "Al-Kahf": 18,
+    "Maryam": 19,
+    "Ta-Ha": 20,
+    "Al-Anbiya": 21,
+    "Al-Hajj": 22,
+    "Al-Mu'minun": 23,
+    "An-Nur": 24,
+    "Al-Furqan": 25,
+    "Ash-Shu'ara": 26,
+    "An-Naml": 27,
+    "Al-Qasas": 28,
+    "Al-Ankabut": 29,
+    "Ar-Rum": 30,
+    "Luqman": 31,
+    "As-Sajda": 32,
+    "Al-Ahzab": 33,
+    "Saba": 34,
+    "Fatir": 35,
+    "Ya-Sin": 36,
+    "As-Saffat": 37,
+    "Sad": 38,
+    "Az-Zumar": 39,
+    "Ghafir": 40,
+    "Fussilat": 41,
+    "Ash-Shura": 42,
+    "Az-Zukhruf": 43,
+    "Ad-Dukhan": 44,
+    "Al-Jathiya": 45,
+    "Al-Ahqaf": 46,
+    "Muhammad": 47,
+    "Al-Fath": 48,
+    "Al-Hujurat": 49,
+    "Qaf": 50,
+    "Adh-Dhariyat": 51,
+    "At-Tur": 52,
+    "An-Najm": 53,
+    "Al-Qamar": 54,
+    "Ar-Rahman": 55,
+    "Al-Waqi'a": 56,
+    "Al-Hadid": 57,
+    "Al-Mujadila": 58,
+    "Al-Hashr": 59,
+    "Al-Mumtahina": 60,
+    "As-Saff": 61,
+    "Al-Jumu'a": 62,
+    "Al-Munafiqun": 63,
+    "At-Taghabun": 64,
+    "At-Talaq": 65,
+    "At-Tahrim": 66,
+    "Al-Mulk": 67,
+    "Al-Qalam": 68,
+    "Al-Haqqa": 69,
+    "Al-Ma'arij": 70,
+    "Nuh": 71,
+    "Al-Jinn": 72,
+    "Al-Muzzammil": 73,
+    "Al-Muddathir": 74,
+    "Al-Qiyama": 75,
+    "Al-Insan": 76,
+    "Al-Mursalat": 77,
+    "An-Naba": 78,
+    "An-Nazi'at": 79,
+    "Abasa": 80,
+    "At-Takwir": 81,
+    "Al-Infitar": 82,
+    "Al-Mutaffifin": 83,
+    "Al-Inshiqaq": 84,
+    "Al-Buruj": 85,
+    "At-Tariq": 86,
+    "Al-A'la": 87,
+    "Al-Ghashiya": 88,
+    "Al-Fajr": 89,
+    "Al-Balad": 90,
+    "Ash-Shams": 91,
+    "Al-Lail": 92,
+    "Ad-Duha": 93,
+    "Ash-Sharh": 94,
+    "At-Tin": 95,
+    "Al-'Alaq": 96,
+    "Al-Qadr": 97,
+    "Al-Bayyina": 98,
+    "Az-Zalzala": 99,
+    "Al-Adiyat": 100,
+    "Al-Qari'a": 101,
+    "At-Takathur": 102,
+    "Al-Asr": 103,
+    "Al-Humaza": 104,
+    "Al-Fil": 105,
+    "Quraysh": 106,
+    "Al-Ma'un": 107,
+    "Al-Kawthar": 108,
+    "Al-Kafirun": 109,
+    "An-Nasr": 110,
+    "Al-Masad": 111,
+    "Al-Ikhlas": 112,
+    "Al-Falaq": 113,
+    "An-Nas": 114
+  };
 
   function searchQuran() {
     const query = document.getElementById("quranInput").value.trim();
@@ -2788,6 +1440,7 @@ function loadHardcodedDua() {
     });
   }
 
+  // Search Hadith
   function searchHadith() {
     const inputQuery = document.getElementById("hadithInput").value.trim();
     const dropdownQuery = document.getElementById("hadithDropdown").value;
@@ -2855,6 +1508,27 @@ function loadHardcodedDua() {
       document.getElementById("hadithSearchButton").disabled = false;
     });
   }
+
+  // toggleMenu function
+  function toggleMenu() {
+    document.getElementById('side-menu').classList.toggle('hidden');
+  }
+
+  // switchTab function
+  function switchTab(sectionId, event) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+    event.target.classList.add('active');
+    
+    // Initialize WebRTC when Live Meeting tab is selected
+    if (sectionId === 'liveMeetingSection' && !socket) {
+      initializeWebRTC();
+    }
+    
+    if (sectionId === 'prayerTimes') loadPrayerTimes();
+  }
 </script>
+
 </body>
 </html>
