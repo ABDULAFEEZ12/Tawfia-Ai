@@ -1,11 +1,4 @@
-import eventlet
-eventlet.monkey_patch()
-print("✅ Eventlet monkey patch applied")
-
-# ============================================
-# Imports
-# ============================================
-from flask import (
+update from flask import (
     Flask, request, jsonify, render_template,
     redirect, url_for, session, flash,
     send_file, send_from_directory
@@ -23,9 +16,8 @@ import random
 from difflib import get_close_matches
 from flask_sqlalchemy import SQLAlchemy
 import requests
-from flask_socketio import SocketIO, join_room, emit, leave_room
+from flask_socketio import SocketIO, join_room, emit, disconnect
 import ssl
-from uuid import uuid4
 import uuid
 
 # Load environment variables
@@ -77,7 +69,7 @@ db.init_app(app)
 socketio = SocketIO(
     app, 
     cors_allowed_origins="*",
-    async_mode='eventlet',
+    async_mode='threading',
     ping_timeout=60,
     ping_interval=25,
     logger=True,
@@ -106,13 +98,6 @@ class UserQuestions(db.Model):
     question = db.Column(db.Text, nullable=False)
     answer = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-class Room(db.Model):
-    id = db.Column(db.String(32), primary_key=True)
-    teacher_id = db.Column(db.String(120))
-    teacher_name = db.Column(db.String(80))
-    is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Create database tables
 with app.app_context():
@@ -244,501 +229,8 @@ openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 if not openrouter_api_key:
     print("⚠️ OPENROUTER_API_KEY environment variable not set.")
 
-# ============================================
-# Live Meeting In-Memory Storage
-# ============================================
-rooms = {}           # room_id -> room data
-participants = {}    # socket_id -> participant info
-room_authority = {}  # room_id -> authority state
+# --- Flask Routes and Logic ---
 
-# ============================================
-# Helper Functions for Live Meeting
-# ============================================
-def get_or_create_room(room_id):
-    """Get existing room or create new one"""
-    if room_id not in rooms:
-        rooms[room_id] = {
-            'participants': {},      # socket_id -> {'username', 'role', 'joined_at'}
-            'teacher_sid': None,
-            'created_at': datetime.utcnow().isoformat()
-        }
-    return rooms[room_id]
-
-def get_room_authority(room_id):
-    """Get or create authority state for a room"""
-    if room_id not in room_authority:
-        room_authority[room_id] = {
-            'muted_all': False,
-            'cameras_disabled': False,
-            'mic_requests': {},
-            'questions_enabled': True,
-            'question_visibility': 'public'
-        }
-    return room_authority[room_id]
-
-def get_participants_list(room_id, exclude_sid=None):
-    """Get list of all participants in room except exclude_sid"""
-    if room_id not in rooms:
-        return []
-    
-    room = rooms[room_id]
-    result = []
-    
-    for sid, info in room['participants'].items():
-        if sid != exclude_sid:
-            result.append({
-                'sid': sid,
-                'username': info['username'],
-                'role': info['role']
-            })
-    
-    return result
-
-def cleanup_room(room_id):
-    """Remove empty rooms"""
-    if room_id in rooms:
-        room = rooms[room_id]
-        if not room['participants']:
-            del rooms[room_id]
-            if room_id in room_authority:
-                del room_authority[room_id]
-            with app.app_context():
-                Room.query.filter_by(id=room_id).delete()
-                db.session.commit()
-
-# ============================================
-# Socket.IO Event Handlers - LIVE MEETING
-# ============================================
-@socketio.on('connect')
-def handle_connect():
-    sid = request.sid
-    # CRITICAL FIX: Join client to their private SID room for direct messaging
-    join_room(sid)
-    participants[sid] = {'room_id': None, 'username': None, 'role': None}
-    print(f"✅ Client connected: {sid} (joined private room: {sid})")
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    sid = request.sid
-    
-    # Find which room this participant is in
-    participant = participants.get(sid)
-    if not participant:
-        return
-    
-    room_id = participant['room_id']
-    
-    if room_id in rooms:
-        room = rooms[room_id]
-        
-        # Notify all other participants
-        if sid in room['participants']:
-            participant_info = room['participants'][sid]
-            
-            # Remove from room
-            del room['participants'][sid]
-            
-            # Update teacher_sid if teacher left
-            if sid == room['teacher_sid']:
-                room['teacher_sid'] = None
-                # Notify students that teacher left
-                for participant_sid in room['participants']:
-                    if room['participants'][participant_sid]['role'] == 'student':
-                        emit('teacher-disconnected', room=participant_sid)
-            
-            # Notify others
-            emit('participant-left', {
-                'sid': sid,
-                'username': participant_info['username'],
-                'role': participant_info['role']
-            }, room=room_id, skip_sid=sid)
-            
-            print(f"❌ {participant_info['username']} left room {room_id}")
-        
-        # Clean up empty room
-        cleanup_room(room_id)
-    
-    # Remove from participants
-    if sid in participants:
-        del participants[sid]
-
-@socketio.on('join-room')
-def handle_join_room(data):
-    """Join room and get all existing participants - FIXED"""
-    try:
-        sid = request.sid
-        room_id = data.get('room')
-        role = data.get('role', 'student')
-        username = data.get('username', 'Teacher' if role == 'teacher' else f'Student_{sid[:6]}')
-        
-        if not room_id:
-            emit('error', {'message': 'Room ID required'})
-            return
-        
-        print(f"👤 {username} ({role}) joining room: {room_id}")
-        
-        room = get_or_create_room(room_id)
-        authority_state = get_room_authority(room_id)
-        
-        # Check if teacher already exists
-        if role == 'teacher' and room['teacher_sid']:
-            emit('error', {'message': 'Room already has a teacher'})
-            return
-        
-        # Add to room
-        room['participants'][sid] = {
-            'username': username,
-            'role': role,
-            'joined_at': datetime.utcnow().isoformat()
-        }
-        
-        # Update teacher reference
-        if role == 'teacher':
-            room['teacher_sid'] = sid
-            authority_state['teacher_sid'] = sid
-            
-            with app.app_context():
-                existing_room = Room.query.get(room_id)
-                if not existing_room:
-                    room_db = Room(
-                        id=room_id,
-                        teacher_id=sid,
-                        teacher_name=username,
-                        is_active=True
-                    )
-                    db.session.add(room_db)
-                else:
-                    existing_room.teacher_id = sid
-                    existing_room.teacher_name = username
-                db.session.commit()
-            
-            # Notify all students that teacher joined
-            for participant_sid in room['participants']:
-                if room['participants'][participant_sid]['role'] == 'student':
-                    emit('teacher-joined', {
-                        'teacher_sid': sid,
-                        'teacher_name': username
-                    }, room=participant_sid)
-        
-        # Update participant info
-        participants[sid] = {
-            'room_id': room_id,
-            'username': username,
-            'role': role
-        }
-        
-        # Join the socket room
-        join_room(room_id)
-        
-        # Get all existing participants (excluding self)
-        existing_participants = get_participants_list(room_id, exclude_sid=sid)
-        
-        # Send room joined confirmation
-        emit('room-joined', {
-            'room': room_id,
-            'sid': sid,
-            'username': username,
-            'role': role,
-            'existing_participants': existing_participants,
-            'teacher_sid': room['teacher_sid'],
-            'is_waiting': (role == 'student' and not room['teacher_sid'])  # Inform student they're waiting
-        })
-        
-        # Notify all other participants about new joiner
-        emit('new-participant', {
-            'sid': sid,
-            'username': username,
-            'role': role
-        }, room=room_id, skip_sid=sid)
-        
-        # Send authority state if student and teacher exists
-        if role == 'student' and room['teacher_sid']:
-            emit('room-state', {
-                'muted_all': authority_state['muted_all'],
-                'cameras_disabled': authority_state['cameras_disabled'],
-                'questions_enabled': authority_state['questions_enabled'],
-                'question_visibility': authority_state['question_visibility']
-            })
-        
-        # Log room status
-        print(f"✅ {username} joined room {room_id}. Total participants: {len(room['participants'])}")
-        
-    except Exception as e:
-        print(f"❌ Error in join-room: {e}")
-        emit('error', {'message': str(e)})
-
-# ============================================
-# WebRTC Signaling - Full Mesh Support - FIXED
-# ============================================
-@socketio.on('webrtc-offer')
-def handle_webrtc_offer(data):
-    """Relay WebRTC offer to specific participant - FIXED"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        offer = data.get('offer')
-        
-        if not all([room_id, target_sid, offer]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        print(f"📨 {request.sid[:8]} → offer → {target_sid[:8]}")
-        
-        # FIX: Use target_sid as room (requires client to join their SID room on connect)
-        emit('webrtc-offer', {
-            'from_sid': request.sid,
-            'offer': offer,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        print(f"❌ Error relaying offer: {e}")
-
-@socketio.on('webrtc-answer')
-def handle_webrtc_answer(data):
-    """Relay WebRTC answer to specific participant - FIXED"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        answer = data.get('answer')
-        
-        if not all([room_id, target_sid, answer]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        print(f"📨 {request.sid[:8]} → answer → {target_sid[:8]}")
-        
-        # FIX: Use target_sid as room
-        emit('webrtc-answer', {
-            'from_sid': request.sid,
-            'answer': answer,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        print(f"❌ Error relaying answer: {e}")
-
-@socketio.on('webrtc-ice-candidate')
-def handle_webrtc_ice_candidate(data):
-    """Relay ICE candidate to specific participant - FIXED"""
-    try:
-        room_id = data.get('room')
-        target_sid = data.get('target_sid')
-        candidate = data.get('candidate')
-        
-        if not all([room_id, target_sid, candidate]):
-            return
-        
-        # Verify both are in the same room
-        sender = participants.get(request.sid)
-        target = participants.get(target_sid)
-        
-        if not sender or not target:
-            return
-        
-        if sender['room_id'] != room_id or target['room_id'] != room_id:
-            return
-        
-        print(f"📨 {request.sid[:8]} → ICE → {target_sid[:8]}")
-        
-        # FIX: Use target_sid as room
-        emit('webrtc-ice-candidate', {
-            'from_sid': request.sid,
-            'candidate': candidate,
-            'room': room_id
-        }, room=target_sid)
-        
-    except Exception as e:
-        print(f"❌ Error relaying ICE candidate: {e}")
-
-# ============================================
-# NEW: Full Mesh Initiation System
-# ============================================
-@socketio.on('request-full-mesh')
-def handle_request_full_mesh(data):
-    """Initiate full mesh connections between all participants"""
-    try:
-        room_id = data.get('room')
-        sid = request.sid
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        
-        # Verify participant is in room
-        if sid not in room['participants']:
-            return
-        
-        # Get all other participants in room
-        other_participants = []
-        for other_sid, info in room['participants'].items():
-            if other_sid != sid:
-                other_participants.append({
-                    'sid': other_sid,
-                    'username': info['username'],
-                    'role': info['role']
-                })
-        
-        # Send list of peers to connect to
-        emit('initiate-mesh-connections', {
-            'peers': other_participants,
-            'room': room_id
-        }, room=sid)
-        
-        print(f"🔗 Initiating full mesh for {sid[:8]} with {len(other_participants)} peers")
-        
-    except Exception as e:
-        print(f"❌ Error in request-full-mesh: {e}")
-
-# ============================================
-# Teacher Authority System
-# ============================================
-@socketio.on('teacher-mute-all')
-def handle_teacher_mute_all(data):
-    """Teacher mutes all students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        # Verify this is the teacher
-        if teacher_sid != room['teacher_sid']:
-            return
-        
-        authority = get_room_authority(room_id)
-        authority['muted_all'] = True
-        
-        # Notify all students
-        for sid in room['participants']:
-            if room['participants'][sid]['role'] == 'student':
-                emit('room-muted', {'muted': True}, room=sid)
-        
-        print(f"🔇 Teacher muted all in room {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in teacher-mute-all: {e}")
-
-@socketio.on('teacher-unmute-all')
-def handle_teacher_unmute_all(data):
-    """Teacher unmutes all students"""
-    try:
-        room_id = data.get('room')
-        
-        if not room_id or room_id not in rooms:
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            return
-        
-        authority = get_room_authority(room_id)
-        authority['muted_all'] = False
-        
-        for sid in room['participants']:
-            if room['participants'][sid]['role'] == 'student':
-                emit('room-muted', {'muted': False}, room=sid)
-        
-        print(f"🔊 Teacher unmuted all in room {room_id}")
-        
-    except Exception as e:
-        print(f"❌ Error in teacher-unmute-all: {e}")
-
-# ============================================
-# Control Events - FIXED
-# ============================================
-@socketio.on('start-broadcast')
-def handle_start_broadcast(data):
-    """Teacher starts broadcasting to all students - FIXED"""
-    try:
-        room_id = data.get('room')
-        
-        if room_id not in rooms:
-            emit('error', {'message': 'Room not found'})
-            return
-        
-        room = rooms[room_id]
-        teacher_sid = request.sid
-        
-        if teacher_sid != room['teacher_sid']:
-            emit('error', {'message': 'Only teacher can start broadcast'})
-            return
-        
-        print(f"📢 Teacher starting broadcast in room: {room_id}")
-        
-        # Get all student SIDs
-        student_sids = []
-        student_info = []
-        for sid, info in room['participants'].items():
-            if info['role'] == 'student':
-                student_sids.append(sid)
-                student_info.append({
-                    'sid': sid,
-                    'username': info['username']
-                })
-        
-        # Notify teacher
-        emit('broadcast-ready', {
-            'student_sids': student_sids,
-            'student_info': student_info,
-            'student_count': len(student_sids),
-            'room': room_id
-        }, room=teacher_sid)
-        
-        # FIX: Initiate WebRTC connections for each student
-        for student_sid in student_sids:
-            # Send list of all peers to connect to (full mesh)
-            peers_to_connect = []
-            for other_sid in room['participants']:
-                if other_sid != student_sid:  # Don't connect to self
-                    peers_to_connect.append({
-                        'sid': other_sid,
-                        'username': room['participants'][other_sid]['username'],
-                        'role': room['participants'][other_sid]['role']
-                    })
-            
-            emit('initiate-full-mesh', {
-                'peers': peers_to_connect,
-                'teacher_sid': teacher_sid,
-                'room': room_id
-            }, room=student_sid)
-        
-    except Exception as e:
-        print(f"❌ Error in start-broadcast: {e}")
-        emit('error', {'message': str(e)})
-
-@socketio.on('ping')
-def handle_ping(data):
-    """Keep-alive ping"""
-    emit('pong', {'timestamp': datetime.utcnow().isoformat()})
-
-# ============================================
-# Flask Routes
-# ============================================
 @app.route('/')
 def index():
     user = session.get('user')
@@ -1844,12 +1336,12 @@ def get_surah_by_id(surah_id):
         85: "Al-Buruj",
         86: "At-Tariq",
         87: "Al-A'la",
-        88: "Al-Ghashiyah",
+        88: "Al-Gashiyah",
         89: "Al-Fajr",
         90: "Al-Balad",
         91: "Ash-Shams",
         92: "Al-Lail",
-        93: "Al-Duha",
+        93: "Ad-Duha",
         94: "Ash-Sharh",
         95: "At-Tin",
         96: "Al-'Alaq",
@@ -1860,7 +1352,7 @@ def get_surah_by_id(surah_id):
         101: "Al-Qari'a",
         102: "At-Takathur",
         103: "Al-Asr",
-        104: "Al-Humazah",
+        104: "Al-Humaza",
         105: "Al-Fil",
         106: "Quraysh",
         107: "Al-Ma'un",
@@ -1997,40 +1489,494 @@ def daily_dua():
         }), 500
 
 # ============================================
-# Live Meeting Routes (WORKING VERSION)
+# LIVE MEETING SYSTEM - UPDATED WITH LANDING PAGE
 # ============================================
-@app.route('/live-meeting')
+
+# NEW: Landing page for live meeting
+@app.route("/live-meeting")
 def live_meeting_landing():
-    return render_template('live_meeting.html')
+    return render_template("live_meeting_landing.html")
 
-@app.route('/live-meeting/teacher')
-def live_meeting_teacher_create():
-    room_id = str(uuid4())[:8]
-    return redirect(f'/live-meeting/teacher/{room_id}')
+# Create new meeting (teacher)
+@app.route("/live-meeting/create")
+def create_meeting():
+    room_id = str(uuid.uuid4())[:8]
+    return redirect(url_for('live_meeting', room_id=room_id))
 
-@app.route('/live-meeting/teacher/<room_id>')
-def live_meeting_teacher_view(room_id):
-    return render_template('teacher_live.html', room_id=room_id)
+# Join existing meeting page
+@app.route("/live-meeting/join", methods=['GET', 'POST'])
+def join_meeting():
+    if request.method == 'POST':
+        room_id = request.form.get('room_id', '').strip()
+        username = request.form.get('username', '').strip()
+        
+        if not room_id:
+            flash('Please enter a meeting ID', 'error')
+            return redirect(url_for('join_meeting'))
+        
+        if not username:
+            username = f'Student{random.randint(100, 999)}'
+        
+        # Store in session
+        session['meeting_username'] = username
+        
+        return redirect(url_for('student_live', room_id=room_id))
+    
+    return render_template("join_meeting.html")
 
-@app.route('/live-meeting/student/<room_id>')
-def live_meeting_student_view(room_id):
-    return render_template('student_live.html', room_id=room_id)
+@app.route("/live-meeting/<room_id>")
+def live_meeting(room_id):
+    return render_template("live_meeting.html", room_id=room_id)
 
-@app.route('/live-meeting/join', methods=['POST'])
-def live_meeting_join():
-    room_id = request.form.get('room_id', '').strip()
-    username = request.form.get('username', '').strip()
+# Student join page
+@app.route("/student-live/<room_id>")
+def student_live(room_id):
+    username = session.get('meeting_username', f'Student{random.randint(100, 999)}')
+    return render_template("student_live.html", room_id=room_id, username=username)
+
+# ============================================
+# SOCKET.IO HANDLERS
+# ============================================
+
+active_rooms = {}
+waiting_students = {}
+connected_students = {}
+student_details = {}
+
+@socketio.on('connect')
+def handle_connect():
+    print(f"✅ New client connected: {request.sid}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print(f"❌ Client disconnected: {request.sid}")
+    # Clean up disconnected users from all rooms
+    for room_id in list(active_rooms.keys()):
+        if 'teacher_sid' in active_rooms[room_id] and active_rooms[room_id]['teacher_sid'] == request.sid:
+            # Teacher disconnected
+            emit('room-ended', {
+                'room': room_id,
+                'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+                'reason': 'Teacher disconnected'
+            }, room=room_id)
+            
+            # Clean up room
+            if room_id in active_rooms:
+                del active_rooms[room_id]
+            if room_id in waiting_students:
+                del waiting_students[room_id]
+            if room_id in connected_students:
+                del connected_students[room_id]
+            
+        else:
+            # Student disconnected
+            for user_id, details in list(student_details.items()):
+                if details.get('sid') == request.sid:
+                    # Remove from connected students
+                    if room_id in connected_students and user_id in connected_students[room_id]:
+                        connected_students[room_id].remove(user_id)
+                    
+                    # Remove from waiting students
+                    if room_id in waiting_students and user_id in waiting_students[room_id]:
+                        waiting_students[room_id].remove(user_id)
+                    
+                    # Remove details
+                    if user_id in student_details:
+                        del student_details[user_id]
+                    
+                    # Notify room
+                    emit('student-left', {
+                        'userId': user_id,
+                        'username': details.get('username', 'Student')
+                    }, room=room_id)
+                    break
+
+@socketio.on('teacher-join')
+def handle_teacher_join(data):
+    try:
+        room_id = data.get('room', 'default')
+        user_id = data.get('userId', f'teacher_{request.sid}')
+        username = data.get('username', 'Teacher')
+        
+        print(f"👨‍🏫 Teacher {username} ({user_id}) joining room {room_id}")
+        
+        # Initialize room if it doesn't exist
+        if room_id not in active_rooms:
+            active_rooms[room_id] = {
+                'state': 'waiting',
+                'teacher_id': user_id,
+                'teacher_sid': request.sid,
+                'teacher_name': username,
+                'connections': [request.sid],
+                'created_at': datetime.utcnow().isoformat(),
+                'webrtc_started': False
+            }
+            waiting_students[room_id] = []
+            connected_students[room_id] = []
+        else:
+            # Update existing room
+            active_rooms[room_id]['teacher_sid'] = request.sid
+            active_rooms[room_id]['teacher_id'] = user_id
+            active_rooms[room_id]['teacher_name'] = username
+            if request.sid not in active_rooms[room_id]['connections']:
+                active_rooms[room_id]['connections'].append(request.sid)
+        
+        join_room(room_id)
+        
+        emit('room-state', {
+            'state': active_rooms[room_id]['state'],
+            'waitingStudents': len(waiting_students.get(room_id, [])),
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': user_id,
+            'teacherName': username
+        })
+        
+        print(f"✅ Teacher joined room {room_id}")
+        
+    except Exception as e:
+        print(f"❌ Error in teacher-join: {e}")
+        emit('error', {'message': f'Failed to join room: {str(e)}'})
+
+@socketio.on('student-join')
+def handle_student_join(data):
+    try:
+        room_id = data.get('room', 'default')
+        user_id = data.get('userId', f'student_{request.sid}')
+        username = data.get('username', 'Student')
+        
+        print(f"👨‍🎓 Student {username} ({user_id}) joining room {room_id}")
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room does not exist or teacher has not joined yet'})
+            return
+        
+        # Store student details
+        student_details[user_id] = {
+            'sid': request.sid,
+            'username': username,
+            'room': room_id,
+            'joined_at': datetime.utcnow().isoformat()
+        }
+        
+        join_room(room_id)
+        
+        if active_rooms[room_id]['state'] == 'waiting':
+            # Add to waiting students
+            if user_id not in waiting_students[room_id]:
+                waiting_students[room_id].append(user_id)
+            
+            emit('student-waiting', {
+                'userId': user_id,
+                'username': username,
+                'socketId': request.sid
+            }, room=room_id, include_self=False)
+            
+            # Send student-waiting-ack to the student
+            emit('student-waiting-ack', {
+                'status': 'waiting',
+                'room': room_id,
+                'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher')
+            })
+            
+        else:
+            # Add to connected students
+            if user_id not in connected_students[room_id]:
+                connected_students[room_id].append(user_id)
+            
+            emit('student-joined', {
+                'userId': user_id,
+                'username': username,
+                'socketId': request.sid
+            }, room=room_id, include_self=False)
+            
+            # Send student-joined-ack to the student
+            emit('student-joined-ack', {
+                'status': 'joined',
+                'room': room_id,
+                'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher')
+            })
+        
+        # Update room state for teacher
+        emit('room-state', {
+            'state': active_rooms[room_id]['state'],
+            'waitingStudents': len(waiting_students.get(room_id, [])),
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': active_rooms[room_id].get('teacher_id'),
+            'teacherName': active_rooms[room_id].get('teacher_name')
+        }, room=room_id)
+        
+    except Exception as e:
+        print(f"❌ Error in student-join: {e}")
+        emit('error', {'message': f'Failed to join as student: {str(e)}'})
+
+@socketio.on('start-meeting')
+def handle_start_meeting(data):
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        active_rooms[room_id]['state'] = 'live'
+        
+        # Move all waiting students to connected
+        for student_id in waiting_students.get(room_id, []):
+            if student_id not in connected_students[room_id]:
+                connected_students[room_id].append(student_id)
+                
+                # Notify the student
+                student_sid = student_details.get(student_id, {}).get('sid')
+                if student_sid:
+                    emit('meeting-started', {
+                        'room': room_id,
+                        'teacherId': active_rooms[room_id].get('teacher_id'),
+                        'teacherName': active_rooms[room_id].get('teacher_name')
+                    }, room=student_sid)
+        
+        waiting_students[room_id] = []
+        
+        print(f"🚀 Meeting started in room {room_id} with {len(connected_students.get(room_id, []))} students")
+        
+        # Notify all in room
+        emit('room-started', {
+            'room': room_id,
+            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+            'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher'),
+            'students': [
+                {
+                    'userId': sid,
+                    'username': student_details.get(sid, {}).get('username', 'Student'),
+                    'socketId': student_details.get(sid, {}).get('sid')
+                }
+                for sid in connected_students.get(room_id, [])
+            ]
+        }, room=room_id)
+        
+        # Update room state
+        emit('room-state', {
+            'state': 'live',
+            'waitingStudents': 0,
+            'connectedStudents': len(connected_students.get(room_id, [])),
+            'teacherId': active_rooms[room_id].get('teacher_id'),
+            'teacherName': active_rooms[room_id].get('teacher_name')
+        }, room=room_id)
+        
+    except Exception as e:
+        print(f"❌ Error in start-meeting: {e}")
+        emit('error', {'message': f'Failed to start meeting: {str(e)}'})
+
+@socketio.on('end-meeting')
+def handle_end_meeting(data):
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in active_rooms:
+            emit('error', {'message': 'Room not found'})
+            return
+        
+        active_rooms[room_id]['state'] = 'ended'
+        
+        print(f"🛑 Meeting ended in room {room_id}")
+        
+        # Notify all participants
+        emit('room-ended', {
+            'room': room_id,
+            'teacherId': active_rooms[room_id].get('teacher_id', 'unknown'),
+            'teacherName': active_rooms[room_id].get('teacher_name', 'Teacher'),
+            'message': 'Meeting has ended'
+        }, room=room_id)
+        
+        # Clean up
+        if room_id in waiting_students:
+            del waiting_students[room_id]
+        if room_id in connected_students:
+            del connected_students[room_id]
+        if room_id in active_rooms:
+            del active_rooms[room_id]
+        
+        # Clean up student details for this room
+        for user_id in list(student_details.keys()):
+            if student_details[user_id].get('room') == room_id:
+                del student_details[user_id]
+        
+    except Exception as e:
+        print(f"❌ Error in end-meeting: {e}")
+        emit('error', {'message': f'Failed to end meeting: {str(e)}'})
+
+@socketio.on('webrtc-signal')
+def handle_webrtc_signal(data):
+    try:
+        room_id = data.get('room', 'default')
+        from_user = data.get('from')
+        to_user = data.get('to')
+        signal = data.get('signal')
+        type = data.get('type', 'signal')  # 'offer', 'answer', 'candidate'
+        
+        print(f"📡 WebRTC {type} from {from_user} to {to_user} in room {room_id}")
+        
+        # Find target socket ID
+        target_sid = None
+        if to_user.startswith('teacher_'):
+            # Send to teacher
+            if room_id in active_rooms:
+                target_sid = active_rooms[room_id].get('teacher_sid')
+        else:
+            # Send to student
+            if to_user in student_details:
+                target_sid = student_details[to_user].get('sid')
+        
+        if target_sid:
+            emit('webrtc-signal', {
+                'from': from_user,
+                'to': to_user,
+                'signal': signal,
+                'type': type
+            }, room=target_sid)
+        else:
+            print(f"⚠️ Target user {to_user} not found")
+            
+    except Exception as e:
+        print(f"❌ Error in webrtc-signal: {e}")
+
+@socketio.on('start-webrtc')
+def handle_start_webrtc(data):
+    try:
+        room_id = data.get('room', 'default')
+        
+        if room_id not in connected_students or not connected_students[room_id]:
+            emit('error', {'message': 'No students connected'})
+            return
+        
+        active_rooms[room_id]['webrtc_started'] = True
+        
+        print(f"🎥 Starting WebRTC in room {room_id} with {len(connected_students.get(room_id, []))} students")
+        
+        # Get teacher info
+        teacher_id = active_rooms[room_id].get('teacher_id')
+        teacher_name = active_rooms[room_id].get('teacher_name', 'Teacher')
+        
+        # Notify teacher
+        emit('webrtc-start-teacher', {
+            'students': [
+                {
+                    'userId': student_id,
+                    'username': student_details.get(student_id, {}).get('username', 'Student'),
+                    'socketId': student_details.get(student_id, {}).get('sid')
+                }
+                for student_id in connected_students.get(room_id, [])
+            ]
+        })
+        
+        # Notify each student
+        for student_id in connected_students.get(room_id, []):
+            student_sid = student_details.get(student_id, {}).get('sid')
+            if student_sid:
+                emit('webrtc-start-student', {
+                    'teacherId': teacher_id,
+                    'teacherName': teacher_name,
+                    'room': room_id
+                }, room=student_sid)
+        
+    except Exception as e:
+        print(f"❌ Error in start-webrtc: {e}")
+        emit('error', {'message': f'Failed to start WebRTC: {str(e)}'})
+
+@socketio.on('mute-student')
+def handle_mute_student(data):
+    room_id = data.get('room')
+    student_id = data.get('userId')
     
-    if not room_id:
-        flash('Please enter a meeting ID')
-        return redirect('/live-meeting')
+    # Find student socket ID
+    if student_id in student_details:
+        student_sid = student_details[student_id].get('sid')
+        if student_sid:
+            emit('student-muted', {
+                'userId': student_id,
+                'muted': True
+            }, room=student_sid)
+            
+            # Notify teacher
+            emit('student-muted-confirm', {
+                'userId': student_id,
+                'muted': True
+            })
+
+@socketio.on('unmute-student')
+def handle_unmute_student(data):
+    room_id = data.get('room')
+    student_id = data.get('userId')
     
-    if not username:
-        username = f"Student_{str(uuid4())[:4]}"
+    # Find student socket ID
+    if student_id in student_details:
+        student_sid = student_details[student_id].get('sid')
+        if student_sid:
+            emit('student-muted', {
+                'userId': student_id,
+                'muted': False
+            }, room=student_sid)
+            
+            # Notify teacher
+            emit('student-muted-confirm', {
+                'userId': student_id,
+                'muted': False
+            })
+
+@socketio.on('mic-request')
+def handle_mic_request(data):
+    room_id = data.get('room')
+    user_id = data.get('userId', 'unknown')
+    username = data.get('username', 'Student')
     
-    session['live_username'] = username
+    # Send to teacher
+    if room_id in active_rooms:
+        teacher_sid = active_rooms[room_id].get('teacher_sid')
+        if teacher_sid:
+            emit('mic-request', {
+                'userId': user_id,
+                'username': username,
+                'socketId': request.sid
+            }, room=teacher_sid)
+
+@socketio.on('student-question')
+def handle_student_question(data):
+    room_id = data.get('room')
+    user_id = data.get('userId', 'unknown')
+    username = data.get('username', 'Student')
+    question = data.get('question', '')
+    question_id = f"q_{user_id}_{int(datetime.utcnow().timestamp())}"
     
-    return redirect(f'/live-meeting/student/{room_id}')
+    # Send to teacher
+    if room_id in active_rooms:
+        teacher_sid = active_rooms[room_id].get('teacher_sid')
+        if teacher_sid:
+            emit('student-question', {
+                'userId': user_id,
+                'username': username,
+                'question': question,
+                'questionId': question_id
+            }, room=teacher_sid)
+
+@socketio.on('teacher-leave')
+def handle_teacher_leave(data):
+    room_id = data.get('room')
+    user_id = data.get('userId')
+    
+    if room_id in active_rooms:
+        # Notify all students
+        emit('room-ended', {
+            'room': room_id,
+            'teacherId': user_id,
+            'reason': 'Teacher left the meeting'
+        }, room=room_id)
+        
+        # Clean up
+        if room_id in active_rooms:
+            del active_rooms[room_id]
+        if room_id in waiting_students:
+            del waiting_students[room_id]
+        if room_id in connected_students:
+            del connected_students[room_id]
 
 @app.route('/socket-test')
 def socket_test():
@@ -2357,7 +2303,7 @@ def serve_live_meeting_css():
     }
     """, 200, {'Content-Type': 'text/css'}
 
-# Additional routes
+# Additional routes (kept from original but with error handling)
 @app.route('/reminder')
 def reminder():
     json_path = os.path.join(os.path.expanduser("~"), "Documents", "Tawfiqai", "DATA", "reminders.json")
@@ -2760,7 +2706,6 @@ if __name__ == "__main__":
     print(f"📡 Socket.IO enabled: True")
     print(f"💾 Database URL: {DATABASE_URL[:50]}..." if DATABASE_URL else "💾 Using SQLite database")
     print(f"🎥 Live Meeting System: READY")
-    print(f"✅ Working live meeting integrated")
     
     socketio.run(
         app,
