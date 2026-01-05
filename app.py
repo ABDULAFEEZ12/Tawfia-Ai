@@ -13,6 +13,7 @@ from flask_socketio import SocketIO, join_room, emit, leave_room
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
+from hashlib import sha256
 from functools import wraps
 import uuid
 import requests
