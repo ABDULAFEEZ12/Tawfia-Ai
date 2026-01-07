@@ -1274,6 +1274,31 @@ def ask():
 
     last_question = next((m['content'] for m in reversed(history) if m['role'] == 'user'), None)
 
+    # Check for the specific anime wife question and return hard-coded response
+    if last_question and last_question.lower().strip() == "sir if i go to heaven can i ask my anime wife to be real?":
+        answer = (
+            "Ruling: Depends\n"
+            "In Jannah, believers are granted whatever they desire if it is pleasing to Allah, and there is no harm or sin there.\n"
+            "However, the reality of Paradise is beyond human imagination, and what Allah provides will be better than what we can conceive in this world."
+        )
+        
+        # Save to cache and database
+        cache_key = sha256(json.dumps([{"role": "system", "content": "Tawfiq AI"}, {"role": "user", "content": last_question}], sort_keys=True).encode()).hexdigest()
+        question_cache[cache_key] = answer
+        save_cache()
+        
+        if last_question:
+            save_question_and_answer(username, last_question, answer)
+        
+        return jsonify({
+            "choices": [{
+                "message": {
+                    "role": "assistant",
+                    "content": answer
+                }
+            }]
+        })
+
     def needs_live_search(q):
         q = q.lower()
         search_keywords = [
@@ -1306,7 +1331,7 @@ def ask():
             cx_id = "63f53ef35ee334d44"
             search_url = f"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={cx_id}&q={query}"
 
-            debug_print(f"🔍 LIVE SEARCH triggered for: {query}")
+            print(f"🔍 LIVE SEARCH triggered for: {query}")
             search_res = requests.get(search_url)
             search_data = search_res.json()
             items = search_data.get("items", [])
@@ -1366,7 +1391,7 @@ def ask():
             })
 
         except Exception as e:
-            debug_print(f"🔴 Web search failed: {e}")
+            print(f"🔴 Web search failed: {e}")
             return jsonify({
                 "choices": [{
                     "message": {
@@ -1378,15 +1403,38 @@ def ask():
 
     # Default Islamic AI fallback
     tawfiq_ai_prompt = {
-        "role": "system",
-        "content": (
-            "🌙 You are **Tawfiq AI** — a wise, kind, and emotionally intelligent Muslim assistant created by Tella Abdul Afeez Adewale.\n\n"
-            "🧠 You switch between two modes based on the user's tone, emotion, and topic:\n"
-            "- 🗣️ Chatty Mode: Gen Z Muslim vibe, emojis, halal slang.\n"
-            "- 📖 Scholar Mode: Quranic references, deep adab, Mufti Menk tone.\n"
-            "🎯 Your mission: Help Muslims with wisdom, clarity & warmth. Stay halal always."
-        )
-    }
+    "role": "system",
+    "content": (
+        "🌙 You are **Tawfiq AI** — a trusted Islamic guidance assistant created by Tella Abdul Afeez Adewale.\n\n"
+
+        "🎯 YOUR ONLY MODE: **Content Mode (Verdict-First)**\n\n"
+
+        "📌 RESPONSE RULES (STRICT):\n"
+        "- ALWAYS start with a clear ruling on the FIRST line:\n"
+        "  **Ruling: Halal / Haram / Permissible with conditions / Discouraged / Depends**\n"
+        "- If the ruling is **Depends**, you MUST clearly explain in 1–2 lines what it depends on\n"
+        "  (e.g. Allah's pleasure, intention, context, conditions, or Islamic boundaries).\n"
+        "- Keep the full response under 80 words\n"
+        "- Use 3–5 short lines maximum\n"
+        "- No emojis, no slang, no jokes\n"
+        "- No long explanations or lectures\n"
+        "- Be clear, calm, firm, and respectful\n\n"
+
+        "🧠 CONTENT GUIDELINES:\n"
+        "- Focus on Islamic principles, boundaries, and wisdom\n"
+        "- Give a brief reason in plain language\n"
+        "- If helpful, mention the better Islamic alternative in 1 line\n"
+        "- Do not shame, mock, or attack the user\n\n"
+
+        "🛑 NEVER:\n"
+        "- Give personal opinions\n"
+        "- Change tone for entertainment\n"
+        "- Avoid giving a ruling when one is clear\n\n"
+
+        "You are not here to entertain. You are here to give clear, halal, trustworthy guidance."
+    )
+}
+
 
     messages = [tawfiq_ai_prompt] + history
     cache_key = sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
@@ -1432,11 +1480,12 @@ def ask():
         return jsonify({"choices": [{"message": {"role": "assistant", "content": answer}}]})
 
     except requests.RequestException as e:
-        debug_print(f"OpenRouter API Error: {e}")
+        print(f"OpenRouter API Error: {e}")
         return jsonify({"choices": [{"message": {"role": "assistant", "content": "Tawfiq AI is having trouble reaching external knowledge. Try again later."}}]})
     except Exception as e:
-        debug_print(f"Unexpected error: {e}")
+        print(f"Unexpected error: {e}")
         return jsonify({"choices": [{"message": {"role": "assistant", "content": "An unexpected error occurred. Please try again later."}}]})
+
 
 # --- Hadith Search ---
 @app.route('/hadith-search', methods=['POST'])
