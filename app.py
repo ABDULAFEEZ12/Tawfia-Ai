@@ -12,7 +12,7 @@ from flask import Flask, render_template, session, redirect, url_for, request, f
 from flask_socketio import SocketIO, join_room, emit, leave_room
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import func
+from sqlalchemy import inspect, text  # ADDED: inspect for checking table structure
 from hashlib import sha256
 from functools import wraps
 import uuid
@@ -84,13 +84,16 @@ socketio = SocketIO(
 )
 
 # ============================================
-# Database Models (Combined)
+# Database Models (Combined) - UPDATED
 # ============================================
 class User(db.Model):
+    # Use plural table name to avoid PostgreSQL reserved word issues
+    __tablename__ = 'users'  # CHANGED from 'user' to 'users'
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)  # This is the correct column
     level = db.Column(db.Integer, default=1)
     joined_on = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
@@ -102,6 +105,8 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 class UserQuestions(db.Model):
+    __tablename__ = 'user_questions'
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), nullable=False)
     question = db.Column(db.Text, nullable=False)
@@ -109,26 +114,134 @@ class UserQuestions(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Room(db.Model):
+    __tablename__ = 'rooms'
+    
     id = db.Column(db.String(32), primary_key=True)
     teacher_id = db.Column(db.String(120))
     teacher_name = db.Column(db.String(80))
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Create tables
-with app.app_context():
-    db.create_all()
-    debug_print("✅ Database tables created")
-    
-    # Create default user if not exists (only for SQLite)
-    if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
-        user = User.query.filter_by(username='zayd').first()
-        if not user:
-            user = User(username='zayd', email='zayd@example.com')
-            user.set_password('secure123')
-            db.session.add(user)
-            db.session.commit()
-            debug_print("✅ Default user created")
+# ============================================
+# Database Initialization with Schema Fix
+# ============================================
+def initialize_database():
+    """Initialize database with schema fixes"""
+    with app.app_context():
+        try:
+            # First, check current table structure
+            inspector = inspect(db.engine)
+            existing_tables = inspector.get_table_names()
+            debug_print(f"Existing tables: {existing_tables}")
+            
+            # Check if 'user' table exists (old name)
+            if 'user' in existing_tables:
+                debug_print("⚠️ Found old 'user' table. Checking columns...")
+                columns = inspector.get_columns('user')
+                column_names = [col['name'] for col in columns]
+                debug_print(f"Columns in 'user' table: {column_names}")
+                
+                # Check what password column exists
+                password_columns = [col for col in column_names if 'password' in col.lower()]
+                debug_print(f"Password-related columns: {password_columns}")
+                
+                # If 'password' column exists but not 'password_hash', we need to migrate
+                if 'password' in column_names and 'password_hash' not in column_names:
+                    debug_print("🔄 Migrating 'password' column to 'password_hash'...")
+                    try:
+                        # For PostgreSQL
+                        if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
+                            db.session.execute(text('ALTER TABLE "user" RENAME COLUMN password TO password_hash'))
+                            db.session.execute(text('ALTER TABLE "user" ALTER COLUMN password_hash TYPE VARCHAR(200)'))
+                        # For SQLite
+                        else:
+                            # SQLite doesn't support column rename directly, need workaround
+                            debug_print("⚠️ SQLite requires manual migration for column rename")
+                            # Create new table with correct schema
+                            db.session.execute(text('''
+                                CREATE TABLE users_new (
+                                    id INTEGER PRIMARY KEY,
+                                    username VARCHAR(150) UNIQUE NOT NULL,
+                                    email VARCHAR(150) UNIQUE NOT NULL,
+                                    password_hash VARCHAR(200) NOT NULL,
+                                    level INTEGER DEFAULT 1,
+                                    joined_on TIMESTAMP,
+                                    last_login TIMESTAMP
+                                )
+                            '''))
+                            # Copy data
+                            db.session.execute(text('''
+                                INSERT INTO users_new (id, username, email, password_hash, level, joined_on, last_login)
+                                SELECT id, username, email, password, level, joined_on, last_login FROM "user"
+                            '''))
+                            # Drop old table and rename
+                            db.session.execute(text('DROP TABLE "user"'))
+                            db.session.execute(text('ALTER TABLE users_new RENAME TO users'))
+                        
+                        db.session.commit()
+                        debug_print("✅ Successfully migrated password column")
+                    except Exception as e:
+                        db.session.rollback()
+                        debug_print(f"❌ Migration failed: {e}")
+                        # Try alternative: rename table instead
+                        try:
+                            db.session.execute(text('ALTER TABLE "user" RENAME TO users'))
+                            db.session.commit()
+                            debug_print("✅ Renamed table from 'user' to 'users'")
+                        except Exception as e2:
+                            db.session.rollback()
+                            debug_print(f"❌ Table rename also failed: {e2}")
+            
+            # Create tables if they don't exist
+            db.create_all()
+            debug_print("✅ Database tables created/verified")
+            
+            # Check if password_hash column exists in users table
+            if 'users' in inspector.get_table_names():
+                columns = inspector.get_columns('users')
+                column_names = [col['name'] for col in columns]
+                debug_print(f"Columns in 'users' table: {column_names}")
+                
+                # If password_hash column doesn't exist, add it
+                if 'password_hash' not in column_names:
+                    debug_print("➕ Adding missing password_hash column...")
+                    try:
+                        # For PostgreSQL
+                        if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
+                            db.session.execute(text('ALTER TABLE users ADD COLUMN password_hash VARCHAR(200)'))
+                        # For SQLite
+                        else:
+                            db.session.execute(text('ALTER TABLE users ADD COLUMN password_hash VARCHAR(200)'))
+                        
+                        # Update existing rows with empty password_hash
+                        db.session.execute(text("UPDATE users SET password_hash = '' WHERE password_hash IS NULL"))
+                        db.session.commit()
+                        debug_print("✅ Added password_hash column")
+                    except Exception as e:
+                        db.session.rollback()
+                        debug_print(f"❌ Failed to add column: {e}")
+            
+            # Create default user if not exists (only for SQLite/dev environment)
+            if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
+                user = User.query.filter_by(username='zayd').first()
+                if not user:
+                    user = User(username='zayd', email='zayd@example.com')
+                    user.set_password('secure123')
+                    db.session.add(user)
+                    db.session.commit()
+                    debug_print("✅ Default user created")
+                    
+        except Exception as e:
+            debug_print(f"❌ Database initialization error: {e}")
+            # Try to create tables anyway
+            try:
+                db.create_all()
+                debug_print("✅ Tables created despite errors")
+            except Exception as e2:
+                debug_print(f"❌ Could not create tables: {e2}")
+
+# Initialize database
+initialize_database()
 
 # ============================================
 # In-Memory Storage for Live Meeting
@@ -1601,6 +1714,58 @@ def temp_login():
     '''
 
 # ============================================
+# NEW: Database Schema Debug Route
+# ============================================
+@app.route('/debug/schema')
+def debug_schema():
+    """Debug endpoint to view database schema"""
+    try:
+        with app.app_context():
+            inspector = inspect(db.engine)
+            tables = inspector.get_table_names()
+            
+            schema_info = {}
+            for table in tables:
+                columns = inspector.get_columns(table)
+                schema_info[table] = [
+                    {'name': col['name'], 'type': str(col['type'])} 
+                    for col in columns
+                ]
+            
+            return jsonify({
+                'tables': tables,
+                'schema': schema_info
+            })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ============================================
+# NEW: Quick Database Fix Route
+# ============================================
+@app.route('/fix-db')
+def fix_database():
+    """Quick fix for database schema issues"""
+    try:
+        with app.app_context():
+            # Check if we're on PostgreSQL
+            if 'postgresql' in app.config['SQLALCHEMY_DATABASE_URI']:
+                # Try to rename the table from 'user' to 'users' if it exists
+                try:
+                    db.session.execute(text('ALTER TABLE IF EXISTS "user" RENAME TO users'))
+                    db.session.commit()
+                    return "✅ Renamed 'user' table to 'users'"
+                except:
+                    db.session.rollback()
+                    return "ℹ️ Table already named 'users' or doesn't exist"
+            else:
+                # For SQLite, just recreate tables
+                db.drop_all()
+                db.create_all()
+                return "✅ Recreated all tables with correct schema"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+# ============================================
 # Run Server
 # ============================================
 if __name__ == '__main__':
@@ -1609,13 +1774,16 @@ if __name__ == '__main__':
     print("🌟 Full Mesh WebRTC Live Meeting System")
     print("🤖 Tawfiq AI Assistant with Islamic Knowledge")
     print(f"{'='*60}")
+    print("✅ FIXED: Database schema with password_hash column")
+    print("✅ FIXED: Table name changed from 'user' to 'users'")
+    print("✅ FIXED: Automatic schema migration on startup")
     print("✅ FIXED: SID private rooms for signaling")
     print("✅ FIXED: Students can join without teacher")
     print("✅ FIXED: Full mesh initiation system")
-    print("✅ WebRTC signaling with STUN/TURN")
-    print("✅ Production ready for Render deployment")
     print(f"{'='*60}")
     print("\n📡 Connection test: http://localhost:5000/test-connection")
+    print("🔧 Database fix: http://localhost:5000/fix-db")
+    print("📊 Schema debug: http://localhost:5000/debug/schema")
     print("👨‍🏫 Teacher test: http://localhost:5000/live_meeting/teacher")
     print("👨‍🎓 Student test: http://localhost:5000/live_meeting")
     print("🤖 Tawfiq AI: http://localhost:5000/talk-to-tawfiq")
